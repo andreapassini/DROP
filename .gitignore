@@ -1,0 +1,14 @@
+# Visual Studio files and folder
+.vs/
+**.sln
+*.sln
+/**.sln
+/*.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+**.csproj
+
+# Binaries
+**/bin/
+bin-int/
