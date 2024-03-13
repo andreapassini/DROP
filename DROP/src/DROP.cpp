@@ -18,9 +18,9 @@
 #define RIGHT_DIRECTION glm::vec3(1.0f, 0.0f, 0.0f)
 #define LEFT_DIRECTION glm::vec3(-1.0f, 0.0f, 0.0f)
             
-//#include <imgui/imgui.h>
-//#include <imgui/imgui_impl_glfw.h>
-//#include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 
 // Function prototypes

@@ -13,9 +13,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}" -- BuildName/x64
 IncludeDir = {}
 IncludeDir["glad"] = "dependencies/glad/include"
 IncludeDir["GLFW"] = "dependencies/GLFW/include"
+IncludeDir["IMGUI"] = "dependencies/IMGUI/include"
 
 include "dependencies/glad"
 include "dependencies/GLFW"
+include "dependencies/IMGUI"
 
 project "DROP"
     location "DROP"
@@ -37,7 +39,8 @@ project "DROP"
         "dependencies/assimp/includes",
 
         "%{IncludeDir.glad}",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.IMGUI}",
     }
 
     libdirs { 
@@ -54,7 +57,7 @@ project "DROP"
         -- "glfw3.lib",
         -- "glfw3_mt.lib",
         -- "opengl32.lib",
-        "Opengl32.lib",
+        -- "Opengl32.lib",
 
         -- ASSIMP
         "assimp-vc143-mt.lib",
@@ -64,6 +67,9 @@ project "DROP"
         "poly2tri.lib",
         "pugixml.lib",
         "zlib.lib",
+
+        -- IMGUI
+        "IMGUI",
 
         "gdi32.lib",
         "user32.lib",
