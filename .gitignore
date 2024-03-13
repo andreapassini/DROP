@@ -12,3 +12,5 @@
 # Binaries
 **/bin/
 bin-int/
+dependencies/assimp/libs/assimp-vc143-mt.lib
+DROP.sln
