@@ -33,6 +33,12 @@ project "DROP"
     }
 
     includedirs{
+        "%{prj.name}/src/utils",
+        "%{prj.name}/src/shaders",
+        "%{prj.name}/src/colliders",
+        "%{prj.name}/src/physicsSimulation",
+        "%{prj.name}/src/scenes",
+
         -- "dependencies/glfw/include",
         "dependencies/glm/include",
         "dependencies/stb_img/include",
