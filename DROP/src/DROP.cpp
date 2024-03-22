@@ -88,6 +88,20 @@ positive Z axis points "outside" the screen
 // we include the library for images loading
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image/stb_image.h>
+#define stringify( name ) #name
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
+#define UP_DIRECTION glm::vec3(0.0f, 1.0f, 0.0f)
+#define DOWN_DIRECTION glm::vec3(0.0f, -1.0f, 0.0f)
+
+#define FORWARD_DIRECTION glm::vec3(0.0f, 0.0f, 1.0f)
+#define BACKWARD_DIRECTION glm::vec3(0.0f, 0.0f, -1.0f)
+
+#define RIGHT_DIRECTION glm::vec3(1.0f, 0.0f, 0.0f)
+#define LEFT_DIRECTION glm::vec3(-1.0f, 0.0f, 0.0f)
 
 // dimensions of application's window
 GLuint screenWidth = 1200, screenHeight = 900;
@@ -117,6 +131,8 @@ void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& s
 
 // load image from disk and create an OpenGL texture
 GLint LoadTexture(const char* path);
+
+void imGuiSetup(GLFWwindow* window);
 
 // we initialize an array of booleans for each keyboard key
 bool keys[1024];
@@ -279,6 +295,7 @@ int main()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ///////////////////////////////////////////////////////////////////
 
+    imGuiSetup(window);
 
     // Projection matrix of the camera: FOV angle, aspect ratio, near and far planes
     glm::mat4 projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 10000.0f);
@@ -296,6 +313,20 @@ int main()
         glfwPollEvents();
         // we apply FPS camera movements
         apply_camera_movements();
+
+        // render your GUI
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("Controls");
+
+        ImGui::Text("DROP");
+        ImGui::NewLine;
+        ImGui::Text("FPS: %d", (int)1/deltaTime);
+        ImGui::NewLine;
+        ImGui::End();
+
 
         /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
         // we set view and projection matrix for the rendering using light as a camera
@@ -374,9 +405,16 @@ int main()
         // we render the scene
         RenderObjects(illumination_shader, planeModel, cubeModel, sphereModel, bunnyModel, RENDER, depthMap);
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         // Swapping back and front buffers
         glfwSwapBuffers(window);
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     // when I exit from the graphics loop, it is because the application is closing
     // we delete the Shader Programs
@@ -416,9 +454,15 @@ void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& s
 
       N.B.) the last defined is the first applied
 
-      We need also the matrix for normals transformation, which is the inverse of the transpose of the 3x3 submatrix (upper left) of the modelview. We do not consider the 4th column because we do not need translations for normals.
+      We need also the matrix for normals transformation, which is the inverse of the transpose of the 3x3 submatrix (upper left) of the modelview. 
+      We do not consider the 4th column because we do not need translations for normals.
       An explanation (where XT means the transpose of X, etc):
-        "Two column vectors X and Y are perpendicular if and only if XT.Y=0. If We're going to transform X by a matrix M, we need to transform Y by some matrix N so that (M.X)T.(N.Y)=0. Using the identity (A.B)T=BT.AT, this becomes (XT.MT).(N.Y)=0 => XT.(MT.N).Y=0. If MT.N is the identity matrix then this reduces to XT.Y=0. And MT.N is the identity matrix if and only if N=(MT)-1, i.e. N is the inverse of the transpose of M.
+        "Two column vectors X and Y are perpendicular if and only if XT.Y=0. 
+        If We're going to transform X by a matrix M, we need to transform Y by some matrix N so that (M.X)T.(N.Y)=0. 
+        Using the identity (A.B)T=BT.AT, this becomes (XT.MT).(N.Y)=0 => XT.(MT.N).Y=0. 
+        If MT.N is the identity matrix then this reduces to XT.Y=0. 
+        And MT.N is the identity matrix if and only if N=(MT)-1, 
+        i.e. N is the inverse of the transpose of M.
     */
     // we reset to identity at each frame
     planeModelMatrix = glm::mat4(1.0f);
@@ -666,4 +710,13 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     // we pass the offset to the Camera class instance in order to update the rendering
     camera.ProcessMouseMovement(xoffset, yoffset);
 
+}
+
+void imGuiSetup(GLFWwindow* window)
+{
+    // ImGui SETUP
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 410");
 }

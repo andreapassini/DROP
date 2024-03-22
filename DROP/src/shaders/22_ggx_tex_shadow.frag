@@ -59,7 +59,8 @@ subroutine uniform shadow_map Shadow_Calculation;
 ////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////
-// it applies a very basic shadow mapping. The final result is heavily aliased (with a lot of "shadow acne"), and the areas outside the light frustum are rendered as in shadow
+// it applies a very basic shadow mapping. The final result is heavily aliased (with a lot of "shadow acne"), 
+and the areas outside the light frustum are rendered as in shadow
 subroutine(shadow_map)
 float Shadow_Acne() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
 {
@@ -106,7 +107,8 @@ float Shadow_Bias() // this name is the one which is detected by the SetupShader
 }
 
 //////////////////////////////////////////
-// it applies Percentage-Closer Filtering to smooth the shadow edged. Moreover, the rendering of the areas behind the far plane of the light frustum is corrected
+// it applies Percentage-Closer Filtering to smooth the shadow edged. 
+Moreover, the rendering of the areas behind the far plane of the light frustum is corrected
 subroutine(shadow_map)
 float Shadow_PCF_Final() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
 {
