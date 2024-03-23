@@ -30,6 +30,7 @@ using namespace std;
 
 // Std. Includes
 #include <vector>
+#include <GLAD/glad.h>
 
 // data structure for vertices
 struct Vertex {

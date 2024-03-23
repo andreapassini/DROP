@@ -427,7 +427,9 @@ int main()
 
 
 //////////////////////////////////////////
-// we render the objects. We pass also the current rendering step, and the depth map generated in the first step, which is used by the shaders of the second step
+// we render the objects. 
+// We pass also the current rendering step, and the depth map generated in the first step, 
+// which is used by the shaders of the second step
 //void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& sphereModel, Model& bunnyModel, GLint render_pass, GLuint depthMap)
 void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& sphereModel, Model& bunnyModel, GLint render_pass, GLuint depthMap)
 {

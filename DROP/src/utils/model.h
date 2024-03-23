@@ -21,6 +21,7 @@ Universita' degli Studi di Milano
 
 
 #pragma once
+#include <iostream>
 using namespace std;
 
 // we use GLM data structures to convert data in the Assimp data structures in a data structures suited for VBO, VAO and EBO buffers
@@ -32,7 +33,7 @@ using namespace std;
 #include <assimp/postprocess.h>
 
 // we include the Mesh class, which manages the "OpenGL side" (= creation and allocation of VBO, VAO, EBO buffers) of the loading of models
-#include "utils/mesh.h"
+#include "../utils/mesh.h"
 
 /////////////////// MODEL class ///////////////////////
 class Model

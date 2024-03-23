@@ -12,8 +12,9 @@ public:
 	Renderer();
 	~Renderer();
 
-	void RenderScene(const std::vector<RenderableObject> &renderableObjects, glm::mat4 view);
+	void RenderScene(const std::vector<RenderableObject> &renderableObjects, glm::mat4 view, int shaderId);
 
 private:
-
+	const GLuint SHADOW_WIDTH;
+	const GLuint SHADOW_HEIGHT;
 };
