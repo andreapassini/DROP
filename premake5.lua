@@ -33,8 +33,6 @@ project "DROP"
     }
 
     includedirs{
-        "%{prj.name}/src/utils",
-
         -- "dependencies/glfw/include",
         "dependencies/glm/include",
         "dependencies/stb_img/include",
@@ -59,7 +57,6 @@ project "DROP"
         -- "glfw3.lib",
         -- "glfw3_mt.lib",
         -- "opengl32.lib",
-        -- "Opengl32.lib",
 
         -- ASSIMP
         "assimp-vc143-mt.lib",

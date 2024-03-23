@@ -428,6 +428,7 @@ int main()
 
 //////////////////////////////////////////
 // we render the objects. We pass also the current rendering step, and the depth map generated in the first step, which is used by the shaders of the second step
+//void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& sphereModel, Model& bunnyModel, GLint render_pass, GLuint depthMap)
 void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& sphereModel, Model& bunnyModel, GLint render_pass, GLuint depthMap)
 {
     // For the second rendering step -> we pass the shadow map to the shaders
@@ -500,8 +501,11 @@ void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& s
     cubeModelMatrix = glm::mat4(1.0f);
     cubeNormalMatrix = glm::mat3(1.0f);
     cubeModelMatrix = glm::translate(cubeModelMatrix, glm::vec3(0.0f, 1.0f, 0.0f));
-    cubeModelMatrix = glm::rotate(cubeModelMatrix, glm::radians(orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
+    cubeModelMatrix = glm::rotate(cubeModelMatrix, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
     cubeModelMatrix = glm::scale(cubeModelMatrix, glm::vec3(0.8f, 0.8f, 0.8f));
+
+    //cubeModelMatrix = sphereModelMatrix * cubeModelMatrix;
+
     cubeNormalMatrix = glm::inverseTranspose(glm::mat3(view * cubeModelMatrix));
     glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(cubeModelMatrix));
     glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(cubeNormalMatrix));
