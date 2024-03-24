@@ -105,15 +105,17 @@ void Renderer::RenderScene(
 
     // we determine the position in the Shader Program of the uniform variables
     GLint lightDirLocation = glGetUniformLocation(illumination_shader->Program, "lightVector");
-    GLint kdLocation = glGetUniformLocation(illumination_shader->Program, "Kd");
-    GLint alphaLocation = glGetUniformLocation(illumination_shader->Program, "alpha");
-    GLint f0Location = glGetUniformLocation(illumination_shader->Program, "F0");
+    // Set this for each rebnderableObject material
+    //GLint kdLocation = glGetUniformLocation(illumination_shader->Program, "Kd");
+    //GLint alphaLocation = glGetUniformLocation(illumination_shader->Program, "alpha");
+    //GLint f0Location = glGetUniformLocation(illumination_shader->Program, "F0");
 
     // we assign the value to the uniform variables
     glUniform3fv(lightDirLocation, 1, glm::value_ptr(lightDir));
-    glUniform1f(kdLocation, Kd);
-    glUniform1f(alphaLocation, alpha);
-    glUniform1f(f0Location, F0);
+    // Set this for each rebnderableObject material
+    //glUniform1f(kdLocation, Kd);  // Moving it to the single drawing calls
+    //glUniform1f(alphaLocation, alpha);
+    //glUniform1f(f0Location, F0);
 
     // we render the scene
     //RenderObjects(illumination_shader, planeModel, cubeModel, 

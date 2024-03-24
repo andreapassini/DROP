@@ -13,6 +13,7 @@
 
 #include "../utils/shader.h"
 
+
 class RenderableObject
 {
 public:
@@ -21,6 +22,7 @@ public:
 	glm::mat4* const modelMatrix;	// in world coordinates
 	// Mesh
 	Model* model;
+	Material* material;
 	// Material
 	TextureParameter textureParameter;
 	
@@ -29,10 +31,12 @@ public:
 	RenderableObject(
 		glm::mat4* const modelMatrix_val = nullptr,
 		Model* model_val = nullptr,
+		Material* material_val = nullptr,
 		TextureParameter textureParameter_val = TextureParameter()
 	) :
 		modelMatrix(modelMatrix_val),
 		model(model_val),
+		material(material_val),
 		textureParameter(textureParameter_val)
 	{};
 

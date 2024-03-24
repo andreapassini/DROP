@@ -13,14 +13,32 @@ void RenderableObject::Draw(
     const GLint render_pass, 
     const GLuint depthMap)
 {
-    // For the second rendering step -> we pass the shadow map to the shaders
-    if (render_pass == RENDER)
+    switch (render_pass)
     {
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
-        glUniform1i(shadowLocation, 2);
+    default:
+    case render_passes::RENDER:
+        {   // without this scope there is an error for the variable "**location" not used
+            GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+            GLint alphaLocation = glGetUniformLocation(shader.Program, "alpha");
+            GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+
+            glUniform1f(kdLocation, (*this).material->Kd);
+            glUniform1f(alphaLocation, (*this).material->alpha);
+            glUniform1f(f0Location, (*this).material->F0);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, depthMap);
+            GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
+            glUniform1i(shadowLocation, 2);
+        }
+        break;
+    case render_passes::SHADOWMAP:
+        if (this->material->castShadow == false)
+            return;
+
+        break;
     }
+
     // we pass the needed uniforms
     GLint textureLocation = glGetUniformLocation(shader.Program, "tex");
     GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");

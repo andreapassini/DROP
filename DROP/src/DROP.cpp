@@ -312,9 +312,16 @@ int main()
         1,
         &textureID,
         80.0);
+    Material planeMaterial(
+        3.0f,
+        0.2f,
+        0.9f,
+        false
+    );
     RenderableObject plane(
         &planeTransform,
         &planeModel,
+        &planeMaterial,
         planeTextureParameter);
 
     rendereableObjects.push_back(plane);
@@ -325,9 +332,16 @@ int main()
         true,
         0,
         &textureID );
+    Material sphereMaterial(
+        3.0f,
+        0.2f,
+        0.9f,
+        true
+    );
     RenderableObject sphere(
         &sphereTransform,
         &sphereModel,
+        &sphereMaterial,
         sphereTextureParameter );
 
     rendereableObjects.push_back(sphere);
@@ -338,9 +352,16 @@ int main()
         true,
         0,
         &textureID);
+    Material cubeMaterial(
+        3.0f,
+        0.2f,
+        0.9f,
+        false
+    );
     RenderableObject cube(
         &cubeTransform,
         &cubeModel,
+        &cubeMaterial,
         cubeTextureParameter);
 
     rendereableObjects.push_back(cube);
@@ -351,9 +372,16 @@ int main()
         true,
         0,
         &textureID);
+    Material bunnyMaterial(
+        3.0f,
+        0.2f,
+        0.9f,
+        true
+    );
     RenderableObject bunny(
         &bunnyTransform,
         &bunnyModel,
+        &bunnyMaterial,
         bunnyTextureParameter);
 
     rendereableObjects.push_back(bunny);
