@@ -9,20 +9,20 @@ private:
 public:
     bool useTexture;
     GLuint textureId;
-    std::vector<GLuint>* textures;
+    std::vector<int>* textures;
     // UV repetitions
     GLfloat repeat;
 
     TextureParameter(
         bool use_texture_val = false,
         GLuint textId_val = 0,
-        std::vector<GLuint>* textures_val = nullptr,
+        std::vector<int>* textures_val = nullptr,
         GLfloat repeatParameter_val = 1.0f)
         :
         useTexture(use_texture_val),
         textureId(textId_val),
         textures(textures_val),
-        repeat(repeatParameter_val)
-    {};
-    ~TextureParameter();
+        repeat(repeatParameter_val) {};
+
+    ~TextureParameter() {};
 };

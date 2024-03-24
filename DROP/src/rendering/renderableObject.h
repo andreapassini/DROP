@@ -18,7 +18,7 @@ class RenderableObject
 public:
 
 	// ModelMatrix
-	glm::mat4 modelMatrix;	// in world coordinates
+	glm::mat4* const modelMatrix;	// in world coordinates
 	// Mesh
 	Model* model;
 	// Material
@@ -27,9 +27,10 @@ public:
 	enum render_passes { SHADOWMAP, RENDER };
 
 	RenderableObject(
-		glm::mat4 modelMatrix_val = glm::mat4(1.0f),
+		glm::mat4* const modelMatrix_val = nullptr,
 		Model* model_val = nullptr,
-		TextureParameter textureParameter_val = TextureParameter()) :
+		TextureParameter textureParameter_val = TextureParameter()
+	) :
 		modelMatrix(modelMatrix_val),
 		model(model_val),
 		textureParameter(textureParameter_val)

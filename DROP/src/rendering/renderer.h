@@ -15,7 +15,7 @@ class Renderer
 {
 public:
 	Renderer();
-	~Renderer();
+    ~Renderer() {};
 
 	void RenderScene(
         std::vector<RenderableObject>* const renderableObjects,
@@ -36,12 +36,7 @@ public:
         // a vector for all the shader subroutines names used and swapped in the application
         std::vector<std::string>* const shaders,
         const int width,
-        const int height,
-        const GLboolean spinning,
-        GLfloat* orientationY,
-        const GLfloat spin_speed,
-        const GLfloat deltaTime
-
+        const int height
     );
 
 private:

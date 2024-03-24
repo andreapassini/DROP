@@ -7,8 +7,11 @@
 
 #include "../utils/shader.h"
 
-void RenderableObject::Draw(const Shader& shader, const glm::mat4& view,
-    const GLint render_pass, const GLuint depthMap)
+void RenderableObject::Draw(
+    const Shader& shader, 
+    const glm::mat4& view,
+    const GLint render_pass, 
+    const GLuint depthMap)
 {
     // For the second rendering step -> we pass the shadow map to the shaders
     if (render_pass == RENDER)
@@ -23,18 +26,18 @@ void RenderableObject::Draw(const Shader& shader, const glm::mat4& view,
     GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
 
 
-	if (textureParameter.useTexture) {
+	if (this->textureParameter.useTexture) {
         // we activate the texture of the plane
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, (textureParameter.textures)->at(textureParameter.textureId));
+        glBindTexture(GL_TEXTURE_2D, (this->textureParameter.textures)->at(this->textureParameter.textureId));
         glUniform1i(textureLocation, 0);
-        glUniform1f(repeatLocation, textureParameter.repeat);
+        glUniform1f(repeatLocation, this->textureParameter.repeat);
     }
 
-    glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(view * modelMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(view * *this->modelMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(*this->modelMatrix));
     glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
     // we render the plane
-    model->Draw();
+    this->model->Draw();
 
 }

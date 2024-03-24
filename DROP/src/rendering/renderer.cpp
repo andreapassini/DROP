@@ -34,11 +34,7 @@ void Renderer::RenderScene(
     // a vector for all the shader subroutines names used and swapped in the application
     std::vector<std::string>* const shaders,
     const int width,
-    const int height,
-    const GLboolean spinning,
-    GLfloat* orientationY,
-    const GLfloat spin_speed,
-    const GLfloat deltaTime
+    const int height
 ) {
     /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
     // we set view and projection matrix for the rendering using light as a camera
@@ -91,10 +87,6 @@ void Renderer::RenderScene(
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    // if animated rotation is activated, than we increment the rotation angle using delta time and the rotation speed parameter
-    if (spinning)
-        (*orientationY) += (deltaTime * spin_speed);
 
     // we set the viewport for the final rendering step
     glViewport(0, 0, width, height);
