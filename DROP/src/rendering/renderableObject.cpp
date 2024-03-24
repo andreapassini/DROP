@@ -7,8 +7,6 @@
 
 #include "../utils/shader.h"
 
-enum render_passes { SHADOWMAP, RENDER };
-
 void RenderableObject::Draw(const Shader& shader, const glm::mat4& view,
     const GLint render_pass, const GLuint depthMap)
 {
