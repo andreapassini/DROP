@@ -1,8 +1,8 @@
 #include "sceneGraph.h"
 
-SceneGraph::SceneGraph(uint32_t )
+SceneGraph::SceneGraph(uint32_t sizeEstimation)
 {
-	nodes.reserve(250);
+	nodes.reserve(sizeEstimation);
 }
 
 uint32_t SceneGraph::AddNode()

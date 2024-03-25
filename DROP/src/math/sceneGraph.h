@@ -20,8 +20,8 @@ class SceneGraph
 	std::unordered_map<uint32_t, Node> nodes;
 
 public:
-	SceneGraph();
-	SceneGraph();
+	SceneGraph(uint32_t sizeEstimation);
+	~SceneGraph();
 	uint32_t AddNode();
 };
 
