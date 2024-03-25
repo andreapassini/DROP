@@ -28,9 +28,6 @@
 #include "../utils/shader.h"
 #include "../utils/camera.h"
 
-//#define UNLOCK_FRAMERTE
-//#define VISIBLE_MOUSE
-
 Renderer::Renderer(
     GLuint screenWidth_val,
     GLuint screenHeight_val,

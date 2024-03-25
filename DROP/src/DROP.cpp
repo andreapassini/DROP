@@ -165,16 +165,6 @@ GLboolean wireframe = GL_FALSE;
 // View matrix: the camera moves, so we just set to indentity now
 glm::mat4 view = glm::mat4(1.0f);
 
-// Model and Normal transformation matrices for the objects in the scene: we set to identity
-glm::mat4 sphereModelMatrix = glm::mat4(1.0f);
-glm::mat3 sphereNormalMatrix = glm::mat3(1.0f);
-glm::mat4 cubeModelMatrix = glm::mat4(1.0f);
-glm::mat3 cubeNormalMatrix = glm::mat3(1.0f);
-glm::mat4 bunnyModelMatrix = glm::mat4(1.0f);
-glm::mat3 bunnyNormalMatrix = glm::mat3(1.0f);
-glm::mat4 planeModelMatrix = glm::mat4(1.0f);
-glm::mat3 planeNormalMatrix = glm::mat3(1.0f);
-
 // we create a camera. We pass the initial position as a parameter to the constructor. 
 // The last boolean tells if we want a camera "anchored" to the ground
 Camera camera(glm::vec3(0.0f, 0.0f, 7.0f), GL_FALSE,
@@ -183,18 +173,11 @@ Camera camera(glm::vec3(0.0f, 0.0f, 7.0f), GL_FALSE,
 // in this example, we consider a directional light. We pass the direction of incoming light as an uniform to the shaders
 glm::vec3 lightDir0 = glm::vec3(1.0f, 1.0f, 1.0f);
 
-// weight for the diffusive component
-GLfloat Kd = 3.0f;
-// roughness index for GGX shader
-GLfloat alpha = 0.2f;
-// Fresnel reflectance at 0 degree (Schlik's approximation)
-GLfloat F0 = 0.9f;
-
 // vector for the textures IDs
 std::vector<GLint> textureID;
 
-// UV repetitions
-GLfloat repeat = 1.0;
+//#define UNLOCK_FRAMERTE
+//#define VISIBLE_MOUSE
 
 /////////////////// MAIN function ///////////////////////
 int main()
