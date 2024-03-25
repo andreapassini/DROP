@@ -23,7 +23,9 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 // Default camera settings
@@ -32,7 +34,8 @@ const GLfloat YAW        = -90.0f; //Y
 const GLfloat PITCH      =  0.0f; //X
 
 // speed of camera movement
-const GLfloat SPEED      =  3.0f;
+const GLfloat SPEED      =  10.0f;
+const GLfloat UP_DOWN_MULTIPLIER      =  0.5f;
 // speed compensation in case of diagonal camera movement (= 1/sqrt(2))
 const GLfloat DIAGONAL_COMPENSATION = 0.70710678f;
 // parameter to weight mouse movement
@@ -105,7 +108,11 @@ public:
             this->Position -= this->Right * velocity;
         if (direction == RIGHT)
             this->Position += this->Right * velocity;
-        
+        if (direction == UP)
+            this->Position += this->Up * (velocity * UP_DOWN_MULTIPLIER);
+        if (direction == DOWN)
+            this->Position -= this->Up * (velocity * UP_DOWN_MULTIPLIER);
+
     }
 
     //////////////////////////////////////////

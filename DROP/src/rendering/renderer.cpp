@@ -67,12 +67,16 @@ Renderer::Renderer(
     }
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(0); // Unlock framerate
+
+
     // we put in relation the window and the callbacks
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
 
     // we disable the mouse cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     // GLAD tries to load the context set by GLFW
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

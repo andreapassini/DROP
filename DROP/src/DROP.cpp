@@ -93,6 +93,7 @@ positive Z axis points "outside" the screen
 #include "utils/shader.h"
 #include "utils/model.h"
 #include "utils/camera.h"
+#include "utils/performanceCalculator.h"
 #include "rendering/renderer.h"
 #include "rendering/renderableObject.h"
 
@@ -147,6 +148,9 @@ bool firstMouse = true;
 // parameters for time calculation (for animations)
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+GLfloat lastFramerateUpdate = 0.0f;
+const GLfloat framerateUpdateTime = 0.5f;
+uint32_t framerate;
 
 // rotation angle on Y axis
 GLfloat orientationY = 0.0f;
@@ -311,15 +315,21 @@ int main()
 
     rendereableObjects.push_back(bunny);
 
+    PerformanceCalculator framerateCalculator(100, 25);
 
     // Rendering loop: this code is executed at each frame
     while (!glfwWindowShouldClose(renderer.window))
     {
         // we determine the time passed from the beginning
         // and we calculate time difference between current frame rendering and the previous one
-        GLfloat currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        GLfloat currentTime = glfwGetTime();
+        deltaTime = currentTime - lastFrame;
+        lastFrame = currentTime;
+        framerateCalculator.Step(deltaTime);
+        if (currentTime - lastFramerateUpdate >= framerateUpdateTime) {
+            framerate = (uint32_t)framerateCalculator.framerate;
+            lastFramerateUpdate = currentTime;
+        }
 
         // Check is an I/O event is happening
         glfwPollEvents();
@@ -335,7 +345,7 @@ int main()
 
         ImGui::Text("DROP");
         ImGui::NewLine;
-        ImGui::Text("FPS: %d", (int)1/deltaTime);
+        ImGui::Text("FPS: %d", framerate);
         ImGui::NewLine;
         ImGui::End();
 
@@ -509,6 +519,10 @@ void apply_camera_movements()
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (keys[GLFW_KEY_D])
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (keys[GLFW_KEY_LEFT_CONTROL])
+        camera.ProcessKeyboard(DOWN, deltaTime);
+    if (keys[GLFW_KEY_SPACE])
+        camera.ProcessKeyboard(UP, deltaTime);
 }
 
 //////////////////////////////////////////

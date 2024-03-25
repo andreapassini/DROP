@@ -8,7 +8,8 @@ private:
     unsigned int overlap;
     unsigned int iter;
     std::deque<double> measurements; 
-    static double CalculateMeanMeasurements(std::deque<double> queue){
+
+    double CalculateMeanMeasurements(std::deque<double> queue) const {
         double mean = 0.0f;
         for(size_t i = 0; i < queue.size(); i++){
             mean += queue[i];
@@ -16,18 +17,18 @@ private:
         mean /= queue.size();
         return mean;
     };
+
 public:
     double framerate;
-    PerformanceCalculator(unsigned int windowDim, unsigned int printAfterNSteps){
-        this->windowSize = windowDim;
-        this->overlap = printAfterNSteps;
-        this->iter = 0;
-    };
+
+    PerformanceCalculator(const uint32_t windowSize_val, const uint32_t overlap_val):
+        windowSize(windowSize_val), overlap(overlap_val), iter(0), framerate(0) {};
+
     ~PerformanceCalculator(){
-        delete &this->measurements;
+        // delete &this->measurements;
     };
 
-    void Step(double deltaTime){
+    void Step(const double deltaTime){
         this->measurements.push_back(deltaTime);
 
         unsigned int vectorDim = this->measurements.size();
@@ -43,7 +44,7 @@ public:
         }
     }
 
-    void LogStatus(){
+    void LogStatus() const {
         std::cout << "Log of the Performance Calculator" << std::endl;
         std::cout << "Size: " << this->measurements.size() << std::endl;
         std::cout << "Framerate: " << this->framerate << std::endl;
