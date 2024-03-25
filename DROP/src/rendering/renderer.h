@@ -40,7 +40,7 @@ public:
         void (*key_callback)(GLFWwindow*, int, int, int, int),
         void (*mouse_callback)(GLFWwindow*, double, double)
     );
-    ~Renderer() {};
+    ~Renderer();
 
     GLFWwindow* window;
     GLuint depthMapFBO;

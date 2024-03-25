@@ -63,6 +63,7 @@ Renderer::Renderer(
         glfwTerminate();
         assert(false);
         //return -1;
+        return;
     }
     glfwMakeContextCurrent(window);
 
@@ -79,6 +80,7 @@ Renderer::Renderer(
         std::cout << "Failed to initialize OpenGL context" << std::endl;
         assert(false);
         //return -1;
+        return;
     }
 
     // we define the viewport dimensions
@@ -238,3 +240,7 @@ void Renderer::RenderScene(
     }
 
 }
+
+
+Renderer::~Renderer() {
+};
