@@ -1,5 +1,25 @@
 #include "renderer.h"
 
+// Loader for OpenGL extensions
+// http://glad.dav1d.de/
+// THIS IS OPTIONAL AND NOT REQUIRED, ONLY USE THIS IF YOU DON'T WANT GLAD TO INCLUDE windows.h
+// GLAD will include windows.h for APIENTRY if it was not previously defined.
+// Make sure you have the correct definition for APIENTRY for platforms which define _WIN32 but don't use __stdcall
+#ifdef _WIN32
+#define APIENTRY __stdcall
+#endif
+
+#include <glad/glad.h>
+
+// GLFW library to create window and to manage I/O
+#include <glfw/glfw3.h>
+
+// another check related to OpenGL loader
+// confirm that GLAD didn't include windows.h
+#ifdef _WINDOWS_
+#error windows.h was included!
+#endif
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -8,11 +28,101 @@
 #include "../utils/shader.h"
 #include "../utils/camera.h"
 
-Renderer::Renderer():
+Renderer::Renderer(
+    GLuint screenWidth_val,
+    GLuint screenHeight_val,
+    void (*key_callback)(GLFWwindow*, int, int, int, int),
+    void (*mouse_callback)(GLFWwindow*, double, double)
+):
+    width(screenWidth_val),
+    height(screenHeight_val),
     SHADOW_WIDTH(1024),
     SHADOW_HEIGHT(1024)
 {
+    // We are in DROP/DROP!!!
 
+    // Initialization of OpenGL context using GLFW
+    glfwInit();
+    // We set OpenGL specifications required for this application
+    // In this case: 4.1 Core
+    // If not supported by your graphics HW, the context will not be created and the application will close
+    // N.B.) creating GLAD code to load extensions, try to take into account the specifications and any extensions you want to use,
+    // in relation also to the values indicated in these GLFW commands
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // we set if the window is resizable
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+    // we create the application's window
+    window = glfwCreateWindow(width, height, "DROP", nullptr, nullptr);
+    if (!window)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        assert(false);
+        //return -1;
+    }
+    glfwMakeContextCurrent(window);
+
+    // we put in relation the window and the callbacks
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+
+    // we disable the mouse cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // GLAD tries to load the context set by GLFW
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize OpenGL context" << std::endl;
+        assert(false);
+        //return -1;
+    }
+
+    // we define the viewport dimensions
+    //int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    // we enable Z test
+    glEnable(GL_DEPTH_TEST);
+
+    //the "clear" color for the frame buffer
+    glClearColor(0.26f, 0.46f, 0.98f, 1.0f);
+
+    /////////////////// CREATION OF BUFFER FOR THE  DEPTH MAP /////////////////////////////////////////
+    // buffer dimension: too large -> performance may slow down if we have many lights; too small -> strong aliasing
+    const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    //GLuint depthMapFBO;
+    // we create a Frame Buffer Object: the first rendering step will render to this buffer, and not to the real frame buffer
+    glGenFramebuffers(1, &depthMapFBO);
+    // we create a texture for the depth map
+    //GLuint depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    // in the texture, we will save only the depth data of the fragments. Thus, we specify that we need to render only depth in the first rendering step
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // we set to clamp the uv coordinates outside [0,1] to the color of the border
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    // outside the area covered by the light frustum, everything is rendered in shadow (because we set GL_CLAMP_TO_BORDER)
+    // thus, we set the texture border to white, so to render correctly everything not involved by the shadow map
+    //*************
+    GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    // we bind the depth map FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    // we set that we are not calculating nor saving color data
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    ///////////////////////////////////////////////////////////////////
 }
 
 void Renderer::RenderScene(

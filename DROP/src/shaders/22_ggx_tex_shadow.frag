@@ -64,7 +64,9 @@ subroutine uniform shadow_map Shadow_Calculation;
 subroutine(shadow_map)
 float Shadow_Acne() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
 {
-    // given the fragment position in light coordinates, we apply the perspective divide. Usually, perspective divide is applied in an automatic way to the coordinates saved in the gl_Position variable. In this case, the vertex position in light coordinates has been saved in a separate variable, so we need to do it manually
+    // given the fragment position in light coordinates, we apply the perspective divide. 
+    // Usually, perspective divide is applied in an automatic way to the coordinates saved in the gl_Position variable. 
+    // In this case, the vertex position in light coordinates has been saved in a separate variable, so we need to do it manually
     vec3 projCoords = posLightSpace.xyz / posLightSpace.w;
     // after the perspective divide the values are in the range [-1,1]: we must convert them in [0,1]
     projCoords = projCoords * 0.5 + 0.5;
@@ -112,7 +114,9 @@ float Shadow_Bias() // this name is the one which is detected by the SetupShader
 subroutine(shadow_map)
 float Shadow_PCF_Final() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
 {
-    // given the fragment position in light coordinates, we apply the perspective divide. Usually, perspective divide is applied in an automatic way to the coordinates saved in the gl_Position variable. In this case, the vertex position in light coordinates has been saved in a separate variable, so we need to do it manually
+    // given the fragment position in light coordinates, we apply the perspective divide. 
+    // Usually, perspective divide is applied in an automatic way to the coordinates saved in the gl_Position variable. 
+    // In this case, the vertex position in light coordinates has been saved in a separate variable, so we need to do it manually
     vec3 projCoords = posLightSpace.xyz / posLightSpace.w;
     // after the perspective divide the values are in the range [-1,1]: we must convert them in [0,1]
     projCoords = projCoords * 0.5 + 0.5;
@@ -136,7 +140,8 @@ float Shadow_PCF_Final() // this name is the one which is detected by the SetupS
         {
             // we sample the depth map
             float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            // if the depth (with bias) of the current fragment is greater than the depth in the shadow map, then the fragment is in shadow. We add the result to the shadow variable
+            // if the depth (with bias) of the current fragment is greater than the depth in the shadow map, then the fragment is in shadow. 
+            // We add the result to the shadow variable
             shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;
         }
     }
@@ -230,7 +235,8 @@ void main()
     // the rendering equation is:
     //integral of: BRDF * Li * (cosine angle between N and L)
     // BRDF in our case is: the sum of Lambert and GGX
-    // Li is considered as equal to 1: light is white, and we have not applied attenuation. With colored lights, and with attenuation, the code must be modified and the Li factor must be multiplied to finalColor
+    // Li is considered as equal to 1: light is white, and we have not applied attenuation. 
+    // With colored lights, and with attenuation, the code must be modified and the Li factor must be multiplied to finalColor
     //We weight using the shadow value
     // N.B. ) shadow value = 1 -> fragment is in shadow
     //        shadow value = 0 -> fragment is in light
