@@ -129,9 +129,6 @@ void SetupShader(int shader_program);
 // print on console the name of current shader subroutine
 void PrintCurrentShader(int subroutine);
 
-// in this application, we have isolated the models rendering using a function, which will be called in each rendering step
-void RenderObjects(Shader& shader, Model& planeModel, Model& cubeModel, Model& sphereModel, Model& bunnyModel, GLint render_pass, GLuint depthMap);
-
 // load image from disk and create an OpenGL texture
 GLint LoadTexture(const char* path);
 
