@@ -28,6 +28,9 @@
 #include "../utils/shader.h"
 #include "../utils/camera.h"
 
+//#define UNLOCK_FRAMERTE
+//#define VISIBLE_MOUSE
+
 Renderer::Renderer(
     GLuint screenWidth_val,
     GLuint screenHeight_val,
@@ -67,7 +70,10 @@ Renderer::Renderer(
     }
     glfwMakeContextCurrent(window);
 
+#ifdef UNLOCK_FRAMERTE
     glfwSwapInterval(0); // Unlock framerate
+#endif // UNLOCK_FRAMERTE
+
 
 
     // we put in relation the window and the callbacks
@@ -75,8 +81,12 @@ Renderer::Renderer(
     glfwSetCursorPosCallback(window, mouse_callback);
 
     // we disable the mouse cursor
+#ifdef VISIBLE_MOUSE
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+#else
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+#endif // VISIBLE_MOUSE
+
 
     // GLAD tries to load the context set by GLFW
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

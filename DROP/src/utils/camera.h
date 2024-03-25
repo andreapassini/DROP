@@ -34,12 +34,12 @@ const GLfloat YAW        = -90.0f; //Y
 const GLfloat PITCH      =  0.0f; //X
 
 // speed of camera movement
-const GLfloat SPEED      =  10.0f;
-const GLfloat UP_DOWN_MULTIPLIER      =  0.5f;
+//const GLfloat SPEED      =  10.0f;
+//const GLfloat UP_DOWN_MULTIPLIER      =  0.5f;
 // speed compensation in case of diagonal camera movement (= 1/sqrt(2))
 const GLfloat DIAGONAL_COMPENSATION = 0.70710678f;
 // parameter to weight mouse movement
-const GLfloat SENSITIVITY =  0.25f;
+//const GLfloat SENSITIVITY =  0.25f;
 
 ///////////////////  CAMERA class ///////////////////////
 class Camera
@@ -59,6 +59,7 @@ public:
     GLfloat Pitch;
     // Camera speed parameters
     GLfloat MovementSpeed;
+    GLfloat MovementSpeedVerticalMultiplier;
     GLfloat MovementCompensation = 1.0f;
     // Camera rotation parameter
     GLfloat MouseSensitivity;
@@ -66,8 +67,14 @@ public:
     //////////////////////////////////////////
     // simplified constructor
     // it can be extended passing different values of speed and mouse sensitivity, etc...
-    Camera(glm::vec3 position, GLboolean onGround)
-        :Position(position),onGround(onGround),Yaw(YAW),Pitch(PITCH),MovementSpeed(SPEED),MouseSensitivity(SENSITIVITY)
+    Camera(glm::vec3 position, GLboolean onGround, 
+        GLfloat MovementSpeed_val, 
+        GLfloat MovementSpeedVerticalMultiplier_val,
+        GLfloat MouseSensitivity_val)
+        :Position(position),onGround(onGround),Yaw(YAW),Pitch(PITCH),
+        MovementSpeed(MovementSpeed_val),
+        MovementSpeedVerticalMultiplier(MovementSpeedVerticalMultiplier_val),
+        MouseSensitivity(MouseSensitivity_val)
     {
         this->WorldUp = glm::vec3(0.0f,1.0f,0.0f);
         // initialization of the camera reference system
@@ -109,9 +116,9 @@ public:
         if (direction == RIGHT)
             this->Position += this->Right * velocity;
         if (direction == UP)
-            this->Position += this->Up * (velocity * UP_DOWN_MULTIPLIER);
+            this->Position += this->Up * (velocity * MovementSpeedVerticalMultiplier);
         if (direction == DOWN)
-            this->Position -= this->Up * (velocity * UP_DOWN_MULTIPLIER);
+            this->Position -= this->Up * (velocity * MovementSpeedVerticalMultiplier);
 
     }
 

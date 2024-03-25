@@ -177,7 +177,8 @@ glm::mat3 planeNormalMatrix = glm::mat3(1.0f);
 
 // we create a camera. We pass the initial position as a parameter to the constructor. 
 // The last boolean tells if we want a camera "anchored" to the ground
-Camera camera(glm::vec3(0.0f, 0.0f, 7.0f), GL_FALSE);
+Camera camera(glm::vec3(0.0f, 0.0f, 7.0f), GL_FALSE,
+    10.0f, 0.5f, 0.25f);
 
 // in this example, we consider a directional light. We pass the direction of incoming light as an uniform to the shaders
 glm::vec3 lightDir0 = glm::vec3(1.0f, 1.0f, 1.0f);
