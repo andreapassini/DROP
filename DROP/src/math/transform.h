@@ -59,7 +59,7 @@ public:
 
 
 
-// the result is the transfomration that does b first, then me (this)
+// the result is the transformation that does b first, then me (this)
 inline Transform Transform::operator * (const Transform & b) const {
     Transform c;
     c.scale = scale * b.scale;

@@ -90,6 +90,19 @@ public:
         );
     }
 
+    Scalar getAngleDegree() {
+        return rad2deg(2 * acos(re));
+    }
+
+    Scalar getAngleRadians() {
+        return 2 * acos(re);
+    }
+
+    Vector3 getAxis() {
+        Scalar angle = getAngleRadians();
+        im / angle;
+        return im;
+    }
 };
 
 
