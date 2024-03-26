@@ -19,7 +19,7 @@ public:
     Quaternion(Scalar a, Scalar b, Scalar c, Scalar d):im(a,b,c),re(d) {}
 
     // empty construction: returns quaternion 1 + 0 * i
-    Quaternion():Quaternion(0,0,0,1){}
+    Quaternion():Quaternion(0,1,0,1){}
 
     Quaternion(Vector3 iii, Scalar rrr):im(iii),re(rrr){}
 

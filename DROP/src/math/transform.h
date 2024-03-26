@@ -1,4 +1,5 @@
 #pragma once
+
 #include <assert.h>
 #include "mat3.h"
 #include "quaternion.h"

@@ -3,7 +3,7 @@
 #include "transform.h"
 
 #include <vector>
-#include <collection.h>
+#include <unordered_map>
 
 #include "glm/glm.hpp"
 
@@ -12,6 +12,13 @@ public:
 	const uint32_t id;
 	VgMath::Transform localTransform;
 	Node* parent;
+
+	VgMath::Transform cumulativeTransform;
+	glm::mat4 modelMatrix;
+
+	Node() : id(), parent(nullptr), modelMatrix(glm::mat4(1.0f)) {
+
+	}
 
 	Node(const uint32_t id_val) :
 		id(id_val), parent(nullptr), 
@@ -36,7 +43,7 @@ public:
 
 	void CalculateCumulativeTransform() {
 		if (this->parent != nullptr) {
-			cumulativeTransform = cumulativeTransform * this->parent->GetTransformWorldCoordinates();
+			cumulativeTransform = localTransform * this->parent->GetTransformWorldCoordinates();
 		}
 	}
 
@@ -44,9 +51,6 @@ public:
 		CalculateCumulativeTransform();
 		return cumulativeTransform;
 	};
-
-	VgMath::Transform cumulativeTransform;
-	glm::mat4 modelMatrix;
 
 private:
 
@@ -57,18 +61,20 @@ private:
 	Node* world;
 	uint32_t index;
 
+public:
 	// Wanna keep this so i can easily find the one i need and loop on through every node
 	std::unordered_map<uint32_t, Node> nodes;
 
-public:
 	SceneGraph(const uint32_t sizeEstimation);
 	~SceneGraph() {};
 
-	uint32_t AddNode(const uint32_t parentId);
-	uint32_t AddNode(const uint32_t parentId, const VgMath::Transform& transform);
+	uint32_t AddObject(const uint32_t parentId);
+	uint32_t AddObject(const uint32_t parentId, const VgMath::Transform& transform);
 
 	void DeleteNode(const uint32_t id_val);
 
 	void CalculateWorldTransforms();
+
+	static constexpr uint32_t ROOT_ID = 0;
 };
 
