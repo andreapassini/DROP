@@ -23,8 +23,13 @@ uint32_t SceneGraph::AddObject(const uint32_t parentId_val, const VgMath::Transf
 {
 	index++;
 
-	Node node(index, transform_val, &nodes[parentId_val]);
+	Node* n = &nodes[parentId_val];
+
+	Node node(index, transform_val, n);
 	nodes[index] = node;
+
+	// To be removed
+	Node nodeRef = nodes[index];
 
 	return index;
 }
@@ -67,17 +72,17 @@ void SceneGraph::CalculateWorldTransforms()
 			)
 		);
 
-		//// To be removed
-		//glm::vec3 t(
-		//	nodes[i].cumulativeTransform.translate.x,
-		//	nodes[i].cumulativeTransform.translate.y,
-		//	nodes[i].cumulativeTransform.translate.z
-		//);
-		//std::cout << "t: " << t.x << ", " << t.y << ", " << t.z << std::endl;
-		//std::cout << "M: " << "\n"
-		//	<< nodes[i].modelMatrix[0].x << ", " << nodes[i].modelMatrix[0].y << ", " << nodes[i].modelMatrix[0].z << "\n"
-		//	<< nodes[i].modelMatrix[1].x << ", " << nodes[i].modelMatrix[1].y << ", " << nodes[i].modelMatrix[1].z << "\n"
-		//	<< nodes[i].modelMatrix[2].x << ", " << nodes[i].modelMatrix[2].y << ", " << nodes[i].modelMatrix[2].z << std::endl;
+		// To be removed
+		glm::vec3 t(
+			nodes[i].cumulativeTransform.translate.x,
+			nodes[i].cumulativeTransform.translate.y,
+			nodes[i].cumulativeTransform.translate.z
+		);
+		std::cout << "t: " << t.x << ", " << t.y << ", " << t.z << std::endl;
+		std::cout << "M: " << "\n"
+			<< nodes[i].modelMatrix[0].x << ", " << nodes[i].modelMatrix[0].y << ", " << nodes[i].modelMatrix[0].z << "\n"
+			<< nodes[i].modelMatrix[1].x << ", " << nodes[i].modelMatrix[1].y << ", " << nodes[i].modelMatrix[1].z << "\n"
+			<< nodes[i].modelMatrix[2].x << ", " << nodes[i].modelMatrix[2].y << ", " << nodes[i].modelMatrix[2].z << std::endl;
 
 		nodes[i].modelMatrix = glm::rotate(
 			nodes[i].modelMatrix,
@@ -89,17 +94,17 @@ void SceneGraph::CalculateWorldTransforms()
 			)
 		);
 
-		//// To be removed
-		//glm::vec3 r(
-		//	(float)nodes[i].cumulativeTransform.rotate.getAxis().x,
-		//	(float)nodes[i].cumulativeTransform.rotate.getAxis().y,
-		//	(float)nodes[i].cumulativeTransform.rotate.getAxis().z
-		//);
-		//std::cout << "r: " << r.x << ", " << r.y << ", " << r.z << "angle: " << (float)nodes[i].cumulativeTransform.rotate.getAngleRadians() << std::endl;
-		//std::cout << "M: " << "\n"
-		//	<< nodes[i].modelMatrix[0].x << ", " << nodes[i].modelMatrix[0].y << ", " << nodes[i].modelMatrix[0].z << "\n"
-		//	<< nodes[i].modelMatrix[1].x << ", " << nodes[i].modelMatrix[1].y << ", " << nodes[i].modelMatrix[1].z << "\n"
-		//	<< nodes[i].modelMatrix[2].x << ", " << nodes[i].modelMatrix[2].y << ", " << nodes[i].modelMatrix[2].z << std::endl;
+		// To be removed
+		glm::vec3 r(
+			(float)nodes[i].cumulativeTransform.rotate.getAxis().x,
+			(float)nodes[i].cumulativeTransform.rotate.getAxis().y,
+			(float)nodes[i].cumulativeTransform.rotate.getAxis().z
+		);
+		std::cout << "r: " << r.x << ", " << r.y << ", " << r.z << " angle: " << (float)nodes[i].cumulativeTransform.rotate.getAngleRadians() << std::endl;
+		std::cout << "M: " << "\n"
+			<< nodes[i].modelMatrix[0].x << ", " << nodes[i].modelMatrix[0].y << ", " << nodes[i].modelMatrix[0].z << "\n"
+			<< nodes[i].modelMatrix[1].x << ", " << nodes[i].modelMatrix[1].y << ", " << nodes[i].modelMatrix[1].z << "\n"
+			<< nodes[i].modelMatrix[2].x << ", " << nodes[i].modelMatrix[2].y << ", " << nodes[i].modelMatrix[2].z << std::endl;
 
 		nodes[i].modelMatrix = glm::scale(
 			nodes[i].modelMatrix,
@@ -118,11 +123,13 @@ void SceneGraph::CalculateWorldTransforms()
 
 		//// To be removed
 		//std::cout << "s: " << (float)nodes[i].cumulativeTransform.scale << std::endl;
-		//std::cout << "M: " << "\n"
-		//	<< nodes[i].modelMatrix[0].x << ", " << nodes[i].modelMatrix[0].y << ", " << nodes[i].modelMatrix[0].z << "\n"
-		//	<< nodes[i].modelMatrix[1].x << ", " << nodes[i].modelMatrix[1].y << ", " << nodes[i].modelMatrix[1].z << "\n"
-		//	<< nodes[i].modelMatrix[2].x << ", " << nodes[i].modelMatrix[2].y << ", " << nodes[i].modelMatrix[2].z << "\n" << std::endl;
-
+		std::cout << "key: " << i << std::endl;
+		std::cout << "M: " << "\n"
+			<< nodes[i].modelMatrix[0].x << ", " << nodes[i].modelMatrix[0].y << ", " << nodes[i].modelMatrix[0].z << ", " << nodes[i].modelMatrix[0].w << "\n"
+			<< nodes[i].modelMatrix[1].x << ", " << nodes[i].modelMatrix[1].y << ", " << nodes[i].modelMatrix[1].z << ", " << nodes[i].modelMatrix[1].w << "\n"
+			<< nodes[i].modelMatrix[2].x << ", " << nodes[i].modelMatrix[2].y << ", " << nodes[i].modelMatrix[2].z << ", " << nodes[i].modelMatrix[2].w << "\n"
+			<< nodes[i].modelMatrix[3].x << ", " << nodes[i].modelMatrix[3].y << ", " << nodes[i].modelMatrix[3].z << ", " << nodes[i].modelMatrix[3].w << "\n" << std::endl;
+		int a = 5;
 	}
 }
 

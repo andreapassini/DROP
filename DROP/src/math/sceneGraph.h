@@ -9,7 +9,7 @@
 
 class Node {
 public:
-	const uint32_t id;
+	uint32_t id;
 	VgMath::Transform localTransform;
 	Node* parent;
 
@@ -30,7 +30,7 @@ public:
 		localTransform(transform_val), cumulativeTransform(), modelMatrix(glm::mat4(1.0f))
 		{ };
 
-	Node(const uint32_t id_val, const VgMath::Transform transform_val, Node* const parent_val) :
+	Node(const uint32_t id_val, const VgMath::Transform transform_val, Node* parent_val) :
 		id(id_val), parent(parent_val), 
 		localTransform(transform_val), cumulativeTransform(), modelMatrix(glm::mat4(1.0f))
 		{ };
@@ -38,12 +38,18 @@ public:
 	~Node() {};
 
 	void operator=(const Node& n) {
-		Node(n.id, n.localTransform);
+		this->id = n.id;
+		this->parent = n.parent;
+		this->localTransform = n.localTransform;
+		//Node(n.id, n.localTransform, n.parent);
 	}
 
 	void CalculateCumulativeTransform() {
 		if (this->parent != nullptr) {
 			cumulativeTransform = localTransform * this->parent->GetTransformWorldCoordinates();
+		}
+		else {
+			cumulativeTransform = localTransform;
 		}
 	}
 

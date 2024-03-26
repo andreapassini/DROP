@@ -25,6 +25,7 @@ public:
 #if ANISOTROPIC_SCALING
     Transform(): translate(0,0,0), scale(1,1,1),  rotate() {}
 #else
+    //Transform(): translate(0,0,0), scale(1),  rotate(VgMath::Vector3(0.0, 1.0, 0.0), 0.0) {}
     Transform(): translate(0,0,0), scale(1),  rotate() {}
 #endif
 
