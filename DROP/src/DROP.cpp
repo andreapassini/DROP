@@ -215,6 +215,9 @@ int main()
 
     SceneGraph sceneGraph(150);
 
+    sceneGraph.nodes[SceneGraph::ROOT_ID].localTransform.rotate =
+        VgMath::Quaternion(0.0, 1.0, 0.0, 0.0);
+
     // Projection matrix of the camera: FOV angle, aspect ratio, near and far planes
     glm::mat4 projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 10'000.0f);
 
