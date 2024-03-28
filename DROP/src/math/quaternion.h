@@ -99,10 +99,11 @@ public:
     }
 
     Scalar getAngleDegree() {
-        return rad2deg(2 * acos(re));
+        return rad2deg(getAngleRadians());
     }
 
     Scalar getAngleRadians() {
+        assert(this->norm() <= 1.0);
         assert(re >= -1 && re <= 1);
 
         return 2 * acos(re);
