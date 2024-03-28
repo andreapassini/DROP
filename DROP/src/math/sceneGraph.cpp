@@ -1,6 +1,6 @@
 #include "sceneGraph.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
+//#include <glm/gtx/string_cast.hpp>
 
 SceneGraph::SceneGraph(const uint32_t sizeEstimation)
 {
@@ -61,6 +61,10 @@ void SceneGraph::CalculateWorldTransforms()
 
 	for (uint32_t i = 0; i <= index; i++) {
 		
+		////// To be removed
+		//std::cout << "M: " << "\n"
+		//	<< glm::to_string(nodes[i].modelMatrix) << std::endl;
+
 		nodes[i].CalculateCumulativeTransform();
 		nodes[i].modelMatrix = glm::mat4(1.0f);
 
@@ -73,17 +77,6 @@ void SceneGraph::CalculateWorldTransforms()
 			)
 		);
 
-		// To be removed
-		std::cout << "\n" << "key: " << i << std::endl;
-		glm::vec3 t(
-			nodes[i].cumulativeTransform.translate.x,
-			nodes[i].cumulativeTransform.translate.y,
-			nodes[i].cumulativeTransform.translate.z
-		);
-		std::cout << "t: " << t.x << ", " << t.y << ", " << t.z << std::endl;
-		std::cout << "M: " << "\n"
-			<< glm::to_string(nodes[i].modelMatrix) << std::endl;
-
 		nodes[i].modelMatrix = glm::rotate(
 			nodes[i].modelMatrix,
 			glm::radians((float)nodes[i].cumulativeTransform.rotate.getAngleDegree()),
@@ -93,19 +86,6 @@ void SceneGraph::CalculateWorldTransforms()
 				(float)nodes[i].cumulativeTransform.rotate.getAxis().z
 			)
 		);
-
-		// To be removed
-		glm::vec3 r(
-			(float)nodes[i].cumulativeTransform.rotate.getAxis().x,
-			(float)nodes[i].cumulativeTransform.rotate.getAxis().y,
-			(float)nodes[i].cumulativeTransform.rotate.getAxis().z
-		);
-		std::cout << "r: " << r.x << ", " << r.y << ", " << r.z << "\n" <<
-			" cos (a/2): " << (float)nodes[i].cumulativeTransform.rotate.re << "\n" <<
-			" angle rad: " << glm::radians((float)nodes[i].cumulativeTransform.rotate.getAngleDegree()) << "\n" <<
-			" angle deg: " << (float)nodes[i].cumulativeTransform.rotate.getAngleDegree() << std::endl;
-		std::cout << "M: " << "\n"
-			<< glm::to_string(nodes[i].modelMatrix) << std::endl;
 
 		nodes[i].modelMatrix = glm::scale(
 			nodes[i].modelMatrix,
@@ -121,11 +101,6 @@ void SceneGraph::CalculateWorldTransforms()
 			)
 #endif
 		);
-
-		//// To be removed
-		std::cout << "M: " << "\n"
-			<< glm::to_string(nodes[i].modelMatrix) << std::endl;
-		int a = 5;
 	}
 }
 
