@@ -19,7 +19,7 @@ public:
     Quaternion(Scalar a, Scalar b, Scalar c, Scalar d):im(a,b,c),re(d) {}
 
     // empty construction: returns quaternion 1 + 0 * i
-    Quaternion():Quaternion(0,1,0,1){}
+    Quaternion():Quaternion(0,0,0,1){}
 
     Quaternion(Vector3 iii, Scalar rrr):im(iii),re(rrr){}
 
@@ -81,6 +81,14 @@ public:
         );
     }
 
+    static Quaternion angleAxis(Degrees angle, Versor3&& axis) {
+        Scalar angleRad = deg2rad(angle);
+        return Quaternion(
+            std::sin(angleRad / 2) * axis,
+            std::cos(angleRad / 2)
+        );
+    }
+
     Mat3 toMatrix() const{
         // TODO: optimize! axes, as vectors, have a lot of 0s
         return Mat3(
@@ -91,15 +99,22 @@ public:
     }
 
     Scalar getAngleDegree() {
-        return rad2deg(2 * acos(re));
+        return rad2deg(getAngleRadians());
     }
 
     Scalar getAngleRadians() {
+        assert(this->norm() <= 1.0);
+        assert(re >= -1 && re <= 1);
+
         return 2 * acos(re);
     }
 
     Vector3 getAxis() {
         Scalar angle = getAngleRadians();
+
+        if (angle == 0.0)
+            return im;
+
         im / angle;
         return im;
     }
