@@ -107,20 +107,20 @@ private:
             return;
         }
 
-        // we start the recursive processing of nodes in the Assimp data structure
+        // we start the recursive processing of gameObjects in the Assimp data structure
         this->processNode(scene->mRootNode, scene);
     }
 
     //////////////////////////////////////////
 
-    // Recursive processing of nodes of Assimp data structure
+    // Recursive processing of gameObjects of Assimp data structure
     void processNode(aiNode* node, const aiScene* scene)
     {
         // we process each mesh inside the current node
         for(GLuint i = 0; i < node->mNumMeshes; i++)
         {
             // the "node" object contains only the indices to objects in the scene
-            // "Scene" contains all the data. Class node is used only to point to one or more mesh inside the scene and to maintain informations on relations between nodes
+            // "Scene" contains all the data. Class node is used only to point to one or more mesh inside the scene and to maintain informations on relations between gameObjects
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             // we start processing of the Assimp mesh using processMesh method.
             // the result (an istance of the Mesh class) is added to the vector
@@ -129,7 +129,7 @@ private:
             // https://en.cppreference.com/w/cpp/container/vector/emplace_back
             this->meshes.emplace_back(processMesh(mesh));
         }
-        // we then recursively process each of the children nodes
+        // we then recursively process each of the children gameObjects
         for(GLuint i = 0; i < node->mNumChildren; i++)
         {
             this->processNode(node->mChildren[i], scene);

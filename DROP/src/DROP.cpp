@@ -97,6 +97,8 @@ positive Z axis points "outside" the screen
 #include "rendering/renderer.h"
 #include "rendering/renderableObject.h"
 
+#include "math/sceneGraph.h"
+
 #define UP_DIRECTION glm::vec3(0.0f, 1.0f, 0.0f)
 #define DOWN_DIRECTION glm::vec3(0.0f, -1.0f, 0.0f)
 
@@ -211,12 +213,21 @@ int main()
 
     imGuiSetup(renderer.window);
 
+    SceneGraph sceneGraph(150);
+
+    sceneGraph.gameObjects[SceneGraph::ROOT_ID].localTransform.rotate =
+        glm::vec4(0.0, 1.0, 0.0, 0.0);
+
     // Projection matrix of the camera: FOV angle, aspect ratio, near and far planes
     glm::mat4 projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 10'000.0f);
 
     std::vector<RenderableObject> rendereableObjects;
 
-    glm::mat4 planeTransform = glm::mat4(1.0f);
+    uint32_t planeSGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
+    sceneGraph.gameObjects[planeSGHandle].localTransform.translate = glm::vec3(0.0f, -1.0f, 0.0f);
+    sceneGraph.gameObjects[planeSGHandle].localTransform.scale = 10.0;
+    sceneGraph.gameObjects[planeSGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
     TextureParameter planeTextureParameter(
         true,
         1,
@@ -229,7 +240,7 @@ int main()
         false
     );
     RenderableObject plane(
-        &planeTransform,
+        &sceneGraph.gameObjects[planeSGHandle].modelMatrix,
         &planeModel,
         &planeMaterial,
         planeTextureParameter);
@@ -237,7 +248,11 @@ int main()
     rendereableObjects.push_back(plane);
 
     // Sphere
-    glm::mat4 sphereTransform = glm::mat4(1.0f);
+    uint32_t sphereSGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
+    sceneGraph.gameObjects[sphereSGHandle].localTransform.translate = glm::vec3(-3.0f, 1.0f, 0.0f);
+    sceneGraph.gameObjects[sphereSGHandle].localTransform.scale = 1;
+    sceneGraph.gameObjects[sphereSGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
     TextureParameter sphereTextureParameter(
         true,
         0,
@@ -249,7 +264,7 @@ int main()
         true
     );
     RenderableObject sphere(
-        &sphereTransform,
+        &sceneGraph.gameObjects[sphereSGHandle].modelMatrix,
         &sphereModel,
         &sphereMaterial,
         sphereTextureParameter );
@@ -257,7 +272,11 @@ int main()
     rendereableObjects.push_back(sphere);
 
     // Cube
-    glm::mat4 cubeTransform = glm::mat4(1.0f);
+    uint32_t cubeSGHandle = sceneGraph.AddObject(sphereSGHandle);
+    sceneGraph.gameObjects[cubeSGHandle].localTransform.translate = glm::vec3(0.0f, 1.0f, 0.0f);
+    sceneGraph.gameObjects[cubeSGHandle].localTransform.scale = 0.48;
+    sceneGraph.gameObjects[cubeSGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
     TextureParameter cubeTextureParameter(
         true,
         0,
@@ -269,7 +288,7 @@ int main()
         false
     );
     RenderableObject cube(
-        &cubeTransform,
+        &sceneGraph.gameObjects[cubeSGHandle].modelMatrix,
         &cubeModel,
         &cubeMaterial,
         cubeTextureParameter);
@@ -277,7 +296,11 @@ int main()
     rendereableObjects.push_back(cube);
 
     // Bunny
-    glm::mat4 bunnyTransform = glm::mat4(1.0f);
+    uint32_t bunnySGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
+    sceneGraph.gameObjects[bunnySGHandle].localTransform.translate = glm::vec3(3.0f, 1.0f, 0.0f);
+    sceneGraph.gameObjects[bunnySGHandle].localTransform.scale = 0.3;
+    sceneGraph.gameObjects[bunnySGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
     TextureParameter bunnyTextureParameter(
         true,
         0,
@@ -289,7 +312,7 @@ int main()
         true
     );
     RenderableObject bunny(
-        &bunnyTransform,
+        &sceneGraph.gameObjects[bunnySGHandle].modelMatrix,
         &bunnyModel,
         &bunnyMaterial,
         bunnyTextureParameter);
@@ -333,26 +356,46 @@ int main()
         if (spinning)
             orientationY += (deltaTime * spin_speed);
 
-        planeTransform = glm::mat4(1.0f);
-        planeTransform = glm::translate(planeTransform, glm::vec3(0.0f, -1.0f, 0.0f));
-        planeTransform = glm::scale(planeTransform, glm::vec3(10.0f, 1.0f, 10.0f));
+        sceneGraph.gameObjects[sphereSGHandle].localTransform.translate +=
+            glm::vec3(1.0, 0.0, 0.0) * deltaTime;
         
-        sphereTransform = glm::mat4(1.0f);
-        sphereTransform = glm::translate(sphereTransform, glm::vec3(-3.0f, 1.0f, 0.0f));
-        sphereTransform = glm::rotate(sphereTransform, glm::radians(orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-        sphereTransform = glm::scale(sphereTransform, glm::vec3(0.8f, 0.8f, 0.8f));
+        sceneGraph.gameObjects[cubeSGHandle].localTransform.rotate =
+            glm::vec4(0.0f, 1.0f, 0.0f, orientationY);
         
-        cubeTransform = glm::mat4(1.0f);
-        cubeTransform = glm::translate(cubeTransform, glm::vec3(0.0f, 1.0f, 0.0f));
-        cubeTransform = glm::rotate(cubeTransform, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-        cubeTransform = glm::scale(cubeTransform, glm::vec3(0.8f, 0.8f, 0.8f));
-        
-        bunnyTransform = glm::mat4(1.0f);
-        bunnyTransform = glm::translate(bunnyTransform, glm::vec3(3.0f, 1.0f, 0.0f));
-        bunnyTransform = glm::rotate(bunnyTransform, glm::radians(orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-        bunnyTransform = glm::scale(bunnyTransform, glm::vec3(0.3f, 0.3f, 0.3f));
+        //planeTransform = glm::mat4(1.0f);
+        //planeTransform = glm::translate(planeTransform, glm::vec3(0.0f, -1.0f, 0.0f));
+        //planeTransform = glm::scale(planeTransform, glm::vec3(10.0f, 1.0f, 10.0f));
+        //
+        //sphereTransform = glm::mat4(1.0f);
+        //sphereTransform = glm::translate(sphereTransform, glm::vec3(-3.0f, 1.0f, 0.0f));
+        //sphereTransform = glm::rotate(sphereTransform, glm::radians(orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
+        //sphereTransform = glm::scale(sphereTransform, glm::vec3(0.8f, 0.8f, 0.8f));
+        //
+        //cubeTransform = glm::mat4(1.0f);
+        //cubeTransform = glm::translate(cubeTransform, glm::vec3(0.0f, 1.0f, 0.0f));
+        //cubeTransform = glm::rotate(cubeTransform, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
+        //cubeTransform = glm::scale(cubeTransform, glm::vec3(0.8f, 0.8f, 0.8f));
+        //
+        //bunnyTransform = glm::mat4(1.0f);
+        //bunnyTransform = glm::translate(bunnyTransform, glm::vec3(3.0f, 1.0f, 0.0f));
+        //bunnyTransform = glm::rotate(bunnyTransform, glm::radians(orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
+        //bunnyTransform = glm::scale(bunnyTransform, glm::vec3(0.3f, 0.3f, 0.3f));
 
+        sceneGraph.CalculateWorldTransforms();
 
+        //sceneGraph.gameObjects[bunnySGHandle].modelMatrix = glm::rotate(
+        //    sceneGraph.gameObjects[bunnySGHandle].modelMatrix,
+        //    glm::radians(orientationY),
+        //    glm::vec3(0.0f, 1.0f, 0.0f)
+        //);
+
+        //sceneGraph.gameObjects[sphereSGHandle].modelMatrix =
+        //    sceneGraph.gameObjects[bunnySGHandle].modelMatrix * sceneGraph.gameObjects[sphereSGHandle].modelMatrix;
+
+        //VgMath::Quaternion(glm::vec3(0.0, 1.0, 0.0), VgMath::deg2rad(orientationY));
+
+        ////////////////////////////////////////
+        
         renderer.RenderScene(
             &rendereableObjects,
             view,
@@ -516,9 +559,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    // if P is pressed, we start/stop the animated rotation of models
-    if (key == GLFW_KEY_P && action == GLFW_PRESS)
-        spinning = !spinning;
+    //// if P is pressed, we start/stop the animated rotation of models
+    //if (key == GLFW_KEY_P && action == GLFW_PRESS)
+    //    spinning = !spinning;
 
     // if L is pressed, we activate/deactivate wireframe rendering of models
     if (key == GLFW_KEY_L && action == GLFW_PRESS)
