@@ -99,19 +99,42 @@ public:
     }
 
     Scalar squaredNorm() const {
-        return dot( *this, *this );
+        //return dot( *this, *this );
         // OR:
-        // return x*x + y*y + z*z ;
+        
+        // To be removed
+        Scalar mag = x*x;
+        mag += y * y;
+        mag += z * z;
+        return mag;
+        // 
+        
+        //return x*x + y*y + z*z ;
     }
 
     Scalar norm() const {
-        return std::sqrt( squaredNorm() );
+        // To be removed
+        Scalar sqrdN = squaredNorm();
+        Scalar sqrtN = std::sqrt(sqrdN);
+        return sqrtN;
+        //
+
+        //return std::sqrt( squaredNorm() );
     }
 
     Versor3 normalized() const;
 
     Point3 asPoint3() const;
-    Versor3 asVersor3() const;
+    
+    VgMath::Versor3 asVersor3() const;
+    //{
+        //Scalar length = (*this).norm();
+        //return Versor3(
+        //    x/ length,
+        //    y/ length,
+        //    z/ length
+        //);
+    //};
 
     /*
     // l'operatore == lo usiamo per l'egualianza SECCA
@@ -140,7 +163,7 @@ inline Vector3 cross(const Vector3& a, const Vector3& b){
 }
 
 inline Scalar rad2deg(Scalar k){
-    return k/(M_PI)*180;
+    return k*180/(M_PI);
 }
 
 inline Scalar deg2rad(Degrees k){

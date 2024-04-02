@@ -53,14 +53,24 @@ public:
     // apply this quaternion as a rotation to a 3D vector
     // q.apply(v) = q' * v * q
     Vector3 apply(const Vector3 &v) const{
-        // TODO: optimize! exploiting the 0 of the real part
-        Quaternion res = this->conjugated()
-                         *
-                         Quaternion(v,0) // quaternion that represents a vector v
-                         *
-                         (*this);
-        assert( areEqual( res.re , 0 ) );
+
+        this->im.normalized();
+
+        Quaternion res = 
+                        (*this)
+                        *
+                        Quaternion(v,0) // quaternion that represents a vector v
+                        *
+                        this->inverse();
+
+        assert(areEqual(res.re, 0));
         return res.im;
+
+        // Result is the same, framerate is less WTF
+        //return dot(im, v) * im
+        //    + (re * re) * v
+        //    + (2 * re) * cross(im, v)
+        //    - cross(cross(im, v), im);
     }
 
     // points rotate just like vectors
@@ -74,19 +84,17 @@ public:
     }
 
     static Quaternion angleAxis(Degrees angle, Versor3 axis){
-        Scalar angleRad = deg2rad(angle);
-        return Quaternion(
-            std::sin( angleRad / 2 ) * axis,
-            std::cos( angleRad / 2 )
-        );
-    }
 
-    static Quaternion angleAxis(Degrees angle, Versor3&& axis) {
+        if (angle == 0.0) {
+            angle = EPSILON;
+        }
+
         Scalar angleRad = deg2rad(angle);
+
         return Quaternion(
-            std::sin(angleRad / 2) * axis,
-            std::cos(angleRad / 2)
-        );
+                    axis * std::sin(angleRad * 0.5),
+                    std::cos(angleRad * 0.5)
+                );
     }
 
     Mat3 toMatrix() const{
@@ -103,28 +111,20 @@ public:
     }
 
     Scalar getAngleRadians() {
-        //assert(this->norm() <= 1.0);
-        //assert(re >= -1 && re <= 1);
-
+        Scalar halfAngle = acos(re);
         return 2 * acos(re);
     }
 
-    Vector3 getAxis() {
-        Scalar angle = getAngleRadians();
-
-        if (angle == 0.0)
-            return im;
-
-        im / angle;
-        return im;
+    Versor3 getAxis() {
+        return im.normalized();
     }
 };
 
 
 inline Quaternion operator * (const Quaternion &a , const Quaternion &b) {
     return Quaternion(
-       a.re*b.im + a.im*b.re + cross(a.im,b.im),  // imaginary part
-       a.re*b.re - dot(a.im,b.im) // real part
+       a.re * b.im + a.im * b.re + cross(a.im, b.im),  // imaginary part
+       a.re * b.re - dot(a.im, b.im) // real part
     );
 }
 

@@ -1,6 +1,11 @@
 #include "sceneGraph.h"
+
+#include "vector3.h"
+#include "versor3.h"
+#include "mat3.h"
+
 #include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 SceneGraph::SceneGraph(const uint32_t sizeEstimation)
 {
@@ -60,46 +65,50 @@ void SceneGraph::CalculateWorldTransforms()
 {
 
 	for (uint32_t i = 0; i <= index; i++) {
-		////// To be removed
+		//// To be removed
 		//std::cout << "Key: " << i << "\n"
 		//	<< glm::to_string(gameObjects[i].modelMatrix) << std::endl;
 
 		gameObjects[i].CalculateCumulativeTransform();
-//		gameObjects[i].modelMatrix = glm::mat4(1.0f);
-//
-//		gameObjects[i].modelMatrix = glm::translate(
-//			gameObjects[i].modelMatrix, 
-//			glm::vec3(
-//				gameObjects[i].cumulativeTransform.translate.x, 
-//				gameObjects[i].cumulativeTransform.translate.y,
-//				gameObjects[i].cumulativeTransform.translate.z
-//			)
-//		);
-//
-//		gameObjects[i].modelMatrix = glm::rotate(
-//			gameObjects[i].modelMatrix,
-//			glm::radians((float)gameObjects[i].cumulativeTransform.rotate.getAngleDegree()),
-//			glm::vec3(
-//				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().x,
-//				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().y,
-//				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().z
-//			)
-//		);
-//
-//		gameObjects[i].modelMatrix = glm::scale(
-//			gameObjects[i].modelMatrix,
-//#if ANISOTROPIC_SCALING
-//			glm::vec3(
-//				(float)gameObjects[i].cumulativeTransform.scale.x,
-//				(float)gameObjects[i].cumulativeTransform.scale.y,
-//				(float)gameObjects[i].cumulativeTransform.scale.z
-//			)
-//#else
-//			glm::vec3(
-//				(float)gameObjects[i].cumulativeTransform.scale
-//			)
-//#endif
-//		);
+
+		gameObjects[i].modelMatrix = glm::mat4(1.0f);
+
+		gameObjects[i].modelMatrix = glm::translate(
+			gameObjects[i].modelMatrix, 
+			glm::vec3(
+				gameObjects[i].cumulativeTransform.translate.x, 
+				gameObjects[i].cumulativeTransform.translate.y,
+				gameObjects[i].cumulativeTransform.translate.z
+			)
+		);
+
+		gameObjects[i].modelMatrix = glm::rotate(
+			gameObjects[i].modelMatrix,
+			(float)gameObjects[i].cumulativeTransform.rotate.getAngleRadians(),
+			glm::vec3(
+				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().x,
+				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().y,
+				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().z
+			)
+		);
+
+		gameObjects[i].modelMatrix = glm::scale(
+			gameObjects[i].modelMatrix,
+#if ANISOTROPIC_SCALING
+			glm::vec3(
+				(float)gameObjects[i].cumulativeTransform.scale.x,
+				(float)gameObjects[i].cumulativeTransform.scale.y,
+				(float)gameObjects[i].cumulativeTransform.scale.z
+			)
+#else
+			glm::vec3(
+				(float)gameObjects[i].cumulativeTransform.scale,
+				(float)gameObjects[i].cumulativeTransform.scale,
+				(float)gameObjects[i].cumulativeTransform.scale
+			)
+#endif
+		);
+
 	}
 }
 

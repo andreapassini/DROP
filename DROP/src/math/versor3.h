@@ -6,9 +6,6 @@
 #include <assert.h>
 #include "vector3.h"
 
-
-
-
 using namespace std;
 
 namespace VgMath{
@@ -19,13 +16,13 @@ typedef double Scalar;
 class Versor3{
 private:
 
-    // constuctor for intrnal use only: I cannot initialize a verson giving the coords!
-    Versor3(Scalar _x, Scalar _y, Scalar _z):x(_x),y(_y),z(_z){ }
+    // constructor for internal use only: I cannot initialize a versor giving the coords!
 
     // empty constructor
     Versor3(){ }
 
 public:
+    Versor3(Scalar _x, Scalar _y, Scalar _z):x(_x),y(_y),z(_z){ }
     Scalar x,y,z; // with the understanding that x^2 + y^2 + z^2 == 1.0
 
     static Versor3 right()   { return Versor3(+1,0,0); }

@@ -79,6 +79,9 @@ positive Z axis points "outside" the screen
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 // we include the library for images loading
 #define STB_IMAGE_IMPLEMENTATION
@@ -98,6 +101,10 @@ positive Z axis points "outside" the screen
 #include "rendering/renderableObject.h"
 
 #include "math/sceneGraph.h"
+#include "math/mat3.h"
+#include "math/vector3.h"
+#include "math/versor3.h"
+#include "math/quaternion.h"
 
 #define UP_DIRECTION glm::vec3(0.0f, 1.0f, 0.0f)
 #define DOWN_DIRECTION glm::vec3(0.0f, -1.0f, 0.0f)
@@ -152,7 +159,7 @@ const GLfloat framerateUpdateTime = 0.5f;
 uint32_t framerate;
 
 // rotation angle on Y axis
-GLfloat orientationY = 0.0f;
+VgMath::Scalar orientationY = 0.0f;
 // rotation speed on Y axis
 GLfloat spin_speed = 30.0f;
 // boolean to start/stop animated rotation on Y angle
@@ -216,7 +223,7 @@ int main()
     SceneGraph sceneGraph(150);
 
     sceneGraph.gameObjects[SceneGraph::ROOT_ID].localTransform.rotate =
-        glm::vec4(0.0, 1.0, 0.0, 0.0);
+        VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
     // Projection matrix of the camera: FOV angle, aspect ratio, near and far planes
     glm::mat4 projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f, 10'000.0f);
@@ -224,9 +231,10 @@ int main()
     std::vector<RenderableObject> rendereableObjects;
 
     uint32_t planeSGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
-    sceneGraph.gameObjects[planeSGHandle].localTransform.translate = glm::vec3(0.0f, -1.0f, 0.0f);
+    sceneGraph.gameObjects[planeSGHandle].localTransform.translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
     sceneGraph.gameObjects[planeSGHandle].localTransform.scale = 10.0;
-    sceneGraph.gameObjects[planeSGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+    sceneGraph.gameObjects[planeSGHandle].localTransform.rotate = 
+        VgMath::Quaternion::angleAxis(VgMath::Degrees(90.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
     TextureParameter planeTextureParameter(
         true,
@@ -249,9 +257,10 @@ int main()
 
     // Sphere
     uint32_t sphereSGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
-    sceneGraph.gameObjects[sphereSGHandle].localTransform.translate = glm::vec3(-3.0f, 1.0f, 0.0f);
-    sceneGraph.gameObjects[sphereSGHandle].localTransform.scale = 1;
-    sceneGraph.gameObjects[sphereSGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+    sceneGraph.gameObjects[sphereSGHandle].localTransform.translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
+    sceneGraph.gameObjects[sphereSGHandle].localTransform.scale = 1.0;
+    sceneGraph.gameObjects[sphereSGHandle].localTransform.rotate = 
+        VgMath::Quaternion::angleAxis(VgMath::Degrees(90.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
     TextureParameter sphereTextureParameter(
         true,
@@ -273,9 +282,10 @@ int main()
 
     // Cube
     uint32_t cubeSGHandle = sceneGraph.AddObject(sphereSGHandle);
-    sceneGraph.gameObjects[cubeSGHandle].localTransform.translate = glm::vec3(0.0f, 1.0f, 0.0f);
+    sceneGraph.gameObjects[cubeSGHandle].localTransform.translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
     sceneGraph.gameObjects[cubeSGHandle].localTransform.scale = 0.48;
-    sceneGraph.gameObjects[cubeSGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+    sceneGraph.gameObjects[cubeSGHandle].localTransform.rotate = 
+        VgMath::Quaternion::angleAxis(VgMath::Degrees(90.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
     TextureParameter cubeTextureParameter(
         true,
@@ -297,9 +307,10 @@ int main()
 
     // Bunny
     uint32_t bunnySGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
-    sceneGraph.gameObjects[bunnySGHandle].localTransform.translate = glm::vec3(3.0f, 1.0f, 0.0f);
+    sceneGraph.gameObjects[bunnySGHandle].localTransform.translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
     sceneGraph.gameObjects[bunnySGHandle].localTransform.scale = 0.3;
-    sceneGraph.gameObjects[bunnySGHandle].localTransform.rotate = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+    sceneGraph.gameObjects[bunnySGHandle].localTransform.rotate = 
+        VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
     TextureParameter bunnyTextureParameter(
         true,
@@ -356,12 +367,12 @@ int main()
         if (spinning)
             orientationY += (deltaTime * spin_speed);
 
-        sceneGraph.gameObjects[sphereSGHandle].localTransform.translate +=
-            glm::vec3(1.0, 0.0, 0.0) * deltaTime;
+        //sceneGraph.gameObjects[sphereSGHandle].localTransform.translate +=
+        //    VgMath::Vector3(1.0, 0.0, 0.0) * deltaTime;
         
-        sceneGraph.gameObjects[cubeSGHandle].localTransform.rotate =
-            glm::vec4(0.0f, 1.0f, 0.0f, orientationY);
-        
+        sceneGraph.gameObjects[sphereSGHandle].localTransform.rotate =
+            VgMath::Quaternion::angleAxis(VgMath::Degrees(orientationY), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
+
         //planeTransform = glm::mat4(1.0f);
         //planeTransform = glm::translate(planeTransform, glm::vec3(0.0f, -1.0f, 0.0f));
         //planeTransform = glm::scale(planeTransform, glm::vec3(10.0f, 1.0f, 10.0f));

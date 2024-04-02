@@ -1,6 +1,9 @@
 #pragma once
 
 #include "transform.h"
+#include "vector3.h"
+#include "versor3.h"
+#include "mat3.h"
 
 #include <vector>
 #include <unordered_map>
@@ -17,7 +20,8 @@ public:
 	VgMath::Transform cumulativeTransform;
 	glm::mat4 modelMatrix;
 
-	Node() : id(), parent(nullptr), modelMatrix(glm::mat4(1.0f)) {
+	Node() : id(), parent(nullptr), 
+		localTransform(), cumulativeTransform(), modelMatrix(glm::mat4(1.0f)) {
 
 	}
 
@@ -46,55 +50,20 @@ public:
 	}
 
 	void CalculateCumulativeTransform() {
-		modelMatrix = glm::mat4(1.0f);
 
-		modelMatrix = glm::translate(
-			modelMatrix,
-			glm::vec3(
-				localTransform.translate.x,
-				localTransform.translate.y,
-				localTransform.translate.z
-			)
-		);
-
-		modelMatrix = glm::rotate(
-			modelMatrix,
-			glm::radians(localTransform.rotate[3]),
-			glm::vec3(
-				localTransform.rotate.x,
-				localTransform.rotate.y,
-				localTransform.rotate.z
-			)
-		);
-
-		modelMatrix = glm::scale(
-			modelMatrix,
-#if ANISOTROPIC_SCALING
-			glm::vec3(
-				(float)cumulativeTransform.scale.x,
-				(float)cumulativeTransform.scale.y,
-				(float)cumulativeTransform.scale.z
-			)
-#else
-			glm::vec3(
-				localTransform.scale,
-				localTransform.scale,
-				localTransform.scale
-			)
-#endif
-		);
+		cumulativeTransform = localTransform;
 
 		if (this->parent != nullptr) {
-			modelMatrix = this->parent->GetTransformWorldCoordinates() * modelMatrix;
+			if(this->parent->id != 0){
+				cumulativeTransform = this->parent->GetTransformWorldCoordinates() * localTransform;
+			}
 		}
-		else {
-			modelMatrix = modelMatrix;
-		}
+
 	}
 
-	glm::mat4 GetTransformWorldCoordinates() {
+	VgMath::Transform GetTransformWorldCoordinates() {
 		CalculateCumulativeTransform();
-		return modelMatrix;
+		return cumulativeTransform;
 	};
 
 private:
