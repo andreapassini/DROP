@@ -51,7 +51,7 @@ public:
     }
 
     // apply this quaternion as a rotation to a 3D vector
-    // q.apply(v) = q' * v * q
+    // https://www.haroldserrano.com/blog/developing-a-math-engine-in-c-implementing-quaternions
     Vector3 apply(const Vector3 &v) const{
 
         this->im.normalized();
