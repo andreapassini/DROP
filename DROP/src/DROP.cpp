@@ -395,12 +395,6 @@ int main()
             modelMatrices
         );
 
-        //// TO BE REMOVED
-        //for (auto& it : sceneGraph.gameObjects) {
-        //    it.second.cumulativeTransform = cumulatedTransforms[it.first];
-        //    it.second.modelMatrix = modelMatrices[it.first];
-        //}
-
         ////////////////////////////////////////
         
         renderer.RenderScene(

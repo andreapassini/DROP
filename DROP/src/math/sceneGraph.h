@@ -46,7 +46,7 @@ public:
 		//Node(n.id, n.localTransform, n.parent);
 	}
 
-	VgMath::Transform CalculateCumulativeTransform() {
+	VgMath::Transform CalculateCumulativeTransform() const {
 
 		VgMath::Transform cumulativeTransform;
 		cumulativeTransform = localTransform;
@@ -87,5 +87,11 @@ public:
 	);
 
 	static constexpr uint32_t ROOT_ID = 0;
+
+private:
+	static void CalculateSingleWorldTransform(
+		const Node& const node,
+		VgMath::Transform* cumulatedTransform,
+		glm::mat4* modelMatrix);
 };
 

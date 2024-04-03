@@ -8,6 +8,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <unordered_map>
+#include <future> 
 
 SceneGraph::SceneGraph(const uint32_t sizeEstimation)
 {
@@ -63,51 +64,114 @@ void SceneGraph::DeleteNode(const uint32_t id_val)
 	int numberOfErasedNodes = gameObjects.erase(id_val);
 }
 
+// Calculate the cumulated transform starting from a local transform
+// it also calculated the model matrix.
+// It was not working with const ref
+void SceneGraph::CalculateSingleWorldTransform(
+	const Node& const node,
+	VgMath::Transform* cumulatedTransform, 
+	glm::mat4* modelMatrix)
+{
+	(*modelMatrix) = glm::mat4(1.0f);
+	(*cumulatedTransform) = node.CalculateCumulativeTransform();
+
+	(*modelMatrix) = glm::translate(
+		(*modelMatrix),
+		glm::vec3(
+			(*cumulatedTransform).translate.x,
+			(*cumulatedTransform).translate.y,
+			(*cumulatedTransform).translate.z
+		)
+	);
+
+	(*modelMatrix) = glm::rotate(
+		(*modelMatrix),
+		(float)(*cumulatedTransform).rotate.getAngleRadians(),
+		glm::vec3(
+			(float)(*cumulatedTransform).rotate.getAxis().x,
+			(float)(*cumulatedTransform).rotate.getAxis().y,
+			(float)(*cumulatedTransform).rotate.getAxis().z
+		)
+	);
+
+	(*modelMatrix) = glm::scale(
+		(*modelMatrix),
+#if ANISOTROPIC_SCALING
+		glm::vec3(
+			(float)(*cumulatedTransform).scale.x,
+			(float)(*cumulatedTransform).scale.y,
+			(float)(*cumulatedTransform).scale.z
+		)
+#else
+		glm::vec3(
+			(float)(*cumulatedTransform).scale,
+			(float)(*cumulatedTransform).scale,
+			(float)(*cumulatedTransform).scale
+		)
+#endif
+	);
+}
+
 void SceneGraph::CalculateWorldTransforms(
 	std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms,
 	std::unordered_map<uint32_t, glm::mat4>& const modelMatrices
 ) {
 
+	std::vector<std::future<void>> futures;
+
 	for (auto& it : gameObjects) {
-		modelMatrices[it.first] = glm::mat4(1.0f);
-		cumulatedTransforms[it.first] = it.second.CalculateCumulativeTransform();
-
-		modelMatrices[it.first] = glm::translate(
-			modelMatrices[it.first],
-			glm::vec3(
-				cumulatedTransforms[it.first].translate.x,
-				cumulatedTransforms[it.first].translate.y,
-				cumulatedTransforms[it.first].translate.z
+		futures.push_back(
+			std::async(std::launch::async, 
+				CalculateSingleWorldTransform,
+					it.second, 
+					&cumulatedTransforms[it.first], 
+					&modelMatrices[it.first]
 			)
 		);
 
-		modelMatrices[it.first] = glm::rotate(
-			modelMatrices[it.first],
-			(float)cumulatedTransforms[it.first].rotate.getAngleRadians(),
-			glm::vec3(
-				(float)cumulatedTransforms[it.first].rotate.getAxis().x,
-				(float)cumulatedTransforms[it.first].rotate.getAxis().y,
-				(float)cumulatedTransforms[it.first].rotate.getAxis().z
-			)
-		);
+//		modelMatrices[it.first] = glm::mat4(1.0f);
+//		cumulatedTransforms[it.first] = it.second.CalculateCumulativeTransform();
+//
+//		modelMatrices[it.first] = glm::translate(
+//			modelMatrices[it.first],
+//			glm::vec3(
+//				cumulatedTransforms[it.first].translate.x,
+//				cumulatedTransforms[it.first].translate.y,
+//				cumulatedTransforms[it.first].translate.z
+//			)
+//		);
+//
+//		modelMatrices[it.first] = glm::rotate(
+//			modelMatrices[it.first],
+//			(float)cumulatedTransforms[it.first].rotate.getAngleRadians(),
+//			glm::vec3(
+//				(float)cumulatedTransforms[it.first].rotate.getAxis().x,
+//				(float)cumulatedTransforms[it.first].rotate.getAxis().y,
+//				(float)cumulatedTransforms[it.first].rotate.getAxis().z
+//			)
+//		);
+//
+//		modelMatrices[it.first] = glm::scale(
+//			modelMatrices[it.first],
+//#if ANISOTROPIC_SCALING
+//			glm::vec3(
+//				(float)cumulatedTransforms[it.first].scale.x,
+//				(float)cumulatedTransforms[it.first].scale.y,
+//				(float)cumulatedTransforms[it.first].scale.z
+//			)
+//#else
+//			glm::vec3(
+//				(float)cumulatedTransforms[it.first].scale,
+//				(float)cumulatedTransforms[it.first].scale,
+//				(float)cumulatedTransforms[it.first].scale
+//			)
+//#endif
+//		);
+		
+	}
 
-		modelMatrices[it.first] = glm::scale(
-			modelMatrices[it.first],
-#if ANISOTROPIC_SCALING
-			glm::vec3(
-				(float)cumulatedTransforms[it.first].scale.x,
-				(float)cumulatedTransforms[it.first].scale.y,
-				(float)cumulatedTransforms[it.first].scale.z
-			)
-#else
-			glm::vec3(
-				(float)cumulatedTransforms[it.first].scale,
-				(float)cumulatedTransforms[it.first].scale,
-				(float)cumulatedTransforms[it.first].scale
-			)
-#endif
-		);
-
+	for (auto& handle : futures) {
+		handle.wait();
 	}
 }
 
