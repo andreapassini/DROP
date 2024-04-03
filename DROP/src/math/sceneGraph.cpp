@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include <unordered_map>
+
 SceneGraph::SceneGraph(const uint32_t sizeEstimation)
 {
 	gameObjects.reserve(sizeEstimation);
@@ -61,50 +63,47 @@ void SceneGraph::DeleteNode(const uint32_t id_val)
 	int numberOfErasedNodes = gameObjects.erase(id_val);
 }
 
-void SceneGraph::CalculateWorldTransforms()
-{
+void SceneGraph::CalculateWorldTransforms(
+	std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms,
+	std::unordered_map<uint32_t, glm::mat4>& const modelMatrices
+) {
 
-	for (uint32_t i = 0; i <= index; i++) {
-		//// To be removed
-		//std::cout << "Key: " << i << "\n"
-		//	<< glm::to_string(gameObjects[i].modelMatrix) << std::endl;
+	for (auto& it : gameObjects) {
+		modelMatrices[it.first] = glm::mat4(1.0f);
+		cumulatedTransforms[it.first] = it.second.CalculateCumulativeTransform();
 
-		gameObjects[i].CalculateCumulativeTransform();
-
-		gameObjects[i].modelMatrix = glm::mat4(1.0f);
-
-		gameObjects[i].modelMatrix = glm::translate(
-			gameObjects[i].modelMatrix, 
+		modelMatrices[it.first] = glm::translate(
+			modelMatrices[it.first],
 			glm::vec3(
-				gameObjects[i].cumulativeTransform.translate.x, 
-				gameObjects[i].cumulativeTransform.translate.y,
-				gameObjects[i].cumulativeTransform.translate.z
+				cumulatedTransforms[it.first].translate.x,
+				cumulatedTransforms[it.first].translate.y,
+				cumulatedTransforms[it.first].translate.z
 			)
 		);
 
-		gameObjects[i].modelMatrix = glm::rotate(
-			gameObjects[i].modelMatrix,
-			(float)gameObjects[i].cumulativeTransform.rotate.getAngleRadians(),
+		modelMatrices[it.first] = glm::rotate(
+			modelMatrices[it.first],
+			(float)cumulatedTransforms[it.first].rotate.getAngleRadians(),
 			glm::vec3(
-				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().x,
-				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().y,
-				(float)gameObjects[i].cumulativeTransform.rotate.getAxis().z
+				(float)cumulatedTransforms[it.first].rotate.getAxis().x,
+				(float)cumulatedTransforms[it.first].rotate.getAxis().y,
+				(float)cumulatedTransforms[it.first].rotate.getAxis().z
 			)
 		);
 
-		gameObjects[i].modelMatrix = glm::scale(
-			gameObjects[i].modelMatrix,
+		modelMatrices[it.first] = glm::scale(
+			modelMatrices[it.first],
 #if ANISOTROPIC_SCALING
 			glm::vec3(
-				(float)gameObjects[i].cumulativeTransform.scale.x,
-				(float)gameObjects[i].cumulativeTransform.scale.y,
-				(float)gameObjects[i].cumulativeTransform.scale.z
+				(float)cumulatedTransforms[it.first].scale.x,
+				(float)cumulatedTransforms[it.first].scale.y,
+				(float)cumulatedTransforms[it.first].scale.z
 			)
 #else
 			glm::vec3(
-				(float)gameObjects[i].cumulativeTransform.scale,
-				(float)gameObjects[i].cumulativeTransform.scale,
-				(float)gameObjects[i].cumulativeTransform.scale
+				(float)cumulatedTransforms[it.first].scale,
+				(float)cumulatedTransforms[it.first].scale,
+				(float)cumulatedTransforms[it.first].scale
 			)
 #endif
 		);

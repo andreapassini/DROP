@@ -247,13 +247,6 @@ int main()
         0.9f,
         false
     );
-    RenderableObject plane(
-        &sceneGraph.gameObjects[planeSGHandle].modelMatrix,
-        &planeModel,
-        &planeMaterial,
-        planeTextureParameter);
-
-    rendereableObjects.push_back(plane);
 
     // Sphere
     uint32_t sphereSGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
@@ -272,13 +265,6 @@ int main()
         0.9f,
         true
     );
-    RenderableObject sphere(
-        &sceneGraph.gameObjects[sphereSGHandle].modelMatrix,
-        &sphereModel,
-        &sphereMaterial,
-        sphereTextureParameter );
-
-    rendereableObjects.push_back(sphere);
 
     // Cube
     uint32_t cubeSGHandle = sceneGraph.AddObject(sphereSGHandle);
@@ -297,13 +283,6 @@ int main()
         0.9f,
         false
     );
-    RenderableObject cube(
-        &sceneGraph.gameObjects[cubeSGHandle].modelMatrix,
-        &cubeModel,
-        &cubeMaterial,
-        cubeTextureParameter);
-
-    rendereableObjects.push_back(cube);
 
     // Bunny
     uint32_t bunnySGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
@@ -322,15 +301,53 @@ int main()
         0.9f,
         true
     );
+
+    PerformanceCalculator framerateCalculator(100, 25);
+
+    // Initialize cumulated transform hash map
+    std::unordered_map<uint32_t, VgMath::Transform> cumulatedTransforms;
+    cumulatedTransforms.reserve( sceneGraph.gameObjects.size());
+
+    std::unordered_map<uint32_t, glm::mat4> modelMatrices;
+    modelMatrices.reserve(sceneGraph.gameObjects.size());
+
+    // Now the 2 maps have all the keys as the SceneGraph
+    for (auto& it : sceneGraph.gameObjects) {
+        cumulatedTransforms[it.first] = VgMath::Transform();
+        modelMatrices[it.first] = glm::mat4(1.0f);
+    }
+
+    RenderableObject plane(
+        &modelMatrices[planeSGHandle],
+        &planeModel,
+        &planeMaterial,
+        planeTextureParameter);
+
+    rendereableObjects.push_back(plane);
+
+    RenderableObject sphere(
+        &modelMatrices[sphereSGHandle],
+        &sphereModel,
+        &sphereMaterial,
+        sphereTextureParameter);
+
+    rendereableObjects.push_back(sphere);
+
+    RenderableObject cube(
+        &modelMatrices[cubeSGHandle],
+        &cubeModel,
+        &cubeMaterial,
+        cubeTextureParameter);
+
+    rendereableObjects.push_back(cube);
+
     RenderableObject bunny(
-        &sceneGraph.gameObjects[bunnySGHandle].modelMatrix,
+        &modelMatrices[bunnySGHandle],
         &bunnyModel,
         &bunnyMaterial,
         bunnyTextureParameter);
 
     rendereableObjects.push_back(bunny);
-
-    PerformanceCalculator framerateCalculator(100, 25);
 
     // Rendering loop: this code is executed at each frame
     while (!glfwWindowShouldClose(renderer.window))
@@ -373,37 +390,16 @@ int main()
         sceneGraph.gameObjects[sphereSGHandle].localTransform.rotate =
             VgMath::Quaternion::angleAxis(VgMath::Degrees(orientationY), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
-        //planeTransform = glm::mat4(1.0f);
-        //planeTransform = glm::translate(planeTransform, glm::vec3(0.0f, -1.0f, 0.0f));
-        //planeTransform = glm::scale(planeTransform, glm::vec3(10.0f, 1.0f, 10.0f));
-        //
-        //sphereTransform = glm::mat4(1.0f);
-        //sphereTransform = glm::translate(sphereTransform, glm::vec3(-3.0f, 1.0f, 0.0f));
-        //sphereTransform = glm::rotate(sphereTransform, glm::radians(orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-        //sphereTransform = glm::scale(sphereTransform, glm::vec3(0.8f, 0.8f, 0.8f));
-        //
-        //cubeTransform = glm::mat4(1.0f);
-        //cubeTransform = glm::translate(cubeTransform, glm::vec3(0.0f, 1.0f, 0.0f));
-        //cubeTransform = glm::rotate(cubeTransform, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-        //cubeTransform = glm::scale(cubeTransform, glm::vec3(0.8f, 0.8f, 0.8f));
-        //
-        //bunnyTransform = glm::mat4(1.0f);
-        //bunnyTransform = glm::translate(bunnyTransform, glm::vec3(3.0f, 1.0f, 0.0f));
-        //bunnyTransform = glm::rotate(bunnyTransform, glm::radians(orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-        //bunnyTransform = glm::scale(bunnyTransform, glm::vec3(0.3f, 0.3f, 0.3f));
+        sceneGraph.CalculateWorldTransforms(
+            cumulatedTransforms,
+            modelMatrices
+        );
 
-        sceneGraph.CalculateWorldTransforms();
-
-        //sceneGraph.gameObjects[bunnySGHandle].modelMatrix = glm::rotate(
-        //    sceneGraph.gameObjects[bunnySGHandle].modelMatrix,
-        //    glm::radians(orientationY),
-        //    glm::vec3(0.0f, 1.0f, 0.0f)
-        //);
-
-        //sceneGraph.gameObjects[sphereSGHandle].modelMatrix =
-        //    sceneGraph.gameObjects[bunnySGHandle].modelMatrix * sceneGraph.gameObjects[sphereSGHandle].modelMatrix;
-
-        //VgMath::Quaternion(glm::vec3(0.0, 1.0, 0.0), VgMath::deg2rad(orientationY));
+        //// TO BE REMOVED
+        //for (auto& it : sceneGraph.gameObjects) {
+        //    it.second.cumulativeTransform = cumulatedTransforms[it.first];
+        //    it.second.modelMatrix = modelMatrices[it.first];
+        //}
 
         ////////////////////////////////////////
         

@@ -17,27 +17,24 @@ public:
 	VgMath::Transform localTransform;
 	Node* parent;
 
-	VgMath::Transform cumulativeTransform;
-	glm::mat4 modelMatrix;
-
 	Node() : id(), parent(nullptr), 
-		localTransform(), cumulativeTransform(), modelMatrix(glm::mat4(1.0f)) {
+		localTransform() {
 
 	}
 
 	Node(const uint32_t id_val) :
 		id(id_val), parent(nullptr), 
-		localTransform(), cumulativeTransform(), modelMatrix(glm::mat4(1.0f))
+		localTransform()
 		{ };
 
 	Node(const uint32_t id_val, const VgMath::Transform transform_val) :
 		id(id_val), parent(nullptr), 
-		localTransform(transform_val), cumulativeTransform(), modelMatrix(glm::mat4(1.0f))
+		localTransform(transform_val)
 		{ };
 
 	Node(const uint32_t id_val, const VgMath::Transform transform_val, Node* parent_val) :
 		id(id_val), parent(parent_val), 
-		localTransform(transform_val), cumulativeTransform(), modelMatrix(glm::mat4(1.0f))
+		localTransform(transform_val)
 		{ };
 
 	~Node() {};
@@ -49,22 +46,19 @@ public:
 		//Node(n.id, n.localTransform, n.parent);
 	}
 
-	void CalculateCumulativeTransform() {
+	VgMath::Transform CalculateCumulativeTransform() {
 
+		VgMath::Transform cumulativeTransform;
 		cumulativeTransform = localTransform;
 
-		if (this->parent != nullptr) {
-			if(this->parent->id != 0){
-				cumulativeTransform = this->parent->GetTransformWorldCoordinates() * localTransform;
+		if (this->parent != nullptr) {	// Has a parent
+			if(this->parent->id != 0){	// The parent is not the world
+				cumulativeTransform = this->parent->CalculateCumulativeTransform() * localTransform;
 			}
 		}
 
-	}
-
-	VgMath::Transform GetTransformWorldCoordinates() {
-		CalculateCumulativeTransform();
 		return cumulativeTransform;
-	};
+	}
 
 private:
 
@@ -87,7 +81,10 @@ public:
 
 	void DeleteNode(const uint32_t id_val);
 
-	void CalculateWorldTransforms();
+	void CalculateWorldTransforms(
+		std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms,
+		std::unordered_map<uint32_t, glm::mat4>& const modelMatrices
+	);
 
 	static constexpr uint32_t ROOT_ID = 0;
 };
