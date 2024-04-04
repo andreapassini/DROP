@@ -106,6 +106,8 @@ positive Z axis points "outside" the screen
 #include "math/versor3.h"
 #include "math/quaternion.h"
 
+#include "physics/physicsEngine.h"
+
 #define UP_DIRECTION glm::vec3(0.0f, 1.0f, 0.0f)
 #define DOWN_DIRECTION glm::vec3(0.0f, -1.0f, 0.0f)
 
@@ -349,6 +351,8 @@ int main()
 
     rendereableObjects.push_back(bunny);
 
+    PhysicsEngine physicsEngine;
+
     // Rendering loop: this code is executed at each frame
     while (!glfwWindowShouldClose(renderer.window))
     {
@@ -413,6 +417,24 @@ int main()
             renderer.width,
             renderer.height
         );
+
+        uint32_t physIter = 0;
+        while (!physicsEngine.isPaused && currentTime > physicsEngine.getVirtualTIme()) {
+
+            //physicsEngine.AddForceToAll(glm::vec3(0.0f, gravity, 0.0f));
+
+            physicsEngine.PhysicsStep();
+
+            physIter++;
+
+            if (physIter > physicsEngine.maxIter) {
+                std::cout << "Physics Simulation lagging " << std::endl;
+                physicsEngine.SynchVirtualTime(currentTime);
+                break;
+            }
+        }
+
+        
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
