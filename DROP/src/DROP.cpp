@@ -351,7 +351,7 @@ int main()
 
     rendereableObjects.push_back(bunny);
 
-    PhysicsEngine physicsEngine;
+    PhysicsEngine physicsEngine(glfwGetTime(), 5U);
 
     // Rendering loop: this code is executed at each frame
     while (!glfwWindowShouldClose(renderer.window))
@@ -383,6 +383,9 @@ int main()
         ImGui::NewLine;
         ImGui::Text("FPS: %d", framerate);
         ImGui::NewLine;
+        
+        ImGui::Text("ON/OFF cursor:\n");
+        ImGui::Text("   Left CTRL + ALT");
         ImGui::End();
 
         if (spinning)
@@ -608,6 +611,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             current_subroutine = new_subroutine;
             PrintCurrentShader(current_subroutine);
         }
+    }
+
+    if (key == GLFW_KEY_LEFT_SHIFT && keys[GLFW_KEY_LEFT_ALT]) {
+        int cursorMode = glfwGetInputMode(window, GLFW_CURSOR);
+
+        switch (cursorMode)
+        {
+        case GLFW_CURSOR_DISABLED:
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            break;
+        case GLFW_CURSOR_NORMAL:
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            break;
+        default:
+            break;
+        }
+        
     }
 
     // we keep trace of the pressed keys
