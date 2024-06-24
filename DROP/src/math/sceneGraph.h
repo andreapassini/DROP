@@ -13,47 +13,39 @@
 
 class Node {
 public:
-	uint32_t id;
-	VgMath::Transform localTransform;
-	Node* parent;
+	uint32_t m_Id;
+	VgMath::Transform m_LocalTransform;
+	Node* m_Parent;
 
-	Node() : id(), parent(nullptr), 
-		localTransform() {
+	Node() 
+		: m_Id(), m_Parent(nullptr), m_LocalTransform() { }
 
-	}
+	Node(const uint32_t id_val) 
+		: m_Id(id_val), m_Parent(nullptr), m_LocalTransform() { };
 
-	Node(const uint32_t id_val) :
-		id(id_val), parent(nullptr), 
-		localTransform()
-		{ };
+	Node(const uint32_t id_val, const VgMath::Transform transform_val) 
+		: m_Id(id_val), m_Parent(nullptr), m_LocalTransform(transform_val) { };
 
-	Node(const uint32_t id_val, const VgMath::Transform transform_val) :
-		id(id_val), parent(nullptr), 
-		localTransform(transform_val)
-		{ };
-
-	Node(const uint32_t id_val, const VgMath::Transform transform_val, Node* parent_val) :
-		id(id_val), parent(parent_val), 
-		localTransform(transform_val)
-		{ };
+	Node(const uint32_t id_val, const VgMath::Transform transform_val, Node* parent_val) 
+		: m_Id(id_val), m_Parent(parent_val), m_LocalTransform(transform_val) { };
 
 	~Node() {};
 
 	void operator=(const Node& n) {
-		this->id = n.id;
-		this->parent = n.parent;
-		this->localTransform = n.localTransform;
+		this->m_Id = n.m_Id;
+		this->m_Parent = n.m_Parent;
+		this->m_LocalTransform = n.m_LocalTransform;
 		//Node(n.id, n.localTransform, n.parent);
 	}
 
-	VgMath::Transform CalculateCumulativeTransform() const {
-
+	VgMath::Transform CalculateCumulativeTransform() const 
+	{
 		VgMath::Transform cumulativeTransform;
-		cumulativeTransform = localTransform;
+		cumulativeTransform = m_LocalTransform;
 
-		if (this->parent != nullptr) {	// Has a parent
-			if(this->parent->id != 0){	// The parent is not the world
-				cumulativeTransform = this->parent->CalculateCumulativeTransform() * localTransform;
+		if (this->m_Parent != nullptr) {	// Has a parent
+			if(this->m_Parent->m_Id != 0){	// The parent is not the world
+				cumulativeTransform = this->m_Parent->CalculateCumulativeTransform() * m_LocalTransform;
 			}
 		}
 
@@ -65,33 +57,27 @@ private:
 };
 
 class SceneGraph {
-private:
-	Node* world;
-	uint32_t index;
-
 public:
-	// Wanna keep this so i can easily find the one i need and loop on through every node
-	std::unordered_map<uint32_t, Node> gameObjects;
-
 	SceneGraph(const uint32_t sizeEstimation);
 	~SceneGraph() {};
-
 	uint32_t AddObject(const uint32_t parentId);
 	uint32_t AddObject(const uint32_t parentId, const VgMath::Transform& transform);
-
 	void DeleteNode(const uint32_t id_val);
-
 	void CalculateWorldTransforms(
 		std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms,
-		std::unordered_map<uint32_t, glm::mat4>& const modelMatrices
-	);
-
+		std::unordered_map<uint32_t, glm::mat4>& const modelMatrices );
+public:
+	// Wanna keep this so i can easily find the one i need and loop on through every node
+	std::unordered_map<uint32_t, Node> m_GameObjects;
 	static constexpr uint32_t ROOT_ID = 0;
 
 private:
 	static void CalculateSingleWorldTransform(
 		const Node& const node,
 		VgMath::Transform* cumulatedTransform,
-		glm::mat4* modelMatrix);
+		glm::mat4* modelMatrix );
+private:
+	Node* m_World;
+	uint32_t m_Index;
 };
 

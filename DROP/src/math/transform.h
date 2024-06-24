@@ -17,45 +17,45 @@ namespace VgMath{
 class Transform{
 public:
     //glm::vec3 translate;
-    Vector3 translate;
+    Vector3 m_Translate;
 #if ANISOTROPIC_SCALING
     Vector3 scale; // (NON-UNIFORM or ANISOTROPIC) scaling
 #else
-    Scalar scale; // (UNIFORM or ISOTROPIC) scaling
+    Scalar m_Scale; // (UNIFORM or ISOTROPIC) scaling
 #endif
-    Quaternion rotate;
+    Quaternion m_Rotate;
 
     // empty constructor: returns identity transform
 #if ANISOTROPIC_SCALING
     Transform(): translate(0,0,0), scale(1,1,1),  rotate() {}
 #else
-    Transform(): translate(0,0,0), scale(1),  rotate(Quaternion::angleAxis(Degrees(0.0), Vector3(0.0, 1.0, 0.0).normalized())) {}
+    Transform(): m_Translate(0,0,0), m_Scale(1),  m_Rotate(Quaternion::angleAxis(Degrees(0.0), Vector3(0.0, 1.0, 0.0).normalized())) {}
     //Transform(): translate(0,0,0), scale(1),  rotate() {}
 #endif
 
-    Vector3 operator() (const Vector3& v) const{
-        return rotate.apply(scale * v);
+    Vector3 operator() (const Vector3& v) const {
+        return m_Rotate.apply(m_Scale * v);
     }
-    Versor3 operator() (const Versor3& d) const{
-        return rotate.apply( d );
+    Versor3 operator() (const Versor3& d) const {
+        return m_Rotate.apply( d );
     }
-    Point3 operator() (const Point3& p) const{
-        return rotate.apply(p.scaled(scale)) + translate;
+    Point3 operator() (const Point3& p) const {
+        return m_Rotate.apply(p.scaled(m_Scale)) + m_Translate;
     }
-    Scalar operator() (const Scalar& d) const{
-        return d*scale;
+    Scalar operator() (const Scalar& d) const {
+        return d*m_Scale;
     }
 
     // operatoins between transforms
-    Transform inverse() const{
+    Transform inverse() const {
         Transform res;
 #if ANISOTROPIC_SCALING
         res.scale = Vector3( 1/scale.x, 1/scale.y, 1/scale.z ) ;
 #else
-        res.scale = 1.0 /scale;
+        res.m_Scale = 1.0 /m_Scale;
 #endif
-        res.rotate = rotate.inverse();
-        res.translate = res.rotate.apply( -translate * res.scale );
+        res.m_Rotate = m_Rotate.inverse();
+        res.m_Translate = res.m_Rotate.apply( -m_Translate * res.m_Scale );
         return res;
     }
 
@@ -66,21 +66,22 @@ public:
 
 
 // the result is the transformation that does b first, then me (this)
-inline Transform Transform::operator * (const Transform & b) const {
-
+inline Transform Transform::operator * (const Transform & b) const 
+{
     Transform c;
-    c.scale = scale * b.scale;
-    c.rotate = rotate * b.rotate;
-    c.translate = translate + c.rotate.apply( b.translate * scale);
+    c.m_Scale = m_Scale * b.m_Scale;
+    c.m_Rotate = m_Rotate * b.m_Rotate;
+    c.m_Translate = m_Translate + c.m_Rotate.apply( b.m_Translate * m_Scale);
 
     return c;
 }
 
 
-inline bool areEqual(const Transform &a , const Transform &b ){
-    return areEqual( a.scale ,    b.scale )
-        && areEqual( a.translate, b.translate )
-        && areEquivalent( a.rotate,    b.rotate );
+inline bool areEqual(const Transform &a , const Transform &b )
+{
+    return areEqual( a.m_Scale ,    b.m_Scale )
+        && areEqual( a.m_Translate, b.m_Translate )
+        && areEquivalent( a.m_Rotate,    b.m_Rotate );
 }
 
 
