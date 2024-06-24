@@ -19,12 +19,12 @@ class RenderableObject
 public:
 
 	// ModelMatrix
-	glm::mat4* const modelMatrix;	// in world coordinates
+	glm::mat4* const m_ModelMatrix;	// in world coordinates
 	// Mesh
-	Model* model;
-	Material* material;
+	Model* m_Model;
+	Material* m_Material;
 	// Material
-	TextureParameter textureParameter;
+	TextureParameter m_TextureParameter;
 	
 	enum render_passes { SHADOWMAP, RENDER };
 
@@ -34,10 +34,10 @@ public:
 		Material* material_val = nullptr,
 		TextureParameter textureParameter_val = TextureParameter()
 	) :
-		modelMatrix(modelMatrix_val),
-		model(model_val),
-		material(material_val),
-		textureParameter(textureParameter_val)
+		m_ModelMatrix(modelMatrix_val),
+		m_Model(model_val),
+		m_Material(material_val),
+		m_TextureParameter(textureParameter_val)
 	{};
 
 	void Draw(const Shader& shader, const glm::mat4& view,

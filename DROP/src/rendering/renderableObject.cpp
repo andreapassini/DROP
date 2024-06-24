@@ -22,9 +22,9 @@ void RenderableObject::Draw(
             GLint alphaLocation = glGetUniformLocation(shader.Program, "alpha");
             GLint f0Location = glGetUniformLocation(shader.Program, "F0");
 
-            glUniform1f(kdLocation, (*this).material->Kd);
-            glUniform1f(alphaLocation, (*this).material->alpha);
-            glUniform1f(f0Location, (*this).material->F0);
+            glUniform1f(kdLocation, (*this).m_Material->Kd);
+            glUniform1f(alphaLocation, (*this).m_Material->Alpha);
+            glUniform1f(f0Location, (*this).m_Material->F0);
 
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -33,7 +33,7 @@ void RenderableObject::Draw(
         }
         break;
     case render_passes::SHADOWMAP:
-        if (this->material->castShadow == false)
+        if (this->m_Material->CastShadow == false)
             return;
 
         break;
@@ -44,18 +44,18 @@ void RenderableObject::Draw(
     GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
 
 
-	if (this->textureParameter.useTexture) {
+	if (this->m_TextureParameter.UseTexture) {
         // we activate the texture of the plane
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, (this->textureParameter.textures)->at(this->textureParameter.textureId));
+        glBindTexture(GL_TEXTURE_2D, (this->m_TextureParameter.Textures)->at(this->m_TextureParameter.TextureId));
         glUniform1i(textureLocation, 0);
-        glUniform1f(repeatLocation, this->textureParameter.repeat);
+        glUniform1f(repeatLocation, this->m_TextureParameter.Repeat);
     }
 
-    glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(view * *this->modelMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(*this->modelMatrix));
+    glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(view * *this->m_ModelMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(*this->m_ModelMatrix));
     glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
     // we render the plane
-    this->model->Draw();
+    this->m_Model->Draw();
 
 }

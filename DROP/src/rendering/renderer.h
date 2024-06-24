@@ -41,14 +41,6 @@ public:
         void (*mouse_callback)(GLFWwindow*, double, double)
     );
     ~Renderer();
-
-    GLFWwindow* window;
-    GLuint depthMapFBO;
-    GLuint depthMap;
-    int width;
-    int height;
-
-
 	void RenderScene(
         std::vector<RenderableObject>* const renderableObjects,
         glm::mat4 view,
@@ -67,6 +59,13 @@ public:
         const int width,
         const int height
     );
+public:
+    GLFWwindow* m_Window;
+    GLuint m_DepthMapFBO;
+    GLuint m_DepthMap;
+    int m_Width;
+    int m_Height;
+
 
 private:
 	const GLuint SHADOW_WIDTH;

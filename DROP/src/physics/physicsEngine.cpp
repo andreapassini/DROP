@@ -8,25 +8,25 @@ void PhysicsEngine::ApplyForceToSinglePhysicsObject(PhysicsObject* const physics
 
 PhysicsEngine::PhysicsEngine(double startingTime, uint32_t reserve_val)
 {
-	isPaused = false;
-	virtualTime = startingTime;
+	m_IsPaused = false;
+	m_VirtualTime = startingTime;
 
-	constraintsIterations = 1;
-	collisionsIterations = 1;
+	m_ConstraintsIterations = 1;
+	m_CollisionsIterations = 1;
 
-	physicsObjetcs.reserve(reserve_val);
+	m_PhysicsObjetcs.reserve(reserve_val);
 }
 
 void PhysicsEngine::SynchVirtualTime(double timeToSync) {
-	virtualTime = timeToSync;
+	m_VirtualTime = timeToSync;
 }
 
 void PhysicsEngine::PhysicsStep()
 {
-	if (isPaused)
+	if (m_IsPaused)
 		return;
 
-	virtualTime += PhysicsObject::FIXED_TIME_STEP;
+	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
 	
 	ApplyForces();
 
@@ -41,7 +41,7 @@ void PhysicsEngine::ApplyForces()
 {
 	std::vector<std::future<void>> futures;
 
-	for (auto& it : physicsObjetcs) {
+	for (auto& it : m_PhysicsObjetcs) {
 		futures.push_back(
 			std::async(std::launch::async,
 				ApplyForceToSinglePhysicsObject,
@@ -57,24 +57,24 @@ void PhysicsEngine::ApplyForces()
 
 void PhysicsEngine::ApplyConstraints()
 {
-	for (size_t i = 0; i < constraintsIterations; i++) {
+	for (size_t i = 0; i < m_ConstraintsIterations; i++) {
 
 	}
 }
 
 void PhysicsEngine::HandleCollision()
 {
-	for (size_t i = 0; i < collisionsIterations; i++) {
+	for (size_t i = 0; i < m_CollisionsIterations; i++) {
 
 	}
 }
 
-double PhysicsEngine::getVirtualTIme() { return virtualTime; }
+double PhysicsEngine::getVirtualTIme() { return m_VirtualTime; }
 
 void PhysicsEngine::AddForceToAll(VgMath::Vector3 force)
 {
-	for (size_t i = 0; i < physicsObjetcs.size(); i++) {
-		physicsObjetcs[i].AddForce(force);
+	for (size_t i = 0; i < m_PhysicsObjetcs.size(); i++) {
+		m_PhysicsObjetcs[i].AddForce(force);
 	}
 }
 

@@ -11,16 +11,6 @@
 class PhysicsEngine
 {
 public:
-	std::unordered_map<uint32_t, PhysicsObject> physicsObjetcs;
-	// Yes i have to use the pointer and ruin the data-oriented aproach 
-	// since virtual works only with pointers
-	std::unordered_map<uint32_t, vector<Constraint*>> constraints;
-	std::unordered_map<uint32_t, vector<Collider*>> colliders;
-
-	bool isPaused;
-	uint32_t constraintsIterations;
-	uint32_t collisionsIterations;
-
 	PhysicsEngine(double startingTime, uint32_t reserve_val);
 
 	void PhysicsStep();
@@ -30,17 +20,24 @@ public:
 	double getVirtualTIme();
 
 	void AddForceToAll(VgMath::Vector3 force);
+public:
+	std::unordered_map<uint32_t, PhysicsObject> m_PhysicsObjetcs;
+	// Yes I have to use the pointer and ruin the data-oriented approach 
+	// since virtual works only with pointers
+	std::unordered_map<uint32_t, vector<Constraint*>> m_Constraints;
+	std::unordered_map<uint32_t, vector<Collider*>> m_Colliders;
 
+	bool m_IsPaused;
+	uint32_t m_ConstraintsIterations;
+	uint32_t m_CollisionsIterations;
 	static constexpr uint32_t maxIter = 15;
 
 private:
-	double virtualTime;
-
 	void ApplyForces();
 	void ApplyConstraints();
 	void HandleCollision();
-
 	static void ApplyForceToSinglePhysicsObject(PhysicsObject* const physicsObject);
-
+private:
+	double m_VirtualTime;
 };
 

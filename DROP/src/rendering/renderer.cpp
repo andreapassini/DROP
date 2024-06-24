@@ -34,8 +34,8 @@ Renderer::Renderer(
     void (*key_callback)(GLFWwindow*, int, int, int, int),
     void (*mouse_callback)(GLFWwindow*, double, double)
 ):
-    width(screenWidth_val),
-    height(screenHeight_val),
+    m_Width(screenWidth_val),
+    m_Height(screenHeight_val),
     SHADOW_WIDTH(1024),
     SHADOW_HEIGHT(1024)
 {
@@ -56,8 +56,8 @@ Renderer::Renderer(
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
 
     // we create the application's window
-    window = glfwCreateWindow(width, height, "DROP", nullptr, nullptr);
-    if (!window)
+    m_Window = glfwCreateWindow(m_Width, m_Height, "DROP", nullptr, nullptr);
+    if (!m_Window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -65,7 +65,7 @@ Renderer::Renderer(
         //return -1;
         return;
     }
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(m_Window);
 
 #ifdef UNLOCK_FRAMERTE
     glfwSwapInterval(0); // Unlock framerate
@@ -74,14 +74,14 @@ Renderer::Renderer(
 
 
     // we put in relation the window and the callbacks
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetKeyCallback(m_Window, key_callback);
+    glfwSetCursorPosCallback(m_Window, mouse_callback);
 
     // we disable the mouse cursor
 #ifdef VISIBLE_MOUSE
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 #else
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif // VISIBLE_MOUSE
 
 
@@ -96,7 +96,7 @@ Renderer::Renderer(
 
     // we define the viewport dimensions
     //int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
+    glfwGetFramebufferSize(m_Window, &m_Width, &m_Height);
 
     // we enable Z test
     glEnable(GL_DEPTH_TEST);
@@ -109,11 +109,11 @@ Renderer::Renderer(
     const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     //GLuint depthMapFBO;
     // we create a Frame Buffer Object: the first rendering step will render to this buffer, and not to the real frame buffer
-    glGenFramebuffers(1, &depthMapFBO);
+    glGenFramebuffers(1, &m_DepthMapFBO);
     // we create a texture for the depth map
     //GLuint depthMap;
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glGenTextures(1, &m_DepthMap);
+    glBindTexture(GL_TEXTURE_2D, m_DepthMap);
     // in the texture, we will save only the depth data of the fragments. Thus, we specify that we need to render only depth in the first rendering step
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -129,8 +129,8 @@ Renderer::Renderer(
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
     // we bind the depth map FBO
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_DepthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthMap, 0);
     // we set that we are not calculating nor saving color data
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);

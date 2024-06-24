@@ -220,11 +220,11 @@ int main()
     Model bunnyModel("../models/bunny_lp.obj");
     Model planeModel("../models/plane.obj");
 
-    imGuiSetup(renderer.window);
+    imGuiSetup(renderer.m_Window);
 
     SceneGraph sceneGraph(150);
 
-    sceneGraph.gameObjects[SceneGraph::ROOT_ID].localTransform.rotate =
+    sceneGraph.m_GameObjects[SceneGraph::ROOT_ID].m_LocalTransform.m_Rotate =
         VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
     // Projection matrix of the camera: FOV angle, aspect ratio, near and far planes
@@ -233,88 +233,89 @@ int main()
     std::vector<RenderableObject> rendereableObjects;
 
     uint32_t planeSGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
-    sceneGraph.gameObjects[planeSGHandle].localTransform.translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
-    sceneGraph.gameObjects[planeSGHandle].localTransform.scale = 10.0;
-    sceneGraph.gameObjects[planeSGHandle].localTransform.rotate = 
+    sceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
+    sceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Scale = 10.0;
+    sceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Rotate = 
         VgMath::Quaternion::angleAxis(VgMath::Degrees(90.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
-    TextureParameter planeTextureParameter(
-        true,
-        1,
-        &textureID,
-        80.0);
-    Material planeMaterial(
-        3.0f,
-        0.2f,
-        0.9f,
-        false
-    );
+    TextureParameter planeTextureParameter;
+    planeTextureParameter.UseTexture = true;
+    planeTextureParameter.TextureId = 1;
+    planeTextureParameter.Textures = &textureID;
+    planeTextureParameter.Repeat = 80.0f;
+
+    Material planeMaterial;
+    planeMaterial.Kd = 3.0f;
+    planeMaterial.Alpha = 0.2f;
+    planeMaterial.F0 = 0.9f;
+    planeMaterial.CastShadow = false;
 
     // Sphere
     uint32_t sphereSGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
-    sceneGraph.gameObjects[sphereSGHandle].localTransform.translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
-    sceneGraph.gameObjects[sphereSGHandle].localTransform.scale = 1.0;
-    sceneGraph.gameObjects[sphereSGHandle].localTransform.rotate = 
+    sceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
+    sceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Scale = 1.0;
+    sceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Rotate = 
         VgMath::Quaternion::angleAxis(VgMath::Degrees(90.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
-    TextureParameter sphereTextureParameter(
-        true,
-        0,
-        &textureID );
-    Material sphereMaterial(
-        3.0f,
-        0.2f,
-        0.9f,
-        true
-    );
+    TextureParameter sphereTextureParameter;
+    sphereTextureParameter.UseTexture = true;
+    sphereTextureParameter.TextureId = 0;
+    sphereTextureParameter.Textures = &textureID;
+
+    Material sphereMaterial;
+    sphereMaterial.Kd = 3.0f;
+    sphereMaterial.Alpha = 0.2f;
+    sphereMaterial.F0 = 0.9f;
+    sphereMaterial.CastShadow = true;
 
     // Cube
     uint32_t cubeSGHandle = sceneGraph.AddObject(sphereSGHandle);
-    sceneGraph.gameObjects[cubeSGHandle].localTransform.translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
-    sceneGraph.gameObjects[cubeSGHandle].localTransform.scale = 0.48;
-    sceneGraph.gameObjects[cubeSGHandle].localTransform.rotate = 
+    sceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+    sceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Scale = 0.48;
+    sceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Rotate = 
         VgMath::Quaternion::angleAxis(VgMath::Degrees(90.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
-    TextureParameter cubeTextureParameter(
-        true,
-        0,
-        &textureID);
-    Material cubeMaterial(
-        3.0f,
-        0.2f,
-        0.9f,
-        false
-    );
+    TextureParameter cubeTextureParameter;
+    cubeTextureParameter.UseTexture = true;
+    cubeTextureParameter.TextureId = 0;
+    cubeTextureParameter.Textures = &textureID;
+
+    Material cubeMaterial;
+    cubeMaterial.Kd = 3.0f;
+    cubeMaterial.Alpha = 0.2f;
+    cubeMaterial.F0 = 0.9f;
+    cubeMaterial.CastShadow = false;
+
 
     // Bunny
     uint32_t bunnySGHandle = sceneGraph.AddObject(SceneGraph::ROOT_ID);
-    sceneGraph.gameObjects[bunnySGHandle].localTransform.translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
-    sceneGraph.gameObjects[bunnySGHandle].localTransform.scale = 0.3;
-    sceneGraph.gameObjects[bunnySGHandle].localTransform.rotate = 
+    sceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+    sceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Scale = 0.3;
+    sceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Rotate = 
         VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
-    TextureParameter bunnyTextureParameter(
-        true,
-        0,
-        &textureID);
-    Material bunnyMaterial(
-        3.0f,
-        0.2f,
-        0.9f,
-        true
-    );
+    TextureParameter bunnyTextureParameter;
+    bunnyTextureParameter.UseTexture = true;
+    bunnyTextureParameter.TextureId = 0;
+    bunnyTextureParameter.Textures = &textureID;
+
+    Material bunnyMaterial;
+    bunnyMaterial.Kd = 3.0f;
+    bunnyMaterial.Alpha = 0.2f;
+    bunnyMaterial.F0 = 0.9f;
+    bunnyMaterial.CastShadow = true;
 
     PerformanceCalculator framerateCalculator(100, 25);
 
     // Initialize cumulated transform hash map
     std::unordered_map<uint32_t, VgMath::Transform> cumulatedTransforms;
-    cumulatedTransforms.reserve( sceneGraph.gameObjects.size());
+    cumulatedTransforms.reserve( sceneGraph.m_GameObjects.size());
 
     std::unordered_map<uint32_t, glm::mat4> modelMatrices;
-    modelMatrices.reserve(sceneGraph.gameObjects.size());
+    modelMatrices.reserve(sceneGraph.m_GameObjects.size());
 
     // Now the 2 maps have all the keys as the SceneGraph
-    for (auto& it : sceneGraph.gameObjects) {
+    for (auto& it : sceneGraph.m_GameObjects) {
         cumulatedTransforms[it.first] = VgMath::Transform();
         modelMatrices[it.first] = glm::mat4(1.0f);
     }
@@ -354,7 +355,7 @@ int main()
     PhysicsEngine physicsEngine(glfwGetTime(), 5U);
 
     // Rendering loop: this code is executed at each frame
-    while (!glfwWindowShouldClose(renderer.window))
+    while (!glfwWindowShouldClose(renderer.m_Window))
     {
         // we determine the time passed from the beginning
         // and we calculate time difference between current frame rendering and the previous one
@@ -391,10 +392,10 @@ int main()
         if (spinning)
             orientationY += (deltaTime * spin_speed);
 
-        //sceneGraph.gameObjects[sphereSGHandle].localTransform.translate +=
+        //sceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate +=
         //    VgMath::Vector3(1.0, 0.0, 0.0) * deltaTime;
         
-        sceneGraph.gameObjects[sphereSGHandle].localTransform.rotate =
+        sceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(VgMath::Degrees(orientationY), VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
         sceneGraph.CalculateWorldTransforms(
@@ -412,17 +413,17 @@ int main()
             &shadow_shader,
             &illumination_shader,
             &camera,
-            renderer.depthMapFBO,
-            renderer.depthMap,
+            renderer.m_DepthMapFBO,
+            renderer.m_DepthMap,
             wireframe,
             current_subroutine,
             &shaders,
-            renderer.width,
-            renderer.height
+            renderer.m_Width,
+            renderer.m_Height
         );
 
         uint32_t physIter = 0;
-        while (!physicsEngine.isPaused && currentTime > physicsEngine.getVirtualTIme()) {
+        while (!physicsEngine.m_IsPaused && currentTime > physicsEngine.getVirtualTIme()) {
 
             //physicsEngine.AddForceToAll(glm::vec3(0.0f, gravity, 0.0f));
 
@@ -443,7 +444,7 @@ int main()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Swapping back and front buffers
-        glfwSwapBuffers(renderer.window);
+        glfwSwapBuffers(renderer.m_Window);
     }
 
     ImGui_ImplOpenGL3_Shutdown();
