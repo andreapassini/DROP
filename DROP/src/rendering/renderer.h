@@ -37,8 +37,9 @@ public:
 	Renderer(
         GLuint screenWidth_val,
         GLuint screenHeight_val,
-        void (*key_callback)(GLFWwindow*, int, int, int, int),
-        void (*mouse_callback)(GLFWwindow*, double, double)
+        void (*KeyCallback)(GLFWwindow*, int, int, int, int),
+        void (*MouseCallback)(GLFWwindow*, double, double),
+        void (*MouseKeyCallback)(GLFWwindow*, int, int, int)
     );
     ~Renderer();
 	void RenderScene(

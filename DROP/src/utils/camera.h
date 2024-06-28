@@ -1,17 +1,3 @@
-/*
-Camera class
-- creation of a reference system for the camera
-- management of camera movement (FPS-style) using WASD keys and mouse movement
-
-N.B.) adaptation of https://github.com/JoeyDeVries/LearnOpenGL/blob/master/includes/learnopengl/camera.h
-
-author: Davide Gadia
-
-Real-time Graphics Programming - a.a. 2022/2023
-Master degree in Computer Science
-Universita' degli Studi di Milano
-*/
-
 #pragma once
 
 // we use GLM to create the view matrix and to manage camera transformations
@@ -41,30 +27,26 @@ const GLfloat DIAGONAL_COMPENSATION = 0.70710678f;
 // parameter to weight mouse movement
 //const GLfloat SENSITIVITY =  0.25f;
 
-///////////////////  CAMERA class ///////////////////////
 class Camera
 {
 public:
-    //////////////////////////////////////////
-    // simplified constructor
-    // it can be extended passing different values of speed and mouse sensitivity, etc...
-    Camera(glm::vec3 position, GLboolean onGround, 
+    Camera(glm::vec3 position, 
+        GLboolean onGround, 
         GLfloat MovementSpeed_val, 
         GLfloat MovementSpeedVerticalMultiplier_val,
         GLfloat MouseSensitivity_val)
-        :m_Position(position),m_OnGround(onGround),m_Yaw(YAW),m_Pitch(PITCH),
-        m_MovementSpeed(MovementSpeed_val),
-        m_MovementSpeedVerticalMultiplier(MovementSpeedVerticalMultiplier_val),
+        : m_Position(position), 
+        m_OnGround(onGround), 
+        m_MovementSpeed(MovementSpeed_val), m_MovementSpeedVerticalMultiplier(MovementSpeedVerticalMultiplier_val), 
         m_MouseSensitivity(MouseSensitivity_val)
     {
         // initialization of the camera reference system
         this->UpdateCameraVectors();
     }
-    //////////////////////////////////////////
-    // it returns the current view matrix
+
     glm::mat4 GetViewMatrix()
     {
-        return glm::lookAt(this->m_Position, this->m_Position + this->m_Front, this->m_Up);
+        return glm::lookAt(this->m_Position, this->m_Position + this->m_Forward, this->m_Up);
     }
     //////////////////////////////////////////
     // if a single WASD key is pressed, then we will apply the full value of velocity v in the corresponding direction.
@@ -75,7 +57,7 @@ public:
     {
         m_MovementCompensation = (diagonal_movement ? DIAGONAL_COMPENSATION : 1.0f);
     }
-    //////////////////////////////////////////
+
     // it updates camera position when a WASD key is pressed
     void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
     {        
@@ -85,9 +67,9 @@ public:
         GLfloat velocity = this->m_MovementSpeed * deltaTime * m_MovementCompensation;
 
         if (direction == FORWARD)
-            this->m_Position += (this->m_OnGround ? this->m_WorldFront : this->m_Front) * velocity;
+            this->m_Position += (this->m_OnGround ? this->m_WorldForward : this->m_Forward) * velocity;
         if (direction == BACKWARD)
-            this->m_Position -= (this->m_OnGround ? this->m_WorldFront : this->m_Front) * velocity;
+            this->m_Position -= (this->m_OnGround ? this->m_WorldForward : this->m_Forward) * velocity;
         if (direction == LEFT)
             this->m_Position -= this->m_Right * velocity;
         if (direction == RIGHT)
@@ -98,7 +80,7 @@ public:
             this->m_Position -= this->m_Up * (velocity * m_MovementSpeedVerticalMultiplier);
 
     }
-    //////////////////////////////////////////
+
     // it updates camera orientation when mouse is moved
     void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constraintPitch = GL_TRUE)
     {
@@ -126,16 +108,16 @@ public:
 public:
     // Camera Attributes
     glm::vec3 m_Position;
-    glm::vec3 m_Front;
-    glm::vec3 m_WorldFront;
+    glm::vec3 m_Forward;
+    glm::vec3 m_WorldForward;
     glm::vec3 m_Up; // camera local UP vector
     glm::vec3 m_Right;
     glm::vec3 m_WorldUp = glm::vec3(0.0f, 1.0f, 0.0f); //  camera world UP vector -> needed for the initial computation of Right vector
     GLboolean m_OnGround; // it defines if the camera is "anchored" to the ground, or if it strictly follows the current Front direction (even if this means that the camera "flies" in the scene)
     // N.B.) this version works only for flat terrains
     // Eular Angles
-    GLfloat m_Yaw;
-    GLfloat m_Pitch;
+    GLfloat m_Yaw = YAW;
+    GLfloat m_Pitch = PITCH;
     // Camera speed parameters
     GLfloat m_MovementSpeed;
     GLfloat m_MovementSpeedVerticalMultiplier;
@@ -144,23 +126,33 @@ public:
     GLfloat m_MouseSensitivity;
 
 private:
-    //////////////////////////////////////////
-    // it updates the camera reference system
+    // Update the camera reference system
     void UpdateCameraVectors()
     {
         // it computes the new Front vector using trigonometric calculations using Yaw and Pitch angles
         // https://learnopengl.com/#!Getting-started/Camera
-        glm::vec3 m_Front;
-        m_Front.x = cos(glm::radians(this->m_Yaw)) * cos(glm::radians(this->m_Pitch));
-        m_Front.y = sin(glm::radians(this->m_Pitch));
-        m_Front.z = sin(glm::radians(this->m_Yaw)) * cos(glm::radians(this->m_Pitch));
-        this->m_Front = glm::normalize(m_Front);
+        glm::vec3 m_Forward;
+        m_Forward.x = cos(glm::radians(this->m_Yaw)) * cos(glm::radians(this->m_Pitch));
+        m_Forward.y = sin(glm::radians(this->m_Pitch));
+        m_Forward.z = sin(glm::radians(this->m_Yaw)) * cos(glm::radians(this->m_Pitch));
+        this->m_Forward = glm::normalize(m_Forward);
         // if the camera is "anchored" to the ground, the world Front vector is equal to the local Front vector, but with the y component = 0
-        m_Front.y = 0.0f;
-        this->m_WorldFront = glm::normalize(m_Front);
+        m_Forward.y = 0.0f;
+        this->m_WorldForward = glm::normalize(m_Forward);
         // Once calculated the new view direction, we re-calculate the Right vector as cross product between Front and world Up vector
-        this->m_Right = glm::normalize(glm::cross(this->m_Front, this->m_WorldUp));
+        this->m_Right = glm::normalize(glm::cross(this->m_Forward, this->m_WorldUp));
         // we calculate the camera local Up vector as cross product between Front and Right vectors
-        this->m_Up    = glm::normalize(glm::cross(this->m_Right, this->m_Front));     
+        this->m_Up    = glm::normalize(glm::cross(this->m_Right, this->m_Forward));     
     }
+private:
+    float m_VerticalFOV = 45.0f;
+    float m_NearClip = 0.1f;
+    float m_FarClip = 100.0f;
+
+    glm::mat4 m_Projection{ 1.0f };
+    glm::mat4 m_View{ 1.0f };
+    glm::mat4 m_InverseProjection{ 1.0f };
+    glm::mat4 m_InverseView{ 1.0f };
+
+    uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 };

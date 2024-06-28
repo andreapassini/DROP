@@ -124,8 +124,11 @@ GLuint screenWidth = 1200, screenHeight = 900;
 enum render_passes { SHADOWMAP, RENDER };
 
 // callback functions for keyboard and mouse events
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void MouseCallback(GLFWwindow* window, double xpos, double ypos);
+void MouseButtonCallback(GLFWwindow* window, int mouseKey, int action, int mode);
+int cursorMode = GLFW_CURSOR_NORMAL;
+
 // if one of the WASD keys is pressed, we call the corresponding method of the Camera class
 void apply_camera_movements();
 
@@ -160,7 +163,7 @@ GLfloat lastFramerateUpdate = 0.0f;
 const GLfloat framerateUpdateTime = 0.5f;
 uint32_t framerate;
 
-// rotation angle on Y axis
+// rotation angle on Y axis[
 VgMath::Scalar orientationY = 0.0f;
 // rotation speed on Y axis
 GLfloat spin_speed = 30.0f;
@@ -195,8 +198,9 @@ int main()
     Renderer renderer(
         screenWidth,
         screenHeight,
-        key_callback,
-        mouse_callback
+        KeyCallback,
+        MouseCallback,
+        MouseButtonCallback
     );
 
     // we create the Shader Program for the creation of the shadow map
@@ -370,6 +374,7 @@ int main()
 
         // Check is an I/O event is happening
         glfwPollEvents();
+        cursorMode = glfwGetInputMode(renderer.m_Window, GLFW_CURSOR);
         // we apply FPS camera movements
         apply_camera_movements();
 
@@ -438,8 +443,6 @@ int main()
             }
         }
 
-        
-
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -455,6 +458,7 @@ int main()
     // we delete the Shader Programs
     illumination_shader.Delete();
     shadow_shader.Delete();
+
     // chiudo e cancello il contesto creato
     glfwTerminate();
     return 0;
@@ -554,6 +558,9 @@ void PrintCurrentShader(int subroutine)
 // If one of the WASD keys is pressed, the camera is moved accordingly (the code is in utils/camera.h)
 void apply_camera_movements()
 {
+    if (cursorMode != GLFW_CURSOR_DISABLED)
+        return;
+
     // if a single WASD key is pressed, then we will apply the full value of velocity v in the corresponding direction.
     // However, if two keys are pressed together in order to move diagonally (W+D, W+A, S+D, S+A), 
     // then the camera will apply a compensation factor to the velocities applied in the single directions, 
@@ -570,15 +577,15 @@ void apply_camera_movements()
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (keys[GLFW_KEY_D])
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (keys[GLFW_KEY_LEFT_CONTROL])
+    if (keys[GLFW_KEY_Q])
         camera.ProcessKeyboard(DOWN, deltaTime);
-    if (keys[GLFW_KEY_SPACE])
+    if (keys[GLFW_KEY_E])
         camera.ProcessKeyboard(UP, deltaTime);
 }
 
 //////////////////////////////////////////
 // callback for keyboard events
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     GLuint new_subroutine;
 
@@ -614,22 +621,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
 
-    if (key == GLFW_KEY_LEFT_SHIFT && keys[GLFW_KEY_LEFT_ALT]) {
-        int cursorMode = glfwGetInputMode(window, GLFW_CURSOR);
+    //if (key == GLFW_KEY_0) {
+    //    int cursorMode = glfwGetInputMode(window, GLFW_CURSOR);
 
-        switch (cursorMode)
-        {
-        case GLFW_CURSOR_DISABLED:
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            break;
-        case GLFW_CURSOR_NORMAL:
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            break;
-        default:
-            break;
-        }
-        
-    }
+    //    switch (cursorMode)
+    //    {
+    //    case GLFW_CURSOR_DISABLED:
+    //        break;
+    //    case GLFW_CURSOR_NORMAL:
+    //        break;
+    //    default:
+    //        break;
+    //    }
+    //    
+    //}
 
     // we keep trace of the pressed keys
     // with this method, we can manage 2 keys pressed at the same time:
@@ -641,9 +646,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         keys[key] = false;
 }
 
+// int button, int action, int mods
+void MouseButtonCallback(GLFWwindow* window, int mouseKey, int action, int mode)
+{
+    if (mouseKey == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+}
+
+
 //////////////////////////////////////////
 // callback for mouse events
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void MouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
     // we move the camera view following the mouse cursor
     // we calculate the offset of the mouse cursor from the position in the last frame
@@ -663,9 +682,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
+    if (cursorMode != GLFW_CURSOR_DISABLED)
+        return;
+
     // we pass the offset to the Camera class instance in order to update the rendering
     camera.ProcessMouseMovement(xoffset, yoffset);
-
 }
 
 void imGuiSetup(GLFWwindow* window)

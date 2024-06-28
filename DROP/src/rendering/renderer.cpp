@@ -31,8 +31,9 @@
 Renderer::Renderer(
     GLuint screenWidth_val,
     GLuint screenHeight_val,
-    void (*key_callback)(GLFWwindow*, int, int, int, int),
-    void (*mouse_callback)(GLFWwindow*, double, double)
+    void (*KeyCallback)(GLFWwindow*, int, int, int, int),
+    void (*MouseCallback)(GLFWwindow*, double, double),
+    void (*MouseKeyCallback)(GLFWwindow*, int, int, int)
 ):
     m_Width(screenWidth_val),
     m_Height(screenHeight_val),
@@ -74,12 +75,14 @@ Renderer::Renderer(
 
 
     // we put in relation the window and the callbacks
-    glfwSetKeyCallback(m_Window, key_callback);
-    glfwSetCursorPosCallback(m_Window, mouse_callback);
+    glfwSetKeyCallback(m_Window, KeyCallback);
+    glfwSetCursorPosCallback(m_Window, MouseCallback);
+    glfwSetMouseButtonCallback(m_Window, MouseKeyCallback);
 
     // we disable the mouse cursor
+#define VISIBLE_MOUSE 1
 #ifdef VISIBLE_MOUSE
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 #else
     glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif // VISIBLE_MOUSE
