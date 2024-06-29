@@ -93,6 +93,7 @@ positive Z axis points "outside" the screen
 #include <imgui/imgui_impl_opengl3.h>
 
 // classes developed during lab lectures to manage shaders, to load models, and for FPS camera
+#include "input/Input.h"
 #include "utils/shader.h"
 #include "utils/model.h"
 #include "utils/camera.h"
@@ -107,6 +108,8 @@ positive Z axis points "outside" the screen
 #include "math/quaternion.h"
 
 #include "physics/physicsEngine.h"
+
+using namespace DROP;
 
 #define UP_DIRECTION glm::vec3(0.0f, 1.0f, 0.0f)
 #define DOWN_DIRECTION glm::vec3(0.0f, -1.0f, 0.0f)
@@ -124,13 +127,7 @@ GLuint screenWidth = 1200, screenHeight = 900;
 enum render_passes { SHADOWMAP, RENDER };
 
 // callback functions for keyboard and mouse events
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
-void MouseCallback(GLFWwindow* window, double xpos, double ypos);
-void MouseButtonCallback(GLFWwindow* window, int mouseKey, int action, int mode);
-int cursorMode = GLFW_CURSOR_NORMAL;
-
-// if one of the WASD keys is pressed, we call the corresponding method of the Camera class
-void apply_camera_movements();
+void SubroutineKeyCallback(GLFWwindow* window);
 
 // index of the current shader subroutine (= 0 in the beginning)
 GLuint current_subroutine = 0;
@@ -148,11 +145,6 @@ GLint LoadTexture(const char* path);
 
 void imGuiSetup(GLFWwindow* window);
 
-// we initialize an array of booleans for each keyboard key
-bool keys[1024];
-
-// we need to store the previous mouse position to calculate the offset with the current frame
-GLfloat lastX, lastY;
 // when rendering the first frame, we do not have a "previous state" for the mouse, so we need to manage this situation
 bool firstMouse = true;
 
@@ -176,11 +168,6 @@ GLboolean wireframe = GL_FALSE;
 // View matrix: the camera moves, so we just set to indentity now
 glm::mat4 view = glm::mat4(1.0f);
 
-// we create a camera. We pass the initial position as a parameter to the constructor. 
-// The last boolean tells if we want a camera "anchored" to the ground
-Camera camera(glm::vec3(0.0f, 0.0f, 7.0f), GL_FALSE,
-    10.0f, 0.5f, 0.25f);
-
 // in this example, we consider a directional light. We pass the direction of incoming light as an uniform to the shaders
 glm::vec3 lightDir0 = glm::vec3(1.0f, 1.0f, 1.0f);
 
@@ -190,18 +177,23 @@ std::vector<GLint> textureID;
 //#define UNLOCK_FRAMERTE
 //#define VISIBLE_MOUSE
 
-/////////////////// MAIN function ///////////////////////
 int main()
 {
     // We are in DROP/DROP!!!
-
     Renderer renderer(
         screenWidth,
-        screenHeight,
-        KeyCallback,
-        MouseCallback,
-        MouseButtonCallback
+        screenHeight
     );
+
+    Camera camera(
+        glm::vec3(0.0f, 0.0f, 6.0f),
+        45.0f,
+        0.1f,
+        100.0f,
+        10.0f,
+        0.75f);
+
+    Input::m_WindowHandle = renderer.m_Window;
 
     // we create the Shader Program for the creation of the shadow map
     Shader shadow_shader("src\\shaders\\19_shadowmap.vert", "src\\shaders\\20_shadowmap.frag");
@@ -374,9 +366,10 @@ int main()
 
         // Check is an I/O event is happening
         glfwPollEvents();
-        cursorMode = glfwGetInputMode(renderer.m_Window, GLFW_CURSOR);
-        // we apply FPS camera movements
-        apply_camera_movements();
+
+        SubroutineKeyCallback(renderer.m_Window);
+        camera.OnResize(renderer.m_Width, renderer.m_Height);
+        camera.OnUpdate(deltaTime);
 
         // render your GUI
         ImGui_ImplOpenGL3_NewFrame();
@@ -391,7 +384,11 @@ int main()
         ImGui::NewLine;
         
         ImGui::Text("ON/OFF cursor:\n");
-        ImGui::Text("   Left CTRL + ALT");
+        ImGui::Text("   Right mouse btn");
+        
+        ImGui::Separator();
+        ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", camera.m_Position.x, camera.m_Position.y, camera.m_Position.z);
+
         ImGui::End();
 
         if (spinning)
@@ -412,12 +409,11 @@ int main()
         
         renderer.RenderScene(
             &rendereableObjects,
-            view,
-            projection,
+            camera.GetViewMatrix(),
+            camera.GetProjectionMatrix(),
             lightDir0,
             &shadow_shader,
             &illumination_shader,
-            &camera,
             renderer.m_DepthMapFBO,
             renderer.m_DepthMap,
             wireframe,
@@ -555,138 +551,36 @@ void PrintCurrentShader(int subroutine)
 }
 
 //////////////////////////////////////////
-// If one of the WASD keys is pressed, the camera is moved accordingly (the code is in utils/camera.h)
-void apply_camera_movements()
-{
-    if (cursorMode != GLFW_CURSOR_DISABLED)
-        return;
-
-    // if a single WASD key is pressed, then we will apply the full value of velocity v in the corresponding direction.
-    // However, if two keys are pressed together in order to move diagonally (W+D, W+A, S+D, S+A), 
-    // then the camera will apply a compensation factor to the velocities applied in the single directions, 
-    // in order to have the full v applied in the diagonal direction  
-    // the XOR on A and D is to avoid the application of a wrong attenuation in the case W+A+D or S+A+D are pressed together.  
-    GLboolean diagonal_movement = (keys[GLFW_KEY_W] ^ keys[GLFW_KEY_S]) && (keys[GLFW_KEY_A] ^ keys[GLFW_KEY_D]);
-    camera.SetMovementCompensation(diagonal_movement);
-
-    if (keys[GLFW_KEY_W])
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (keys[GLFW_KEY_S])
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (keys[GLFW_KEY_A])
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (keys[GLFW_KEY_D])
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (keys[GLFW_KEY_Q])
-        camera.ProcessKeyboard(DOWN, deltaTime);
-    if (keys[GLFW_KEY_E])
-        camera.ProcessKeyboard(UP, deltaTime);
-}
-
-//////////////////////////////////////////
 // callback for keyboard events
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
+void SubroutineKeyCallback(GLFWwindow* window)
 {
-    GLuint new_subroutine;
 
     // if ESC is pressed, we close the application
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    if(Input::IsKeyDown(Key::Escape))
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    //// if P is pressed, we start/stop the animated rotation of models
-    //if (key == GLFW_KEY_P && action == GLFW_PRESS)
-    //    spinning = !spinning;
-
     // if L is pressed, we activate/deactivate wireframe rendering of models
-    if (key == GLFW_KEY_L && action == GLFW_PRESS)
+    if (Input::IsKeyDown(Key::L))
         wireframe = !wireframe;
 
-    // pressing a key number, we change the shader applied to the models
-    // if the key is between 1 and 9, we proceed and check if the pressed key corresponds to
-    // a valid subroutine
-    if ((key >= GLFW_KEY_1 && key <= GLFW_KEY_9) && action == GLFW_PRESS)
+    GLuint new_subroutine;
+    for (int i = 0; i < 9; i++)
     {
-        // "1" to "9" -> ASCII codes from 49 to 59
-        // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
-        // we subtract 1 to have indices from 0 to 8
-        new_subroutine = (key - '0' - 1);
-        // if the new index is valid ( = there is a subroutine with that index in the shaders vector),
-        // we change the value of the current_subroutine variable
-        // NB: we can just check if the new index is in the range between 0 and the size of the shaders vector,
-        // avoiding to use the std::find function on the vector
-        if (new_subroutine < shaders.size())
+        int key = (int)Key::D0 + i;
+        if (Input::IsKeyDown(KeyCode(key)))
         {
-            current_subroutine = new_subroutine;
-            PrintCurrentShader(current_subroutine);
+            // "1" to "9" -> ASCII codes from 49 to 59
+            // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
+            // we subtract 1 to have indices from 0 to 8
+            new_subroutine = (key - '0' - 1);
+            if (new_subroutine < shaders.size())
+            {
+                current_subroutine = new_subroutine;
+                PrintCurrentShader(current_subroutine);
+            }
         }
+
     }
-
-    //if (key == GLFW_KEY_0) {
-    //    int cursorMode = glfwGetInputMode(window, GLFW_CURSOR);
-
-    //    switch (cursorMode)
-    //    {
-    //    case GLFW_CURSOR_DISABLED:
-    //        break;
-    //    case GLFW_CURSOR_NORMAL:
-    //        break;
-    //    default:
-    //        break;
-    //    }
-    //    
-    //}
-
-    // we keep trace of the pressed keys
-    // with this method, we can manage 2 keys pressed at the same time:
-    // many I/O managers often consider only 1 key pressed at the time (the first pressed, until it is released)
-    // using a boolean array, we can then check and manage all the keys pressed at the same time
-    if (action == GLFW_PRESS)
-        keys[key] = true;
-    else if (action == GLFW_RELEASE)
-        keys[key] = false;
-}
-
-// int button, int action, int mods
-void MouseButtonCallback(GLFWwindow* window, int mouseKey, int action, int mode)
-{
-    if (mouseKey == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-    {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    }
-    else
-    {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
-}
-
-
-//////////////////////////////////////////
-// callback for mouse events
-void MouseCallback(GLFWwindow* window, double xpos, double ypos)
-{
-    // we move the camera view following the mouse cursor
-    // we calculate the offset of the mouse cursor from the position in the last frame
-    // when rendering the first frame, we do not have a "previous state" for the mouse, so we set the previous state equal to the initial values (thus, the offset will be = 0)
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    // offset of mouse cursor position
-    GLfloat xoffset = xpos - lastX;
-    GLfloat yoffset = lastY - ypos;
-
-    // the new position will be the previous one for the next frame
-    lastX = xpos;
-    lastY = ypos;
-
-    if (cursorMode != GLFW_CURSOR_DISABLED)
-        return;
-
-    // we pass the offset to the Camera class instance in order to update the rendering
-    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void imGuiSetup(GLFWwindow* window)

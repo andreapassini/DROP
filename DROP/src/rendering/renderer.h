@@ -35,21 +35,17 @@ class Renderer
 {
 public:
 	Renderer(
-        GLuint screenWidth_val,
-        GLuint screenHeight_val,
-        void (*KeyCallback)(GLFWwindow*, int, int, int, int),
-        void (*MouseCallback)(GLFWwindow*, double, double),
-        void (*MouseKeyCallback)(GLFWwindow*, int, int, int)
+        uint32_t screenWidth_val,
+        uint32_t screenHeight_val
     );
     ~Renderer();
 	void RenderScene(
         std::vector<RenderableObject>* const renderableObjects,
-        glm::mat4 view,
-        glm::mat4 projection,
-        glm::vec3 lightDir,
+        const glm::mat4& view,
+        const glm::mat4& projection,
+        const glm::vec3& lightDir,
         Shader* const shadow_shader,
         Shader* const illumination_shader,
-        Camera* const camera,
         const GLuint depthMapFBO,
         const GLuint depthMap,
         const GLboolean wireframe,

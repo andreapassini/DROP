@@ -29,11 +29,8 @@
 #include "../utils/camera.h"
 
 Renderer::Renderer(
-    GLuint screenWidth_val,
-    GLuint screenHeight_val,
-    void (*KeyCallback)(GLFWwindow*, int, int, int, int),
-    void (*MouseCallback)(GLFWwindow*, double, double),
-    void (*MouseKeyCallback)(GLFWwindow*, int, int, int)
+    uint32_t screenWidth_val,
+    uint32_t screenHeight_val
 ):
     m_Width(screenWidth_val),
     m_Height(screenHeight_val),
@@ -71,22 +68,6 @@ Renderer::Renderer(
 #ifdef UNLOCK_FRAMERTE
     glfwSwapInterval(0); // Unlock framerate
 #endif // UNLOCK_FRAMERTE
-
-
-
-    // we put in relation the window and the callbacks
-    glfwSetKeyCallback(m_Window, KeyCallback);
-    glfwSetCursorPosCallback(m_Window, MouseCallback);
-    glfwSetMouseButtonCallback(m_Window, MouseKeyCallback);
-
-    // we disable the mouse cursor
-#define VISIBLE_MOUSE 1
-#ifdef VISIBLE_MOUSE
-    glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-#else
-    glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-#endif // VISIBLE_MOUSE
-
 
     // GLAD tries to load the context set by GLFW
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -143,12 +124,11 @@ Renderer::Renderer(
 
 void Renderer::RenderScene(
     std::vector<RenderableObject>* const renderableObjects, 
-    glm::mat4 view, 
-    glm::mat4 projection,
-    glm::vec3 lightDir ,
+    const glm::mat4& view, 
+    const glm::mat4& projection,
+    const glm::vec3& lightDir ,
     Shader * const shadow_shader,
     Shader * const illumination_shader,
-    Camera * const camera,
     const GLuint depthMapFBO,
     const GLuint depthMap,
     const GLboolean wireframe,
@@ -194,9 +174,6 @@ void Renderer::RenderScene(
     }
 
     /////////////////// STEP 2 - SCENE RENDERING FROM CAMERA ////////////////////////////////////////////////
-
-    // we get the view matrix from the Camera class
-    view = camera->GetViewMatrix();
 
     // we activate back the standard Frame Buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
