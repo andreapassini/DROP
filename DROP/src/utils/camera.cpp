@@ -28,32 +28,32 @@ bool Camera::OnUpdate(float deltaTime)
 	glm::vec3 rightDirection = glm::cross(m_Forward, worldUpDirection);
 
 	// Movement
-	if (Input::IsKeyDown(KeyCode::W))
+	if (Input::IsKeyPressed(KeyCode::W))
 	{
 		m_Position += m_Forward * m_MovementSpeed * deltaTime;
 		moved = true;
 	}
-	else if (Input::IsKeyDown(KeyCode::S))
+	else if (Input::IsKeyPressed(KeyCode::S))
 	{
 		m_Position -= m_Forward * m_MovementSpeed * deltaTime;
 		moved = true;
 	}
-	if (Input::IsKeyDown(KeyCode::A))
+	if (Input::IsKeyPressed(KeyCode::A))
 	{
 		m_Position -= rightDirection * m_MovementSpeed * deltaTime;
 		moved = true;
 	}
-	else if (Input::IsKeyDown(KeyCode::D))
+	else if (Input::IsKeyPressed(KeyCode::D))
 	{
 		m_Position += rightDirection * m_MovementSpeed * deltaTime;
 		moved = true;
 	}
-	if (Input::IsKeyDown(KeyCode::Q))
+	if (Input::IsKeyPressed(KeyCode::Q))
 	{
 		m_Position -= worldUpDirection * m_MovementSpeed * deltaTime;
 		moved = true;
 	}
-	else if (Input::IsKeyDown(KeyCode::E))
+	else if (Input::IsKeyPressed(KeyCode::E))
 	{
 		m_Position += worldUpDirection * m_MovementSpeed * deltaTime;
 		moved = true;

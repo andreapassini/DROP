@@ -141,7 +141,7 @@ void SetupShader(int shader_program);
 void PrintCurrentShader(int subroutine);
 
 // load image from disk and create an OpenGL texture
-GLint LoadTexture(const char* path);
+int LoadTexture(const char* path);
 
 void imGuiSetup(GLFWwindow* window);
 
@@ -149,16 +149,16 @@ void imGuiSetup(GLFWwindow* window);
 bool firstMouse = true;
 
 // parameters for time calculation (for animations)
-GLfloat deltaTime = 0.0f;
-GLfloat lastFrame = 0.0f;
-GLfloat lastFramerateUpdate = 0.0f;
-const GLfloat framerateUpdateTime = 0.5f;
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+float lastFramerateUpdate = 0.0f;
+const float framerateUpdateTime = 0.5f;
 uint32_t framerate;
 
 // rotation angle on Y axis[
 VgMath::Scalar orientationY = 0.0f;
 // rotation speed on Y axis
-GLfloat spin_speed = 30.0f;
+float spin_speed = 30.0f;
 // boolean to start/stop animated rotation on Y angle
 GLboolean spinning = GL_TRUE;
 
@@ -172,7 +172,7 @@ glm::mat4 view = glm::mat4(1.0f);
 glm::vec3 lightDir0 = glm::vec3(1.0f, 1.0f, 1.0f);
 
 // vector for the textures IDs
-std::vector<GLint> textureID;
+std::vector<int> textureID;
 
 //#define UNLOCK_FRAMERTE
 //#define VISIBLE_MOUSE
@@ -191,7 +191,8 @@ int main()
         0.1f,
         100.0f,
         10.0f,
-        0.75f);
+        0.75f
+    );
 
     Input::m_WindowHandle = renderer.m_Window;
 
@@ -355,7 +356,7 @@ int main()
     {
         // we determine the time passed from the beginning
         // and we calculate time difference between current frame rendering and the previous one
-        GLfloat currentTime = glfwGetTime();
+        float currentTime = glfwGetTime();
         deltaTime = currentTime - lastFrame;
         lastFrame = currentTime;
         framerateCalculator.Step(deltaTime);
@@ -455,14 +456,13 @@ int main()
     illumination_shader.Delete();
     shadow_shader.Delete();
 
-    // chiudo e cancello il contesto creato
     glfwTerminate();
     return 0;
 }
 
 //////////////////////////////////////////
 // we load the image from disk and we create an OpenGL texture
-GLint LoadTexture(const char* path)
+int LoadTexture(const char* path)
 {
     GLuint textureImage;
     int w, h, channels;
@@ -556,18 +556,18 @@ void SubroutineKeyCallback(GLFWwindow* window)
 {
 
     // if ESC is pressed, we close the application
-    if(Input::IsKeyDown(Key::Escape))
+    if(Input::IsKeyPressed(Key::Escape))
         glfwSetWindowShouldClose(window, GL_TRUE);
 
     // if L is pressed, we activate/deactivate wireframe rendering of models
-    if (Input::IsKeyDown(Key::L))
+    if (Input::IsKeyPressed(Key::L))
         wireframe = !wireframe;
 
     GLuint new_subroutine;
     for (int i = 0; i < 9; i++)
     {
         int key = (int)Key::D0 + i;
-        if (Input::IsKeyDown(KeyCode(key)))
+        if (Input::IsKeyPressed(KeyCode(key)))
         {
             // "1" to "9" -> ASCII codes from 49 to 59
             // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9

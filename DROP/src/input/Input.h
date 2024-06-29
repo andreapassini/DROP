@@ -9,10 +9,11 @@ namespace DROP
 {
 	class Input
 	{
-	public:
+	public: 
 		static GLFWwindow* m_WindowHandle;
 	public:
-		static bool IsKeyDown(KeyCode keycode);
+		static bool IsKeyPressed(KeyCode keycode);
+		static bool IsKeyRepeated(KeyCode keycode);
 		static bool IsMouseButtonDown(MouseButton button);
 
 		static glm::vec2 GetMousePosition();

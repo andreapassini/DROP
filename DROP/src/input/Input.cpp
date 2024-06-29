@@ -4,12 +4,26 @@ using namespace DROP;
 
 GLFWwindow* Input::m_WindowHandle = nullptr;
 
-bool Input::IsKeyDown(KeyCode keycode)
+bool Input::IsKeyPressed(KeyCode keycode)
 {
 	GLFWwindow* windowHandle = m_WindowHandle;
 	int state = glfwGetKey(windowHandle, (int)keycode);
-	return state == GLFW_PRESS || state == GLFW_REPEAT;
+	return state == GLFW_PRESS;
 }
+
+bool Input::IsKeyRepeated(KeyCode keycode)
+{
+	GLFWwindow* windowHandle = m_WindowHandle;
+	int state = glfwGetKey(windowHandle, (int)keycode);
+	return state == GLFW_REPEAT;
+}
+
+//bool Input::IsKeyDown(KeyCode keycode)
+//{
+//	GLFWwindow* windowHandle = m_WindowHandle;
+//	int state = glfwGetKey(windowHandle, (int)keycode);
+//	return state == GLFW_PRESS || state == GLFW_REPEAT;
+//}
 
 bool Input::IsMouseButtonDown(MouseButton button)
 {
