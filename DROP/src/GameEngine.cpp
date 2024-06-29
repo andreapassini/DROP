@@ -9,6 +9,8 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include <iostream>
+
 extern bool g_GameEngineRunning;
 
 static DROP::GameEngine* s_Instance = nullptr;
@@ -38,8 +40,55 @@ namespace DROP
 	void GameEngine::Init()
 	{
 		// Setup GLFW window
+		// Initialization of OpenGL context using GLFW
+		glfwInit();
+		// We set OpenGL specifications required for this application
+		// In this case: 4.1 Core
+		// If not supported by your graphics HW, the context will not be created and the application will close
+		// N.B.) creating GLAD code to load extensions, try to take into account the specifications and any extensions you want to use,
+		// in relation also to the values indicated in these GLFW commands
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+		// we set if the window is resizable
+		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
+		// we create the application's window
+		m_WindowHandle = glfwCreateWindow(m_Width, m_Height, "DROP", nullptr, nullptr);
+		if (!m_WindowHandle)
+		{
+			std::cout << "Failed to create GLFW window" << std::endl;
+			glfwTerminate();
+			assert(false);
+			//return -1;
+			return;
+		}
+		glfwMakeContextCurrent(m_WindowHandle);
 
-		// Setup ImGui style
+#ifdef UNLOCK_FRAMERTE
+		glfwSwapInterval(0); // Unlock framerate
+#endif // UNLOCK_FRAMERTE
+
+		// GLAD tries to load the context set by GLFW
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		{
+			std::cout << "Failed to initialize OpenGL context" << std::endl;
+			assert(false);
+			//return -1;
+			return;
+		}
+
+
+		// OpenGL Setup
+
+
+		// ImGui SETUP
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(m_WindowHandle, true);
+		ImGui_ImplOpenGL3_Init("#version 410");
+
 	}
 
 	void GameEngine::Shutdown()
