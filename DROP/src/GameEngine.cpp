@@ -37,6 +37,21 @@ namespace DROP
 		return *s_Instance;
 	}
 
+	void GameEngine::Close()
+	{
+		m_Running = false;
+	}
+
+	float GameEngine::GetTime()
+	{
+		return (float)glfwGetTime();
+	}
+
+	GameEngine* GameEngine::GetInstance()
+	{
+		return s_Instance;
+	}
+
 	void GameEngine::Init()
 	{
 		// Setup GLFW window
@@ -149,6 +164,4 @@ namespace DROP
 			glfwSwapBuffers(m_WindowHandle);
 		}
 	}
-
-
 }

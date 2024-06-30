@@ -46,6 +46,7 @@ namespace DROP
 
 		float GetTime();
 		GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
+		static GameEngine* GetInstance();
 
 	private:
 		void Init();
