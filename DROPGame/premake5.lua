@@ -17,6 +17,7 @@ project "DropGame"
       "../dependencies/assimp/includes",
 
       "../Drop/src",
+        "../dependencies",
 
       -- "%{IncludeDir.glm}",
    }

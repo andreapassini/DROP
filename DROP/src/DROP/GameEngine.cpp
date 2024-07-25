@@ -191,9 +191,6 @@ namespace Drop
 			{
 				// Set ImGui style
 
-				//for (auto& game : m_GamesStack)
-				//	game->OnUIRender();
-
 				m_Game->OnUIRender();
 
 				//ImGui::End();

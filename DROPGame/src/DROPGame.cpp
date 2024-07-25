@@ -205,8 +205,6 @@ public:
         SubroutineKeyCallback();
     }
 
-    //////////////////////////////////////////
-    // callback for keyboard events
     void SubroutineKeyCallback()
     {
         const auto const gameEngine = GameEngine::GetInstance();
