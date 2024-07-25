@@ -41,13 +41,6 @@ namespace Drop
 		void Run();
 		void SetMenubarCallback(const std::function<void()>& menubarCallback) { m_MenubarCallback = menubarCallback; }
 
-		//template<typename T>
-		//void PushGame()
-		//{
-		//	static_assert(std::is_base_of<Game, T>::value, "Pushed type is not subclass of Game!");
-		//	m_GamesStack.emplace_back(std::make_shared<T>())->OnAttach();
-		//}
-
 		template<typename T>
 		void SetGame()
 		{
@@ -66,7 +59,7 @@ namespace Drop
 		static GameEngine* GetInstance();
 
 		static int LoadTexture(const char* path);
-		void SetupShader(int program);
+		std::string SetupShader(int program);
 		void PrintCurrentShader(int subroutine) const;
 	public:
 		SceneGraph m_SceneGraph = (RESERVE);
@@ -84,6 +77,7 @@ namespace Drop
 		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
 		std::unordered_map<uint32_t, glm::mat4> m_ModelMatrices;
 
+		std::string m_ShaderSubroutineInfo = "";
 
 	private:
 		void Init();

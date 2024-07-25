@@ -170,11 +170,17 @@ public:
 
 	virtual void OnUIRender() override
 	{
+        GameEngine* gameEngine = GameEngine::GetInstance();
+
 		ImGui::Begin("Hello");	
 		ImGui::Button("Button");
 
         ImGui::Separator();
         ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
+
+        ImGui::Separator();
+        ImGui::Text(gameEngine->m_ShaderSubroutineInfo.c_str());
+        ImGui::Text("Current Shader: \n\t%s", gameEngine->m_Shaders[m_CurrentSubroutine].c_str());
 
 		ImGui::End();
 
