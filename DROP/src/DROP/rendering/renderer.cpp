@@ -28,6 +28,8 @@
 #include "../utils/shader.h"
 #include "../utils/camera.h"
 
+#define UNLOCK_FRAMERTE
+
 Renderer::Renderer(
     uint32_t screenWidth_val,
     uint32_t screenHeight_val
@@ -73,6 +75,8 @@ Renderer::Renderer(
 
 #ifdef UNLOCK_FRAMERTE
     glfwSwapInterval(0); // Unlock framerate
+#else
+    glfwSwapInterval(1); // Vsycn
 #endif // UNLOCK_FRAMERTE
 
     // GLAD tries to load the context set by GLFW

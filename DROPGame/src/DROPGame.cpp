@@ -172,8 +172,9 @@ public:
 	{
         GameEngine* gameEngine = GameEngine::GetInstance();
 
-		ImGui::Begin("Hello");	
-		ImGui::Button("Button");
+		ImGui::Begin("Drop");	
+
+        ImGui::Text("Fps: %d", (int)(1.0f/m_DebugDeltaTime));
 
         ImGui::Separator();
         ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
@@ -189,20 +190,22 @@ public:
 
     virtual void OnUpdate(float deltaTime) {
         Renderer& const renderer = GameEngine::GetInstance()->m_Renderer;
-        renderer.m_clearColor += renderer.m_ColorIncrement;
-        if ((renderer.m_clearColor.x >= 1.0f
-            || renderer.m_clearColor.y >= 1.0f
-            || renderer.m_clearColor.z >= 1.0f)
-            ||
-            (renderer.m_clearColor.x <= 0.0f
-                || renderer.m_clearColor.y <= 0.0f
-                || renderer.m_clearColor.z <= 0.0f)
-            )
-        {
-            renderer.m_ColorIncrement *= -1;
-        }
+        //renderer.m_clearColor += renderer.m_ColorIncrement;
+        //if ((renderer.m_clearColor.x >= 1.0f
+        //    || renderer.m_clearColor.y >= 1.0f
+        //    || renderer.m_clearColor.z >= 1.0f)
+        //    ||
+        //    (renderer.m_clearColor.x <= 0.0f
+        //        || renderer.m_clearColor.y <= 0.0f
+        //        || renderer.m_clearColor.z <= 0.0f)
+        //    )
+        //{
+        //    renderer.m_ColorIncrement *= -1;
+        //}
 
         SubroutineKeyCallback();
+
+        m_DebugDeltaTime = deltaTime;
     }
 
     void SubroutineKeyCallback()
@@ -239,6 +242,7 @@ public:
         }
     }
 
+    float m_DebugDeltaTime = 0.0f;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)
