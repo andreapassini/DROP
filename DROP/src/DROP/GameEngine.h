@@ -7,16 +7,10 @@
 #include <memory>
 #include <functional>
 
-#include "../../dependencies/IMGUI/include/imgui/imgui.h"
-#include "../../dependencies/IMGUI/include/imgui/imgui_impl_glfw.h"
-#include "../../dependencies/IMGUI/include/imgui/imgui_impl_opengl3.h"
-
-//#include "imgui/imgui.h"
-//#include "imgui/imgui_impl_glfw.h"
-//#include "imgui/imgui_impl_opengl3.h"
-
 #include "physics/physicsEngine.h"
 #include "rendering/renderer.h"
+
+#include "imgui.h"
 
 struct GLFWwindow;
 

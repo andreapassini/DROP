@@ -172,16 +172,23 @@ public:
 	{
         GameEngine* gameEngine = GameEngine::GetInstance();
 
-		ImGui::Begin("Drop");	
+		ImGui::Begin("Drop Rendering");	
 
         ImGui::Text("Fps: %d", (int)(1.0f/m_DebugDeltaTime));
+        ImGui::Text("Average last %d Fps: %d", m_PerformanceWindowSize, m_AverageFPS);
 
         ImGui::Separator();
-        ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
+        ImGui::Checkbox("Wireframe", &m_Wireframe);
 
         ImGui::Separator();
         ImGui::Text(gameEngine->m_ShaderSubroutineInfo.c_str());
         ImGui::Text("Current Shader: \n\t%s", gameEngine->m_Shaders[m_CurrentSubroutine].c_str());
+        
+        ImGui::End();
+
+        ImGui::Begin("Drop Scene");
+        ImGui::Separator();
+        ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
 
 		ImGui::End();
 
@@ -190,22 +197,23 @@ public:
 
     virtual void OnUpdate(float deltaTime) {
         Renderer& const renderer = GameEngine::GetInstance()->m_Renderer;
-        //renderer.m_clearColor += renderer.m_ColorIncrement;
-        //if ((renderer.m_clearColor.x >= 1.0f
-        //    || renderer.m_clearColor.y >= 1.0f
-        //    || renderer.m_clearColor.z >= 1.0f)
-        //    ||
-        //    (renderer.m_clearColor.x <= 0.0f
-        //        || renderer.m_clearColor.y <= 0.0f
-        //        || renderer.m_clearColor.z <= 0.0f)
-        //    )
-        //{
-        //    renderer.m_ColorIncrement *= -1;
-        //}
 
         SubroutineKeyCallback();
 
         m_DebugDeltaTime = deltaTime;
+        
+        // full performance window, time to output the calculated data
+        if (m_Frames >= m_PerformanceWindowSize)
+        {
+            m_AverageFPS = 1 / averageDeltaTime;
+
+            // reset the performance window data
+            m_Frames = 1;
+            m_SumDeltaTime = averageDeltaTime;
+        }
+        m_SumDeltaTime += m_DebugDeltaTime;
+        m_Frames += 1;
+        averageDeltaTime = m_SumDeltaTime / m_Frames;
     }
 
     void SubroutineKeyCallback()
@@ -215,12 +223,6 @@ public:
         //// if ESC is pressed, we close the application
         //if (Input::IsKeyPressed(Key::Escape))
         //    glfwSetWindowShouldClose(window, GL_TRUE);
-
-        // if L is pressed, we activate/deactivate wireframe rendering of models
-        if (Input::IsKeyDown(Key::L))
-            m_Wireframe = true;
-        else if (Input::IsKeyReleased(Key::L))
-            m_Wireframe = false;
 
         GLuint new_subroutine;
         for (int i = 0; i < 9; i++)
@@ -243,6 +245,11 @@ public:
     }
 
     float m_DebugDeltaTime = 0.0f;
+    float averageDeltaTime = 0.0f;
+    uint32_t m_AverageFPS = 0;
+    float m_SumDeltaTime = 0.0f;
+    uint64_t m_Frames = 0;
+    uint64_t m_PerformanceWindowSize = 1'000;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)

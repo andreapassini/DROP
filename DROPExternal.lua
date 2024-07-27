@@ -6,7 +6,7 @@
 group "Dependencies"
    include "dependencies/glad"
    include "dependencies/GLFW"
-   include "dependencies/IMGUI"
+   include "dependencies/imgui"
 group ""
 
 group "Core"
