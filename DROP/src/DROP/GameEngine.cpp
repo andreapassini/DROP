@@ -160,10 +160,6 @@ namespace Drop
 	{
 		m_Running = true;
 
-		//SetupShader(m_Game->m_ShadowShader.Program);
-		m_ShaderSubroutineInfo = SetupShader(m_Game->m_LightShader.Program);
-		PrintCurrentShader(m_Game->m_CurrentSubroutine);
-
 		//ImGuiIO& io = ImGui::GetIO();
 
 		// Main loop
@@ -273,7 +269,7 @@ namespace Drop
 
 				m_Game->OnUIRender();
 
-				//ImGui::End();
+				ImGui::End();
 			}
 
 			m_Renderer.RenderScene(
@@ -290,8 +286,6 @@ namespace Drop
 				m_Renderer.m_DepthMapFBO,
 				m_Renderer.m_DepthMap,
 				m_Game->m_Wireframe,
-				m_Game->m_CurrentSubroutine,
-				&(m_Shaders),
 				m_Renderer.m_Width,
 				m_Renderer.m_Height
 			);
@@ -358,60 +352,5 @@ namespace Drop
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		return textureImage;
-	}
-
-	std::string GameEngine::SetupShader(int program)
-	{
-		int maxSub, maxSubU, countActiveSU;
-		GLchar name[256];
-		int len, numCompS;
-
-		std::string out;
-
-		// global parameters about the Subroutines parameters of the system
-		glGetIntegerv(GL_MAX_SUBROUTINES, &maxSub);
-		glGetIntegerv(GL_MAX_SUBROUTINE_UNIFORM_LOCATIONS, &maxSubU);
-
-		// get the number of Subroutine uniforms (only for the Fragment shader, due to the nature of the exercise)
-		// it is possible to add similar calls also for the Vertex shader
-		glGetProgramStageiv(program, GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &countActiveSU);
-
-		// print info for every Subroutine uniform
-		for (int i = 0; i < countActiveSU; i++)
-		{
-
-			// get the name of the Subroutine uniform (in this example, we have only one)
-			glGetActiveSubroutineUniformName(program, GL_FRAGMENT_SHADER, i, 256, &len, name);
-			// print index and name of the Subroutine uniform
-			out += "Subroutine Name: \n\t" + std::string(name) + "\n";
-
-			// get the number of subroutines
-			glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_NUM_COMPATIBLE_SUBROUTINES, &numCompS);
-
-			// get the indices of the active subroutines info and write into the array s
-			int* s = new int[numCompS];
-			glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_COMPATIBLE_SUBROUTINES, s);
-			out += "Compatible Subroutines: \n";
-
-			// for each index, get the name of the subroutines, print info, and save the name in the shaders vector
-			for (int j = 0; j < numCompS; ++j)
-			{
-				glGetActiveSubroutineName(program, GL_FRAGMENT_SHADER, s[j], 256, &len, name);
-				out += "\t" + std::to_string(s[j]) + " - " + name + "\n";
-				m_Shaders.push_back(name);
-			}
-
-			out += "\n";
-
-			delete[] s;
-		}
-
-		return out;
-	}
-
-	void GameEngine::PrintCurrentShader(int subroutine) const
-	{
-		LOG_CORE_TRACE("Current Shader: {}", m_Shaders[subroutine]);
-		//std::cout << "Current Shader: " << m_Shaders[subroutine] << std::endl;
 	}
 }

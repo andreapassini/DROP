@@ -152,19 +152,10 @@ namespace Drop
         const GLuint depthMapFBO,
         const GLuint depthMap,
         const GLboolean wireframe,
-        // index of the current shader subroutine (= 0 in the beginning)
-        const GLuint current_subroutine,
-        // a vector for all the shader subroutines names used and swapped in the application
-        std::vector<std::string>* const shaders,
         const int width,
         const int height
-    )
+    ) const
     {
-        // TO BE REMOVED
-        //the "clear" color for the frame buffer
-        glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.0f);
-
-
         /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
         // we set view and projection matrix for the rendering using light as a camera
         glm::mat4 lightProjection, lightView;
@@ -224,10 +215,10 @@ namespace Drop
 
         // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
         illumination_shader->Use();
-        // we search inside the Shader Program the name of the subroutine currently selected, and we get the numerical index
-        GLuint index = glGetSubroutineIndex(illumination_shader->Program, GL_FRAGMENT_SHADER, (*shaders)[current_subroutine].c_str());
-        // we activate the subroutine using the index (this is where shaders swapping happens)
-        glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &index);
+        //// we search inside the Shader Program the name of the subroutine currently selected, and we get the numerical index
+        //GLuint index = glGetSubroutineIndex(illumination_shader->Program, GL_FRAGMENT_SHADER, (*shaders)[current_subroutine].c_str());
+        //// we activate the subroutine using the index (this is where shaders swapping happens)
+        //glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &index);
 
         // we pass projection and view matrices to the Shader Program
         glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projection));

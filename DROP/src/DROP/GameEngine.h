@@ -63,15 +63,12 @@ namespace Drop
 
 		Renderer m_Renderer;
 		std::vector<RenderableObject> m_RendereableObjects;
-		std::vector<std::string> m_Shaders;
 		std::vector<int> m_TextureIds;
 		std::vector<Model> m_Models;
 		std::vector<Material> m_Materials;
 
 		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
 		std::unordered_map<uint32_t, glm::mat4> m_ModelMatrices;
-
-		std::string m_ShaderSubroutineInfo = "";
 
 	private:
 		void Init();

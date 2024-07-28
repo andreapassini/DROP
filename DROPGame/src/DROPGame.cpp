@@ -17,7 +17,7 @@ public:
 
 		m_LightShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert",
-			"..\\Drop\\src\\Drop\\shaders\\22_ggx_tex_shadow.frag"
+			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag"
         );
 
         GameEngine* gameEngine = GameEngine::GetInstance();
@@ -179,13 +179,7 @@ public:
 
         ImGui::Separator();
         ImGui::Checkbox("Wireframe", &m_Wireframe);
-
-        ImGui::Separator();
-        ImGui::Text(gameEngine->m_ShaderSubroutineInfo.c_str());
-        ImGui::Text("Current Shader: \n\t%s", gameEngine->m_Shaders[m_CurrentSubroutine].c_str());
         
-        ImGui::End();
-
         ImGui::Begin("Drop Scene");
         ImGui::Separator();
         ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
@@ -198,7 +192,7 @@ public:
     virtual void OnUpdate(float deltaTime) {
         Renderer& const renderer = GameEngine::GetInstance()->m_Renderer;
 
-        SubroutineKeyCallback();
+        Callbacks();
 
         m_DebugDeltaTime = deltaTime;
         
@@ -216,7 +210,7 @@ public:
         averageDeltaTime = m_SumDeltaTime / m_Frames;
     }
 
-    void SubroutineKeyCallback()
+    void Callbacks()
     {
         const auto const gameEngine = GameEngine::GetInstance();
 
@@ -224,24 +218,23 @@ public:
         if (Input::IsKeyPressed(Key::Escape))
             glfwSetWindowShouldClose(GameEngine::GetInstance()->GetWindowHandle(), GL_TRUE);
 
-        GLuint new_subroutine;
-        for (int i = 0; i < 9; i++)
-        {
-            int key = (int)Key::D0 + i;
-            if (Input::IsKeyPressed(KeyCode(key)))
-            {
-                // "1" to "9" -> ASCII codes from 49 to 59
-                // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
-                // we subtract 1 to have indices from 0 to 8
-                new_subroutine = (key - '0' - 1);
-                if (new_subroutine < gameEngine->m_Shaders.size())
-                {
-                    m_CurrentSubroutine = new_subroutine;
-                    gameEngine->PrintCurrentShader(m_CurrentSubroutine);
-                }
-            }
-
-        }
+        //GLuint new_subroutine;
+        //for (int i = 0; i < 9; i++)
+        //{
+        //    int key = (int)Key::D0 + i;
+        //    if (Input::IsKeyPressed(KeyCode(key)))
+        //    {
+        //        // "1" to "9" -> ASCII codes from 49 to 59
+        //        // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
+        //        // we subtract 1 to have indices from 0 to 8
+        //        new_subroutine = (key - '0' - 1);
+        //        if (new_subroutine < gameEngine->m_Shaders.size())
+        //        {
+        //            m_CurrentSubroutine = new_subroutine;
+        //            gameEngine->PrintCurrentShader(m_CurrentSubroutine);
+        //        }
+        //    }
+        //}
     }
 
     float m_DebugDeltaTime = 0.0f;

@@ -44,7 +44,7 @@ namespace Drop
 			"..\\Drop\\src\\Drop\\shaders\\20_shadowmap.frag");
 		Shader m_LightShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert", 
-			"..\\Drop\\src\\Drop\\shaders\\22_ggx_tex_shadow.frag");
+			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag");
 
 		uint32_t m_CurrentSubroutine = 0;
 

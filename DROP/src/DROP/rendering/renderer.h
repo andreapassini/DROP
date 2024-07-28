@@ -55,13 +55,9 @@ namespace Drop
             const GLuint depthMapFBO,
             const GLuint depthMap,
             const GLboolean wireframe,
-            // index of the current shader subroutine (= 0 in the beginning)
-            const GLuint current_subroutine,
-            // a vector for all the shader subroutines names used and swapped in the application
-            std::vector<std::string>* const shaders,
             const int width,
             const int height
-        );
+        ) const ;
     public:
         GLFWwindow* m_Window;
         GLuint m_DepthMapFBO;
