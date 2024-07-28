@@ -10,6 +10,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "input/Input.h"
+#include "utils/Log.h"
 
 //#include <imgui/imgui.h>
 //#include <imgui/imgui_impl_glfw.h>
@@ -78,6 +79,11 @@ namespace Drop
 
 	void GameEngine::Init()
 	{
+		Drop::Log::Init();
+		LOG_CORE_WARN("Initialized Log!");
+
+		LOG_CORE_INFO("Drop Engine starting");
+
 		// to be removed
 		m_WindowHandle = m_Renderer.m_Window;
 		Input::m_WindowHandle = m_Renderer.m_Window;
@@ -407,6 +413,7 @@ namespace Drop
 
 	void GameEngine::PrintCurrentShader(int subroutine) const
 	{
-		std::cout << "Current Shader: " << m_Shaders[subroutine] << std::endl;
+		LOG_CORE_TRACE("Current Shader: {}", m_Shaders[subroutine]);
+		//std::cout << "Current Shader: " << m_Shaders[subroutine] << std::endl;
 	}
 }

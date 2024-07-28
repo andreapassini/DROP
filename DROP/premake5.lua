@@ -18,6 +18,7 @@ project "Drop"
       "../dependencies/glm/include",
       "../dependencies/stb_img/include",
       "../dependencies/assimp/includes",
+      "../dependencies/spdlog/include",
    }
 
    libdirs { 

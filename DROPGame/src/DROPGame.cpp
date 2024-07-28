@@ -220,9 +220,9 @@ public:
     {
         const auto const gameEngine = GameEngine::GetInstance();
 
-        //// if ESC is pressed, we close the application
-        //if (Input::IsKeyPressed(Key::Escape))
-        //    glfwSetWindowShouldClose(window, GL_TRUE);
+        // if ESC is pressed, we close the application
+        if (Input::IsKeyPressed(Key::Escape))
+            glfwSetWindowShouldClose(GameEngine::GetInstance()->GetWindowHandle(), GL_TRUE);
 
         GLuint new_subroutine;
         for (int i = 0; i < 9; i++)
