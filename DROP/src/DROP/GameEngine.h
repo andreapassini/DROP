@@ -11,6 +11,7 @@
 #include "rendering/renderer.h"
 
 #include "imgui.h"
+#include "utils/Window.h"
 
 struct GLFWwindow;
 
@@ -30,7 +31,6 @@ namespace Drop
 		GameEngine(const GameEngineSpecification& specification = GameEngineSpecification());
 		~GameEngine();
 
-		static GameEngine& Get();
 
 		void Run();
 		void SetMenubarCallback(const std::function<void()>& menubarCallback) { m_MenubarCallback = menubarCallback; }
@@ -48,13 +48,12 @@ namespace Drop
 
 		void Close();
 
-		float GetTime();
-		GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
+		inline static GameEngine& Get();
+		inline Window& GetWindowHandle() const { return *m_WindowHandle; }
 		static GameEngine* GetInstance();
 
+		float GetTime();
 		static int LoadTexture(const char* path);
-		std::string SetupShader(int program);
-		void PrintCurrentShader(int subroutine) const;
 	public:
 		SceneGraph m_SceneGraph = (RESERVE);
 
@@ -75,7 +74,7 @@ namespace Drop
 		void Shutdown();
 	private:
 		GameEngineSpecification m_Specification;
-		GLFWwindow* m_WindowHandle = nullptr;
+		std::unique_ptr<Window> m_WindowHandle = nullptr;
 		bool m_Running = false;
 
 		float m_DeltaTime = 0.0f;

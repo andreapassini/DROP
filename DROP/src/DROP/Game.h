@@ -4,10 +4,10 @@
 #include "rendering/renderableObject.h"
 #include "rendering/material.h"
 #include "rendering/TextureParameter.h"
-#include "utils/model.h"
+#include "rendering/model.h"
 #include "utils/camera.h"
 #include "utils/performanceCalculator.h"
-#include "utils/shader.h"
+#include "rendering/shader.h"
 
 #include "physics/physicsObject.h"
 

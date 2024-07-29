@@ -5,11 +5,11 @@
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../utils/model.h"
+#include "../rendering/model.h"
 #include "material.h"
 #include "TextureParameter.h"
 
-#include "../utils/shader.h"
+#include "../rendering/shader.h"
 
 #include <unordered_map>
 

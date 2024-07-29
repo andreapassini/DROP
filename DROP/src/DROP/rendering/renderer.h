@@ -12,6 +12,7 @@
 #define APIENTRY __stdcall
 #endif
 
+#define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 
 // GLFW library to create window and to manage I/O
@@ -28,7 +29,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../utils/shader.h"
+#include "../rendering/shader.h"
 #include "../utils/camera.h"
 
 namespace Drop
@@ -40,6 +41,7 @@ namespace Drop
             uint32_t screenWidth_val,
             uint32_t screenHeight_val
         );
+        void Init(GLFWwindow* window);
         ~Renderer();
         void RenderScene(
             const std::vector<RenderableObject>& m_RenderableObjects,

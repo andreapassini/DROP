@@ -5,8 +5,10 @@
 #include <stdlib.h>         // abort
 #include <iostream>
 
-#include <glad/glad.h>
+#define GLFW_INCLUDE_NONE
 #include <glfw/glfw3.h>
+#include <glad/glad.h>
+
 #include <glm/gtx/string_cast.hpp>
 
 #include "input/Input.h"
@@ -43,6 +45,7 @@ namespace Drop
 		m_PhysicsEngine(0.0, 123),
 		m_Renderer(specification.Width, specification.Height)
 	{
+		assert(!s_Instance, "Game Engine already Exists");
 		s_Instance = this;
 
 		Init();
@@ -55,14 +58,14 @@ namespace Drop
 		s_Instance = nullptr;
 	}
 
-	GameEngine& GameEngine::Get()
-	{
-		return *s_Instance;
-	}
-
 	void GameEngine::Close()
 	{
 		m_Running = false;
+	}
+
+	inline GameEngine& GameEngine::Get()
+	{
+		return *s_Instance;
 	}
 
 	float GameEngine::GetTime()
@@ -83,48 +86,10 @@ namespace Drop
 		LOG_CORE_INFO("Drop Engine starting");
 
 		// to be removed
-		m_WindowHandle = m_Renderer.m_Window;
-		Input::m_WindowHandle = m_Renderer.m_Window;
+		m_WindowHandle = std::unique_ptr<Window>(Window::Create());
+		Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
 
-		// OpenGL Setup
-//		// Setup GLFW window
-//		// Initialization of OpenGL context using GLFW
-//		glfwInit();
-//		// We set OpenGL specifications required for this application
-//		// In this case: 4.1 Core
-//		// If not supported by your graphics HW, the context will not be created and the application will close
-//		// N.B.) creating GLAD code to load extensions, try to take into account the specifications and any extensions you want to use,
-//		// in relation also to the values indicated in these GLFW commands
-//		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-//		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-//		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-//		// we set if the window is resizable
-//		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
-//		// we create the application's window
-//		m_WindowHandle = glfwCreateWindow(m_Specification.Width, m_Specification.Height, "Drop", nullptr, nullptr);
-//		if (!m_WindowHandle)
-//		{
-//			std::cout << "Failed to create GLFW window" << std::endl;
-//			glfwTerminate();
-//			assert(false);
-//			//return -1;
-//			return;
-//		}
-//		glfwMakeContextCurrent(m_WindowHandle);
-//
-//#ifdef UNLOCK_FRAMERTE
-//		glfwSwapInterval(0); // Unlock framerate
-//#endif // UNLOCK_FRAMERTE
-//
-//		// GLAD tries to load the context set by GLFW
-//		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-//		{
-//			std::cout << "Failed to initialize OpenGL context" << std::endl;
-//			assert(false);
-//			//return -1;
-//			return;
-//		}
+		m_Renderer.Init((GLFWwindow*)m_WindowHandle->GetNativeWindow());
 
 		// ImGui SETUP
 		IMGUI_CHECKVERSION();
@@ -163,7 +128,7 @@ namespace Drop
 		//ImGuiIO& io = ImGui::GetIO();
 
 		// Main loop
-		while (!glfwWindowShouldClose(m_WindowHandle))
+		while (!m_WindowHandle->IsShouldClose())
 		{
 			// we determine the time passed from the beginning
 			// and we calculate time difference between current frame rendering and the previous one
@@ -171,12 +136,8 @@ namespace Drop
 			m_DeltaTime = currentTime - m_LastFrameTime;
 			m_LastFrameTime = currentTime;
 
-			// Poll and handle events (inputs, window resize, etc.)
-			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-			// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-			// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-			// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-			glfwPollEvents();
+			// pooling events
+			m_WindowHandle->OnUpdate();
 
 			m_Game->m_Camera.OnUpdate(m_DeltaTime);
 			m_Game->m_Camera.OnResize(m_Renderer.m_Width, m_Renderer.m_Height);
@@ -302,7 +263,7 @@ namespace Drop
 			//}
 
 			// Swapping back and front buffers
-			glfwSwapBuffers(m_WindowHandle);
+			m_WindowHandle->OnEndFrame();
 		}
 	}
 
@@ -314,8 +275,9 @@ namespace Drop
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 
-		glfwDestroyWindow(m_WindowHandle);
-		glfwTerminate();
+		m_WindowHandle.reset();
+
+		//m_WindowHandle.~unique_ptr();
 
 		g_GameEngineRunning = false;
 	}

@@ -10,6 +10,7 @@
 #endif
 
 
+#define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 
 // GLFW library to create window and to manage I/O
@@ -29,7 +30,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../utils/shader.h"
+#include "../rendering/shader.h"
 #include "../utils/camera.h"
 
 #define UNLOCK_FRAMERTE
@@ -45,68 +46,25 @@ namespace Drop
         SHADOW_WIDTH(1024),
         SHADOW_HEIGHT(1024)
     {
+    }
+
+    void Renderer::Init(GLFWwindow* window)
+    {
         // We are in Drop/Drop!!!
-
-        // Initialization of OpenGL context using GLFW
-        glfwInit();
-        // We set OpenGL specifications required for this application
-        // In this case: 4.1 Core
-        // If not supported by your graphics HW, the context will not be created and the application will close
-        // N.B.) creating GLAD code to load extensions, try to take into account the specifications and any extensions you want to use,
-        // in relation also to the values indicated in these GLFW commands
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        // we set if the window is resizable
-        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
-
-        // we create the application's window
-        m_Window = glfwCreateWindow((int)m_Width, (int)m_Height, "Drop Game", nullptr, nullptr);
-        if (!m_Window)
-        {
-            std::cout << "Failed to create GLFW window" << std::endl;
-            glfwTerminate();
-            assert(false);
-            //return -1;
-            return;
-        }
-        glfwMakeContextCurrent(m_Window);
-
-        // TO BE REMOVED
-        int debugWight = 0;
-        int debugHeight = 0;
-        glfwGetWindowSize(m_Window, &debugWight, &debugHeight);
-        std::cout << debugWight << " " << debugHeight << std::endl;
-
-#ifdef UNLOCK_FRAMERTE
-        glfwSwapInterval(0); // Unlock framerate
-#else
-        glfwSwapInterval(1); // Vsycn
-#endif // UNLOCK_FRAMERTE
-
-        // GLAD tries to load the context set by GLFW
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            std::cout << "Failed to initialize OpenGL context" << std::endl;
-            assert(false);
-            //return -1;
-            return;
-        }
-
+        // 
         // we define the viewport dimensions
         //int width, height;
+        m_Window = window;
         glfwGetFramebufferSize(m_Window, &(int)m_Width, &(int)m_Height);
 
         // we enable Z test
         glEnable(GL_DEPTH_TEST);
 
         //the "clear" color for the frame buffer
-        glClearColor(0.26f, 0.46f, 0.98f, 1.0f);
+        glClearColor(127.0f / 255.f, 201.0 / 255.f, 175.0f / 255.f, 1.0f);
 
         /////////////////// CREATION OF BUFFER FOR THE  DEPTH MAP /////////////////////////////////////////
         // buffer dimension: too large -> performance may slow down if we have many lights; too small -> strong aliasing
-        const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
         //GLuint depthMapFBO;
         // we create a Frame Buffer Object: the first rendering step will render to this buffer, and not to the real frame buffer
         glGenFramebuffers(1, &m_DepthMapFBO);
@@ -136,6 +94,7 @@ namespace Drop
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         ///////////////////////////////////////////////////////////////////
+
     }
 
     void Renderer::RenderScene(

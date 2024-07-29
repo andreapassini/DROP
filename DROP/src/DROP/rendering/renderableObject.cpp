@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../utils/shader.h"
+#include "../rendering/shader.h"
 
 
 void RenderableObject::Draw(

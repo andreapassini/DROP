@@ -33,7 +33,7 @@ using namespace std;
 #include <assimp/postprocess.h>
 
 // we include the Mesh class, which manages the "OpenGL side" (= creation and allocation of VBO, VAO, EBO buffers) of the loading of models
-#include "../utils/mesh.h"
+#include "../rendering/mesh.h"
 
 /////////////////// MODEL class ///////////////////////
 class Model
