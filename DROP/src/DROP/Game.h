@@ -42,13 +42,20 @@ namespace Drop
 		Shader m_ShadowShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\19_shadowmap.vert", 
 			"..\\Drop\\src\\Drop\\shaders\\20_shadowmap.frag");
+
 		Shader m_LightShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert", 
 			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag");
 
-		uint32_t m_CurrentSubroutine = 0;
+		Shader m_DebugShader = Shader(
+			"..\\Drop\\src\\Drop\\shaders\\debugLine.vert",
+			"..\\Drop\\src\\Drop\\shaders\\debugLine.frag");
+
 
 		bool m_Wireframe = false;
+		bool m_VSync = false;
+		bool m_DrawDebug = false;
+
 		glm::vec3 m_LightDir = glm::vec3(1.0f, 1.0f, 1.0f);
 	};
 }

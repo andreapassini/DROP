@@ -1,5 +1,7 @@
 #include "renderer.h"
 
+#include "line.h"
+
 // Loader for OpenGL extensions
 // http://glad.dav1d.de/
 // THIS IS OPTIONAL AND NOT REQUIRED, ONLY USE THIS IF YOU DON'T WANT GLAD TO INCLUDE windows.h
@@ -174,10 +176,6 @@ namespace Drop
 
         // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
         illumination_shader->Use();
-        //// we search inside the Shader Program the name of the subroutine currently selected, and we get the numerical index
-        //GLuint index = glGetSubroutineIndex(illumination_shader->Program, GL_FRAGMENT_SHADER, (*shaders)[current_subroutine].c_str());
-        //// we activate the subroutine using the index (this is where shaders swapping happens)
-        //glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &index);
 
         // we pass projection and view matrices to the Shader Program
         glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -186,21 +184,11 @@ namespace Drop
 
         // we determine the position in the Shader Program of the uniform variables
         GLint lightDirLocation = glGetUniformLocation(illumination_shader->Program, "lightVector");
-        // Set this for each rebnderableObject material
-        //GLint kdLocation = glGetUniformLocation(illumination_shader->Program, "Kd");
-        //GLint alphaLocation = glGetUniformLocation(illumination_shader->Program, "alpha");
-        //GLint f0Location = glGetUniformLocation(illumination_shader->Program, "F0");
 
         // we assign the value to the uniform variables
         glUniform3fv(lightDirLocation, 1, glm::value_ptr(lightDir));
-        // Set this for each rebnderableObject material
-        //glUniform1f(kdLocation, Kd);  // Moving it to the single drawing calls
-        //glUniform1f(alphaLocation, alpha);
-        //glUniform1f(f0Location, F0);
 
         // we render the scene
-        //RenderObjects(illumination_shader, planeModel, cubeModel, 
-        // sphereModel, bunnyModel, RENDER, depthMap);
         size = renderableObjects.size();
         for (size_t i = 0; i < size; i++)
         {
@@ -218,6 +206,32 @@ namespace Drop
 
     }
 
+    void Renderer::DrawDebug(
+        const glm::mat4& view,
+        const glm::mat4& projection,
+        Shader* const debugShader,
+        std::vector<Line>& lines,
+        const int width,
+        const int height
+    ) const
+    {
+        // we set the viewport for the final rendering step
+        glViewport(0, 0, width, height);
+
+        // Draw Lines
+        debugShader->Use();
+
+        //glUniformMatrix4fv(glGetUniformLocation(debugShader->Program, "MVP"), 1, GL_FALSE, glm::value_ptr(projection * view));
+        
+        for (size_t i = 0; i < lines.size(); i++)
+        {
+            glUniform3fv(glGetUniformLocation(debugShader->Program, "color"), 1, glm::value_ptr(lines[i].m_LineColor));
+
+            glBindVertexArray(lines[i].GetVAO());
+            glDrawArrays(GL_LINES, 0, 2);
+            glBindVertexArray(0);
+        }
+    }
 
     Renderer::~Renderer()
     {

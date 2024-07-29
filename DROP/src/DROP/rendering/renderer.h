@@ -2,6 +2,7 @@
 #include "renderableObject.h"
 
 #include <vector>
+#include "line.h"
 
 // Loader for OpenGL extensions
 // http://glad.dav1d.de/
@@ -60,6 +61,14 @@ namespace Drop
             const int width,
             const int height
         ) const ;
+        void DrawDebug(
+            const glm::mat4& view,
+            const glm::mat4& projection,
+            Shader* const debugShader,
+            std::vector<Line>& lines,
+            const int width,
+            const int height
+        ) const;
     public:
         GLFWwindow* m_Window;
         GLuint m_DepthMapFBO;

@@ -247,9 +247,21 @@ namespace Drop
 				m_Renderer.m_DepthMapFBO,
 				m_Renderer.m_DepthMap,
 				m_Game->m_Wireframe,
-				m_Renderer.m_Width,
-				m_Renderer.m_Height
+				m_WindowHandle->GetWidth(),
+				m_WindowHandle->GetHeight()
 			);
+
+			if (m_drawDebug)
+			{
+				m_Renderer.DrawDebug(
+					m_Game->m_Camera.GetViewMatrix(),
+					m_Game->m_Camera.GetProjectionMatrix(),
+					&(m_Game->m_DebugShader),
+					m_Lines,
+					m_WindowHandle->GetWidth(),
+					m_WindowHandle->GetHeight()
+				);
+			}
 
 			// Rendering imgui
 			ImGui::Render();
@@ -275,9 +287,7 @@ namespace Drop
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 
-		m_WindowHandle.reset();
-
-		//m_WindowHandle.~unique_ptr();
+		m_WindowHandle.reset(); // delete the object, leaving m_WindowHandle empty
 
 		g_GameEngineRunning = false;
 	}

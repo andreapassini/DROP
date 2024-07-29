@@ -37,7 +37,8 @@ public:
 
 		// Plane
         uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(0.0f, -1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Scale = 10.0f;
         gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -67,7 +68,8 @@ public:
 
         // Sphere
         uint32_t sphereSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(-3.0f, 1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Scale = 1.0f;
         gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -98,7 +100,8 @@ public:
 
         // Cube
         uint32_t cubeSGHandle = gameEngine->m_SceneGraph.AddObject(sphereSGHandle);
-        gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(3.0f, 1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Scale = 0.48f;
         gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -129,7 +132,8 @@ public:
 
         // Bunny
         uint32_t bunnySGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(3.0f, 1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Scale = 0.3f;
         gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -166,6 +170,21 @@ public:
             gameEngine->m_CumulatedTransforms[it.first] = VgMath::Transform();
             gameEngine->m_ModelMatrices[it.first] = glm::mat4(1.0f);
 		}
+
+        {
+            Line line(glm::vec3(0, 0, 0), glm::vec3(100, 0, 0), glm::vec3(0, 1, 0));
+            gameEngine->m_Lines.push_back(line);
+        }
+        {
+            Line line(glm::vec3(0, 0, 0), glm::vec3(0, 0, 100), glm::vec3(0, 1, 0));
+            gameEngine->m_Lines.push_back(line);
+        }
+        {
+            Line line(glm::vec3(0, 0, 0), glm::vec3(0, 100, 0), glm::vec3(0, 1, 0));
+            gameEngine->m_Lines.push_back(line);
+        }         
+
+        m_VSync = gameEngine->GetWindowHandle().IsVSync();
 	}
 
 	virtual void OnUIRender() override
@@ -175,10 +194,14 @@ public:
 		ImGui::Begin("Drop Rendering");	
 
         ImGui::Text("Fps: %d", (int)(1.0f/m_DebugDeltaTime));
-        ImGui::Text("Average last %d Fps: %d", m_PerformanceWindowSize, m_AverageFPS);
+        ImGui::Text("Average Fps: %d\n\tevery %.2f sec ", m_AverageFPS, m_FrameAverageCalulationDuration);
+        ImGui::Checkbox("VSync", &m_VSync);
 
         ImGui::Separator();
         ImGui::Checkbox("Wireframe", &m_Wireframe);
+
+        ImGui::Separator();
+        ImGui::Checkbox("Draw Debug Lines", &m_DrawDebug);
         
         ImGui::Begin("Drop Scene");
         ImGui::Separator();
@@ -190,21 +213,29 @@ public:
 	}
 
     virtual void OnUpdate(float deltaTime) {
-        Renderer& const renderer = GameEngine::GetInstance()->m_Renderer;
+
+        GameEngine* gameEngine = GameEngine::GetInstance();
+        Renderer& const renderer = gameEngine->m_Renderer;
+
+        gameEngine->GetWindowHandle().SetVSync(m_VSync);
+
+        gameEngine->SetDrawDebug(m_DrawDebug);
 
         Callbacks();
 
         m_DebugDeltaTime = deltaTime;
         
         // full performance window, time to output the calculated data
-        if (m_Frames >= m_PerformanceWindowSize)
+        if (m_FrameAverageCalulationDuration <= gameEngine->GetTime() - m_StartingTimeFrameAverage)
         {
             m_AverageFPS = 1 / averageDeltaTime;
 
             // reset the performance window data
             m_Frames = 1;
             m_SumDeltaTime = averageDeltaTime;
+            m_StartingTimeFrameAverage = gameEngine->GetTime();
         }
+
         m_SumDeltaTime += m_DebugDeltaTime;
         m_Frames += 1;
         averageDeltaTime = m_SumDeltaTime / m_Frames;
@@ -217,32 +248,17 @@ public:
         // if ESC is pressed, we close the application
         if (Input::IsKeyPressed(Key::Escape))
             GameEngine::GetInstance()->GetWindowHandle().SetShouldClose(true);
-
-        //GLuint new_subroutine;
-        //for (int i = 0; i < 9; i++)
-        //{
-        //    int key = (int)Key::D0 + i;
-        //    if (Input::IsKeyPressed(KeyCode(key)))
-        //    {
-        //        // "1" to "9" -> ASCII codes from 49 to 59
-        //        // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
-        //        // we subtract 1 to have indices from 0 to 8
-        //        new_subroutine = (key - '0' - 1);
-        //        if (new_subroutine < gameEngine->m_Shaders.size())
-        //        {
-        //            m_CurrentSubroutine = new_subroutine;
-        //            gameEngine->PrintCurrentShader(m_CurrentSubroutine);
-        //        }
-        //    }
-        //}
     }
 
     float m_DebugDeltaTime = 0.0f;
+
+    float m_StartingTimeFrameAverage = 0.0f;
+    float m_FrameAverageCalulationDuration = 1.0f;
+
     float averageDeltaTime = 0.0f;
     uint32_t m_AverageFPS = 0;
     float m_SumDeltaTime = 0.0f;
     uint64_t m_Frames = 0;
-    uint64_t m_PerformanceWindowSize = 1'000;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)
