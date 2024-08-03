@@ -1,7 +1,5 @@
 #include "renderer.h"
 
-#include "line.h"
-
 // Loader for OpenGL extensions
 // http://glad.dav1d.de/
 // THIS IS OPTIONAL AND NOT REQUIRED, ONLY USE THIS IF YOU DON'T WANT GLAD TO INCLUDE windows.h
@@ -210,7 +208,7 @@ namespace Drop
         const glm::mat4& view,
         const glm::mat4& projection,
         Shader* const debugShader,
-        std::vector<Line>& lines,
+        std::vector<DrawableBox>& drawableBoxes,
         const int width,
         const int height
     ) const
@@ -218,19 +216,32 @@ namespace Drop
         // we set the viewport for the final rendering step
         glViewport(0, 0, width, height);
 
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         // Draw Lines
         debugShader->Use();
 
-        //glUniformMatrix4fv(glGetUniformLocation(debugShader->Program, "MVP"), 1, GL_FALSE, glm::value_ptr(projection * view));
-        
-        for (size_t i = 0; i < lines.size(); i++)
-        {
-            glUniform3fv(glGetUniformLocation(debugShader->Program, "color"), 1, glm::value_ptr(lines[i].m_LineColor));
+        GLint projectionMatrixLocation = glGetUniformLocation(debugShader->Program, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection));
+        GLint viewMatrixLocation = glGetUniformLocation(debugShader->Program, "viewMatrix");
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(view));
 
-            glBindVertexArray(lines[i].GetVAO());
-            glDrawArrays(GL_LINES, 0, 2);
+        for (size_t i = 0; i < drawableBoxes.size(); i++)
+        {
+            GLint modelMatrixLocation = glGetUniformLocation(debugShader->Program, "modelMatrix");
+            glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(drawableBoxes[i].m_ModelMatrix));
+            GLint colorLocation = glGetUniformLocation(debugShader->Program, "colorIn");
+            glUniform3fv(colorLocation, 1, glm::value_ptr(drawableBoxes[i].m_LineColor));
+
+            // VAO is made "active"
+            glBindVertexArray(drawableBoxes[i].m_VAO);
+            // rendering of data in the VAO
+            glDrawElements(GL_TRIANGLES, (GLsizei)(drawableBoxes[i].m_Indices.size()), GL_UNSIGNED_INT, 0);
+            // VAO is "detached"
             glBindVertexArray(0);
         }
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     Renderer::~Renderer()

@@ -251,13 +251,13 @@ namespace Drop
 				m_WindowHandle->GetHeight()
 			);
 
-			if (m_drawDebug)
+			if (m_DrawDebug)
 			{
 				m_Renderer.DrawDebug(
 					m_Game->m_Camera.GetViewMatrix(),
 					m_Game->m_Camera.GetProjectionMatrix(),
 					&(m_Game->m_DebugShader),
-					m_Lines,
+					m_DrawableBox,
 					m_WindowHandle->GetWidth(),
 					m_WindowHandle->GetHeight()
 				);

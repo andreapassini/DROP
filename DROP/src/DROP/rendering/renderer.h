@@ -2,7 +2,7 @@
 #include "renderableObject.h"
 
 #include <vector>
-#include "line.h"
+#include "drawableBox.h"
 
 // Loader for OpenGL extensions
 // http://glad.dav1d.de/
@@ -65,7 +65,7 @@ namespace Drop
             const glm::mat4& view,
             const glm::mat4& projection,
             Shader* const debugShader,
-            std::vector<Line>& lines,
+            std::vector<DrawableBox>& lines,
             const int width,
             const int height
         ) const;

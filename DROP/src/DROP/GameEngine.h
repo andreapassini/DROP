@@ -55,8 +55,8 @@ namespace Drop
 		float GetTime();
 		static int LoadTexture(const char* path);
 
-		inline const bool IsDrawDebug() const { return m_drawDebug;  }
-		inline void SetDrawDebug(bool debug) { m_drawDebug = debug; }
+		inline const bool IsDrawDebug() const { return m_DrawDebug;  }
+		inline void SetDrawDebug(bool debug) { m_DrawDebug = debug; }
 
 	public:
 		SceneGraph m_SceneGraph = (RESERVE);
@@ -69,7 +69,7 @@ namespace Drop
 		std::vector<int> m_TextureIds;
 		std::vector<Model> m_Models;
 		std::vector<Material> m_Materials;
-		std::vector<Line> m_Lines;
+		std::vector<DrawableBox> m_DrawableBox;
 
 		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
 		std::unordered_map<uint32_t, glm::mat4> m_ModelMatrices;
@@ -90,7 +90,7 @@ namespace Drop
 		std::shared_ptr<Game> m_Game;
 		std::function<void()> m_MenubarCallback;
 
-		bool m_drawDebug = true;
+		bool m_DrawDebug = true;
 	};
 
 	// Implemented by CLIENT

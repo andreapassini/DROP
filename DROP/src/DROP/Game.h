@@ -48,13 +48,12 @@ namespace Drop
 			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag");
 
 		Shader m_DebugShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\debugLine.vert",
-			"..\\Drop\\src\\Drop\\shaders\\debugLine.frag");
+			"..\\Drop\\src\\Drop\\shaders\\00_basic.vert",
+			"..\\Drop\\src\\Drop\\shaders\\01_fullcolor.frag");
 
 
 		bool m_Wireframe = false;
 		bool m_VSync = false;
-		bool m_DrawDebug = false;
 
 		glm::vec3 m_LightDir = glm::vec3(1.0f, 1.0f, 1.0f);
 	};

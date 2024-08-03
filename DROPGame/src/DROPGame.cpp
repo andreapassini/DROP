@@ -172,17 +172,11 @@ public:
 		}
 
         {
-            Line line(glm::vec3(0, 0, 0), glm::vec3(100, 0, 0), glm::vec3(0, 1, 0));
-            gameEngine->m_Lines.push_back(line);
-        }
-        {
-            Line line(glm::vec3(0, 0, 0), glm::vec3(0, 0, 100), glm::vec3(0, 1, 0));
-            gameEngine->m_Lines.push_back(line);
-        }
-        {
-            Line line(glm::vec3(0, 0, 0), glm::vec3(0, 100, 0), glm::vec3(0, 1, 0));
-            gameEngine->m_Lines.push_back(line);
-        }         
+            DrawableBox& aBox = gameEngine->m_DrawableBox.emplace_back(
+                glm::vec3(0), 
+                glm::vec3(1)
+            );
+        }       
 
         m_VSync = gameEngine->GetWindowHandle().IsVSync();
 	}
@@ -259,6 +253,8 @@ public:
     uint32_t m_AverageFPS = 0;
     float m_SumDeltaTime = 0.0f;
     uint64_t m_Frames = 0;
+
+    bool m_DrawDebug = true;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)
