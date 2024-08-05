@@ -4,11 +4,10 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
-DrawableBox::DrawableBox(glm::vec3 min, glm::vec3 max, glm::vec3 color)
+DrawableBox::DrawableBox(glm::vec3 min, glm::vec3 max)
     : 
     m_Min(min),
-    m_Max(max),
-    m_LineColor(color)
+    m_Max(max)
 {
     m_Vertices = {
         m_Min.x, m_Min.y, m_Min.z,

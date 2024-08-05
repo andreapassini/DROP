@@ -69,7 +69,8 @@ namespace Drop
 		std::vector<int> m_TextureIds;
 		std::vector<Model> m_Models;
 		std::vector<Material> m_Materials;
-		std::vector<DrawableBox> m_DrawableBox;
+		std::vector<DrawableBox> m_DrawableBoxes;
+		std::vector<Line> m_DrawableLines;
 
 		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
 		std::unordered_map<uint32_t, glm::mat4> m_ModelMatrices;

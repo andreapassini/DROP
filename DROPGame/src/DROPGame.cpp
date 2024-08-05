@@ -172,9 +172,16 @@ public:
 		}
 
         {
-            DrawableBox& aBox = gameEngine->m_DrawableBox.emplace_back(
+            DrawableBox& aBox = gameEngine->m_DrawableBoxes.emplace_back(
                 glm::vec3(0), 
                 glm::vec3(1)
+            );
+        }         
+        
+        {
+            Line& aLine = gameEngine->m_DrawableLines.emplace_back(
+                glm::vec3(2), 
+                glm::vec3(4)
             );
         }       
 

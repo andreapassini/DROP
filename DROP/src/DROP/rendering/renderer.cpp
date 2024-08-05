@@ -209,6 +209,7 @@ namespace Drop
         const glm::mat4& projection,
         Shader* const debugShader,
         std::vector<DrawableBox>& drawableBoxes,
+        std::vector<Line>& drawableLines,
         const int width,
         const int height
     ) const
@@ -234,9 +235,24 @@ namespace Drop
             glUniform3fv(colorLocation, 1, glm::value_ptr(drawableBoxes[i].m_LineColor));
 
             // VAO is made "active"
-            glBindVertexArray(drawableBoxes[i].m_VAO);
+            glBindVertexArray(drawableBoxes[i].GetVAO());
             // rendering of data in the VAO
             glDrawElements(GL_TRIANGLES, (GLsizei)(drawableBoxes[i].m_Indices.size()), GL_UNSIGNED_INT, 0);
+            // VAO is "detached"
+            glBindVertexArray(0);
+        }
+
+        for (size_t i = 0; i < drawableLines.size(); i++)
+        {
+            GLint modelMatrixLocation = glGetUniformLocation(debugShader->Program, "modelMatrix");
+            glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(drawableLines[i].m_ModelMatrix));
+            GLint colorLocation = glGetUniformLocation(debugShader->Program, "colorIn");
+            glUniform3fv(colorLocation, 1, glm::value_ptr(drawableLines[i].m_LineColor));
+
+            // VAO is made "active"
+            glBindVertexArray(drawableLines[i].GetVAO());
+            // rendering of data in the VAO
+            glDrawArrays(GL_LINES, 0, 2);   
             // VAO is "detached"
             glBindVertexArray(0);
         }

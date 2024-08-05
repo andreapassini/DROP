@@ -257,7 +257,8 @@ namespace Drop
 					m_Game->m_Camera.GetViewMatrix(),
 					m_Game->m_Camera.GetProjectionMatrix(),
 					&(m_Game->m_DebugShader),
-					m_DrawableBox,
+					m_DrawableBoxes,
+					m_DrawableLines,
 					m_WindowHandle->GetWidth(),
 					m_WindowHandle->GetHeight()
 				);

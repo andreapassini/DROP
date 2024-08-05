@@ -7,7 +7,6 @@ class Line
 {
 public:
     Line(glm::vec3 start, glm::vec3 end);
-    Line(glm::vec3 start, glm::vec3 end, glm::vec3 color);
 
     inline unsigned int GetVAO()
     {
@@ -17,7 +16,8 @@ public:
     ~Line();
 
 public:
-    glm::vec3 m_LineColor;
+    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+    glm::vec3 m_LineColor = glm::vec3(0, 1, 0);
 
 private:
     unsigned int m_VBO, m_VAO;
