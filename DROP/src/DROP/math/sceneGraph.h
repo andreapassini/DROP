@@ -64,18 +64,18 @@ public:
 	uint32_t AddObject(const uint32_t parentId, const VgMath::Transform& transform);
 	void DeleteNode(const uint32_t id_val);
 	void CalculateWorldTransforms(
-		std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms,
-		std::unordered_map<uint32_t, glm::mat4>& const modelMatrices );
+		std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
+		);
 public:
 	// Wanna keep this so i can easily find the one i need and loop on through every node
 	std::unordered_map<uint32_t, Node> m_GameObjects;
 	static constexpr uint32_t ROOT_ID = 0;
+	static void TransformToMatrix(const VgMath::Transform& inTransform, glm::mat4& outModelMatrix);
 
 private:
 	static void CalculateSingleWorldTransform(
-		const Node& const node,
-		VgMath::Transform* cumulatedTransform,
-		glm::mat4* modelMatrix );
+		const Node& node,
+		VgMath::Transform* cumulatedTransform);
 private:
 	Node* m_World;
 	uint32_t m_Index;

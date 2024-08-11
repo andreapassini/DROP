@@ -17,7 +17,7 @@ public:
 
 		m_LightShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert",
-			"..\\Drop\\src\\Drop\\shaders\\22_ggx_tex_shadow.frag"
+			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag"
         );
 
         GameEngine* gameEngine = GameEngine::GetInstance();
@@ -37,7 +37,8 @@ public:
 
 		// Plane
         uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(0.0f, -1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Scale = 10.0f;
         gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -67,7 +68,8 @@ public:
 
         // Sphere
         uint32_t sphereSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(-3.0f, 1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Scale = 1.0f;
         gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -98,7 +100,8 @@ public:
 
         // Cube
         uint32_t cubeSGHandle = gameEngine->m_SceneGraph.AddObject(sphereSGHandle);
-        gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(3.0f, 1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Scale = 0.48f;
         gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -129,7 +132,8 @@ public:
 
         // Bunny
         uint32_t bunnySGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+        gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Translate = 
+            VgMath::Vector3(3.0f, 1.0f, 0.0f);
         gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Scale = 0.3f;
         gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Rotate =
             VgMath::Quaternion::angleAxis(
@@ -158,21 +162,40 @@ public:
         }
 
         gameEngine->m_CumulatedTransforms.reserve(gameEngine->m_SceneGraph.m_GameObjects.size());
-        gameEngine->m_ModelMatrices.reserve(gameEngine->m_SceneGraph.m_GameObjects.size());
 
 		// Now the 2 maps have all the keys as the SceneGraph
 		for (auto& it : gameEngine->m_SceneGraph.m_GameObjects)
 		{
             gameEngine->m_CumulatedTransforms[it.first] = VgMath::Transform();
-            gameEngine->m_ModelMatrices[it.first] = glm::mat4(1.0f);
 		}
+
+        {
+            Line& aLine = gameEngine->m_DrawableLines.emplace_back(
+                glm::vec3(0), 
+                glm::vec3(2)
+            );
+        }       
+
+        m_VSync = gameEngine->GetWindowHandle().IsVSync();
 	}
 
 	virtual void OnUIRender() override
 	{
-		ImGui::Begin("Hello");	
-		ImGui::Button("Button");
+        GameEngine* gameEngine = GameEngine::GetInstance();
 
+		ImGui::Begin("Drop Rendering");	
+
+        ImGui::Text("Fps: %d", (int)(1.0f/m_DebugDeltaTime));
+        ImGui::Text("Average Fps: %d\n\tevery %.2f sec ", m_AverageFPS, m_FrameAverageCalulationDuration);
+        ImGui::Checkbox("VSync", &m_VSync);
+
+        ImGui::Separator();
+        ImGui::Checkbox("Wireframe", &m_Wireframe);
+
+        ImGui::Separator();
+        ImGui::Checkbox("Draw Debug Lines", &m_DrawDebug);
+        
+        ImGui::Begin("Drop Scene");
         ImGui::Separator();
         ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
 
@@ -182,59 +205,54 @@ public:
 	}
 
     virtual void OnUpdate(float deltaTime) {
-        Renderer& const renderer = GameEngine::GetInstance()->m_Renderer;
-        renderer.m_clearColor += renderer.m_ColorIncrement;
-        if ((renderer.m_clearColor.x >= 1.0f
-            || renderer.m_clearColor.y >= 1.0f
-            || renderer.m_clearColor.z >= 1.0f)
-            ||
-            (renderer.m_clearColor.x <= 0.0f
-                || renderer.m_clearColor.y <= 0.0f
-                || renderer.m_clearColor.z <= 0.0f)
-            )
+
+        GameEngine* gameEngine = GameEngine::GetInstance();
+        Renderer& renderer = gameEngine->m_Renderer;
+
+        gameEngine->GetWindowHandle().SetVSync(m_VSync);
+
+        gameEngine->SetDrawDebug(m_DrawDebug);
+
+        Callbacks();
+
+        m_DebugDeltaTime = deltaTime;
+        
+        // full performance window, time to output the calculated data
+        if (m_FrameAverageCalulationDuration <= gameEngine->GetTime() - m_StartingTimeFrameAverage)
         {
-            renderer.m_ColorIncrement *= -1;
+            m_AverageFPS = (uint32_t)(1.0f / averageDeltaTime);
+
+            // reset the performance window data
+            m_Frames = 1;
+            m_SumDeltaTime = averageDeltaTime;
+            m_StartingTimeFrameAverage = gameEngine->GetTime();
         }
 
-        SubroutineKeyCallback();
+        m_SumDeltaTime += m_DebugDeltaTime;
+        m_Frames += 1;
+        averageDeltaTime = m_SumDeltaTime / m_Frames;
     }
 
-    //////////////////////////////////////////
-    // callback for keyboard events
-    void SubroutineKeyCallback()
+    void Callbacks()
     {
-        const auto const gameEngine = GameEngine::GetInstance();
+        const auto gameEngine = GameEngine::GetInstance();
 
-        //// if ESC is pressed, we close the application
-        //if (Input::IsKeyPressed(Key::Escape))
-        //    glfwSetWindowShouldClose(window, GL_TRUE);
-
-        // if L is pressed, we activate/deactivate wireframe rendering of models
-        if (Input::IsKeyDown(Key::L))
-            m_Wireframe = true;
-        else if (Input::IsKeyReleased(Key::L))
-            m_Wireframe = false;
-
-        GLuint new_subroutine;
-        for (int i = 0; i < 9; i++)
-        {
-            int key = (int)Key::D0 + i;
-            if (Input::IsKeyPressed(KeyCode(key)))
-            {
-                // "1" to "9" -> ASCII codes from 49 to 59
-                // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
-                // we subtract 1 to have indices from 0 to 8
-                new_subroutine = (key - '0' - 1);
-                if (new_subroutine < gameEngine->m_Shaders.size())
-                {
-                    m_CurrentSubroutine = new_subroutine;
-                    gameEngine->PrintCurrentShader(m_CurrentSubroutine);
-                }
-            }
-
-        }
+        // if ESC is pressed, we close the application
+        if (Input::IsKeyPressed(Key::Escape))
+            GameEngine::GetInstance()->GetWindowHandle().SetShouldClose(true);
     }
 
+    float m_DebugDeltaTime = 0.0f;
+
+    float m_StartingTimeFrameAverage = 0.0f;
+    float m_FrameAverageCalulationDuration = 1.0f;
+
+    float averageDeltaTime = 0.0f;
+    uint32_t m_AverageFPS = 0;
+    float m_SumDeltaTime = 0.0f;
+    uint64_t m_Frames = 0;
+
+    bool m_DrawDebug = true;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)
@@ -245,9 +263,8 @@ Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)
     spec.Height = 900;
 
 	Drop::GameEngine* gameEngine = new Drop::GameEngine(spec);
-    std::cout << gameEngine << std::endl; // TO BE REMOVED
-	//gameEngine->PushGame<ExampleGame>();
-	gameEngine->SetGame<ExampleGame>();
+
+    gameEngine->SetGame<ExampleGame>();
 	gameEngine->SetMenubarCallback([gameEngine]()
  	{
  		if (ImGui::BeginMenu("File"))

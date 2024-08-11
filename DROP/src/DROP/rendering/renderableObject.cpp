@@ -7,7 +7,8 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../utils/shader.h"
+#include "../rendering/shader.h"
+#include "DROP/math/sceneGraph.h"
 
 
 void RenderableObject::Draw(
@@ -15,7 +16,7 @@ void RenderableObject::Draw(
     const std::vector<int>& textuers,
     const std::vector<Model>& models,
     const std::vector<Material>& materials,
-    const std::unordered_map<uint32_t, glm::mat4>& modelMatrices,
+    std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms,
 
     const glm::mat4& view,
     const GLint render_pass, 
@@ -60,8 +61,12 @@ void RenderableObject::Draw(
         glUniform1f(repeatLocation, materials[m_MaterialId].Repeat);
     }
 
-    glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(view * modelMatrices.find(m_ModelMatrixId)->second));
-    glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrices.find(m_ModelMatrixId)->second));
+    VgMath::Transform& transform = m_CumulatedTransforms.find(m_ModelMatrixId)->second;
+    glm::mat4 modelMatrix(1.0f);
+    SceneGraph::TransformToMatrix(transform, modelMatrix);
+
+    glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(view * modelMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
     // we render the plane
     models[m_ModelId].Draw();

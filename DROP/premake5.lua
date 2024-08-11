@@ -10,14 +10,15 @@ project "Drop"
    includedirs
    {
       "src",
-
+      
       "../dependencies/glad/include",
       "../dependencies/GLFW/include",
-      "../dependencies/imgui/include",
-
+      "../dependencies/imgui",
+      
       "../dependencies/glm/include",
       "../dependencies/stb_img/include",
       "../dependencies/assimp/includes",
+      "../dependencies/spdlog/include",
    }
 
    libdirs { 
@@ -26,13 +27,11 @@ project "Drop"
 
    links
    {
-      -- glad
       "glad",
-
+      
       "GLFW",
-
-      -- IMGUI
-      "IMGUI",
+      
+      "ImGui",
 
       -- ASSIMP
       "assimp-vc143-mt.lib",

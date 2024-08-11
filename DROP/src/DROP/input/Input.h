@@ -2,6 +2,7 @@
 
 #include "KeyCodes.h"
 
+#define GLFW_INCLUDE_NONE
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 

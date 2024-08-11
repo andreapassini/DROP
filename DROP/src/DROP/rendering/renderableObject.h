@@ -5,11 +5,12 @@
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../utils/model.h"
+#include "../rendering/model.h"
 #include "material.h"
 #include "TextureParameter.h"
 
-#include "../utils/shader.h"
+#include "../rendering/shader.h"
+#include "Drop/math/transform.h"
 
 #include <unordered_map>
 
@@ -40,7 +41,7 @@ public:
 		const std::vector<int>& textuers,
 		const std::vector<Model>& models,
 		const std::vector<Material>& materials,
-		const std::unordered_map<uint32_t, glm::mat4>& modelMatrices,
+		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms,
 
 		const glm::mat4& view,
 		const GLint render_pass, 

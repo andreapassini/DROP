@@ -7,16 +7,11 @@
 #include <memory>
 #include <functional>
 
-#include "../../dependencies/IMGUI/include/imgui/imgui.h"
-#include "../../dependencies/IMGUI/include/imgui/imgui_impl_glfw.h"
-#include "../../dependencies/IMGUI/include/imgui/imgui_impl_opengl3.h"
-
-//#include "imgui/imgui.h"
-//#include "imgui/imgui_impl_glfw.h"
-//#include "imgui/imgui_impl_opengl3.h"
-
 #include "physics/physicsEngine.h"
 #include "rendering/renderer.h"
+
+#include "imgui.h"
+#include "utils/Window.h"
 
 struct GLFWwindow;
 
@@ -36,17 +31,9 @@ namespace Drop
 		GameEngine(const GameEngineSpecification& specification = GameEngineSpecification());
 		~GameEngine();
 
-		static GameEngine& Get();
 
 		void Run();
 		void SetMenubarCallback(const std::function<void()>& menubarCallback) { m_MenubarCallback = menubarCallback; }
-
-		//template<typename T>
-		//void PushGame()
-		//{
-		//	static_assert(std::is_base_of<Game, T>::value, "Pushed type is not subclass of Game!");
-		//	m_GamesStack.emplace_back(std::make_shared<T>())->OnAttach();
-		//}
 
 		template<typename T>
 		void SetGame()
@@ -61,13 +48,16 @@ namespace Drop
 
 		void Close();
 
-		float GetTime();
-		GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
+		inline static GameEngine& Get();
+		inline Window& GetWindowHandle() const { return *m_WindowHandle; }
 		static GameEngine* GetInstance();
 
+		float GetTime();
 		static int LoadTexture(const char* path);
-		void SetupShader(int program);
-		void PrintCurrentShader(int subroutine) const;
+
+		inline const bool IsDrawDebug() const { return m_DrawDebug;  }
+		inline void SetDrawDebug(bool debug) { m_DrawDebug = debug; }
+
 	public:
 		SceneGraph m_SceneGraph = (RESERVE);
 
@@ -76,13 +66,12 @@ namespace Drop
 
 		Renderer m_Renderer;
 		std::vector<RenderableObject> m_RendereableObjects;
-		std::vector<std::string> m_Shaders;
 		std::vector<int> m_TextureIds;
 		std::vector<Model> m_Models;
 		std::vector<Material> m_Materials;
+		std::vector<Line> m_DrawableLines;
 
 		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
-		std::unordered_map<uint32_t, glm::mat4> m_ModelMatrices;
 
 
 	private:
@@ -90,7 +79,7 @@ namespace Drop
 		void Shutdown();
 	private:
 		GameEngineSpecification m_Specification;
-		GLFWwindow* m_WindowHandle = nullptr;
+		std::unique_ptr<Window> m_WindowHandle = nullptr;
 		bool m_Running = false;
 
 		float m_DeltaTime = 0.0f;
@@ -100,6 +89,7 @@ namespace Drop
 		std::shared_ptr<Game> m_Game;
 		std::function<void()> m_MenubarCallback;
 
+		bool m_DrawDebug = true;
 	};
 
 	// Implemented by CLIENT

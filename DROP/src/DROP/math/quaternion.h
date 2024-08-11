@@ -83,7 +83,8 @@ public:
         return  apply( d.asVector3() ).asVersor3();
     }
 
-    static Quaternion angleAxis(Degrees angle, Versor3 axis){
+    static Quaternion angleAxis(Degrees angle, Versor3 axis)
+    {
 
         if (angle == 0.0) {
             angle = EPSILON;
@@ -97,7 +98,8 @@ public:
                 );
     }
 
-    Mat3 toMatrix() const{
+    Mat3 toMatrix() const
+    {
         // TODO: optimize! axes, as vectors, have a lot of 0s
         return Mat3(
            apply( Versor3::right().asVector3()  ),
@@ -106,16 +108,19 @@ public:
         );
     }
 
-    Scalar getAngleDegree() {
+    Scalar getAngleDegree() const 
+    {
         return rad2deg(getAngleRadians());
     }
 
-    Scalar getAngleRadians() {
+    Scalar getAngleRadians() const 
+    {
         Scalar halfAngle = acos(re);
         return 2 * acos(re);
     }
 
-    Versor3 getAxis() {
+    Versor3 getAxis() const 
+    {
         return im.normalized();
     }
 };

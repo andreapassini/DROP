@@ -4,10 +4,10 @@
 #include "rendering/renderableObject.h"
 #include "rendering/material.h"
 #include "rendering/TextureParameter.h"
-#include "utils/model.h"
+#include "rendering/model.h"
 #include "utils/camera.h"
 #include "utils/performanceCalculator.h"
-#include "utils/shader.h"
+#include "rendering/shader.h"
 
 #include "physics/physicsObject.h"
 
@@ -42,13 +42,19 @@ namespace Drop
 		Shader m_ShadowShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\19_shadowmap.vert", 
 			"..\\Drop\\src\\Drop\\shaders\\20_shadowmap.frag");
+
 		Shader m_LightShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert", 
-			"..\\Drop\\src\\Drop\\shaders\\22_ggx_tex_shadow.frag");
+			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag");
 
-		uint32_t m_CurrentSubroutine = 0;
+		Shader m_DebugShader = Shader(
+			"..\\Drop\\src\\Drop\\shaders\\00_basic.vert",
+			"..\\Drop\\src\\Drop\\shaders\\01_fullcolor.frag");
+
 
 		bool m_Wireframe = false;
+		bool m_VSync = false;
+
 		glm::vec3 m_LightDir = glm::vec3(1.0f, 1.0f, 1.0f);
 	};
 }

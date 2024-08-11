@@ -71,52 +71,14 @@ void SceneGraph::DeleteNode(const uint32_t id_val)
 // It was not working with const ref
 void SceneGraph::CalculateSingleWorldTransform(
 	const Node& const node,
-	VgMath::Transform* cumulatedTransform, 
-	glm::mat4* modelMatrix)
+	VgMath::Transform* cumulatedTransform
+	)
 {
-	(*modelMatrix) = glm::mat4(1.0f);
 	(*cumulatedTransform) = node.CalculateCumulativeTransform();
-
-	(*modelMatrix) = glm::translate(
-		(*modelMatrix),
-		glm::vec3(
-			(*cumulatedTransform).m_Translate.x,
-			(*cumulatedTransform).m_Translate.y,
-			(*cumulatedTransform).m_Translate.z
-		)
-	);
-
-	(*modelMatrix) = glm::rotate(
-		(*modelMatrix),
-		(float)(*cumulatedTransform).m_Rotate.getAngleRadians(),
-		glm::vec3(
-			(float)(*cumulatedTransform).m_Rotate.getAxis().x,
-			(float)(*cumulatedTransform).m_Rotate.getAxis().y,
-			(float)(*cumulatedTransform).m_Rotate.getAxis().z
-		)
-	);
-
-	(*modelMatrix) = glm::scale(
-		(*modelMatrix),
-#if ANISOTROPIC_SCALING
-		glm::vec3(
-			(float)(*cumulatedTransform).scale.x,
-			(float)(*cumulatedTransform).scale.y,
-			(float)(*cumulatedTransform).scale.z
-		)
-#else
-		glm::vec3(
-			(float)(*cumulatedTransform).m_Scale,
-			(float)(*cumulatedTransform).m_Scale,
-			(float)(*cumulatedTransform).m_Scale
-		)
-#endif
-	);
 }
 
 void SceneGraph::CalculateWorldTransforms(
-	std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms,
-	std::unordered_map<uint32_t, glm::mat4>& const modelMatrices) 
+	std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms) 
 {
 	std::vector<std::future<void>> futures;
 
@@ -125,8 +87,7 @@ void SceneGraph::CalculateWorldTransforms(
 			std::async(std::launch::async, 
 				CalculateSingleWorldTransform,
 					it.second, 
-					&cumulatedTransforms[it.first], 
-					&modelMatrices[it.first]
+					&cumulatedTransforms[it.first]
 			)
 		);		
 	}
@@ -136,3 +97,44 @@ void SceneGraph::CalculateWorldTransforms(
 	}
 }
 
+// Transform converted into a glm model matrix
+// This is not included directly in the transform file to avoid using an external math library there
+// - outModelMatrix: must be initialized to identity matrix
+void SceneGraph::TransformToMatrix(const VgMath::Transform& inTransform, glm::mat4& outModelMatrix)
+{
+	outModelMatrix = glm::translate(
+		outModelMatrix,
+		glm::vec3(
+			inTransform.m_Translate.x,
+			inTransform.m_Translate.y,
+			inTransform.m_Translate.z
+		)
+	);
+
+	outModelMatrix = glm::rotate(
+		outModelMatrix,
+		(float)(inTransform.m_Rotate.getAngleRadians()),
+		glm::vec3(
+			(float)(inTransform.m_Rotate.getAxis().x),
+			(float)(inTransform.m_Rotate.getAxis().y),
+			(float)(inTransform.m_Rotate.getAxis().z)
+		)
+	);
+
+	outModelMatrix = glm::scale(
+		outModelMatrix,
+#if ANISOTROPIC_SCALING
+		glm::vec3(
+			(float)inTransform.scale.x,
+			(float)inTransform.scale.y,
+			(float)inTransform.scale.z
+		)
+#else
+		glm::vec3(
+			(float)inTransform.m_Scale,
+			(float)inTransform.m_Scale,
+			(float)inTransform.m_Scale
+		)
+#endif
+	);
+}

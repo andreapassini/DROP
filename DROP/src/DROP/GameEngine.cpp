@@ -1,19 +1,25 @@
 #include "GameEngine.h"
 
+
 #include <stdio.h>          // printf, fprintf
 #include <stdlib.h>         // abort
-
 #include <iostream>
 
-#include <glad/glad.h>
+#define GLFW_INCLUDE_NONE
 #include <glfw/glfw3.h>
+#include <glad/glad.h>
+
 #include <glm/gtx/string_cast.hpp>
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
 #include "input/Input.h"
+#include "utils/Log.h"
+
+#include "imgui.h"
+#include "examples/imgui_impl_glfw.h"
+#include "examples/imgui_impl_opengl3.h"
+
+// Emedded font
+#include "ImGui/Roboto-Regular.embed"
 
 // we include the library for images loading
 #define STB_IMAGE_IMPLEMENTATION
@@ -39,6 +45,7 @@ namespace Drop
 		m_PhysicsEngine(0.0, 123),
 		m_Renderer(specification.Width, specification.Height)
 	{
+		assert(!s_Instance, "Game Engine already Exists");
 		s_Instance = this;
 
 		Init();
@@ -51,14 +58,14 @@ namespace Drop
 		s_Instance = nullptr;
 	}
 
-	GameEngine& GameEngine::Get()
-	{
-		return *s_Instance;
-	}
-
 	void GameEngine::Close()
 	{
 		m_Running = false;
+	}
+
+	inline GameEngine& GameEngine::Get()
+	{
+		return *s_Instance;
 	}
 
 	float GameEngine::GetTime()
@@ -73,70 +80,52 @@ namespace Drop
 
 	void GameEngine::Init()
 	{
-		// to be removed
-		m_WindowHandle = m_Renderer.m_Window;
-		Input::m_WindowHandle = m_Renderer.m_Window;
+		Drop::Log::Init();
+		LOG_CORE_WARN("Initialized Log!");
 
-		// OpenGL Setup
-//		// Setup GLFW window
-//		// Initialization of OpenGL context using GLFW
-//		glfwInit();
-//		// We set OpenGL specifications required for this application
-//		// In this case: 4.1 Core
-//		// If not supported by your graphics HW, the context will not be created and the application will close
-//		// N.B.) creating GLAD code to load extensions, try to take into account the specifications and any extensions you want to use,
-//		// in relation also to the values indicated in these GLFW commands
-//		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-//		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-//		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-//		// we set if the window is resizable
-//		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
-//		// we create the application's window
-//		m_WindowHandle = glfwCreateWindow(m_Specification.Width, m_Specification.Height, "Drop", nullptr, nullptr);
-//		if (!m_WindowHandle)
-//		{
-//			std::cout << "Failed to create GLFW window" << std::endl;
-//			glfwTerminate();
-//			assert(false);
-//			//return -1;
-//			return;
-//		}
-//		glfwMakeContextCurrent(m_WindowHandle);
-//
-//#ifdef UNLOCK_FRAMERTE
-//		glfwSwapInterval(0); // Unlock framerate
-//#endif // UNLOCK_FRAMERTE
-//
-//		// GLAD tries to load the context set by GLFW
-//		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-//		{
-//			std::cout << "Failed to initialize OpenGL context" << std::endl;
-//			assert(false);
-//			//return -1;
-//			return;
-//		}
+		LOG_CORE_INFO("Drop Engine starting");
+
+		// to be removed
+		m_WindowHandle = std::unique_ptr<Window>(Window::Create());
+		Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
+
+		m_Renderer.Init((GLFWwindow*)m_WindowHandle->GetNativeWindow());
 
 		// ImGui SETUP
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+		//io.ConfigViewportsNoAutoMerge = true;
+		//io.ConfigViewportsNoTaskBarIcon = true;
+
+		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
-		ImGui_ImplGlfw_InitForOpenGL(m_Renderer.m_Window, true);
+		//ImGui::StyleColorsClassic();
+
+		// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
+		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_WindowHandle->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 410");
-
-
 	}
 
 	void GameEngine::Run()
 	{
 		m_Running = true;
 
-		//SetupShader(m_Game->m_ShadowShader.Program);
-		SetupShader(m_Game->m_LightShader.Program);
-		PrintCurrentShader(m_Game->m_CurrentSubroutine);
+		//ImGuiIO& io = ImGui::GetIO();
 
 		// Main loop
-		while (!glfwWindowShouldClose(m_WindowHandle))
+		while (!m_WindowHandle->IsShouldClose())
 		{
 			// we determine the time passed from the beginning
 			// and we calculate time difference between current frame rendering and the previous one
@@ -144,17 +133,16 @@ namespace Drop
 			m_DeltaTime = currentTime - m_LastFrameTime;
 			m_LastFrameTime = currentTime;
 
-			// Poll and handle events (inputs, window resize, etc.)
-			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-			// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-			// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-			// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-			glfwPollEvents();
+			// pooling events
+			m_WindowHandle->OnUpdate();
 
 			m_Game->m_Camera.OnUpdate(m_DeltaTime);
-			m_Game->m_Camera.OnResize(m_Renderer.m_Width, m_Renderer.m_Height);
+			m_Game->m_Camera.OnResize(m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
+
+			// Update
 			m_Game->OnUpdate(m_DeltaTime);
 
+			// Fixed Update
 			uint32_t physIter = 0;
 			while (!m_PhysicsEngine.m_IsPaused && currentTime > m_PhysicsEngine.GetVirtualTIme())
 			{
@@ -179,32 +167,15 @@ namespace Drop
 
 			// Calculate world transform every time the transform in changed
 			m_SceneGraph.CalculateWorldTransforms(
-				m_CumulatedTransforms,
-				m_ModelMatrices
+				m_CumulatedTransforms
 			);
-
-			// render your GUI
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
-
-			{
-				// Set ImGui style
-
-				//for (auto& game : m_GamesStack)
-				//	game->OnUIRender();
-
-				m_Game->OnUIRender();
-
-				//ImGui::End();
-			}
 
 			m_Renderer.RenderScene(
 				m_RendereableObjects,
 				m_TextureIds,
 				m_Models,
 				m_Materials,
-				m_ModelMatrices,
+				m_CumulatedTransforms,
 				m_Game->m_Camera.GetViewMatrix(),
 				m_Game->m_Camera.GetProjectionMatrix(),
 				m_Game->m_LightDir,
@@ -213,18 +184,47 @@ namespace Drop
 				m_Renderer.m_DepthMapFBO,
 				m_Renderer.m_DepthMap,
 				m_Game->m_Wireframe,
-				m_Game->m_CurrentSubroutine,
-				&(m_Shaders),
-				m_Renderer.m_Width,
-				m_Renderer.m_Height
+				m_WindowHandle->GetWidth(),
+				m_WindowHandle->GetHeight()
 			);
 
-			// Rendering imgui
+			if (m_DrawDebug)
+			{
+				m_Renderer.DrawDebug(
+					m_Game->m_Camera.GetViewMatrix(),
+					m_Game->m_Camera.GetProjectionMatrix(),
+					&(m_Game->m_DebugShader),
+					m_DrawableLines,
+					m_WindowHandle->GetWidth(),
+					m_WindowHandle->GetHeight()
+				);
+			}
+
+			// render your GUI
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			m_Game->OnUIRender();
+			ImGui::End();		
+
+			ImGuiIO& io = ImGui::GetIO();
+			io.DisplaySize = ImVec2((float)m_WindowHandle->GetWidth(), (float)m_WindowHandle->GetHeight());
+
+			// Rendering ImGui
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				GLFWwindow* backup_current_context = glfwGetCurrentContext();
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault();
+				glfwMakeContextCurrent(backup_current_context);
+			}
+
 			// Swapping back and front buffers
-			glfwSwapBuffers(m_WindowHandle);
+			m_WindowHandle->OnEndFrame();
 		}
 	}
 
@@ -236,8 +236,7 @@ namespace Drop
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 
-		glfwDestroyWindow(m_WindowHandle);
-		glfwTerminate();
+		m_WindowHandle.reset(); // delete the object, leaving m_WindowHandle empty
 
 		g_GameEngineRunning = false;
 	}
@@ -274,55 +273,5 @@ namespace Drop
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		return textureImage;
-	}
-
-	void GameEngine::SetupShader(int program)
-	{
-		int maxSub, maxSubU, countActiveSU;
-		GLchar name[256];
-		int len, numCompS;
-
-		// global parameters about the Subroutines parameters of the system
-		glGetIntegerv(GL_MAX_SUBROUTINES, &maxSub);
-		glGetIntegerv(GL_MAX_SUBROUTINE_UNIFORM_LOCATIONS, &maxSubU);
-		std::cout << "Max Subroutines:" << maxSub << " - Max Subroutine Uniforms:" << maxSubU << std::endl;
-
-		// get the number of Subroutine uniforms (only for the Fragment shader, due to the nature of the exercise)
-		// it is possible to add similar calls also for the Vertex shader
-		glGetProgramStageiv(program, GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &countActiveSU);
-
-		// print info for every Subroutine uniform
-		for (int i = 0; i < countActiveSU; i++)
-		{
-
-			// get the name of the Subroutine uniform (in this example, we have only one)
-			glGetActiveSubroutineUniformName(program, GL_FRAGMENT_SHADER, i, 256, &len, name);
-			// print index and name of the Subroutine uniform
-			std::cout << "Subroutine Uniform: " << i << " - name: " << name << std::endl;
-
-			// get the number of subroutines
-			glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_NUM_COMPATIBLE_SUBROUTINES, &numCompS);
-
-			// get the indices of the active subroutines info and write into the array s
-			int* s = new int[numCompS];
-			glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_COMPATIBLE_SUBROUTINES, s);
-			std::cout << "Compatible Subroutines:" << std::endl;
-
-			// for each index, get the name of the subroutines, print info, and save the name in the shaders vector
-			for (int j = 0; j < numCompS; ++j)
-			{
-				glGetActiveSubroutineName(program, GL_FRAGMENT_SHADER, s[j], 256, &len, name);
-				std::cout << "\t" << s[j] << " - " << name << "\n";
-				m_Shaders.push_back(name);
-			}
-			std::cout << std::endl;
-
-			delete[] s;
-		}
-	}
-
-	void GameEngine::PrintCurrentShader(int subroutine) const
-	{
-		std::cout << "Current shader subroutine: " << m_Shaders[subroutine] << std::endl;
 	}
 }
