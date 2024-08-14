@@ -172,7 +172,20 @@ public:
         {
             Line& aLine = gameEngine->m_DrawableLines.emplace_back(
                 glm::vec3(0), 
-                glm::vec3(2)
+                glm::vec3(2),
+                glm::vec3(1.0f, 0.0f, 0.0f)
+            );
+            gameEngine->m_DrawableLines.emplace_back(
+                glm::vec3(1), 
+                glm::vec3(2),
+                glm::vec3(1.0f, 0.0f, 0.0f)
+
+            );
+            gameEngine->m_DrawableLines.emplace_back(
+                glm::vec3(-1), 
+                glm::vec3(-2),
+                glm::vec3(1.0f, 0.0f, 0.0f)
+
             );
         }       
 

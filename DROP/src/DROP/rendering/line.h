@@ -7,8 +7,9 @@ class Line
 {
 public:
     Line(glm::vec3 start, glm::vec3 end);
+    Line(glm::vec3 start, glm::vec3 end, glm::vec3 color);
 
-    inline unsigned int GetVAO()
+    inline unsigned int GetVAO() const
     {
         return m_VAO;
     }

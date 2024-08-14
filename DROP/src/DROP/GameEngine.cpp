@@ -27,6 +27,8 @@
 #include <stb_image/stb_image.h>
 #define stringify( name ) #name
 
+#include "DROP/ECS/ecs.h"
+
 extern bool g_GameEngineRunning;
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
@@ -37,6 +39,7 @@ extern bool g_GameEngineRunning;
 #endif
 
 static Drop::GameEngine* s_Instance = nullptr;
+static ECS g_ECS{ RESERVE, RESERVE, RESERVE };
 
 namespace Drop
 {
@@ -116,6 +119,14 @@ namespace Drop
 
 		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_WindowHandle->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 410");
+
+		// Testing ECS
+		g_ECS.RegisterComponent<TestType>();
+		Entity myEntity = g_ECS.AddEntity();
+		g_ECS.AddComponent<TestType>(myEntity);
+		g_ECS.RegisterSystem<TestSystem>();
+		g_ECS.SystemsStart();
+		g_ECS.SystemsUpdate(0.0f);
 	}
 
 	void GameEngine::Run()

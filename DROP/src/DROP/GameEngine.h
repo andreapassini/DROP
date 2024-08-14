@@ -13,7 +13,17 @@
 #include "imgui.h"
 #include "utils/Window.h"
 
+#include "DROP/ECS/ecs.h"
+#include "DROP/ECS/systems/TestSystem.h"
+
+
 struct GLFWwindow;
+
+// TO BE REMOVED
+struct TestType
+{
+};
+
 
 namespace Drop
 {
@@ -43,7 +53,6 @@ namespace Drop
 			m_Game->OnAttach();
 		}
 
-		//void PushGame(const std::shared_ptr<Game>& game) { m_GamesStack.emplace_back(game); game->OnAttach(); }
 		void SetGame(const std::shared_ptr<Game>& game) { m_Game = game; game->OnAttach(); }
 
 		void Close();
@@ -85,7 +94,6 @@ namespace Drop
 		float m_DeltaTime = 0.0f;
 		float m_LastFrameTime = 0.0f;
 
-		//std::vector<std::shared_ptr<Game>> m_GamesStack;
 		std::shared_ptr<Game> m_Game;
 		std::function<void()> m_MenubarCallback;
 
