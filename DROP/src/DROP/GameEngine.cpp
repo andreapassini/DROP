@@ -133,8 +133,6 @@ namespace Drop
 	{
 		m_Running = true;
 
-		//ImGuiIO& io = ImGui::GetIO();
-
 		// Main loop
 		while (!m_WindowHandle->IsShouldClose())
 		{
