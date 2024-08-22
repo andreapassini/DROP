@@ -230,7 +230,7 @@ namespace Drop
             // rendering of data in the VAO
             glDrawArrays(GL_LINES, 0, 2);   
             // VAO is "detached"
-            //glBindVertexArray(0);
+            glBindVertexArray(0);
         }
 
         //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
