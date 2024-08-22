@@ -170,24 +170,29 @@ public:
 		}
 
         {
-            Line& aLine = gameEngine->m_DrawableLines.emplace_back(
+            // when emplace_back at end, it will call destructor
+            // on the last element to use the new end
+            // https://www.youtube.com/watch?v=FdaYlWOV084
+            gameEngine->m_DrawableLines.reserve(3);
+
+            gameEngine->m_DrawableLines.emplace_back(
                 glm::vec3(0), 
                 glm::vec3(2),
                 glm::vec3(1.0f, 0.0f, 0.0f)
             );
-            gameEngine->m_DrawableLines.emplace_back(
-                glm::vec3(1), 
-                glm::vec3(2),
-                glm::vec3(1.0f, 0.0f, 0.0f)
 
-            );
             gameEngine->m_DrawableLines.emplace_back(
-                glm::vec3(-1), 
-                glm::vec3(-2),
-                glm::vec3(1.0f, 0.0f, 0.0f)
-
+           glm::vec3(2),
+                glm::vec3(4)
+                //glm::vec3(0.0f, 1.0f, 0.0f)
             );
-        }       
+
+            gameEngine->m_DrawableLines.emplace_back(
+                glm::vec3(0),
+                glm::vec3(-4),
+                glm::vec3(0.0f, 0.0f, 1.0f)
+            );
+        }
 
         m_VSync = gameEngine->GetWindowHandle().IsVSync();
 	}

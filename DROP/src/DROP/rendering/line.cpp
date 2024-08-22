@@ -4,17 +4,13 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
+
 // default color GREEN
-Line::Line(glm::vec3 start, glm::vec3 end)
-    : Line(start, end, m_LineColor)
-{
-
-}
-
 Line::Line(glm::vec3 start, glm::vec3 end, glm::vec3 color)
 {
     m_StartPoint = start;
     m_EndPoint = end;
+    m_LineColor = color;
 
     m_Vertices = {
             start.x, start.y, start.z,
