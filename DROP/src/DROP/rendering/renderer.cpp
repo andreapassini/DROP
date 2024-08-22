@@ -204,13 +204,6 @@ namespace Drop
         const int height
     ) const
     {
-
-        // Draw Lines
-        // we set the viewport for the final rendering step
-        glViewport(0, 0, width, height);
-
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
         debugShader->Use();
 
         GLint projectionMatrixLocation = glGetUniformLocation(debugShader->Program, "projectionMatrix");
@@ -232,8 +225,6 @@ namespace Drop
             // VAO is "detached"
             glBindVertexArray(0);
         }
-
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     Renderer::~Renderer()
