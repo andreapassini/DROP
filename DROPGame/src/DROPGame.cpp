@@ -179,10 +179,20 @@ public:
         }         
         
         {
+            //gameEngine->m_DrawableLines.reserve();
             Line& aLine = gameEngine->m_DrawableLines.emplace_back(
-                glm::vec3(2), 
+                glm::vec3(0), 
+                glm::vec3(2)
+            );
+            gameEngine->m_DrawableLines.emplace_back(
+                glm::vec3(2),
                 glm::vec3(4)
             );
+            gameEngine->m_DrawableLines.emplace_back(
+                glm::vec3(4),
+                glm::vec3(6)
+            );
+
         }       
 
         m_VSync = gameEngine->GetWindowHandle().IsVSync();

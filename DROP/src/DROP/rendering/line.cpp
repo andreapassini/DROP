@@ -28,8 +28,43 @@ Line::Line(glm::vec3 start, glm::vec3 end)
     glBindVertexArray(0);
 }
 
-Line::~Line()
+Line::~Line() noexcept
 {
-    glDeleteVertexArrays(1, &m_VAO);
-    glDeleteBuffers(1, &m_VBO);
+    FreeGPUresources();
+}
+
+Line& Line::operator= (Line&& line) noexcept
+{
+    FreeGPUresources();
+
+    if (line.m_VAO)
+    {
+        m_Vertices = std::move(line.m_Vertices);
+        m_LineColor = std::move(line.m_LineColor);
+        m_StartPoint = std::move(line.m_StartPoint);
+        m_EndPoint = std::move(line.m_EndPoint);
+        m_VAO = line.m_VAO;
+        m_VBO = line.m_VBO;
+
+        line.m_VAO = 0;
+    }
+    else
+    {
+        m_VAO = 0;
+    }
+
+    return *this;
+}
+
+
+
+void Line::FreeGPUresources()
+{
+    if (m_VAO)
+    {
+        glDeleteVertexArrays(1, &m_VAO);
+        glDeleteBuffers(1, &m_VBO);
+        m_VAO = 0;
+        m_VBO = 0;
+    }
 }
