@@ -170,10 +170,11 @@ public:
 		}
 
         {
-            // when emplace_back at end, it will call destructor
-            // on the last element to use the new end
+            // when emplace_back at back, it will call destructor
+            // on the last element to use the new back
             // https://www.youtube.com/watch?v=FdaYlWOV084
-            gameEngine->m_DrawableLines.reserve(3);
+            //gameEngine->m_DrawableLines.reserve(3);
+            // To avoid resizing we cancel the copy constructor
 
             gameEngine->m_DrawableLines.emplace_back(
                 glm::vec3(0), 
