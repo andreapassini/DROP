@@ -177,21 +177,20 @@ public:
             // To avoid resizing we cancel the copy constructor
 
             gameEngine->m_DrawableLines.emplace_back(
-                glm::vec3(0), 
-                glm::vec3(2),
-                glm::vec3(1.0f, 0.0f, 0.0f)
-            );
-
-            gameEngine->m_DrawableLines.emplace_back(
-           glm::vec3(2),
-                glm::vec3(4)
-                //glm::vec3(0.0f, 1.0f, 0.0f)
-            );
-
-            gameEngine->m_DrawableLines.emplace_back(
                 glm::vec3(0),
-                glm::vec3(-4),
-                glm::vec3(0.0f, 0.0f, 1.0f)
+                glm::vec3(1)
+                , DEFAULT_HIT_COLOR
+            );
+
+            gameEngine->m_DrawableLines.emplace_back(
+           glm::vec3(1.1),
+                glm::vec3(2)
+                , COLOR_AMBER
+            );
+            
+            gameEngine->m_DrawableLines.emplace_back(
+           glm::vec3(2.1),
+                glm::vec3(3)
             );
         }
 

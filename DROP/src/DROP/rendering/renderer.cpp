@@ -30,6 +30,8 @@
 #include "../rendering/shader.h"
 #include "../utils/camera.h"
 
+#include "colors.h"
+
 #define UNLOCK_FRAMERTE
 
 namespace Drop
@@ -53,7 +55,7 @@ namespace Drop
         glEnable(GL_DEPTH_TEST);
 
         //the "clear" color for the frame buffer
-        glClearColor(127.0f / 255.f, 201.0 / 255.f, 175.0f / 255.f, 1.0f);
+        glClearColor(DEFAULT_CLEAR_COLOR.r, DEFAULT_CLEAR_COLOR.g, DEFAULT_CLEAR_COLOR.b, 1.0f);
 
         /////////////////// CREATION OF BUFFER FOR THE  DEPTH MAP /////////////////////////////////////////
         // buffer dimension: too large -> performance may slow down if we have many lights; too small -> strong aliasing

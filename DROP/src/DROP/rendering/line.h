@@ -1,9 +1,10 @@
 #pragma once
 
+#include "colors.h"
+
 #include "glm/glm.hpp"
 #include "vector"
 
-constexpr glm::vec3 DEFAULT_LINE_COLOR = glm::vec3(0.0f, 1.0f, 0.0f);
 
 class Line
 {
