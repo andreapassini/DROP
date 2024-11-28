@@ -57,8 +57,7 @@ Line& Line::operator=(Line&& line) noexcept
 
 Line::~Line() noexcept
 {
-    glDeleteVertexArrays(1, &m_VAO);
-    glDeleteBuffers(1, &m_VBO);
+    FreeGPUresources();
 }
 
 void Line::FreeGPUresources()
