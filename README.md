@@ -19,7 +19,7 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 # Arachitecture
 
-![DROPArchitecture](https://github.com/user-attachments/assets/c9c999b4-6886-42f5-b744-b48fc7691fcb)
+![DROPArchitecture](https://github.com/user-attachments/assets/8edc2ab9-edb3-4983-beb6-bf3c770f03a7)
 
 # Shadows
 
