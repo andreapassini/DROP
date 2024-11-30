@@ -17,6 +17,10 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 - double click on "GenerateProjects.bat"
 
+# Arachitecture
+
+![DROPArchitecture](https://github.com/user-attachments/assets/8edc2ab9-edb3-4983-beb6-bf3c770f03a7)
+
 # Shadows
 
 In order to create shadows we need to put the camera on the light position with the same orientation as the direction of the light.
