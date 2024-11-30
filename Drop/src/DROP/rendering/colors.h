@@ -73,6 +73,10 @@ constexpr glm::vec3 COLOR_GREEN = glm::vec3(
     0.0f / 255.0f,
     255.0f / 255.0f,
     0.0f / 255.0f);
+constexpr glm::vec3 COLOR_DARK_GREEN = glm::vec3(
+    2.0f / 255.0f,
+    48.0f / 255.0f,
+    32.0f / 255.0f);
 #pragma endregion
 
 #pragma region BLUE
@@ -163,8 +167,19 @@ constexpr glm::vec3 COLOR_BYZANTIUM_PURPLE = glm::vec3(
 
 #pragma endregion
 
+#pragma region BLACK
+constexpr glm::vec3 COLOR_MATTLE_BLACK = glm::vec3(
+    40.0f / 255.0f,
+    40.0f / 255.0f,
+    43.0f / 255.0f);
+constexpr glm::vec3 COLOR_BLACK = glm::vec3(
+    0.0f / 255.0f,
+    0.0f / 255.0f,
+    0.0f / 255.0f);
 
-constexpr glm::vec3 DEFAULT_LINE_COLOR = COLOR_AMBER;
+#pragma endregion
+
+constexpr glm::vec3 DEFAULT_LINE_COLOR = COLOR_GOLD_GAMBOGE;
 
 constexpr glm::vec3 DEFAULT_HIT_COLOR = COLOR_RED;
 
