@@ -29,6 +29,30 @@
 
 #include "DROP/ECS/ecs.h"
 
+// https://learnopengl.com/In-Practice/Debugging
+GLenum glCheckErrorExt(const char* file, int line)
+{
+	GLenum errorCode;
+	while ((errorCode = glGetError()) != GL_NO_ERROR)
+	{
+		std::string error;
+		switch (errorCode)
+		{
+		case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+		case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+		case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+		case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+		case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+		case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+		}
+		std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+	}
+	return errorCode;
+}
+#define glCheckError() glCheckErrorExt(__FILE__, __LINE__) 
+
+
 extern bool g_GameEngineRunning;
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
@@ -133,6 +157,41 @@ namespace Drop
 	{
 		m_Running = true;
 
+		// TEST
+		Shader BillboardShader = Shader(
+			"..\\Drop\\src\\Drop\\shaders\\billboard.vert",
+			"..\\Drop\\src\\Drop\\shaders\\billboard.geom",
+			"..\\Drop\\src\\Drop\\shaders\\billboard.frag");
+
+		GLuint m_VBO, m_VAO;
+
+		glGenVertexArrays(1, &m_VAO);
+		glCheckError();
+
+		glGenBuffers(1, &m_VBO);
+		glCheckError();
+
+		glBindVertexArray(m_VAO);
+		glCheckError();
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		glCheckError();
+
+		// VgMath::Vector3 Point(0.0f);
+		glm::vec3 Point(0.0f);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3), &Point[0], GL_STATIC_DRAW);
+		glCheckError();
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glCheckError();
+		glEnableVertexAttribArray(0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glCheckError();
+
+		glBindVertexArray(0);
+
+
 		// Main loop
 		while (!m_WindowHandle->IsShouldClose())
 		{
@@ -178,6 +237,50 @@ namespace Drop
 			m_SceneGraph.CalculateWorldTransforms(
 				m_CumulatedTransforms
 			);
+
+			// TO BE REMOVED
+			// TEST BILLBOARD
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			// we set the viewport for the final rendering step
+			glViewport(0, 0, m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
+			BillboardShader.Use();
+			glCheckError();
+
+			// we pass projection and view matrices to the Shader Program
+			glUniformMatrix4fv(glGetUniformLocation(BillboardShader.Program, "projectionMatrix"), 1
+				, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetProjectionMatrix()));
+			glCheckError();
+
+			glUniformMatrix4fv(glGetUniformLocation(BillboardShader.Program, "viewMatrix"), 1
+				, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetViewMatrix()));
+			glCheckError();
+
+			VgMath::Transform testTransform;
+			testTransform.m_Translate = VgMath::Vector3(0.0f);
+			glm::mat4 modelMatrix(1.0f);
+			SceneGraph::TransformToMatrix(testTransform, modelMatrix);
+			glUniformMatrix4fv(glGetUniformLocation(BillboardShader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+			glCheckError();
+
+			GLint colorLocation = glGetUniformLocation(BillboardShader.Program, "colorIn");
+			glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.5f, 0.5f, 1.0f)));
+			glCheckError();
+
+			// VAO is made "active"
+			glBindVertexArray(m_VAO);
+			glCheckError();
+
+			// rendering of data in the VAO
+			glDrawArrays(GL_POINTS, 0, 4);
+			glCheckError();
+
+			// VAO is "detached"
+			glBindVertexArray(0);
+			glCheckError();
+
+			// END ---- TEST BILLBOARD
 
 			m_Renderer.RenderScene(
 				m_RendereableObjects,

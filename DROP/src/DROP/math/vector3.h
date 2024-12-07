@@ -32,6 +32,8 @@ public:
     // constructor
     Vector3(Scalar _x, Scalar _y, Scalar _z):x(_x),y(_y),z(_z){ }
 
+    Vector3(Scalar _n):x(_n),y(_n),z(_n){ }
+
     // empty constructor
     Vector3():x(0.0),y(0.0),z(0.0){ }
 
