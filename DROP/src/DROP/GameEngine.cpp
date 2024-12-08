@@ -29,7 +29,11 @@
 
 #include "DROP/ECS/ecs.h"
 
+#define DROP_DEBUG
+#ifdef DROP_DEBUG
 // https://learnopengl.com/In-Practice/Debugging
+// glGetError() provide only one flag at the time
+//  so we need to pump it until empty
 GLenum glCheckErrorExt(const char* file, int line)
 {
 	GLenum errorCode;
@@ -51,6 +55,9 @@ GLenum glCheckErrorExt(const char* file, int line)
 	return errorCode;
 }
 #define glCheckError() glCheckErrorExt(__FILE__, __LINE__) 
+#else
+#define glCheckError()
+#endif // #ifdef DROP_DEBUG
 
 
 extern bool g_GameEngineRunning;
@@ -157,13 +164,27 @@ namespace Drop
 	{
 		m_Running = true;
 
+		// Get the last error
+		glCheckError();
+
 		// TEST
-		Shader BillboardShader = Shader(
+		Shader _BillboardShader = Shader(
 			"..\\Drop\\src\\Drop\\shaders\\billboard.vert",
 			"..\\Drop\\src\\Drop\\shaders\\billboard.geom",
 			"..\\Drop\\src\\Drop\\shaders\\billboard.frag");
 
+		Shader QuadFrustumShader = Shader(
+			"..\\Drop\\src\\Drop\\shaders\\quadFrustum.vert",
+			"..\\Drop\\src\\Drop\\shaders\\quadFrustum.geom",
+			"..\\Drop\\src\\Drop\\shaders\\quadFrustum.frag");
+
+		Shader displayNormalShader = Shader(
+			"..\\Drop\\src\\Drop\\shaders\\displayNormal.vert",
+			"..\\Drop\\src\\Drop\\shaders\\displayNormal.geom",
+			"..\\Drop\\src\\Drop\\shaders\\displayNormal.frag");
+
 		GLuint m_VBO, m_VAO;
+		glCheckError();
 
 		glGenVertexArrays(1, &m_VAO);
 		glCheckError();
@@ -178,11 +199,20 @@ namespace Drop
 		glCheckError();
 
 		// VgMath::Vector3 Point(0.0f);
-		glm::vec3 Point(0.0f);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3), &Point[0], GL_STATIC_DRAW);
+		GLfloat points[] = {
+			0.0f,  0.0f, 0.0f,
+			5.0f,  5.0f, -5.0f,
+			5.0f, -5.0f, 5.0f,
+			5.0f, -5.0f, -5.0f,
+			-5.0f,  5.0f, 5.0f,
+			-5.0f,  5.0f, -5.0f,
+			-5.0f, -5.0f, 5.0f,
+			-5.0f, -5.0f, -5.0f,
+		};
+		glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 		glCheckError();
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
 		glCheckError();
 		glEnableVertexAttribArray(0);
 
@@ -240,40 +270,53 @@ namespace Drop
 
 			// TO BE REMOVED
 			// TEST BILLBOARD
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			// glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			// we set the viewport for the final rendering step
 			glViewport(0, 0, m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
-			BillboardShader.Use();
+			QuadFrustumShader.Use();
 			glCheckError();
 
 			// we pass projection and view matrices to the Shader Program
-			glUniformMatrix4fv(glGetUniformLocation(BillboardShader.Program, "projectionMatrix"), 1
-				, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetProjectionMatrix()));
+			GLint projectionMatrixLocation = glGetUniformLocation(QuadFrustumShader.Program, "projectionMatrix");
+			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetProjectionMatrix()));
 			glCheckError();
 
-			glUniformMatrix4fv(glGetUniformLocation(BillboardShader.Program, "viewMatrix"), 1
-				, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetViewMatrix()));
+			GLint viewMatrixLocation = glGetUniformLocation(QuadFrustumShader.Program, "viewMatrix");
+			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetViewMatrix()));
 			glCheckError();
 
 			VgMath::Transform testTransform;
 			testTransform.m_Translate = VgMath::Vector3(0.0f);
 			glm::mat4 modelMatrix(1.0f);
 			SceneGraph::TransformToMatrix(testTransform, modelMatrix);
-			glUniformMatrix4fv(glGetUniformLocation(BillboardShader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+			GLint modelMatrixLocation = glGetUniformLocation(QuadFrustumShader.Program, "modelMatrix");
+			glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 			glCheckError();
 
-			GLint colorLocation = glGetUniformLocation(BillboardShader.Program, "colorIn");
+			GLint colorLocation = glGetUniformLocation(QuadFrustumShader.Program, "colorIn");
 			glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.5f, 0.5f, 1.0f)));
 			glCheckError();
+
+			GLint testLocation = glGetUniformLocation(QuadFrustumShader.Program, "asdasdsada");
+			glCheckError();
+			glUniform4fv(testLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.5f, 0.5f, 1.0f)));
+			glCheckError();
+
+			// we activate the texture of the plane
+			GLint textureLocation = glGetUniformLocation(QuadFrustumShader.Program, "tex0");
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_TextureIds.at(0));
+			glUniform1i(textureLocation, 0);
 
 			// VAO is made "active"
 			glBindVertexArray(m_VAO);
 			glCheckError();
 
 			// rendering of data in the VAO
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_POINTS, 0, 8);
 			glCheckError();
 
 			// VAO is "detached"
@@ -299,6 +342,22 @@ namespace Drop
 				m_WindowHandle->GetWidth(),
 				m_WindowHandle->GetHeight()
 			);
+
+			
+			m_Renderer.RenderScene(
+				m_RendereableObjects,
+				m_TextureIds,
+				m_Models,
+				m_Materials,
+				m_CumulatedTransforms,
+				m_Game->m_Camera.GetViewMatrix(),
+				m_Game->m_Camera.GetProjectionMatrix(),
+				&(displayNormalShader),
+				m_Game->m_Wireframe,
+				m_WindowHandle->GetWidth(),
+				m_WindowHandle->GetHeight()
+			);
+			
 
 			if (m_DrawDebug)
 			{
@@ -338,6 +397,14 @@ namespace Drop
 			// Swapping back and front buffers
 			m_WindowHandle->OnEndFrame();
 		}
+
+		// TO BE REMOVED
+		// DEBUG
+
+		glDeleteBuffers(1, &m_VBO);
+
+		glDeleteVertexArrays(1, &m_VAO);
+
 	}
 
 	void GameEngine::Shutdown()

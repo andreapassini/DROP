@@ -46,5 +46,15 @@ public:
 		const glm::mat4& view,
 		const GLint render_pass, 
 		const GLuint depthMap) const ;
+
+	void Draw(
+		const Shader& shader,
+		const std::vector<int>& textuers,
+		const std::vector<Model>& models,
+		const std::vector<Material>& materials,
+		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms,
+		const glm::mat4& view
+		) const;
+
 };
 

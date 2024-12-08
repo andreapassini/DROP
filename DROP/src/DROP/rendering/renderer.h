@@ -62,6 +62,22 @@ namespace Drop
             const int width,
             const int height
         ) const ;
+
+        void RenderScene(
+            const std::vector<RenderableObject>& m_RenderableObjects,
+            const std::vector<int>& textures,
+            const std::vector<Model>& models,
+            const std::vector<Material>& materials,
+            const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms,
+            const glm::mat4& view,
+            const glm::mat4& projection,
+            Shader* const illumination_shader,
+            const GLboolean wireframe,
+            const int width,
+            const int height
+        ) const;
+
+
         void DrawDebug(
             const glm::mat4& view,
             const glm::mat4& projection,
