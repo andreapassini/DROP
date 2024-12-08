@@ -212,7 +212,7 @@ namespace Drop
     ) const
     {
         // we activate back the standard Frame Buffer
-        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         //// we "clear" the frame and z buffer
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

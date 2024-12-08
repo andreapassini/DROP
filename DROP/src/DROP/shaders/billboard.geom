@@ -35,7 +35,7 @@ void main()
 		particleSize = 15.1234;
 	}
 
-	particleSize = 123.0;
+	particleSize = 1.0;
 
 	// a: left-bottom 
 	vec2 va = P.xy + vec2(-0.5, -0.5) * particleSize;

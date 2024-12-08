@@ -106,7 +106,7 @@ public:
     {
         std::cout << std::filesystem::current_path() << std::endl;
         cout << "Vertex: " << vertexPath 
-            << "Geometry: " << geometryPath
+            << "\nGeometry: " << geometryPath
             << "\nFragment: " << fragmentPath << endl;
 
         // Step 1: we retrieve shaders source code from provided filepaths

@@ -13,7 +13,6 @@ void main (void)
   uv.y *= -1.0;
   vec3 t = texture(tex0,uv).rgb;
 
-  // colorFrag = vec4(t, 1.0) * Vertex_Color;
-
-  colorFrag = vec4(1.0, 0.5, 0.5, 1.0);
+  // colorFrag = vec4(1.0, 0.5, 0.5, 1.0);
+  colorFrag = vec4(t, 1.0) * Vertex_Color;
 }

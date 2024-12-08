@@ -9,8 +9,9 @@ layout (location = 0) in vec3 position;
 uniform mat4 modelMatrix;
 // view matrix
 uniform mat4 viewMatrix;
+
 // Projection matrix
-uniform mat4 projectionMatrix;
+// uniform mat4 projectionMatrix;
 
 uniform vec4 colorIn;
 

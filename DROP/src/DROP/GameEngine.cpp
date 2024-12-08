@@ -168,20 +168,20 @@ namespace Drop
 		glCheckError();
 
 		// TEST
-		Shader _BillboardShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\billboard.vert",
-			"..\\Drop\\src\\Drop\\shaders\\billboard.geom",
-			"..\\Drop\\src\\Drop\\shaders\\billboard.frag");
+		Shader BillboardShader = Shader(
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\billboard.frag");
 
 		Shader QuadFrustumShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\quadFrustum.vert",
-			"..\\Drop\\src\\Drop\\shaders\\quadFrustum.geom",
-			"..\\Drop\\src\\Drop\\shaders\\quadFrustum.frag");
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
 
 		Shader displayNormalShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\displayNormal.vert",
-			"..\\Drop\\src\\Drop\\shaders\\displayNormal.geom",
-			"..\\Drop\\src\\Drop\\shaders\\displayNormal.frag");
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\displayNormal.vert",
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\displayNormal.geom",
+			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\displayNormal.frag");
 
 		GLuint m_VBO, m_VAO;
 		glCheckError();
@@ -268,63 +268,6 @@ namespace Drop
 				m_CumulatedTransforms
 			);
 
-			// TO BE REMOVED
-			// TEST BILLBOARD
-			// glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			// we set the viewport for the final rendering step
-			glViewport(0, 0, m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
-			QuadFrustumShader.Use();
-			glCheckError();
-
-			// we pass projection and view matrices to the Shader Program
-			GLint projectionMatrixLocation = glGetUniformLocation(QuadFrustumShader.Program, "projectionMatrix");
-			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetProjectionMatrix()));
-			glCheckError();
-
-			GLint viewMatrixLocation = glGetUniformLocation(QuadFrustumShader.Program, "viewMatrix");
-			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetViewMatrix()));
-			glCheckError();
-
-			VgMath::Transform testTransform;
-			testTransform.m_Translate = VgMath::Vector3(0.0f);
-			glm::mat4 modelMatrix(1.0f);
-			SceneGraph::TransformToMatrix(testTransform, modelMatrix);
-
-			GLint modelMatrixLocation = glGetUniformLocation(QuadFrustumShader.Program, "modelMatrix");
-			glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-			glCheckError();
-
-			GLint colorLocation = glGetUniformLocation(QuadFrustumShader.Program, "colorIn");
-			glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.5f, 0.5f, 1.0f)));
-			glCheckError();
-
-			GLint testLocation = glGetUniformLocation(QuadFrustumShader.Program, "asdasdsada");
-			glCheckError();
-			glUniform4fv(testLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.5f, 0.5f, 1.0f)));
-			glCheckError();
-
-			// we activate the texture of the plane
-			GLint textureLocation = glGetUniformLocation(QuadFrustumShader.Program, "tex0");
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, m_TextureIds.at(0));
-			glUniform1i(textureLocation, 0);
-
-			// VAO is made "active"
-			glBindVertexArray(m_VAO);
-			glCheckError();
-
-			// rendering of data in the VAO
-			glDrawArrays(GL_POINTS, 0, 8);
-			glCheckError();
-
-			// VAO is "detached"
-			glBindVertexArray(0);
-			glCheckError();
-
-			// END ---- TEST BILLBOARD
-
 			m_Renderer.RenderScene(
 				m_RendereableObjects,
 				m_TextureIds,
@@ -344,6 +287,7 @@ namespace Drop
 			);
 
 			
+			// Draw Normal as vectors
 			m_Renderer.RenderScene(
 				m_RendereableObjects,
 				m_TextureIds,
@@ -358,6 +302,60 @@ namespace Drop
 				m_WindowHandle->GetHeight()
 			);
 			
+
+			// TO BE REMOVED
+			// TEST BILLBOARD
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			Shader& TestGeomShader = BillboardShader;
+
+			// we set the viewport for the final rendering step
+			glViewport(0, 0, m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
+			TestGeomShader.Use();
+			glCheckError();
+
+			// we pass projection and view matrices to the Shader Program
+			GLint projectionMatrixLocation = glGetUniformLocation(TestGeomShader.Program, "projectionMatrix");
+			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetProjectionMatrix()));
+			glCheckError();
+
+			GLint viewMatrixLocation = glGetUniformLocation(TestGeomShader.Program, "viewMatrix");
+			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(m_Game->m_Camera.GetViewMatrix()));
+			glCheckError();
+
+			VgMath::Transform testTransform;
+			testTransform.m_Translate = VgMath::Vector3(0.0f);
+			glm::mat4 modelMatrix(1.0f);
+			SceneGraph::TransformToMatrix(testTransform, modelMatrix);
+
+			GLint modelMatrixLocation = glGetUniformLocation(TestGeomShader.Program, "modelMatrix");
+			glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+			glCheckError();
+
+			GLint colorLocation = glGetUniformLocation(TestGeomShader.Program, "colorIn");
+			glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.5f, 0.5f, 1.0f)));
+			glCheckError();
+
+			// we activate the texture of the plane
+			GLint textureLocation = glGetUniformLocation(TestGeomShader.Program, "tex0");
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_TextureIds.at(0));
+			glUniform1i(textureLocation, 0);
+
+			// VAO is made "active"
+			glBindVertexArray(m_VAO);
+			glCheckError();
+
+			// rendering of data in the VAO
+			glDrawArrays(GL_POINTS, 0, 8);
+			glCheckError();
+
+			// VAO is "detached"
+			glBindVertexArray(0);
+			glCheckError();
+
+			// END ---- TEST BILLBOARD
 
 			if (m_DrawDebug)
 			{
