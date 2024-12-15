@@ -29,7 +29,7 @@ public:
 
     const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
     const glm::mat4& GetInverseProjectionMatrix() const { return m_InverseProjectionMatrix; }
-    const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
+    glm::mat4& GetViewMatrix() { return m_ViewMatrix; }
     const glm::mat4& GetInverseViewMatrix() const { return m_InverseViewMatrix; }
 public:
     glm::vec3 m_Position{ 0.0f };

@@ -11,24 +11,24 @@ public:
 	ExampleGame()
 	{
 		m_ShadowShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\19_shadowmap.vert",
-			"..\\Drop\\src\\Drop\\shaders\\20_shadowmap.frag"
+			"C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\Drop\\src\\DROP\\shaders\\19_shadowmap.vert",
+			"C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\Drop\\src\\DROP\\shaders\\20_shadowmap.frag"
         );
 
 		m_LightShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert",
-			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag"
+			"C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\Drop\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
+			"C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\Drop\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
         );
 
         GameEngine* gameEngine = GameEngine::GetInstance();
 
-		gameEngine->m_Models.emplace_back("../models/cube.obj");
-        gameEngine->m_Models.emplace_back("../models/sphere.obj");
-        gameEngine->m_Models.emplace_back("../models/bunny_lp.obj");
-        gameEngine->m_Models.emplace_back("../models/plane.obj");
+		gameEngine->m_Models.emplace_back("C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\models\\cube.obj");
+        gameEngine->m_Models.emplace_back("C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\models\\sphere.obj");
+        gameEngine->m_Models.emplace_back("C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\models\\bunny_lp.obj");
+        gameEngine->m_Models.emplace_back("C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\models\\plane.obj");
 
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("../textures/UV_Grid_Sm.png"));
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("../textures/SoilCracked.png"));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\textures\\UV_Grid_Sm.png"));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("C:\\Users\\andre\\ANDREA\\FREE_TIME\\CODE\\DROP\\textures\\SoilCracked.png"));
 
 		gameEngine->m_SceneGraph.m_GameObjects[SceneGraph::ROOT_ID].m_LocalTransform.m_Rotate =
 			VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0),
@@ -59,12 +59,10 @@ public:
 
         RenderableObject renderableObjectPlane = RenderableObject{
                 planeSGHandle,
-                3,
+                3, // modelId
                 (uint32_t)(gameEngine->m_Materials.size() - 1)
         };
         gameEngine->m_RendereableObjects.push_back(renderableObjectPlane);
-        
-
 
         // Sphere
         uint32_t sphereSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
@@ -147,9 +145,9 @@ public:
                 0.2f,
                 0.9f,
                 true,
-                true,           // UseTexture
-                0,              // TextureId
-                1.0f           // Repeat
+                true,   // UseTexture
+                0,      // TextureId
+                1.0f    // Repeat
             };
             gameEngine->m_Materials.push_back(material);
 
@@ -160,6 +158,73 @@ public:
             };
             gameEngine->m_RendereableObjects.push_back(renderableObject);
         }
+
+        ParticleConfiguration& particleConfig = gameEngine->m_ParticleSystem.m_ParticleSetup;
+        particleConfig.m_MaxLifeTime = 50.0f;
+        particleConfig.m_MinLifeTime = 10.0f;
+        particleConfig.m_MaxSpeed = 5.0f;
+        particleConfig.m_MinSpeed = 1.0f;
+
+        {
+            uint32_t paraticleHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Translate =
+                VgMath::Vector3(3.0f, 1.0f, 0.0f);
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Scale = 0.3f;
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Rotate =
+                VgMath::Quaternion::angleAxis(
+                    VgMath::Degrees(0.0),
+                    VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+                );
+            RenderableObject renderableObject = RenderableObject{
+                paraticleHandle,
+                2,
+                (uint32_t)(gameEngine->m_Materials.size() - 1)
+            };
+            gameEngine->m_RendereableObjects.push_back(renderableObject);
+            gameEngine->m_ParticleSystem.Spawn(
+                    &gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Translate);
+        }
+
+        {
+            uint32_t paraticleHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Translate =
+                VgMath::Vector3(2.0f, 2.0f, 3.0f);
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Scale = 0.3f;
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Rotate =
+                VgMath::Quaternion::angleAxis(
+                    VgMath::Degrees(0.0),
+                    VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+                );
+            RenderableObject renderableObject = RenderableObject{
+                paraticleHandle,
+                2,
+                (uint32_t)(gameEngine->m_Materials.size() - 1)
+            };
+            gameEngine->m_RendereableObjects.push_back(renderableObject);
+            gameEngine->m_ParticleSystem.Spawn(
+                &gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Translate);
+        }
+
+        {
+            uint32_t paraticleHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Translate =
+                VgMath::Vector3(0.0f, 1.0f, 0.0f);
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Scale = 0.3f;
+            gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Rotate =
+                VgMath::Quaternion::angleAxis(
+                    VgMath::Degrees(0.0),
+                    VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+                );
+            RenderableObject renderableObject = RenderableObject{
+                paraticleHandle,
+                2,
+                (uint32_t)(gameEngine->m_Materials.size() - 1)
+            };
+            gameEngine->m_RendereableObjects.push_back(renderableObject);
+            gameEngine->m_ParticleSystem.Spawn(
+                &gameEngine->m_SceneGraph.m_GameObjects[paraticleHandle].m_LocalTransform.m_Translate);
+        }
+
 
         gameEngine->m_CumulatedTransforms.reserve(gameEngine->m_SceneGraph.m_GameObjects.size());
 

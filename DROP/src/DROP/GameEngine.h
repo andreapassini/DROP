@@ -9,6 +9,7 @@
 
 #include "physics/physicsEngine.h"
 #include "rendering/renderer.h"
+#include "particle/Particle.h"
 
 #include "imgui.h"
 #include "utils/Window.h"
@@ -82,6 +83,7 @@ namespace Drop
 
 		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
 
+		ParticleSystem m_ParticleSystem;
 
 	private:
 		void Init();

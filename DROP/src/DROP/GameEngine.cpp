@@ -179,6 +179,8 @@ namespace Drop
 				m_CumulatedTransforms
 			);
 
+			m_ParticleSystem.Update(m_DeltaTime);
+
 			m_Renderer.RenderScene(
 				m_RendereableObjects,
 				m_TextureIds,
