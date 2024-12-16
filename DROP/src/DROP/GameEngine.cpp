@@ -169,19 +169,19 @@ namespace Drop
 
 		// TEST
 		Shader BillboardShader = Shader(
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\billboard.frag");
+			"..\\DROP\\src\\DROP\\shaders\\billboard.vert",
+			"..\\DROP\\src\\DROP\\shaders\\billboard.geom",
+			"..\\DROP\\src\\DROP\\shaders\\billboard.frag");
 
 		Shader QuadFrustumShader = Shader(
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
+			"..\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
+			"..\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
+			"..\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
 
 		Shader displayNormalShader = Shader(
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\displayNormal.vert",
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\displayNormal.geom",
-			"E:\\andrea\\FREE_TIME\\CODE\\DROP\\DROP\\src\\DROP\\shaders\\displayNormal.frag");
+			"..\\DROP\\src\\DROP\\shaders\\displayNormal.vert",
+			"..\\DROP\\src\\DROP\\shaders\\displayNormal.geom",
+			"..\\DROP\\src\\DROP\\shaders\\displayNormal.frag");
 
 		GLuint m_VBO, m_VAO;
 		glCheckError();
