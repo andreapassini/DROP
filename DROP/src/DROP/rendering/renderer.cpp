@@ -36,14 +36,7 @@
 
 namespace Drop
 {
-    Renderer::Renderer(
-        uint32_t screenWidth_val,
-        uint32_t screenHeight_val
-    ) :
-        SHADOW_WIDTH(1024),
-        SHADOW_HEIGHT(1024)
-    {
-    }
+    Renderer::Renderer() {}
 
     void Renderer::Init(GLFWwindow* window)
     {
@@ -75,7 +68,6 @@ namespace Drop
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         // outside the area covered by the light frustum, everything is rendered in shadow (because we set GL_CLAMP_TO_BORDER)
-        // thus, we set the texture border to white, so to render correctly everything not involved by the shadow map
         //*************
         GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
@@ -92,21 +84,13 @@ namespace Drop
     }
 
     void Renderer::RenderScene(
+        const SceneContext& sceneContext,
         const std::vector<RenderableObject>& renderableObjects,
-        const std::vector<int>& textures,
-        const std::vector<Model>& models,
-        const std::vector<Material>& materials,
         const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms,
-        const glm::mat4& view,
-        const glm::mat4& projection,
-        const glm::vec3& lightDir,
         Shader* const shadow_shader,
         Shader* const illumination_shader,
         const GLuint depthMapFBO,
-        const GLuint depthMap,
-        const GLboolean wireframe,
-        const int width,
-        const int height
+        const GLuint depthMap
     ) const
     {
         /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
@@ -118,7 +102,7 @@ namespace Drop
         // for a directional light, the projection is orthographic. For point lights, we should use a perspective projection
         lightProjection = glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, near_plane, far_plane);
         // the light is directional, so technically it has no position. We need a view matrix, so we consider a position on the the direction vector of the light
-        lightView = glm::lookAt(lightDir, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        lightView = glm::lookAt(sceneContext.lightDir, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         // transformation matrix for the light
         lightSpaceMatrix = lightProjection * lightView;
         /// We "install" the  Shader Program for the shadow mapping creation
@@ -137,11 +121,11 @@ namespace Drop
         {
             renderableObjects[i].Draw(
                 *shadow_shader,
-                textures,
-                models,
-                materials,
+                sceneContext.textures,
+                sceneContext.models,
+                sceneContext.materials,
                 cumulatedTransforms,
-                view,
+                sceneContext.view,
                 (renderableObjects)[i].SHADOWMAP,
                 depthMap
             );
@@ -156,28 +140,28 @@ namespace Drop
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // we set the rendering mode
-        if (wireframe)
+        if (sceneContext.wireframe)
             // Draw in wireframe
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // we set the viewport for the final rendering step
-        glViewport(0, 0, width, height);
+        glViewport(0, 0, sceneContext.width, sceneContext.height);
 
         // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
         illumination_shader->Use();
 
         // we pass projection and view matrices to the Shader Program
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
+        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.view));
         glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 
         // we determine the position in the Shader Program of the uniform variables
         GLint lightDirLocation = glGetUniformLocation(illumination_shader->Program, "lightVector");
 
         // we assign the value to the uniform variables
-        glUniform3fv(lightDirLocation, 1, glm::value_ptr(lightDir));
+        glUniform3fv(lightDirLocation, 1, glm::value_ptr(sceneContext.lightDir));
 
         // we render the scene
         size = renderableObjects.size();
@@ -185,11 +169,11 @@ namespace Drop
         {
             (renderableObjects)[i].Draw(
                 *illumination_shader,
-                textures,
-                models,
-                materials,
+                sceneContext.textures,
+                sceneContext.models,
+                sceneContext.materials,
                 cumulatedTransforms,
-                view,
+                sceneContext.view,
                 (renderableObjects)[i].RENDER,
                 depthMap
             );
@@ -198,17 +182,10 @@ namespace Drop
     }
 
     void Renderer::RenderScene(
+        const SceneContext& sceneContext,
         const std::vector<RenderableObject>& renderableObjects,
-        const std::vector<int>& textures,
-        const std::vector<Model>& models,
-        const std::vector<Material>& materials,
         const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms,
-        const glm::mat4& view,
-        const glm::mat4& projection,
-        Shader* const illumination_shader,
-        const GLboolean wireframe,
-        const int width,
-        const int height
+        Shader* const illumination_shader
     ) const
     {
         // we activate back the standard Frame Buffer
@@ -218,21 +195,21 @@ namespace Drop
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // we set the rendering mode
-        if (wireframe)
+        if (sceneContext.wireframe)
             // Draw in wireframe
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // we set the viewport for the final rendering step
-        glViewport(0, 0, width, height);
+        glViewport(0, 0, sceneContext.width, sceneContext.height);
 
         // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
         illumination_shader->Use();
 
         // we pass projection and view matrices to the Shader Program
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
+        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.view));
 
         // we render the scene
         size_t size = renderableObjects.size();
@@ -240,30 +217,27 @@ namespace Drop
         {
             (renderableObjects)[i].Draw(
                 *illumination_shader,
-                textures,
-                models,
-                materials,
+                sceneContext.textures,
+                sceneContext.models,
+                sceneContext.materials,
                 cumulatedTransforms,
-                view            
+                sceneContext.view
             );
         }
     }
 
     void Renderer::DrawDebug(
-        const glm::mat4& view,
-        const glm::mat4& projection,
+        const SceneContext& sceneContext,
         Shader* const debugShader,
-        std::vector<Line>& drawableLines,
-        const int width,
-        const int height
+        std::vector<Line>& drawableLines
     ) const
     {
         debugShader->Use();
 
         GLint projectionMatrixLocation = glGetUniformLocation(debugShader->Program, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
         GLint viewMatrixLocation = glGetUniformLocation(debugShader->Program, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.view));
 
         for (size_t i = 0; i < drawableLines.size(); i++)
         {
@@ -283,5 +257,6 @@ namespace Drop
 
     Renderer::~Renderer()
     {
+        m_Window = nullptr;
     }
 }

@@ -76,8 +76,7 @@ namespace Drop
 {
 	GameEngine::GameEngine(const GameEngineSpecification& specification)
 		: m_Specification(specification),
-		m_PhysicsEngine(0.0, 123),
-		m_Renderer(specification.Width, specification.Height)
+		m_PhysicsEngine(0.0, 123)
 	{
 		assert(!s_Instance, "Game Engine already Exists");
 		s_Instance = this;
@@ -221,6 +220,17 @@ namespace Drop
 
 		glBindVertexArray(0);
 
+		SceneContext sceneContext{
+			m_Game->m_Camera.GetViewMatrix()
+			, m_Game->m_Camera.GetProjectionMatrix()
+			, m_Game->m_LightDir
+			, m_TextureIds
+			, m_Models
+			, m_Materials
+			, m_WindowHandle->GetWidth()
+			, m_WindowHandle->GetHeight()
+			, m_Game->m_Wireframe
+		};	
 
 		// Main loop
 		while (!m_WindowHandle->IsShouldClose())
@@ -269,37 +279,22 @@ namespace Drop
 			);
 
 			m_Renderer.RenderScene(
+				sceneContext,
 				m_RendereableObjects,
-				m_TextureIds,
-				m_Models,
-				m_Materials,
 				m_CumulatedTransforms,
-				m_Game->m_Camera.GetViewMatrix(),
-				m_Game->m_Camera.GetProjectionMatrix(),
-				m_Game->m_LightDir,
 				&(m_Game->m_ShadowShader),
 				&(m_Game->m_LightShader),
 				m_Renderer.m_DepthMapFBO,
-				m_Renderer.m_DepthMap,
-				m_Game->m_Wireframe,
-				m_WindowHandle->GetWidth(),
-				m_WindowHandle->GetHeight()
+				m_Renderer.m_DepthMap
 			);
 
 			
 			// Draw Normal as vectors
 			m_Renderer.RenderScene(
+				sceneContext,
 				m_RendereableObjects,
-				m_TextureIds,
-				m_Models,
-				m_Materials,
 				m_CumulatedTransforms,
-				m_Game->m_Camera.GetViewMatrix(),
-				m_Game->m_Camera.GetProjectionMatrix(),
-				&(displayNormalShader),
-				m_Game->m_Wireframe,
-				m_WindowHandle->GetWidth(),
-				m_WindowHandle->GetHeight()
+				&(displayNormalShader)
 			);
 			
 
@@ -360,12 +355,9 @@ namespace Drop
 			if (m_DrawDebug)
 			{
 				m_Renderer.DrawDebug(
-					m_Game->m_Camera.GetViewMatrix(),
-					m_Game->m_Camera.GetProjectionMatrix(),
+					sceneContext, 
 					&(m_Game->m_DebugShader),
-					m_DrawableLines,
-					m_WindowHandle->GetWidth(),
-					m_WindowHandle->GetHeight()
+					m_DrawableLines
 				);
 			}
 
