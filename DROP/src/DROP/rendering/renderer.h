@@ -1,5 +1,7 @@
 #pragma once
+
 #include "renderableObject.h"
+#include "../particles/particle.h"
 
 #include <vector>
 #include "drawableBox.h"
@@ -33,54 +35,80 @@
 
 #include "../rendering/shader.h"
 #include "../utils/camera.h"
+#include "../rendering/billboard.h"
 
 namespace Drop
 {
+    struct SceneContext
+    {
+        const glm::mat4& view;
+        const glm::mat4& projection;
+        const glm::vec3& lightDir;
+
+        const std::vector<int>& textures;
+        const std::vector<Model>& models;
+        const std::vector<Material>& materials;
+
+        int width;
+        int height;
+
+        GLboolean wireframe;
+    };
+
     class Renderer
     {
     public:
-        Renderer(
-            uint32_t screenWidth_val,
-            uint32_t screenHeight_val
-        );
+        Renderer();
         void Init(GLFWwindow* window);
         ~Renderer();
         void RenderScene(
-            const std::vector<RenderableObject>& m_RenderableObjects,
-            const std::vector<int>& textures,
-            const std::vector<Model>& models,
-            const std::vector<Material>& materials,
-            const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms,
-            const glm::mat4& view,
-            const glm::mat4& projection,
-            const glm::vec3& lightDir,
-            Shader* const shadow_shader,
-            Shader* const illumination_shader,
-            const GLuint depthMapFBO,
-            const GLuint depthMap,
-            const GLboolean wireframe,
-            const int width,
-            const int height
+            const SceneContext& sceneContext
+            , const std::vector<RenderableObject>& renderableObjects
+            , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
+            , Shader* const shadow_shader
+            , Shader* const illumination_shader
+            , const GLuint depthMapFBO
+            , const GLuint depthMap
         ) const ;
-        void DrawDebug(
-            const glm::mat4& view,
-            const glm::mat4& projection,
-            Shader* const debugShader,
-            std::vector<Line>& drawableLines,
-            const int width,
-            const int height
+
+        void RenderScene(
+            const SceneContext& sceneContext
+            , const std::vector<RenderableObject>& renderableObjects
+            , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
+            , Shader* const illumination_shader
         ) const;
+
+        void RenderParticles(
+            const SceneContext& sceneContext
+            , const Particle* const particles
+            , const uint32_t numberOfParticles
+            , Shader* const billboardShader
+        ) const;
+
+        void RenderBillboard(
+            const SceneContext& sceneContext
+            , const std::vector<Billboard>& billboards
+            , Shader* const billboardShader
+        ) const;
+
+        void DrawDebug(
+            const SceneContext& sceneContext
+            , Shader* const debugShader
+            , std::vector<Line>& drawableLines
+        ) const;
+
+        void Shutdown();
+
     public:
-        GLFWwindow* m_Window;
-        GLuint m_DepthMapFBO;
-        GLuint m_DepthMap;
+
+        GLFWwindow* m_Window = nullptr;
+
+        GLuint m_DepthMapFBO = 0;
+        GLuint m_DepthMap = 0;
+
+        const GLuint SHADOW_WIDTH = 1024;
+        const GLuint SHADOW_HEIGHT = 1024;
+
         glm::vec3 m_clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
-
-        // For Debug - TO BE REMOVED
-        float m_ColorIncrement = 0.001f;
-
-    private:
-        const GLuint SHADOW_WIDTH;
-        const GLuint SHADOW_HEIGHT;
     };
 }

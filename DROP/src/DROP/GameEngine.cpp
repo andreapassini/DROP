@@ -45,8 +45,7 @@ namespace Drop
 {
 	GameEngine::GameEngine(const GameEngineSpecification& specification)
 		: m_Specification(specification),
-		m_PhysicsEngine(0.0, 123),
-		m_Renderer(specification.Width, specification.Height)
+		m_PhysicsEngine(0.0, 123)
 	{
 		assert(!s_Instance, "Game Engine already Exists");
 		s_Instance = this;
@@ -133,6 +132,29 @@ namespace Drop
 	{
 		m_Running = true;
 
+		Shader billboardShader = Shader(
+			"..\\DROP\\src\\DROP\\shaders\\billboard.vert",
+			"..\\DROP\\src\\DROP\\shaders\\billboard.geom",
+			"..\\DROP\\src\\DROP\\shaders\\billboard.frag");
+
+		SceneContext sceneContext{
+			m_Game->m_Camera.GetViewMatrix()
+			, m_Game->m_Camera.GetProjectionMatrix()
+			, m_Game->m_LightDir
+			, m_TextureIds
+			, m_Models
+			, m_Materials
+			, m_WindowHandle->GetWidth()
+			, m_WindowHandle->GetHeight()
+			, m_Game->m_Wireframe
+		};	
+		
+		ParticleEmitter particleEmitter;
+		particleEmitter.spawningValues.lifeTime = 5.0f;
+		particleEmitter.spawningValues.position = { 0.0f };
+		float waitTime = 0.0f;
+		float spawnDelay = 0.5f;
+
 		// Main loop
 		while (!m_WindowHandle->IsShouldClose())
 		{
@@ -147,6 +169,10 @@ namespace Drop
 
 			m_Game->m_Camera.OnUpdate(m_DeltaTime);
 			m_Game->m_Camera.OnResize(m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
+
+			sceneContext.height = m_WindowHandle->GetHeight();
+			sceneContext.width = m_WindowHandle->GetWidth();
+			sceneContext.wireframe = m_Game->m_Wireframe;
 
 			// Update
 			m_Game->OnUpdate(m_DeltaTime);
@@ -174,38 +200,53 @@ namespace Drop
 				}
 			}
 
+			if (waitTime < currentTime) {
+				waitTime = currentTime + spawnDelay;
+				//particleEmitter.spawningValues.position.x += 1.0f;
+				EmitParticles(particleEmitter);
+			}
+			UpdateParticles(
+				particleEmitter.particles
+				, particleEmitter.numberOfParticles
+				, m_DeltaTime
+			);
+
 			// Calculate world transform every time the transform in changed
 			m_SceneGraph.CalculateWorldTransforms(
 				m_CumulatedTransforms
 			);
 
 			m_Renderer.RenderScene(
+				sceneContext,
 				m_RendereableObjects,
-				m_TextureIds,
-				m_Models,
-				m_Materials,
 				m_CumulatedTransforms,
-				m_Game->m_Camera.GetViewMatrix(),
-				m_Game->m_Camera.GetProjectionMatrix(),
-				m_Game->m_LightDir,
 				&(m_Game->m_ShadowShader),
 				&(m_Game->m_LightShader),
 				m_Renderer.m_DepthMapFBO,
-				m_Renderer.m_DepthMap,
-				m_Game->m_Wireframe,
-				m_WindowHandle->GetWidth(),
-				m_WindowHandle->GetHeight()
+				m_Renderer.m_DepthMap
+			);
+
+			//// Draw Normal as vectors
+			//m_Renderer.RenderScene(
+			//	sceneContext,
+			//	m_RendereableObjects,
+			//	m_CumulatedTransforms,
+			//	&(displayNormalShader)
+			//);
+
+			m_Renderer.RenderParticles(
+				sceneContext
+				, particleEmitter.particles
+				, particleEmitter.numberOfParticles
+				, &billboardShader
 			);
 
 			if (m_DrawDebug)
 			{
 				m_Renderer.DrawDebug(
-					m_Game->m_Camera.GetViewMatrix(),
-					m_Game->m_Camera.GetProjectionMatrix(),
+					sceneContext, 
 					&(m_Game->m_DebugShader),
-					m_DrawableLines,
-					m_WindowHandle->GetWidth(),
-					m_WindowHandle->GetHeight()
+					m_DrawableLines
 				);
 			}
 
@@ -235,6 +276,11 @@ namespace Drop
 			// Swapping back and front buffers
 			m_WindowHandle->OnEndFrame();
 		}
+
+		// TO BE REMOVED - Billboard
+		glDeleteBuffers(1, &m_VBO);
+		glDeleteVertexArrays(1, &m_VAO);
+		// ------
 	}
 
 	void GameEngine::Shutdown()

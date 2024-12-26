@@ -5,6 +5,11 @@
 
 // https://htmlcolorcodes.com/colors/shades-of-blue/
 
+constexpr glm::vec3 COLOR_WHITE = glm::vec3(
+    255.0f / 255.0f,
+    255.0f / 255.0f,
+    255.0f / 255.0f);
+
 #pragma region ORANGE
 constexpr glm::vec3 COLOR_AMBER = glm::vec3(
     255.0f / 255.0f,

@@ -71,3 +71,31 @@ void RenderableObject::Draw(
     // we render the plane
     models[m_ModelId].Draw();
 }
+
+void RenderableObject::Draw(
+    const Shader& shader,
+    const std::vector<int>& textuers,
+    const std::vector<Model>& models,
+    const std::vector<Material>& materials,
+    std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms,
+    const glm::mat4& view
+) const
+{
+    GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+    GLint alphaLocation = glGetUniformLocation(shader.Program, "alpha");
+    GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+
+    glUniform1f(kdLocation, materials[m_MaterialId].Kd);
+    glUniform1f(alphaLocation, materials[m_MaterialId].Alpha);
+    glUniform1f(f0Location, materials[m_MaterialId].F0);
+
+    VgMath::Transform& transform = m_CumulatedTransforms.find(m_ModelMatrixId)->second;
+    glm::mat4 modelMatrix(1.0f);
+    SceneGraph::TransformToMatrix(transform, modelMatrix);
+
+    glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(view * modelMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
+    // we render the plane
+    models[m_ModelId].Draw();
+}

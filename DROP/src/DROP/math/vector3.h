@@ -27,10 +27,24 @@ Scalar dot(const Vector3& a, const Vector3& b);
 
 class Vector3{
 public:
-    Scalar x,y,z; // the three coordinates (as fields)
+    //Scalar x,y,z; // the three coordinates (as fields)
+#ifndef ANONYMOUS_STRUCT
+    union { Scalar x, r; };
+    union { Scalar y, g; };
+    union { Scalar z, b; };
+#else
+    union
+    {
+        struct { Scalar x, y, z; };
+        struct { Scalar r, g, b; };
+    }
+#endif // 
+
 
     // constructor
     Vector3(Scalar _x, Scalar _y, Scalar _z):x(_x),y(_y),z(_z){ }
+
+    Vector3(Scalar _n):x(_n),y(_n),z(_n){ }
 
     // empty constructor
     Vector3():x(0.0),y(0.0),z(0.0){ }

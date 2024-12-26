@@ -25,16 +25,14 @@ using namespace std;
 #include <filesystem>
 
 
-/////////////////// SHADER class ///////////////////////
 class Shader
 {
 public:
     GLuint Program;
 
-    //////////////////////////////////////////
 
     //constructor
-    Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
+    Shader(const GLchar* const vertexPath, const GLchar* const fragmentPath)
     {
         std::cout << std::filesystem::current_path() << std::endl;
         cout << "Vertex: " << vertexPath << "\nFragment: " << fragmentPath << endl;
@@ -104,7 +102,96 @@ public:
         glDeleteShader(fragment);
     }
 
-    //////////////////////////////////////////
+    Shader(const GLchar* const vertexPath, const GLchar* const geometryPath, const GLchar* const fragmentPath)
+    {
+        std::cout << std::filesystem::current_path() << std::endl;
+        cout << "Vertex: " << vertexPath 
+            << "\nGeometry: " << geometryPath
+            << "\nFragment: " << fragmentPath << endl;
+
+        // Step 1: we retrieve shaders source code from provided filepaths
+        string vertexCode;
+        string geometryCode;
+        string fragmentCode;
+        ifstream vShaderFile;
+        ifstream gShaderFile;
+        ifstream fShaderFile;
+
+        // ensure ifstream objects can throw exceptions:
+        vShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+        gShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+        fShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+        try
+        {
+            // Open files
+            vShaderFile.open(vertexPath);
+            gShaderFile.open(geometryPath);
+            fShaderFile.open(fragmentPath);
+            stringstream vShaderStream, gShaderStream, fShaderStream;
+            // Read file's buffer contents into streams
+            vShaderStream << vShaderFile.rdbuf();
+            gShaderStream << gShaderFile.rdbuf();
+            fShaderStream << fShaderFile.rdbuf();
+            // close file handlers
+            vShaderFile.close();
+            gShaderFile.close();
+            fShaderFile.close();
+            // Convert stream into string
+            vertexCode = vShaderStream.str();
+            geometryCode = gShaderStream.str();
+            fragmentCode = fShaderStream.str();
+        }
+        catch (ifstream::failure e)
+        {
+            cout << e.what() << ", " << e.code().message() << e.code().value() << endl;
+            cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
+        }
+
+        // Convert strings to char pointers
+        const GLchar* vShaderCode = vertexCode.c_str();
+        const GLchar* gShaderCode = geometryCode.c_str();
+        const GLchar* fShaderCode = fragmentCode.c_str();
+
+
+        // Step 2: we compile the shaders
+        GLuint vertex, geometry, fragment;
+
+        // Vertex Shader
+        vertex = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertex, 1, &vShaderCode, NULL);
+        glCompileShader(vertex);
+        // check compilation errors
+        checkCompileErrors(vertex, "VERTEX");
+
+        // Geometry Shader
+        geometry = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometry, 1, &gShaderCode, NULL);
+        glCompileShader(geometry);
+        // check compilation errors
+        checkCompileErrors(geometry, "GEOMETRY");
+
+        // Fragment Shader
+        fragment = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragment, 1, &fShaderCode, NULL);
+        glCompileShader(fragment);
+        // check compilation errors
+        checkCompileErrors(fragment, "FRAGMENT");
+
+
+        // Step 3: Shader Program creation
+        this->Program = glCreateProgram();
+        glAttachShader(this->Program, vertex);
+        glAttachShader(this->Program, geometry);
+        glAttachShader(this->Program, fragment);
+        glLinkProgram(this->Program);
+        // check linking errors
+        checkCompileErrors(this->Program, "PROGRAM");
+
+        // Step 4: we delete the shaders because they are linked to the Shader Program, and we do not need them anymore
+        glDeleteShader(vertex);
+        glDeleteShader(geometry);
+        glDeleteShader(fragment);
+    }
 
     // We activate the Shader Program as part of the current rendering process
     void Use() { glUseProgram(this->Program); }
@@ -113,7 +200,6 @@ public:
     void Delete() { glDeleteProgram(this->Program); }
 
 private:
-    //////////////////////////////////////////
 
     // Check compilation and linking errors
     void checkCompileErrors(GLuint shader, string type)

@@ -11,24 +11,24 @@ public:
 	ExampleGame()
 	{
 		m_ShadowShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\19_shadowmap.vert",
-			"..\\Drop\\src\\Drop\\shaders\\20_shadowmap.frag"
+			"..\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
+			"..\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag"
         );
 
 		m_LightShader = Shader(
-			"..\\Drop\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert",
-			"..\\Drop\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag"
+			"..\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
+			"..\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
         );
 
         GameEngine* gameEngine = GameEngine::GetInstance();
 
-		gameEngine->m_Models.emplace_back("../models/cube.obj");
-        gameEngine->m_Models.emplace_back("../models/sphere.obj");
-        gameEngine->m_Models.emplace_back("../models/bunny_lp.obj");
-        gameEngine->m_Models.emplace_back("../models/plane.obj");
+		gameEngine->m_Models.emplace_back("..\\models\\cube.obj");
+        gameEngine->m_Models.emplace_back("..\\models\\sphere.obj");
+        gameEngine->m_Models.emplace_back("..\\models\\bunny_lp.obj");
+        gameEngine->m_Models.emplace_back("..\\models\\plane.obj");
 
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("../textures/UV_Grid_Sm.png"));
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("../textures/SoilCracked.png"));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\UV_Grid_Sm.png"));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\SoilCracked.png"));
 
 		gameEngine->m_SceneGraph.m_GameObjects[SceneGraph::ROOT_ID].m_LocalTransform.m_Rotate =
 			VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0),
