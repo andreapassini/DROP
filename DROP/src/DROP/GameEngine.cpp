@@ -276,11 +276,6 @@ namespace Drop
 			// Swapping back and front buffers
 			m_WindowHandle->OnEndFrame();
 		}
-
-		// TO BE REMOVED - Billboard
-		glDeleteBuffers(1, &m_VBO);
-		glDeleteVertexArrays(1, &m_VAO);
-		// ------
 	}
 
 	void GameEngine::Shutdown()
