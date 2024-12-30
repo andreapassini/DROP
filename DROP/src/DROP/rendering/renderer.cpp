@@ -308,7 +308,7 @@ namespace Drop
 
             glm::mat4 modelMatrix(1.0f);
             VgMath::Transform testTransform;
-            testTransform.m_Translate = particle.position;
+            testTransform.m_Translate = particle.position.asVector3();
             SceneGraph::TransformToMatrix(testTransform, modelMatrix);
             GLint modelMatrixLocation = glGetUniformLocation(billboardShader->Program, "modelMatrix");
             glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));

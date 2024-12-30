@@ -16,7 +16,7 @@ void EmitParticles(ParticleEmitter& particleEmitter)
 		particle.age = 0.0f;
 		particle.isActive = true;
 
-		particle.position = spawningValues.position;
+		particle.position = spawningValues.spawningSurface.RandomPointOnSurface();
 
 		particle.lifeTime = spawningValues.lifeTime;
 
@@ -48,7 +48,8 @@ void UpdateParticles(Particle* const particles, uint32_t size, const float delta
 			continue;
 		}
 
-		particle.position += (particle.speed * deltaTime);
+		//particle.position += (particle.speed * deltaTime);
+		particle.position = particle.position + (particle.speed * deltaTime);
 
 		particle.lerpFactor = particle.age / particle.lifeTime;
 		particle.size = particle.startsize + particle.lerpFactor * (particle.endsize - particle.startsize);

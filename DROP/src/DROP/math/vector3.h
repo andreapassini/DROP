@@ -23,6 +23,28 @@ class Vector3;
 class Versor3;
 class Point3;
 
+class Vector2 {
+public:
+#ifndef ANONYMOUS_STRUCT
+    union { Scalar x, r; };
+    union { Scalar y, g; };
+#else
+    union
+    {
+        struct { Scalar x, y; };
+        struct { Scalar r, g; };
+    }
+#endif // 
+
+    // constructor
+    Vector2(Scalar _x, Scalar _y) :x(_x), y(_y) {}
+
+    Vector2(Scalar _n) :x(_n), y(_n) {}
+
+    // empty constructor
+    Vector2() :x(0.0), y(0.0) {}
+};
+
 Scalar dot(const Vector3& a, const Vector3& b);
 
 class Vector3{
@@ -138,7 +160,7 @@ public:
 
     Versor3 normalized() const;
 
-    Point3 asPoint3() const;
+    VgMath::Point3 asPoint3() const;
     
     VgMath::Versor3 asVersor3() const;
     //{

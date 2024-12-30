@@ -126,6 +126,10 @@ inline bool areEqual( const Versor3& a, const Versor3& b ){
     return (a-b).isZero();
 }
 
+inline Versor3 Vector3::asVersor3() const {
+    return normalized();
+}
+
 // DEFINIZNIONE DI Vector3::normalized();
 inline Versor3 Vector3::normalized() const
 {

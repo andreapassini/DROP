@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../math/mat3.h"
+#include "../math/surface.h"
 
 using namespace VgMath;
 
 #define MAX_PARTICLES 100
 
 struct Particle {
-	Vector3 position{ 0.0f };
+	Point3 position{ 0.0f };
 	float size = 1.0f;
 	Vector3 speed{ 0.0f };
 
@@ -32,7 +33,7 @@ struct Particle {
 };
 
 struct ParticleStartValues {
-	Vector3 position{ 0.0f };
+	Surface spawningSurface;
 
 	// In Milliseconds
 	float lifeTime = 10.0f;

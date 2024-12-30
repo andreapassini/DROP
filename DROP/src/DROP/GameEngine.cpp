@@ -151,7 +151,10 @@ namespace Drop
 		
 		ParticleEmitter particleEmitter;
 		particleEmitter.spawningValues.lifeTime = 5.0f;
-		particleEmitter.spawningValues.position = { 0.0f };
+		Transform spawningSurfaceTransform;
+		particleEmitter.spawningValues.spawningSurface.m_Size.x = 5.0f;
+		particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
+		particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
 		float waitTime = 0.0f;
 		float spawnDelay = 0.5f;
 

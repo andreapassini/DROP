@@ -16,8 +16,11 @@ public:
     // constuctor
     Point3(Scalar _x, Scalar _y, Scalar _z):x(_x),y(_y),z(_z){ }
 
+    Point3(Scalar _x):x(_x),y(_x),z(_x){ }
+
     // empty constructor: ORIGIN point
     Point3():x(0.0),y(0.0),z(0.0){ }
+
 
     static Point3 random(Scalar scale) {
         return Point3(
@@ -82,7 +85,10 @@ public:
         return areEqual(x,0) && areEqual(y,0) && areEqual(z,0);
     }
 
-    Vector3 asVector3() const {  return Vector3(x,y,z); }
+    Vector3 asVector3() const;
+
+    //friend class Vector3;
+    friend Point3 Vector3::asPoint3() const;
 
 }; // end of class Point3
 
@@ -100,7 +106,13 @@ inline Point3 operator + (const Vector3 &v, const Point3 &p){
     return p+v;
 }
 
-
+inline Point3 Vector3::asPoint3() const {
+    return Point3(x, y, z);
+}
+ 
+inline Vector3 Point3::asVector3() const {
+    return Vector3(x, y, z);
+}
 
 
 } // end of namespace
