@@ -10,8 +10,14 @@
 //      it can remove (destroy) existing primitives.
 
 layout (points) in;
-layout (line_strip, max_vertices = 5) out;
+layout (triangle_strip, max_vertices = 4) out;
 
+uniform vec2 size;
+
+// model matrix
+uniform mat4 modelMatrix;
+// view matrix
+uniform mat4 viewMatrix;
 // Projection matrix
 uniform mat4 projectionMatrix;
 
@@ -20,36 +26,39 @@ in Vertex
   vec4 color;
 } vertex[];
 
+out vec2 Vertex_UV;
 out vec4 Vertex_Color;
 
 void main()
 {
 	vec4 P = gl_in[0].gl_Position;
 
-	float size = 5.0;
-
 	// a: left-bottom 
-	vec2 va = P.xy + vec2(-0.5, -0.5) * size;
-	// gl_Position = projectionMatrix * vec4(va, P.zw);
-	gl_Position = projectionMatrix * vec4(va, 0.0, 0.0);
+	// vec2 va = P.xy + vec2(-0.5 * size., -0.5 * size.) * size;
+	vec2 va = P.xy + vec2(-0.5 * size.x, -0.5 * size.y);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(va, P.zw);
+	Vertex_UV = vec2(0.0, 0.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
 
 	// b: left-top
-	vec2 vb = P.xy + vec2(-0.5, 0.5) * size;
-	gl_Position = projectionMatrix * vec4(vb, 0.0, 0.0);
+	vec2 vb = P.xy + vec2(-0.5 * size.x, 0.5 * size.y) * size;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vb, P.zw);
+	Vertex_UV = vec2(0.0, 1.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
   
 	// d: right-bottom
-	vec2 vd = P.xy + vec2(0.5, -0.5) * size;
-	gl_Position = projectionMatrix * vec4(vd, 0.0, 0.0);
+	vec2 vd = P.xy + vec2(0.5 * size.x, -0.5 * size.y) * size;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vd, P.zw);
+	Vertex_UV = vec2(1.0, 0.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
 
 	// c: right-top
-	vec2 vc = P.xy + vec2(0.5, 0.5) * size;
-	gl_Position = projectionMatrix * vec4(vc, 0.0, 0.0);
+	vec2 vc = P.xy + vec2(0.5 * size.x, 0.5 * size.y) * size;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vc, P.zw);
+	Vertex_UV = vec2(1.0, 1.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
 

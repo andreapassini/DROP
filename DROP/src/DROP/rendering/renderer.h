@@ -97,6 +97,12 @@ namespace Drop
             , std::vector<Line>& drawableLines
         ) const;
 
+        void DrawParticleEmitterSurface(
+            const SceneContext& sceneContext
+            , Shader* const debugShader
+            , std::vector<ParticleEmitter>& drawableParticleEmitter
+        ) const;
+
         void Shutdown();
 
     public:

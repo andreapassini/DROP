@@ -152,6 +152,8 @@ namespace Drop
 		ParticleEmitter particleEmitter;
 		particleEmitter.spawningValues.lifeTime = 5.0f;
 		Transform spawningSurfaceTransform;
+		spawningSurfaceTransform.m_Translate = (0.0f, 1.0f, 0.0f);
+		particleEmitter.spawningValues.endsize = 0.0f;
 		particleEmitter.spawningValues.spawningSurface.m_Size.x = 5.0f;
 		particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
 		particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
@@ -250,6 +252,14 @@ namespace Drop
 					sceneContext, 
 					&(m_Game->m_DebugShader),
 					m_DrawableLines
+				);
+
+				std::vector<ParticleEmitter> ParticleEmitters;
+				ParticleEmitters.push_back(particleEmitter);
+				m_Renderer.DrawParticleEmitterSurface(
+					sceneContext
+					, &(m_Game->m_EmptyQuadShader),
+					ParticleEmitters
 				);
 			}
 

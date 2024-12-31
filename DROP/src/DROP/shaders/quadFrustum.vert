@@ -6,9 +6,9 @@
 layout (location = 0) in vec3 position;
 
 // model matrix
-uniform mat4 modelMatrix;
+// uniform mat4 modelMatrix;
 // view matrix
-uniform mat4 viewMatrix;
+// uniform mat4 viewMatrix;
 
 // Projection matrix
 // uniform mat4 projectionMatrix;
@@ -23,11 +23,8 @@ out Vertex
 void main()
 {
     // transformations are applied to each vertex
-    // We wanna work in View coordinate to simplify the geometry shader
-    gl_Position = viewMatrix * modelMatrix * vec4(position, 1.0f);
-
-    // The classic vertex shader, left here as a reference
-    // gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0f);
+    // We wanna work in Local coordinate to simplify the geometry shader
+    gl_Position = vec4(position, 1.0f);
 
     vertex.color = colorIn;
 }
