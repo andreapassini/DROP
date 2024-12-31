@@ -25,6 +25,7 @@ public:
 #endif
     Quaternion m_Rotate;
 
+public:
     // empty constructor: returns identity transform
 #if ANISOTROPIC_SCALING
     Transform(): translate(0,0,0), scale(1,1,1),  rotate() {}
@@ -46,7 +47,12 @@ public:
         return d*m_Scale;
     }
 
-    // operatoins between transforms
+    Versor3 Up() const;
+
+    void Up(Versor3& outUp) const;
+
+
+    // operations between transforms
     Transform inverse() const {
         Transform res;
 #if ANISOTROPIC_SCALING
@@ -64,6 +70,16 @@ public:
 };
 
 
+inline Versor3 Transform::Up() const {
+    Versor3 up = Versor3::up();
+    up = (*this)(up);
+    return up;
+}
+
+inline void Transform::Up(Versor3& outUp) const {
+    outUp = Versor3::up();
+    outUp = (*this)(outUp);
+}
 
 // the result is the transformation that does b first, then me (this)
 inline Transform Transform::operator * (const Transform & b) const 
@@ -76,13 +92,11 @@ inline Transform Transform::operator * (const Transform & b) const
     return c;
 }
 
-
 inline bool areEqual(const Transform &a , const Transform &b )
 {
     return areEqual( a.m_Scale ,    b.m_Scale )
         && areEqual( a.m_Translate, b.m_Translate )
         && areEquivalent( a.m_Rotate,    b.m_Rotate );
 }
-
 
 }; // end of namespace definition
