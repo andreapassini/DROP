@@ -3,6 +3,9 @@
 
 namespace VgMath {
 
+// Represent a surface
+// - Normal, the up vector of the transform
+// - Size, the dimension of the surface
 class Surface {
 public:
 	const Transform* m_Transform = nullptr;

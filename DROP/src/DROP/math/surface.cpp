@@ -4,7 +4,7 @@
 using namespace VgMath;
 
 Versor3 Surface::Normal() const{
-	Versor3 up(0.0f, 1.0f, 0.0f);
+	Versor3 up = Versor3::up();
 	up = (*m_Transform)(up);
 	return up;
 }
