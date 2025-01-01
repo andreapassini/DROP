@@ -56,6 +56,12 @@ namespace Drop
 			"..\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
 			"..\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
 
+		Shader m_EmptyBoxShader = Shader(
+			"..\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
+			"..\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
+			"..\\DROP\\src\\DROP\\shaders\\boxFrustum.frag");
+
+
 
 		bool m_Wireframe = false;
 		bool m_VSync = false;
