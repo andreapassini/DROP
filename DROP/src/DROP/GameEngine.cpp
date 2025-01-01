@@ -158,7 +158,7 @@ namespace Drop
 		particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
 		particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
 		float waitTime = 0.0f;
-		float spawnDelay = 0.5f;
+		float spawnDelay = 2.5f;
 
 		// Main loop
 		while (!m_WindowHandle->IsShouldClose())

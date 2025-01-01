@@ -10,15 +10,12 @@
 //      it can remove (destroy) existing primitives.
 
 layout (points) in;
-layout (triangle_strip, max_vertices = 4) out;
+layout (line_strip, max_vertices = 5) out;
 
 uniform vec2 size;
 
-// model matrix
 uniform mat4 modelMatrix;
-// view matrix
 uniform mat4 viewMatrix;
-// Projection matrix
 uniform mat4 projectionMatrix;
 
 in Vertex
@@ -33,34 +30,48 @@ void main()
 {
 	vec4 P = gl_in[0].gl_Position;
 
+//	vec2 currSize = vec2(10.0, 10.0); // Debug purpose
+	vec2 currSize = size;
+
 	// a: left-bottom 
-	// vec2 va = P.xy + vec2(-0.5 * size., -0.5 * size.) * size;
-	vec2 va = P.xy + vec2(-0.5 * size.x, -0.5 * size.y);
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(va, P.zw);
+	vec2 va = P.xz + vec2(-0.5, -0.5) * currSize;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
+		* vec4(va.x, P.y, va.y, P.w);
 	Vertex_UV = vec2(0.0, 0.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
 
 	// b: left-top
-	vec2 vb = P.xy + vec2(-0.5 * size.x, 0.5 * size.y) * size;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vb, P.zw);
+	vec2 vb = P.xz + vec2(-0.5, 0.5) * currSize;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
+		* vec4(vb.x, P.y, vb.y, P.w);
 	Vertex_UV = vec2(0.0, 1.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
   
+	// c: right-top
+	vec2 vc = P.xz + vec2(0.5, 0.5) * currSize;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
+		* vec4(vc.x, P.y, vc.y, P.w);
+	Vertex_UV = vec2(1.0, 1.0);
+	Vertex_Color = vertex[0].color;
+	EmitVertex();  
+
 	// d: right-bottom
-	vec2 vd = P.xy + vec2(0.5 * size.x, -0.5 * size.y) * size;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vd, P.zw);
+	vec2 vd = P.xz + vec2(0.5, -0.5) * currSize;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
+		* vec4(vd.x, P.y, vd.y, P.w);
 	Vertex_UV = vec2(1.0, 0.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
 
-	// c: right-top
-	vec2 vc = P.xy + vec2(0.5 * size.x, 0.5 * size.y) * size;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vc, P.zw);
-	Vertex_UV = vec2(1.0, 1.0);
+	// Back to the start
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
+		* vec4(va.x, P.y, va.y, P.w);
+	Vertex_UV = vec2(0.0, 0.0);
 	Vertex_Color = vertex[0].color;
 	EmitVertex();  
+
 
 	EndPrimitive();  
 }
