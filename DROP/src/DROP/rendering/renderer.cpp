@@ -511,12 +511,17 @@ namespace Drop
             glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
             glCheckError();
 
-            GLint particleSizeLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "2D_size");
+            GLint particleSizeLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "size");
             glCheckError();
-            glUniform2f(
+            glUniform2fv(
                 particleSizeLocation
-                , particleEmitter.spawningValues.spawningSurface.m_Size.x
-                , particleEmitter.spawningValues.spawningSurface.m_Size.y
+                , 1
+                , glm::value_ptr(
+                    glm::vec2(
+                        particleEmitter.spawningValues.spawningSurface.m_Size.x
+                        , particleEmitter.spawningValues.spawningSurface.m_Size.y
+                    )
+                )
             );
             glCheckError();
 
