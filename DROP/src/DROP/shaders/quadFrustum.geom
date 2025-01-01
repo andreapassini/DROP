@@ -34,7 +34,7 @@ void main()
 	vec2 currSize = size;
 
 	// a: left-bottom 
-	vec2 va = P.xz + vec2(-0.5, -0.5) * currSize;
+	vec2 va = P.xz + vec2(-1.0, -1.0) * currSize;
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
 		* vec4(va.x, P.y, va.y, P.w);
 	Vertex_UV = vec2(0.0, 0.0);
@@ -42,7 +42,7 @@ void main()
 	EmitVertex();  
 
 	// b: left-top
-	vec2 vb = P.xz + vec2(-0.5, 0.5) * currSize;
+	vec2 vb = P.xz + vec2(-1.0, 1.0) * currSize;
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
 		* vec4(vb.x, P.y, vb.y, P.w);
 	Vertex_UV = vec2(0.0, 1.0);
@@ -50,7 +50,7 @@ void main()
 	EmitVertex();  
   
 	// c: right-top
-	vec2 vc = P.xz + vec2(0.5, 0.5) * currSize;
+	vec2 vc = P.xz + vec2(1.0, 1.0) * currSize;
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
 		* vec4(vc.x, P.y, vc.y, P.w);
 	Vertex_UV = vec2(1.0, 1.0);
@@ -58,7 +58,7 @@ void main()
 	EmitVertex();  
 
 	// d: right-bottom
-	vec2 vd = P.xz + vec2(0.5, -0.5) * currSize;
+	vec2 vd = P.xz + vec2(1.0, -1.0) * currSize;
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix 
 		* vec4(vd.x, P.y, vd.y, P.w);
 	Vertex_UV = vec2(1.0, 0.0);
