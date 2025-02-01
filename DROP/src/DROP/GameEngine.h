@@ -19,6 +19,12 @@
 
 struct GLFWwindow;
 
+// TO BE REMOVED
+struct TestType
+{
+};
+
+
 namespace Drop
 {
 
