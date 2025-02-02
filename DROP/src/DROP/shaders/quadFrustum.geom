@@ -1,4 +1,4 @@
-#version 410 core
+#version 430 core
 
 // From: https://www.geeks3d.com/20111111/simple-introduction-to-geometry-shaders-glsl-opengl-tutorial-part1/
 // The geometry shader (or GS) stage is located after the vertex shader 

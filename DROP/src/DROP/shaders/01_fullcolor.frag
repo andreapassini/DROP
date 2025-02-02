@@ -12,7 +12,7 @@ Universita' degli Studi di Milano
 
 */
 
-#version 410 core
+#version 430 core
 
 // output shader variable
 out vec4 colorFrag;

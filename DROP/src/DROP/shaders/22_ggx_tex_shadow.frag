@@ -16,7 +16,7 @@ Universita' degli Studi di Milano
 
 */
 
-#version 410 core
+#version 430 core
 
 const float PI = 3.14159265359;
 

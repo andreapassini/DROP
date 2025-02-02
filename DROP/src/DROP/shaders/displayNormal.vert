@@ -1,4 +1,4 @@
-#version 410 core
+#version 430 core
 
 // vertex position in world coordinates
 layout (location = 0) in vec3 position;

@@ -1,4 +1,4 @@
-#version 410 core
+#version 430 core
 
 uniform sampler2D tex0;
 in vec2 Vertex_UV;

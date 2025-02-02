@@ -32,7 +32,10 @@ public:
 
 
     //constructor
-    Shader(const GLchar* const vertexPath, const GLchar* const fragmentPath)
+    Shader(
+        const GLchar* const vertexPath
+        , const GLchar* const fragmentPath
+    )
     {
         std::cout << std::filesystem::current_path() << std::endl;
         cout << "Vertex: " << vertexPath << "\nFragment: " << fragmentPath << endl;
@@ -102,7 +105,11 @@ public:
         glDeleteShader(fragment);
     }
 
-    Shader(const GLchar* const vertexPath, const GLchar* const geometryPath, const GLchar* const fragmentPath)
+    Shader(
+        const GLchar* const vertexPath
+        , const GLchar* const geometryPath
+        , const GLchar* const fragmentPath
+    )
     {
         std::cout << std::filesystem::current_path() << std::endl;
         cout << "Vertex: " << vertexPath 
@@ -193,6 +200,61 @@ public:
         glDeleteShader(fragment);
     }
 
+    Shader(
+        const GLchar* const computePath
+    )
+    {
+        std::cout << std::filesystem::current_path() << std::endl;
+        cout << "Computer " << computePath << endl;
+
+        // Step 1: we retrieve shaders source code from provided filepaths
+        string computeCode;
+        ifstream cShaderFile;
+
+        // ensure ifstream objects can throw exceptions:
+        cShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+        try
+        {
+            // Open files
+            cShaderFile.open(computePath);
+            stringstream cShaderStream;
+            // Read file's buffer contents into streams
+            cShaderStream << cShaderFile.rdbuf();
+            // close file handlers
+            cShaderFile.close();
+            // Convert stream into string
+            computeCode = cShaderStream.str();
+        }
+        catch (ifstream::failure e)
+        {
+            cout << e.what() << ", " << e.code().message() << e.code().value() << endl;
+            cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
+        }
+
+        // Convert strings to char pointers
+        const GLchar* cShaderCode = computeCode.c_str();
+
+        // Step 2: we compile the shaders
+        GLuint compute;
+
+        // Compute Shader
+        compute = glCreateShader(GL_COMPUTE_SHADER);
+        glShaderSource(compute, 1, &cShaderCode, NULL);
+        glCompileShader(compute);
+        // check compilation errors
+        checkCompileErrors(compute, "COMPUTE");
+
+        // Step 3: Shader Program creation
+        this->Program = glCreateProgram();
+        glAttachShader(this->Program, compute);
+        glLinkProgram(this->Program);
+        // check linking errors
+        checkCompileErrors(this->Program, "PROGRAM");
+
+        // Step 4: we delete the shaders because they are linked to the Shader Program, and we do not need them anymore
+        glDeleteShader(compute);
+    }
+    
     // We activate the Shader Program as part of the current rendering process
     void Use() { glUseProgram(this->Program); }
 

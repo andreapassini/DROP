@@ -11,7 +11,7 @@ Universita' degli Studi di Milano
 */
 
 
-#version 410 core
+#version 430 core
 
 // vertex position in world coordinates
 // the number used for the location in the layout qualifier is the position of the vertex attribute

@@ -16,7 +16,7 @@ Master degree in Computer Science
 Universita' degli Studi di Milano
 */
 
-#version 410 core
+#version 430 core
 
 void main()
 {}
