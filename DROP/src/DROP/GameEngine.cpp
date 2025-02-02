@@ -27,7 +27,7 @@
 #include <stb_image/stb_image.h>
 #define stringify( name ) #name
 
-#include "DROP/ECS/ecs.h"
+#include "DROP/ECS/beecs.h"
 
 extern bool g_GameEngineRunning;
 
@@ -39,7 +39,7 @@ extern bool g_GameEngineRunning;
 #endif
 
 static Drop::GameEngine* s_Instance = nullptr;
-static ECS g_ECS{ RESERVE, RESERVE, RESERVE };
+static bseecs::ECS g_ECS{};
 
 namespace Drop
 {
@@ -120,12 +120,12 @@ namespace Drop
 		ImGui_ImplOpenGL3_Init("#version 410");
 
 		// Testing ECS
-		g_ECS.RegisterComponent<TestType>();
-		Entity myEntity = g_ECS.AddEntity();
-		g_ECS.AddComponent<TestType>(myEntity);
-		g_ECS.RegisterSystem<TestSystem>();
-		g_ECS.SystemsStart();
-		g_ECS.SystemsUpdate(0.0f);
+		g_ECS.RegisterComponent<Transform>();
+		g_ECS.RegisterComponent<Camera, Transform>();
+		g_ECS.RegisterComponent<Model, Transform>();
+		g_ECS.RegisterComponent<ParticleEmitter, Transform>();
+		g_ECS.RegisterComponent<Billboard, Transform>();
+		g_ECS.RegisterComponent<PhysicsObject>();
 	}
 
 	void GameEngine::Run()

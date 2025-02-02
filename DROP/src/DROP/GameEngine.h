@@ -13,8 +13,7 @@
 #include "imgui.h"
 #include "utils/Window.h"
 
-#include "DROP/ECS/ecs.h"
-#include "DROP/ECS/systems/TestSystem.h"
+#include "DROP/ECS/beecs.h"
 
 
 struct GLFWwindow;
@@ -81,6 +80,8 @@ namespace Drop
 		std::vector<Line> m_DrawableLines;
 
 		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
+
+		// GPU Particles
 
 
 	private:
