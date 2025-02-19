@@ -13,6 +13,9 @@
 #include <type_traits>
 #include <cassert>
 
+// project includes
+#include "../memory/arena.h"
+
 // Can replace these defines with custom macros elsewhere
 #ifndef BSEECS_ASSERTS
 	#define BSEECS_ASSERT(condition, msg) \
@@ -203,6 +206,21 @@ namespace bseecs {
 
 	};
 
+	template<typename T>
+	class ISingletonComponent
+	{
+	public:
+		
+		ISingletonComponent(Arena& arenaAllocator) {
+
+			m_Ptr = Allocate<T>(arenaAllocator);
+		};
+		~ISingletonComponent();
+
+	private:
+
+		T* m_Ptr = nullptr;
+	};
 
 	class ECS {
 	private:
@@ -253,6 +271,14 @@ namespace bseecs {
 		#define BSEECS_ASSERT_VALID_ENTITY(id) \
 			BSEECS_ASSERT(id != NULL_ENTITY, "NULL_ENTITY cannot be operated on by the ECS") \
 			BSEECS_ASSERT(id < m_maxEntityID && id >= 0, "Invalid entity ID out of bounds: " << id);
+
+
+		// Add Singleton components here,
+		// allocate the components in an arena
+		// Get all the pointers
+		// A map on SingletonComponents
+		// when adding, getting and removing Singleton Components, use a template
+
 
 	
 	private:
@@ -669,7 +695,6 @@ namespace bseecs {
 		std::vector<MainComponent>& m_MainDense;
 		SparseSet<MainComponent>& m_MainComps;
 	};
-
 }
 
 #endif
