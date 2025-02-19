@@ -206,21 +206,26 @@ namespace bseecs {
 
 	};
 
-	template<typename T>
 	class ISingletonComponent
 	{
+		ISingletonComponent(Arena& arenaAllocator);
+	};
+
+	template<typename T>
+	class SingletonComponent : public ISingletonComponent
+	{
 	public:
-		
-		ISingletonComponent(Arena& arenaAllocator) {
 
-			m_Ptr = Allocate<T>(arenaAllocator);
+		template<typename Temp>
+		SingletonComponent(Arena& arenaAllocator)
+		{
+			BSEECS_ASSERT(std::is_same<Temp, T>::value);
+			m_Ptr = Allocate<Temp>(arenaAllocator);
 		};
-		~ISingletonComponent();
-
-	private:
 
 		T* m_Ptr = nullptr;
 	};
+
 
 	class ECS {
 	private:
@@ -273,12 +278,15 @@ namespace bseecs {
 			BSEECS_ASSERT(id < m_maxEntityID && id >= 0, "Invalid entity ID out of bounds: " << id);
 
 
-		// Add Singleton components here,
-		// allocate the components in an arena
-		// Get all the pointers
-		// A map on SingletonComponents
-		// when adding, getting and removing Singleton Components, use a template
+		std::vector<ISingletonComponent*> m_singletonComponents;
+		
+		struct SingletonComponentInfo
+		{
+			size_t m_bitPosition{};
+		};
 
+		// Key is component name, value is the bit position in ComponentMask
+		std::unordered_map<TypeName, SingletonComponentInfo> m_singeltonComponentBitPosition;
 
 	
 	private:
@@ -672,6 +680,62 @@ namespace bseecs {
 						"Bad lambda provided to .ForEach(), parameter pack does not match lambda args");
 				}
 			}
+		}
+
+
+		// Singleton component methods
+
+		template <typename T>
+		size_t GetSingletonComponentBitPosition()
+		{
+			TypeName name = typeid(T).name();
+			auto it = m_singeltonComponentBitPosition.find(name);
+			if (it == m_singeltonComponentBitPosition.end())
+				return tombstone;
+
+			return it->second.m_singeltonComponentBitPosition;
+		}
+
+		template <typename T>
+		T& GetSingletonComponent()
+		{
+			size_t bitPos = GetSingletonComponentBitPosition<T>();
+
+			BSEECS_ASSERT(bitPos == tombstone
+				, "Attempting to operate on unregistered component '" << typeid(T).name() << "'");
+			
+
+			BSEECS_ASSERT(bitPos < m_singletonComponents.size() && bitPos >= 0
+				, "(Internal): Attempting to index into m_componentPools with out of range bit position");
+
+			// Downcast the generic pointer to the specific sparse set
+			ISingletonComponent* genericPtr = m_singletonComponents[bitPos].get();
+			SingletonComponent<T>* tempComp = dynamic_cast<T>(genericPtr);
+			T* comp = dynamic_cast<T>(tempComp.m_Ptr);
+			BSEECS_ASSERT(comp, "Dynamic cast failed for component pool '" << typeid(T).name() << "'");
+
+			return *comp;
+		}
+
+		/*
+		*  Register a component with specific required components
+		*	and create a pool for it
+		*/
+		template <typename T>
+		void RegisterSingletonComponent(Arena& arenaAllocator)
+		{
+			TypeName name = typeid(T).name();
+			BSEECS_ASSERT(m_singeltonComponentBitPosition.find(name) == m_singeltonComponentBitPosition.end(),
+				"Component with name '" << name << "' already registered");
+			BSEECS_ASSERT(m_singeltonComponentBitPosition.size() < MAX_COMPONENTS,
+				"Exceeded max number of registered components");
+
+			SingletonComponentInfo& current = m_singeltonComponentBitPosition[name];
+			current.m_bitPosition = m_singletonComponents.size();
+
+			m_singletonComponents.push_back(new ISingletonComponent(arenaAllocator));
+
+			BSEECS_INFO("Registered component '" << name << "'");
 		}
 	};
 
