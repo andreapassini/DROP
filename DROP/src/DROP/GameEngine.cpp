@@ -133,11 +133,6 @@ namespace Drop
 	{
 		m_Running = true;
 
-		Shader billboardShader = Shader(
-			"..\\DROP\\src\\DROP\\shaders\\billboard.vert",
-			"..\\DROP\\src\\DROP\\shaders\\billboard.geom",
-			"..\\DROP\\src\\DROP\\shaders\\billboard.frag");
-
 		SceneContext sceneContext{
 			m_Game->m_Camera.GetViewMatrix()
 			, m_Game->m_Camera.GetProjectionMatrix()
@@ -225,15 +220,15 @@ namespace Drop
 			// RENDERER
 			RenderingSystem::Update(g_ECS, m_DeltaTime);
 
-			// Move this function into the RenderingSystem::Update function
-			m_Renderer.RenderScene(
-				sceneContext
-				, m_renderingContext
-				, m_RendereableObjects
-				, m_CumulatedTransforms
-				, &(m_Game->m_ShadowShader)
-				, &(m_Game->m_LightShader)
-			);
+			//// Move this function into the RenderingSystem::Update function
+			//Renderer::RenderScene(
+			//	sceneContext
+			//	, m_renderingContext
+			//	, m_RendereableObjects
+			//	, m_CumulatedTransforms
+			//	, &(m_Game->m_ShadowShader)
+			//	, &(m_Game->m_LightShader)
+			//);
 
 			//// Draw Normal as vectors
 			//m_Renderer.RenderScene(
@@ -243,29 +238,29 @@ namespace Drop
 			//	&(displayNormalShader)
 			//);
 
-			m_Renderer.RenderParticles(
-				sceneContext
-				, particleEmitter.particles
-				, particleEmitter.numberOfParticles
-				, &billboardShader
-			);
+			//Renderer::RenderParticles(
+			//	sceneContext
+			//	, particleEmitter.particles
+			//	, particleEmitter.numberOfParticles
+			//	, &billboardShader
+			//);
 
-			if (m_DrawDebug)
-			{
-				m_Renderer.DrawDebug(
-					sceneContext, 
-					&(m_Game->m_DebugShader),
-					m_DrawableLines
-				);
+			//if (m_DrawDebug)
+			//{
+			//	Renderer::DrawDebug(
+			//		sceneContext, 
+			//		&(m_Game->m_DebugShader),
+			//		m_DrawableLines
+			//	);
 
-				std::vector<ParticleEmitter> ParticleEmitters;
-				ParticleEmitters.push_back(particleEmitter);
-				m_Renderer.DrawParticleEmitterSurface(
-					sceneContext
-					, &(m_Game->m_EmptyQuadShader),
-					ParticleEmitters
-				);
-			}
+			//	std::vector<ParticleEmitter> ParticleEmitters;
+			//	ParticleEmitters.push_back(particleEmitter);
+			//	Renderer::DrawParticleEmitterSurface(
+			//		sceneContext
+			//		, &(m_Game->m_EmptyQuadShader),
+			//		ParticleEmitters
+			//	);
+			//}
 
 			// render your GUI
 			ImGui_ImplOpenGL3_NewFrame();
