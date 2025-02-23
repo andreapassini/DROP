@@ -28,6 +28,7 @@
 #define stringify( name ) #name
 
 #include "DROP/ECS/beecs.h"
+#include "rendering/RenderingSystem.h"
 
 extern bool g_GameEngineRunning;
 
@@ -91,7 +92,7 @@ namespace Drop
 		m_WindowHandle = std::unique_ptr<Window>(Window::Create());
 		Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
 
-		m_Renderer.Init((GLFWwindow*)m_WindowHandle->GetNativeWindow());
+		m_Renderer.Init((GLFWwindow*)m_WindowHandle->GetNativeWindow(), m_renderingContext);
 
 		// ImGui SETUP
 		IMGUI_CHECKVERSION();
@@ -221,14 +222,17 @@ namespace Drop
 				m_CumulatedTransforms
 			);
 
+			// RENDERER
+			RenderingSystem::Update(g_ECS, m_DeltaTime);
+
+			// Move this function into the RenderingSystem::Update function
 			m_Renderer.RenderScene(
-				sceneContext,
-				m_RendereableObjects,
-				m_CumulatedTransforms,
-				&(m_Game->m_ShadowShader),
-				&(m_Game->m_LightShader),
-				m_Renderer.m_DepthMapFBO,
-				m_Renderer.m_DepthMap
+				sceneContext
+				, m_renderingContext
+				, m_RendereableObjects
+				, m_CumulatedTransforms
+				, &(m_Game->m_ShadowShader)
+				, &(m_Game->m_LightShader)
 			);
 
 			//// Draw Normal as vectors

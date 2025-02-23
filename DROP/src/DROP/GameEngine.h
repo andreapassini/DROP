@@ -68,6 +68,7 @@ namespace Drop
 		std::vector<PhysicsObject> m_PhysicsObjects;
 
 		Renderer m_Renderer;
+		RendererContext m_renderingContext;
 		std::vector<RenderableObject> m_RendereableObjects;
 		std::vector<int> m_TextureIds;
 		std::vector<Model> m_Models;

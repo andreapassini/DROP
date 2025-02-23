@@ -39,8 +39,7 @@
 
 namespace Drop
 {
-    struct SceneContext
-    {
+    struct SceneContext {
         const glm::mat4& view;
         const glm::mat4& projection;
         const glm::vec3& lightDir;
@@ -55,21 +54,32 @@ namespace Drop
         GLboolean wireframe;
     };
 
+    struct RendererContext {
+        GLFWwindow* window = nullptr;
+
+        GLuint depthMapFBO = 0;
+        GLuint depthMap = 0;
+
+        const GLuint SHADOW_WIDTH = 1024;
+        const GLuint SHADOW_HEIGHT = 1024;
+
+        glm::vec3 clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
+    };
+
     class Renderer
     {
     public:
         Renderer();
-        void Init(GLFWwindow* window);
+        void Init(GLFWwindow* window, RendererContext& rendererContext);
         ~Renderer();
         void RenderScene(
             const SceneContext& sceneContext
+            , const RendererContext& rendererContext
             , const std::vector<RenderableObject>& renderableObjects
             , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
             , Shader* const shadow_shader
             , Shader* const illumination_shader
-            , const GLuint depthMapFBO
-            , const GLuint depthMap
-        ) const ;
+        ) const;
 
         void RenderScene(
             const SceneContext& sceneContext
@@ -104,17 +114,5 @@ namespace Drop
         ) const;
 
         void Shutdown();
-
-    public:
-
-        GLFWwindow* m_Window = nullptr;
-
-        GLuint m_DepthMapFBO = 0;
-        GLuint m_DepthMap = 0;
-
-        const GLuint SHADOW_WIDTH = 1024;
-        const GLuint SHADOW_HEIGHT = 1024;
-
-        glm::vec3 m_clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
     };
 }
