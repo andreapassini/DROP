@@ -69,11 +69,11 @@ namespace Drop
 {
     Renderer::Renderer() {}
 
-    void Renderer::Init(GLFWwindow* window)
+    void Renderer::Init(GLFWwindow* window, RendererContext& rendererContext)
     {
         // We are in Drop/Drop!!!
         // 
-        m_Window = window;
+        rendererContext.window = window;
 
         // we enable Z test
         glEnable(GL_DEPTH_TEST);
@@ -85,13 +85,22 @@ namespace Drop
         // buffer dimension: too large -> performance may slow down if we have many lights; too small -> strong aliasing
         //GLuint depthMapFBO;
         // we create a Frame Buffer Object: the first rendering step will render to this buffer, and not to the real frame buffer
-        glGenFramebuffers(1, &m_DepthMapFBO);
+        glGenFramebuffers(1, &rendererContext.depthMapFBO);
         // we create a texture for the depth map
         //GLuint depthMap;
-        glGenTextures(1, &m_DepthMap);
-        glBindTexture(GL_TEXTURE_2D, m_DepthMap);
+        glGenTextures(1, &rendererContext.depthMap);
+        glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
         // in the texture, we will save only the depth data of the fragments. Thus, we specify that we need to render only depth in the first rendering step
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexImage2D(
+            GL_TEXTURE_2D
+            , 0
+            , GL_DEPTH_COMPONENT
+            , rendererContext.SHADOW_WIDTH
+            , rendererContext.SHADOW_HEIGHT
+            , 0
+            , GL_DEPTH_COMPONENT
+            , GL_FLOAT
+            , NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         // we set to clamp the uv coordinates outside [0,1] to the color of the border
@@ -104,8 +113,13 @@ namespace Drop
         glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
         // we bind the depth map FBO
-        glBindFramebuffer(GL_FRAMEBUFFER, m_DepthMapFBO);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthMap, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, rendererContext.depthMapFBO);
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER
+            , GL_DEPTH_ATTACHMENT
+            , GL_TEXTURE_2D
+            , rendererContext.depthMap
+            , 0);
         // we set that we are not calculating nor saving color data
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
@@ -115,12 +129,11 @@ namespace Drop
 
     void Renderer::RenderScene(
         const SceneContext& sceneContext
+        , const RendererContext& rendererContext
         , const std::vector<RenderableObject>& renderableObjects
         , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
         , Shader* const shadow_shader
         , Shader* const illumination_shader
-        , const GLuint depthMapFBO
-        , const GLuint depthMap
     ) const
     {
         /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
@@ -138,11 +151,19 @@ namespace Drop
         /// We "install" the  Shader Program for the shadow mapping creation
         shadow_shader->Use();
         // we pass the transformation matrix as uniform
-        glUniformMatrix4fv(glGetUniformLocation(shadow_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shadow_shader->Program
+                , "lightSpaceMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(lightSpaceMatrix)
+        );
         // we set the viewport for the first rendering step = dimensions of the depth texture
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glViewport(0, 0, rendererContext.SHADOW_WIDTH, rendererContext.SHADOW_HEIGHT);
         // we activate the FBO for the depth map rendering
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, rendererContext.depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // we render the scene, using the shadow shader
@@ -157,7 +178,7 @@ namespace Drop
                 cumulatedTransforms,
                 sceneContext.view,
                 (renderableObjects)[i].SHADOWMAP,
-                depthMap
+                rendererContext.depthMap
             );
         }
 
@@ -183,9 +204,33 @@ namespace Drop
         illumination_shader->Use();
 
         // we pass projection and view matrices to the Shader Program
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.view));
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                illumination_shader->Program
+                , "projectionMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.projection)
+        );
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                illumination_shader->Program
+                , "viewMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.view)
+        );
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                illumination_shader->Program
+                , "lightSpaceMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(lightSpaceMatrix)
+        );
 
         // we determine the position in the Shader Program of the uniform variables
         GLint lightDirLocation = glGetUniformLocation(illumination_shader->Program, "lightVector");
@@ -205,7 +250,7 @@ namespace Drop
                 cumulatedTransforms,
                 sceneContext.view,
                 (renderableObjects)[i].RENDER,
-                depthMap
+                rendererContext.depthMap
             );
         }
 
@@ -234,12 +279,30 @@ namespace Drop
         // we set the viewport for the final rendering step
         glViewport(0, 0, sceneContext.width, sceneContext.height);
 
-        // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
+        // We "install" the selected Shader Program as part of the current rendering process. 
+        // We pass to the shader the light transformation matrix, 
+        // and the depth map rendered in the first rendering step
         illumination_shader->Use();
 
         // we pass projection and view matrices to the Shader Program
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
-        glUniformMatrix4fv(glGetUniformLocation(illumination_shader->Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(sceneContext.view));
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                illumination_shader->Program
+                , "projectionMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.projection)
+        );
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                illumination_shader->Program
+                , "viewMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.view)
+        );
 
         // we render the scene
         size_t size = renderableObjects.size();
@@ -548,10 +611,7 @@ namespace Drop
 
 
 
-    void Renderer::Shutdown() {
-    }
+    void Renderer::Shutdown() {}
 
-    Renderer::~Renderer() {
-        m_Window = nullptr;
-    }
+    Renderer::~Renderer() {}
 }
