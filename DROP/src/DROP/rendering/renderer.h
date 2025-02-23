@@ -47,11 +47,14 @@ namespace Drop
         const std::vector<int>& textures;
         const std::vector<Model>& models;
         const std::vector<Material>& materials;
+        std::vector<Line> drawableLines;
 
         int width;
         int height;
 
         GLboolean wireframe;
+
+        std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
     };
 
     struct RendererContext {
@@ -64,55 +67,83 @@ namespace Drop
         const GLuint SHADOW_HEIGHT = 1024;
 
         glm::vec3 clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
+
+        bool m_DrawDebug = false;
+
+        Shader m_ShadowShader = Shader(
+            "..\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
+            "..\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag");
+
+        Shader m_LightShader = Shader(
+            "..\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
+            "..\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag");
+
+        Shader m_DebugShader = Shader(
+            "..\\DROP\\src\\DROP\\shaders\\00_basic.vert",
+            "..\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag");
+
+        Shader m_EmptyQuadShader = Shader(
+            "..\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
+            "..\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
+            "..\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
+
+        Shader m_EmptyBoxShader = Shader(
+            "..\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
+            "..\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
+            "..\\DROP\\src\\DROP\\shaders\\boxFrustum.frag");
+
+        Shader m_BillboardShader = Shader(
+            "..\\DROP\\src\\DROP\\shaders\\billboard.vert",
+            "..\\DROP\\src\\DROP\\shaders\\billboard.geom",
+            "..\\DROP\\src\\DROP\\shaders\\billboard.frag");
     };
 
     class Renderer
     {
     public:
         Renderer();
-        void Init(GLFWwindow* window, RendererContext& rendererContext);
+        static void Init(GLFWwindow* window, RendererContext& rendererContext);
         ~Renderer();
-        void RenderScene(
+        static void RenderScene(
             const SceneContext& sceneContext
             , const RendererContext& rendererContext
             , const std::vector<RenderableObject>& renderableObjects
             , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
             , Shader* const shadow_shader
             , Shader* const illumination_shader
-        ) const;
+        );
 
-        void RenderScene(
+        static void RenderScene(
             const SceneContext& sceneContext
             , const std::vector<RenderableObject>& renderableObjects
             , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
             , Shader* const illumination_shader
-        ) const;
+        );
 
-        void RenderParticles(
+        static void RenderParticles(
             const SceneContext& sceneContext
-            , const Particle* const particles
-            , const uint32_t numberOfParticles
+            , std::vector<ParticleEmitter>& particleEmitters
             , Shader* const billboardShader
-        ) const;
+        );
 
-        void RenderBillboard(
+        static void RenderBillboard(
             const SceneContext& sceneContext
             , const std::vector<Billboard>& billboards
             , Shader* const billboardShader
-        ) const;
+        );
 
-        void DrawDebug(
+        static void DrawDebug(
             const SceneContext& sceneContext
             , Shader* const debugShader
             , std::vector<Line>& drawableLines
-        ) const;
+        );
 
-        void DrawParticleEmitterSurface(
+        static void DrawParticleEmitterSurface(
             const SceneContext& sceneContext
             , Shader* const debugShader
             , std::vector<ParticleEmitter>& drawableParticleEmitter
-        ) const;
+        );
 
-        void Shutdown();
+        static void Shutdown();
     };
 }
