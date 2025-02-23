@@ -1,5 +1,13 @@
 #include "arena.h"
 
+struct Arena
+{
+	size_t capacity = 0;
+	size_t size = 0;
+	uint8_t* data = nullptr;
+	Arena* nextArena = nullptr;
+};
+
 void InitArena(Arena* const arena, const size_t capacity)
 {
 	arena->data = (uint8_t*)malloc(sizeof(arena->data) * capacity);

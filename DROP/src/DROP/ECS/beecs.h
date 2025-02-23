@@ -208,14 +208,14 @@ namespace bseecs {
 
 	class ISingletonComponent {
 	public:
-		ISingletonComponent(Arena& arenaAllocator) {};
+		ISingletonComponent(Drop::Arena& arenaAllocator) {};
 	};
 
 	template<typename T>
 	class SingletonComponent : public ISingletonComponent
 	{
 	public:
-		SingletonComponent(Arena& arenaAllocator)
+		SingletonComponent(Drop::Arena& arenaAllocator)
 		{
 			m_Component = Drop::Allocate<T>(arenaAllocator);
 		};
@@ -719,7 +719,7 @@ namespace bseecs {
 		*	and create a pool for it
 		*/
 		template <typename T>
-		void RegisterSingletonComponent(Arena& arenaAllocator)
+		void RegisterSingletonComponent(Drop::Arena& arenaAllocator)
 		{
 			TypeName name = typeid(T).name();
 			BSEECS_ASSERT(m_singeltonComponentBitPosition.find(name) == m_singeltonComponentBitPosition.end(),
