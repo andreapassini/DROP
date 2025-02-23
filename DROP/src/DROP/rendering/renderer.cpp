@@ -69,8 +69,7 @@ namespace Drop
 {
     Renderer::Renderer() {}
 
-    void Renderer::Init(GLFWwindow* window, RendererContext& rendererContext)
-    {
+    void Renderer::Init(GLFWwindow* window, RendererContext& rendererContext) {
         // We are in Drop/Drop!!!
         // 
         rendererContext.window = window;
@@ -134,8 +133,7 @@ namespace Drop
         , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
         , Shader* const shadow_shader
         , Shader* const illumination_shader
-    ) const
-    {
+    ) {
         /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
         // we set view and projection matrix for the rendering using light as a camera
         glm::mat4 lightProjection, lightView;
@@ -261,8 +259,7 @@ namespace Drop
         , const std::vector<RenderableObject>& renderableObjects
         , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
         , Shader* const illumination_shader
-    ) const
-    {
+    ) {
         // we activate back the standard Frame Buffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -321,10 +318,9 @@ namespace Drop
 
     void Renderer::RenderParticles(
         const SceneContext& sceneContext
-        , const Particle* const particles
-        , const uint32_t numberOfParticles
+        , std::vector<ParticleEmitter>& particleEmitters
         , Shader* const billboardShader
-    ) const {
+    ) {
         // Clear errors
         glCheckError();
 
@@ -349,61 +345,63 @@ namespace Drop
         //glBindVertexArray(m_billboardVAO);
         //glCheckError();
 
-        uint32_t activeParticle = 0;
-        for (uint32_t i = 0; i < numberOfParticles; i++)
-        {
-            const Particle& particle = particles[i];
+        for (ParticleEmitter& particleEmitter : particleEmitters) {
+            uint32_t activeParticle = 0;
+            for (uint32_t i = 0; i < particleEmitter.numberOfParticles; i++)
+            {
+                const Particle& particle = particleEmitter.particles[i];
 
-            if (!particle.isActive) {
-                continue;
+                if (!particle.isActive) {
+                    continue;
+                }
+                activeParticle++;
+
+                //GLint positionLocation = glGetUniformLocation(billboardShader->Program, "position");
+                //glCheckError();
+                //glUniform3fv(positionLocation, 1, glm::value_ptr(
+                //    glm::vec3(particle.position.x
+                //        , particle.position.y
+                //        , particle.position.z
+                //    )
+                //));
+                //glCheckError();
+
+                glm::mat4 modelMatrix(1.0f);
+                VgMath::Transform testTransform;
+                testTransform.m_Translate = particle.position.asVector3();
+                SceneGraph::TransformToMatrix(testTransform, modelMatrix);
+                GLint modelMatrixLocation = glGetUniformLocation(billboardShader->Program, "modelMatrix");
+                glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+                glCheckError();
+
+                GLint particleSizeLocation = glGetUniformLocation(billboardShader->Program, "particle_size");
+                glCheckError();
+                glUniform1f(particleSizeLocation, particle.size);
+                glCheckError();
+
+                GLint colorLocation = glGetUniformLocation(billboardShader->Program, "colorIn");
+                glUniform4fv(colorLocation, 1, glm::value_ptr(
+                    glm::vec4( 
+                        particle.color.r
+                        , particle.color.g
+                        , particle.color.b
+                        , particle.colorAlpha
+                    )
+                    //glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
+                ));
+                glCheckError();
+
+                // we activate the texture of the plane
+                GLint textureLocation = glGetUniformLocation(billboardShader->Program, "tex0");
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, sceneContext.textures[particle.textureID]);
+                glUniform1i(textureLocation, 0);
+                glCheckError();
+
+                // rendering data
+                glDrawArrays(GL_POINTS, 0, 1);
+                glCheckError();
             }
-            activeParticle++;
-
-            //GLint positionLocation = glGetUniformLocation(billboardShader->Program, "position");
-            //glCheckError();
-            //glUniform3fv(positionLocation, 1, glm::value_ptr(
-            //    glm::vec3(particle.position.x
-            //        , particle.position.y
-            //        , particle.position.z
-            //    )
-            //));
-            //glCheckError();
-
-            glm::mat4 modelMatrix(1.0f);
-            VgMath::Transform testTransform;
-            testTransform.m_Translate = particle.position.asVector3();
-            SceneGraph::TransformToMatrix(testTransform, modelMatrix);
-            GLint modelMatrixLocation = glGetUniformLocation(billboardShader->Program, "modelMatrix");
-            glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-            glCheckError();
-
-            GLint particleSizeLocation = glGetUniformLocation(billboardShader->Program, "particle_size");
-            glCheckError();
-            glUniform1f(particleSizeLocation, particle.size);
-            glCheckError();
-
-            GLint colorLocation = glGetUniformLocation(billboardShader->Program, "colorIn");
-            glUniform4fv(colorLocation, 1, glm::value_ptr(
-                glm::vec4( 
-                    particle.color.r
-                    , particle.color.g
-                    , particle.color.b
-                    , particle.colorAlpha
-                )
-                //glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
-            ));
-            glCheckError();
-
-            // we activate the texture of the plane
-            GLint textureLocation = glGetUniformLocation(billboardShader->Program, "tex0");
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, sceneContext.textures[particle.textureID]);
-            glUniform1i(textureLocation, 0);
-            glCheckError();
-
-            // rendering data
-            glDrawArrays(GL_POINTS, 0, 1);
-            glCheckError();
         }
 
         // VAO is "detached"
@@ -415,7 +413,7 @@ namespace Drop
         const SceneContext& sceneContext
         , const std::vector<Billboard>& billboards
         , Shader* const billboardShader
-    ) const {
+    ) {
         // Clear errors
         glCheckError();
 
@@ -499,8 +497,7 @@ namespace Drop
         const SceneContext& sceneContext
         , Shader* const debugShader
         , std::vector<Line>& drawableLines
-    ) const
-    {
+    ) {
         debugShader->Use();
 
         GLint projectionMatrixLocation = glGetUniformLocation(debugShader->Program, "projectionMatrix");
@@ -528,7 +525,7 @@ namespace Drop
         const SceneContext& sceneContext
         , Shader* const emptyQuadGeomShader
         , std::vector<ParticleEmitter>& drawableParticleEmitter
-    ) const {
+    ) {
         // Clear errors
         glCheckError();
 
@@ -608,8 +605,6 @@ namespace Drop
         glBindVertexArray(0);
         glCheckError();
     }
-
-
 
     void Renderer::Shutdown() {}
 
