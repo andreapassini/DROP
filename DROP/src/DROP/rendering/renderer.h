@@ -47,7 +47,7 @@ namespace Drop
         const std::vector<int>& textures;
         const std::vector<Model>& models;
         const std::vector<Material>& materials;
-        std::vector<Line> drawableLines;
+        //std::vector<Line> drawableLines;
 
         int width;
         int height;
