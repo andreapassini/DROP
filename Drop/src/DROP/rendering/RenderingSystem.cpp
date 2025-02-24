@@ -33,11 +33,11 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 
 	if (rendererContext.m_DrawDebug)
 	{
-		Renderer::DrawDebug(
-			sceneContext,
-			&(rendererContext.m_DebugShader),
-			sceneContext.drawableLines
-		);
+		//Renderer::DrawDebug(
+		//	sceneContext,
+		//	&(rendererContext.m_DebugShader),
+		//	sceneContext.drawableLines
+		//);
 
 		Renderer::DrawParticleEmitterSurface(
 			sceneContext
