@@ -10,15 +10,15 @@ class ExampleGame : public Drop::Game
 public:
 	ExampleGame()
 	{
-		m_ShadowShader = Shader(
-			"..\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
-			"..\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag"
-        );
+		//m_ShadowShader = Shader(
+		//	"..\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
+		//	"..\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag"
+  //      );
 
-		m_LightShader = Shader(
-			"..\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
-			"..\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
-        );
+		//m_LightShader = Shader(
+		//	"..\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
+		//	"..\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
+  //      );
 
         GameEngine* gameEngine = GameEngine::GetInstance();
 
