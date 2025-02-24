@@ -140,6 +140,7 @@ namespace Drop
 			, m_TextureIds
 			, m_Models
 			, m_Materials
+			//, m_DrawableLines
 			, m_WindowHandle->GetWidth()
 			, m_WindowHandle->GetHeight()
 			, m_Game->m_Wireframe
