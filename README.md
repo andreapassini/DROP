@@ -38,6 +38,8 @@ The cumulated one for the scale, orientation and postion of the object in world 
 
 ![image](https://github.com/user-attachments/assets/ad58199a-1f34-45df-a140-754480f9fa46)
 
+![image](https://github.com/user-attachments/assets/0b672c16-0f5e-4f52-9e16-04d7a811a194)
+
 ![image](https://github.com/user-attachments/assets/cc46a3b7-93f5-4fb0-a87d-c1d8ca80e737)
 
 
