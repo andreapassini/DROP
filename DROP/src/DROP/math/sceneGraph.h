@@ -11,45 +11,50 @@
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-class Node {
+#include "../ECS/beecs.h"
+
+using namespace bseecs;
+
+class SceneGraphNode {
 public:
-	uint32_t m_Id;
+	//uint32_t m_Id; // this will be the ECS id so we dont need it
+	
 	VgMath::Transform m_LocalTransform;
-	Node* m_Parent;
+	VgMath::Transform m_CumulatedTransform; // cumulated transform
+	
+	//SceneGraphNode* m_Parent; //  this will be a stored ECS id
+	EntityID m_Parent;
 
-	Node() 
-		: m_Id(), m_Parent(nullptr), m_LocalTransform() { }
+	SceneGraphNode() 
+		: m_Parent(0), m_LocalTransform() { }
 
-	Node(const uint32_t id_val) 
-		: m_Id(id_val), m_Parent(nullptr), m_LocalTransform() { };
+	SceneGraphNode(const VgMath::Transform& transform_val) 
+		: m_Parent(0), m_LocalTransform(transform_val) { };
 
-	Node(const uint32_t id_val, const VgMath::Transform transform_val) 
-		: m_Id(id_val), m_Parent(nullptr), m_LocalTransform(transform_val) { };
+	SceneGraphNode(const VgMath::Transform& transform_val, EntityID parent_val)
+		: m_Parent(parent_val), m_LocalTransform(transform_val) { };
 
-	Node(const uint32_t id_val, const VgMath::Transform transform_val, Node* parent_val) 
-		: m_Id(id_val), m_Parent(parent_val), m_LocalTransform(transform_val) { };
+	~SceneGraphNode() {};
 
-	~Node() {};
-
-	void operator=(const Node& n) {
-		this->m_Id = n.m_Id;
+	void operator=(const SceneGraphNode& n) {
+		// this mith be a mess, better fix it later
 		this->m_Parent = n.m_Parent;
 		this->m_LocalTransform = n.m_LocalTransform;
-		//Node(n.id, n.localTransform, n.parent);
+		this->m_CumulatedTransform = n.m_CumulatedTransform;
 	}
 
-	VgMath::Transform CalculateCumulativeTransform() const 
+	SceneGraphNode* CalculateCumulativeTransform(ECS* const ecs)
 	{
-		VgMath::Transform cumulativeTransform;
-		cumulativeTransform = m_LocalTransform;
-
-		if (this->m_Parent != nullptr) {	// Has a parent
-			if(this->m_Parent->m_Id != 0){	// The parent is not the world
-				cumulativeTransform = this->m_Parent->CalculateCumulativeTransform() * m_LocalTransform;
-			}
+		if(m_Parent != 0){	// The parent is not the world
+			SceneGraphNode* currentParentNode = ecs->GetComponentPool<SceneGraphNode>().Get(m_Parent);
+			m_CumulatedTransform = currentParentNode->CalculateCumulativeTransform(ecs)->m_CumulatedTransform * m_LocalTransform;
 		}
-
-		return cumulativeTransform;
+		else
+		{
+			m_CumulatedTransform = m_LocalTransform;
+		}
+	
+		return this;
 	}
 
 private:
@@ -76,16 +81,16 @@ public:
 	);
 public:
 	// Wanna keep this so i can easily find the one i need and loop on through every node
-	std::unordered_map<uint32_t, Node> m_GameObjects;
+	std::unordered_map<uint32_t, SceneGraphNode> m_GameObjects;
 	static constexpr uint32_t ROOT_ID = 0;
 
 private:
 	static void CalculateSingleWorldTransform(
-		const Node& node,
+		const SceneGraphNode& node,
 		VgMath::Transform* cumulatedTransform
 	);
 private:
-	Node* m_World;
+	SceneGraphNode* m_World;
 	uint32_t m_Index;
 };
 
