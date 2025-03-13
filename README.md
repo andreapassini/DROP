@@ -33,3 +33,8 @@ Implementing the scene graph using a tree.
 We will store the transform in local coordinates and the cumulated transform in world coordinates.
 Local transform for the transformations related to the single object.
 The cumulated one for the scale, orientation and postion of the object in world space, to be used by the other components.
+
+# Particle System
+
+![image](https://github.com/user-attachments/assets/ad58199a-1f34-45df-a140-754480f9fa46)
+
