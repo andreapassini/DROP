@@ -11,7 +11,7 @@
 
 #include "physics/physicsObject.h"
 
-#include "math/sceneGraph.h"
+#include "sceneGraph/sceneGraph.h"
 
 #define RESERVE 150
 

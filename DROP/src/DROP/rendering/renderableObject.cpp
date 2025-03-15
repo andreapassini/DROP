@@ -8,7 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "../rendering/shader.h"
-#include "DROP/math/sceneGraph.h"
+#include "DROP/sceneGraph/sceneGraph.h"
 
 
 void RenderableObject::Draw(
