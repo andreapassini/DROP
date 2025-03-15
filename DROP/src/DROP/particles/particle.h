@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../math/mat3.h"
-#include "../math/surface.h"
+#include "DROP/math/mat3.h"
+#include "DROP/math/surface.h"
 
 using namespace VgMath;
 

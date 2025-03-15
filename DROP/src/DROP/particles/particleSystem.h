@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ECS/beecs.h"
+#include "DROP/ECS/beecs.h"
 
 
 using namespace bseecs;

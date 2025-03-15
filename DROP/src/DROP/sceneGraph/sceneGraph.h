@@ -1,17 +1,13 @@
 #pragma once
 
-#include "transform.h"
-#include "vector3.h"
-#include "versor3.h"
-#include "mat3.h"
-
 #include <vector>
 #include <unordered_map>
 
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../ECS/beecs.h"
+#include "DROP/ECS/beecs.h"
+#include "DROP/math/transform.h"
 
 using namespace bseecs;
 

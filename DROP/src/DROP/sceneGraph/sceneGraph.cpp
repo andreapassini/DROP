@@ -11,7 +11,7 @@ SceneGraph::SceneGraph(const uint32_t sizeEstimation)
 	m_GameObjects.reserve(sizeEstimation);
 
 	m_Index = 0;
-	Node rootNode(m_Index, VgMath::Transform());	// Root or world always at index 0 
+	SceneGraphNode rootNode(m_Index, VgMath::Transform());	// Root or world always at index 0 
 
 	m_GameObjects[m_Index] = rootNode;
 
@@ -29,14 +29,14 @@ uint32_t SceneGraph::AddObject(const uint32_t parentId_val, const VgMath::Transf
 {
 	m_Index++;
 
-	Node* n = &m_GameObjects[parentId_val];
+	SceneGraphNode* n = &m_GameObjects[parentId_val];
 
-	Node node(m_Index, transform_val, n);
+	SceneGraphNode node(m_Index, transform_val, n);
 	m_GameObjects.insert({ m_Index , node });
 	m_GameObjects[m_Index] = node;
 
 	// To be removed
-	Node nodeRef = m_GameObjects[m_Index];
+	SceneGraphNode nodeRef = m_GameObjects[m_Index];
 
 	return m_Index;
 }
@@ -44,7 +44,7 @@ uint32_t SceneGraph::AddObject(const uint32_t parentId_val, const VgMath::Transf
 // TODO: add an error return value or an option type
 void SceneGraph::DeleteNode(const uint32_t id_val)
 {
-	Node nodeToRemove = m_GameObjects[id_val];
+	SceneGraphNode nodeToRemove = m_GameObjects[id_val];
 
 	// You are trying to remove the root node - "that's fucking illegal"
 	if (nodeToRemove.m_Parent == nullptr) {	
@@ -66,7 +66,7 @@ void SceneGraph::DeleteNode(const uint32_t id_val)
 // it also calculated the model matrix.
 // It was not working with const ref
 void SceneGraph::CalculateSingleWorldTransform(
-	const Node& const node,
+	const SceneGraphNode& const node,
 	VgMath::Transform* cumulatedTransform
 	)
 {

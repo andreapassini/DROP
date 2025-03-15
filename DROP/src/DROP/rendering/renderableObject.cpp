@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../rendering/shader.h"
+#include "DROP/rendering/shader.h"
 #include "DROP/sceneGraph/sceneGraph.h"
 
 

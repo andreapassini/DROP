@@ -3,8 +3,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "../input/Input.h"
-#include "../math/versor3.h"
+#include "DROP/input/Input.h"
+#include "DROP/math/versor3.h"
 
 using namespace Drop;
 
