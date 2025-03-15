@@ -31,7 +31,7 @@
 #include "../utils/camera.h"
 
 #include "colors.h"
-#include "../math/sceneGraph.h"
+#include "../sceneGraph/sceneGraph.h"
 #include "../utils/Log.h"
 
 #define UNLOCK_FRAMERTE
