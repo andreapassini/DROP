@@ -1,7 +1,7 @@
 #pragma once
 
 #include "renderableObject.h"
-#include "../particles/particle.h"
+#include "DROP/particles/particle.h"
 
 #include <vector>
 #include "drawableBox.h"
@@ -33,9 +33,9 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../rendering/shader.h"
-#include "../utils/camera.h"
-#include "../rendering/billboard.h"
+#include "DROP/rendering/shader.h"
+#include "DROP/utils/camera.h"
+#include "DROP/rendering/billboard.h"
 
 namespace Drop
 {
@@ -71,31 +71,31 @@ namespace Drop
         bool m_DrawDebug = false;
 
         Shader m_ShadowShader = Shader(
-            "..\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
-            "..\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag");
+            "DROP\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
+            "DROP\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag");
 
         Shader m_LightShader = Shader(
-            "..\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
-            "..\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag");
+            "DROP\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
+            "DROP\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag");
 
         Shader m_DebugShader = Shader(
-            "..\\DROP\\src\\DROP\\shaders\\00_basic.vert",
-            "..\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag");
+            "DROP\\DROP\\src\\DROP\\shaders\\00_basic.vert",
+            "DROP\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag");
 
         Shader m_EmptyQuadShader = Shader(
-            "..\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
-            "..\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
-            "..\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
+            "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
+            "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
+            "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
 
         Shader m_EmptyBoxShader = Shader(
-            "..\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
-            "..\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
-            "..\\DROP\\src\\DROP\\shaders\\boxFrustum.frag");
+            "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
+            "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
+            "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.frag");
 
         Shader m_BillboardShader = Shader(
-            "..\\DROP\\src\\DROP\\shaders\\billboard.vert",
-            "..\\DROP\\src\\DROP\\shaders\\billboard.geom",
-            "..\\DROP\\src\\DROP\\shaders\\billboard.frag");
+            "DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
+            "DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
+            "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag");
     };
 
     class Renderer

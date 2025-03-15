@@ -23,7 +23,7 @@
 
 // we include the library for images loading
 #define STB_IMAGE_IMPLEMENTATION
-//#include "../../dependencies/stb_img/include/stb_image/stb_image.h"
+//#include "DROP/../dependencies/stb_img/include/stb_image/stb_image.h"
 #include <stb_image/stb_image.h>
 #define stringify( name ) #name
 

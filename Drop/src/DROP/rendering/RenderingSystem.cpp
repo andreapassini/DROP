@@ -1,7 +1,7 @@
 #include "RenderingSystem.h"
 
-#include "../rendering/model.h"
-#include "../rendering/renderer.h"
+#include "DROP/rendering/model.h"
+#include "DROP/rendering/renderer.h"
 
 using namespace Drop;
 

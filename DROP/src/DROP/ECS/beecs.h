@@ -14,7 +14,7 @@
 #include <cassert>
 
 // project includes
-#include "../memory/arena.h"
+#include "DROP/memory/arena.h"
 
 // Can replace these defines with custom macros elsewhere
 #ifndef BSEECS_ASSERTS

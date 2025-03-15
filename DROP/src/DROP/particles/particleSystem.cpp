@@ -1,5 +1,5 @@
 #include "particleSystem.h"
-#include "../particles/particle.h"
+#include "DROP/particles/particle.h"
 
 using namespace Drop;
 

@@ -27,12 +27,12 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../rendering/shader.h"
-#include "../utils/camera.h"
+#include "DROP/rendering/shader.h"
+#include "DROP/utils/camera.h"
 
 #include "colors.h"
-#include "../sceneGraph/sceneGraph.h"
-#include "../utils/Log.h"
+#include "DROP/sceneGraph/sceneGraph.h"
+#include "DROP/utils/Log.h"
 
 #define UNLOCK_FRAMERTE
 
