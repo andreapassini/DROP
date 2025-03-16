@@ -47,3 +47,45 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	}
 
 }
+
+//// Move this function into the RenderingSystem::Update function
+//Renderer::RenderScene(
+//	sceneContext
+//	, m_renderingContext
+//	, m_RendereableObjects
+//	, m_CumulatedTransforms
+//	, &(m_Game->m_ShadowShader)
+//	, &(m_Game->m_LightShader)
+//);
+
+//// Draw Normal as vectors
+//m_Renderer.RenderScene(
+//	sceneContext,
+//	m_RendereableObjects,
+//	m_CumulatedTransforms,
+//	&(displayNormalShader)
+//);
+
+//Renderer::RenderParticles(
+//	sceneContext
+//	, particleEmitter.particles
+//	, particleEmitter.numberOfParticles
+//	, &billboardShader
+//);
+
+//if (m_DrawDebug)
+//{
+//	Renderer::DrawDebug(
+//		sceneContext, 
+//		&(m_Game->m_DebugShader),
+//		m_DrawableLines
+//	);
+
+//	std::vector<ParticleEmitter> ParticleEmitters;
+//	ParticleEmitters.push_back(particleEmitter);
+//	Renderer::DrawParticleEmitterSurface(
+//		sceneContext
+//		, &(m_Game->m_EmptyQuadShader),
+//		ParticleEmitters
+//	);
+//}
