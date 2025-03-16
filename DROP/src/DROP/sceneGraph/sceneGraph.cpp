@@ -6,84 +6,51 @@
 #include <unordered_map>
 #include <future> 
 
-SceneGraph::SceneGraph(const uint32_t sizeEstimation)
-{
-	m_GameObjects.reserve(sizeEstimation);
-
-	m_Index = 0;
-	SceneGraphNode rootNode(m_Index, VgMath::Transform());	// Root or world always at index 0 
-
-	m_GameObjects[m_Index] = rootNode;
-
-	m_World = &m_GameObjects[m_Index];
-}
-
-uint32_t SceneGraph::AddObject(const uint32_t parentId_val)
-{
-	AddObject(parentId_val, VgMath::Transform());
-
-	return m_Index;
-}
-
-uint32_t SceneGraph::AddObject(const uint32_t parentId_val, const VgMath::Transform& transform_val)
-{
-	m_Index++;
-
-	SceneGraphNode* n = &m_GameObjects[parentId_val];
-
-	SceneGraphNode node(m_Index, transform_val, n);
-	m_GameObjects.insert({ m_Index , node });
-	m_GameObjects[m_Index] = node;
-
-	// To be removed
-	SceneGraphNode nodeRef = m_GameObjects[m_Index];
-
-	return m_Index;
-}
-
-// TODO: add an error return value or an option type
-void SceneGraph::DeleteNode(const uint32_t id_val)
-{
-	SceneGraphNode nodeToRemove = m_GameObjects[id_val];
-
-	// You are trying to remove the root node - "that's fucking illegal"
-	if (nodeToRemove.m_Parent == nullptr) {	
-		return;	
-	}
-
-	for (auto& node : m_GameObjects) {
-		if (node.second.m_Parent != nullptr) {
-			if (node.second.m_Parent->m_Id == id_val) {
-				node.second.m_Parent = nodeToRemove.m_Parent;
-			}
-		}
-	}
-
-	int numberOfErasedNodes = m_GameObjects.erase(id_val);
-}
-
 // Calculate the cumulated transform starting from a local transform
 // it also calculated the model matrix.
 // It was not working with const ref
-void SceneGraph::CalculateSingleWorldTransform(
-	const SceneGraphNode& const node,
-	VgMath::Transform* cumulatedTransform
-	)
-{
-	(*cumulatedTransform) = node.CalculateCumulativeTransform();
+void SceneGraph::CalculateCumulatedTransform(
+	ECS* const ecs
+	, SceneGraphNode& node
+) {
+	SceneGraphNode* currNode = &node;
+	VgMath::Transform cumulated = currNode->m_LocalTransform;
+
+	// Avoid recursion, saving stack
+	while (currNode->m_Parent != -1) {
+		cumulated = cumulated * currNode->m_LocalTransform;
+		currNode = ecs->GetComponentPool<SceneGraphNode>().Get(currNode->m_Parent);
+		if (!currNode) { break; }
+	}
+
+	node.m_CumulatedTransform = cumulated;
+}
+
+void SceneGraph::MoveNode(
+	ECS* const ecs
+	, const EntityID toMove
+	, const EntityID newParent
+) {
+	SparseSet<SceneGraphNode>& compPool = ecs->GetComponentPool<SceneGraphNode>();
+	SceneGraphNode* node = compPool.Get(toMove);
+	if (node) {
+		node->m_Parent = newParent;
+	}
 }
 
 void SceneGraph::CalculateWorldTransforms(
-	std::unordered_map<uint32_t, VgMath::Transform>& const cumulatedTransforms) 
-{
+	ECS* const ecs
+) {
+	std::vector<SceneGraphNode>& denseCompPool = ecs->GetComponentPool<SceneGraphNode>().Data();
+
 	std::vector<std::future<void>> futures;
 
-	for (auto& it : m_GameObjects) {
+	for (auto& it : denseCompPool) {
 		futures.push_back(
 			std::async(std::launch::async, 
-				CalculateSingleWorldTransform,
-					it.second, 
-					&cumulatedTransforms[it.first]
+				CalculateCumulatedTransform
+				, ecs
+				, it
 			)
 		);		
 	}
@@ -96,8 +63,10 @@ void SceneGraph::CalculateWorldTransforms(
 // Transform converted into a glm model matrix
 // This is not included directly in the transform file to avoid using an external math library there
 // - outModelMatrix: must be initialized to identity matrix
-void SceneGraph::TransformToMatrix(const VgMath::Transform& inTransform, glm::mat4& outModelMatrix)
-{
+void SceneGraph::TransformToMatrix(
+	const VgMath::Transform& inTransform
+	, glm::mat4& outModelMatrix
+) {
 	outModelMatrix = glm::translate(
 		outModelMatrix,
 		glm::vec3(
