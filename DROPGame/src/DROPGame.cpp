@@ -47,13 +47,13 @@ public:
             );
                     
         Material materialPlane;
-        materialPlane.Kd = 3.0f;
-        materialPlane.Alpha = 0.2f;
-        materialPlane.F0 = 0.9f;
-        materialPlane.CastShadow = false;
-        materialPlane.UseTexture = true;
-        materialPlane.TextureId = 1;
-        materialPlane.Repeat = 80.0f;
+        materialPlane.kd = 3.0f;
+        materialPlane.alpha = 0.2f;
+        materialPlane.f0 = 0.9f;
+        materialPlane.bCastShadow = false;
+        materialPlane.bUseTexture = true;
+        materialPlane.textureId = 1;
+        materialPlane.UVRepeat = 80.0f;
 
         gameEngine->m_Materials.push_back(materialPlane);
 
@@ -79,7 +79,7 @@ public:
         
         {
             Material material = Material{
-                3.0f,   // Kd 
+                3.0f,   // kd 
                 0.2f,   // Alpha
                 0.9f,   
                 true,
@@ -111,7 +111,7 @@ public:
 
         {
             Material material = Material{
-                3.0f,   // Kd  
+                3.0f,   // kd  
                 0.2f,   // Alpha
                 0.9f,   // F0
                 false,  // CastShadow

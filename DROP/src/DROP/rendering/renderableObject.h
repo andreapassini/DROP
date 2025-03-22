@@ -7,7 +7,6 @@
 
 #include "DROP/rendering/model.h"
 #include "material.h"
-#include "TextureParameter.h"
 
 #include "DROP/rendering/shader.h"
 #include "Drop/math/transform.h"

@@ -3,7 +3,6 @@
 #include "rendering/renderer.h"
 #include "rendering/renderableObject.h"
 #include "rendering/material.h"
-#include "rendering/TextureParameter.h"
 #include "rendering/model.h"
 #include "utils/camera.h"
 #include "utils/performanceCalculator.h"

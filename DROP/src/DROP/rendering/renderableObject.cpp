@@ -28,12 +28,12 @@ void RenderableObject::Draw(
     case render_passes::RENDER:
         {   // without this scope there is an error for the variable "**location" not used
             GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
-            GLint alphaLocation = glGetUniformLocation(shader.Program, "alpha");
+            GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
             GLint f0Location = glGetUniformLocation(shader.Program, "F0");
 
-            glUniform1f(kdLocation, materials[m_MaterialId].Kd);
-            glUniform1f(alphaLocation, materials[m_MaterialId].Alpha);
-            glUniform1f(f0Location, materials[m_MaterialId].F0);
+            glUniform1f(kdLocation, materials[m_MaterialId].kd);
+            glUniform1f(alphaLocation, materials[m_MaterialId].alpha);
+            glUniform1f(f0Location, materials[m_MaterialId].f0);
 
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -42,7 +42,7 @@ void RenderableObject::Draw(
         }
         break;
     case render_passes::SHADOWMAP:
-        if (materials[m_MaterialId].CastShadow == false)
+        if (materials[m_MaterialId].bCastShadow == false)
             return;
 
         break;
@@ -53,12 +53,12 @@ void RenderableObject::Draw(
     GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
 
 
-	if (materials[m_MaterialId].UseTexture) {
+	if (materials[m_MaterialId].bUseTexture) {
         // we activate the texture of the plane
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, (textuers).at(materials[m_MaterialId].TextureId));
+        glBindTexture(GL_TEXTURE_2D, (textuers).at(materials[m_MaterialId].textureId));
         glUniform1i(textureLocation, 0);
-        glUniform1f(repeatLocation, materials[m_MaterialId].Repeat);
+        glUniform1f(repeatLocation, materials[m_MaterialId].UVRepeat);
     }
 
     VgMath::Transform& transform = m_CumulatedTransforms.find(m_ModelMatrixId)->second;
@@ -81,13 +81,13 @@ void RenderableObject::Draw(
     const glm::mat4& view
 ) const
 {
-    GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+    GLint kdLocation = glGetUniformLocation(shader.Program, "kd");
     GLint alphaLocation = glGetUniformLocation(shader.Program, "alpha");
-    GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+    GLint f0Location = glGetUniformLocation(shader.Program, "f0");
 
-    glUniform1f(kdLocation, materials[m_MaterialId].Kd);
-    glUniform1f(alphaLocation, materials[m_MaterialId].Alpha);
-    glUniform1f(f0Location, materials[m_MaterialId].F0);
+    glUniform1f(kdLocation, materials[m_MaterialId].kd);
+    glUniform1f(alphaLocation, materials[m_MaterialId].alpha);
+    glUniform1f(f0Location, materials[m_MaterialId].f0);
 
     VgMath::Transform& transform = m_CumulatedTransforms.find(m_ModelMatrixId)->second;
     glm::mat4 modelMatrix(1.0f);

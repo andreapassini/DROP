@@ -22,7 +22,6 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		, &(rendererContext.m_LightShader)
 	);
 
-	// Do we need to make it more general and divide more the 2 systems?
 	std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
 
 	Renderer::RenderParticles(

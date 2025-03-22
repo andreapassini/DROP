@@ -5,21 +5,25 @@
 #include <glm/glm.hpp>
 #include <GLAD/glad.h>
 
-#include "TextureParameter.h"
+typedef uint32_t TextureID;
+typedef uint32_t ShaderID;
 
 struct Material {
-	// Shader parameters
+	ShaderID shaderID = 0;
+
+	// Illumination shader parameters
 	// weight for the diffusive component
-	GLfloat Kd = 3.0f;
+	GLfloat kd = 3.0f;
 	// roughness index for GGX shader
-	GLfloat Alpha = 0.2f;
+	GLfloat alpha = 0.2f;
 	// Fresnel reflectance at 0 degree (Schlik's approximation)
-	GLfloat F0 = 0.9f;
+	GLfloat f0 = 0.9f;
 
-	bool CastShadow = false;
+	// Shadow parameters
+	bool bCastShadow = false;
 
-	bool UseTexture = false;
-	uint32_t TextureId = 0;
-	// UV repetitions
-	float Repeat = 1.0f;
+	// Texture parameters
+	bool bUseTexture = false;
+	TextureID textureId = 0;
+	float UVRepeat = 1.0f;
 };
