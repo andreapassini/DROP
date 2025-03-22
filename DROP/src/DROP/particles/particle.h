@@ -53,7 +53,9 @@ struct ParticleStartValues {
 };
 
 struct ParticleEmitter {
-	Particle particles[MAX_PARTICLES];
+	//  If we keep a particle pool for each particleEmitter, 
+	//	 we can operate only on those specific particles, like terminating them
+	Particle particles[MAX_PARTICLES]; 
 	uint32_t numberOfParticles = MAX_PARTICLES;
 	uint32_t particleToEmitEachTime = 10;
 	uint32_t lastIndex = 0;
