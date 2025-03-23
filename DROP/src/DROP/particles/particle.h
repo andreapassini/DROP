@@ -55,6 +55,8 @@ struct ParticleStartValues {
 struct ParticleEmitter {
 	//  If we keep a particle pool for each particleEmitter, 
 	//	 we can operate only on those specific particles, like terminating them
+	//	 maybe we can have a particle arena in order to have different particle pool size 
+	//	 depending on the different effects we want
 	Particle particles[MAX_PARTICLES]; 
 	uint32_t numberOfParticles = MAX_PARTICLES;
 	uint32_t particleToEmitEachTime = 10;
