@@ -19,11 +19,8 @@ struct Material {
 	// Fresnel reflectance at 0 degree (Schlik's approximation)
 	GLfloat f0 = 0.9f;
 
-	// Shadow parameters
-	bool bCastShadow = false;
-
 	// Texture parameters
-	bool bUseTexture = false;
+	bool bUseTexture = false; // do we really need to specify it?
 	TextureID textureId = 0;
 	float UVRepeat = 1.0f;
 };

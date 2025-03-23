@@ -40,14 +40,14 @@
 namespace Drop
 {
     struct SceneContext {
-        const glm::mat4& view;
-        const glm::mat4& projection;
-        const glm::vec3& lightDir;
+        // removed const otherwise we could not change the camera
+        glm::mat4& view;
+        glm::mat4& projection;
+        glm::vec3& lightDir;
 
         const std::vector<int>& textures;
         const std::vector<Model>& models;
         const std::vector<Material>& materials;
-        //std::vector<Line> drawableLines;
 
         int width;
         int height;
@@ -63,6 +63,8 @@ namespace Drop
         GLuint depthMapFBO = 0;
         GLuint depthMap = 0;
 
+        // Can we extend shadow to a Cascade Shadow Maps?
+        // or even to Virtual texture Shadow Map
         const GLuint SHADOW_WIDTH = 1024;
         const GLuint SHADOW_HEIGHT = 1024;
 
