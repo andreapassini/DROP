@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 // attach this comp to entity
 // maybe rename it to Static Model
@@ -17,6 +18,5 @@ struct StaticMeshComponent {
 
 	// how much data regarding rendering specifics
 	// has to be stored in this component?
-
 	bool bCastShadow = false;
 };

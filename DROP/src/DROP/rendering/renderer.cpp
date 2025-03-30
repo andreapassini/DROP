@@ -67,8 +67,6 @@ GLenum glCheckErrorExt(const char* file, int line)
 
 namespace Drop
 {
-    Renderer::Renderer() {}
-
     void Renderer::Init(GLFWwindow* window, RendererContext& rendererContext) {
         // We are in Drop/Drop!!!
         // 
@@ -608,5 +606,19 @@ namespace Drop
 
     void Renderer::Shutdown() {}
 
-    Renderer::~Renderer() {}
+    void Renderer::Draw_ShadowPass(
+        const StaticMeshComponent& staticMeshComponent
+        , const VgMath::Transform& worldTransform
+        , const SceneContext& sceneContext
+        , const RendererContext& rendererContext
+    ) {
+        std::vector<Shader>& shaders = rendererContext.shaders;
+        std::vector<Material>& materials = sceneContext.materials;
+        std::vector<Model>& models = sceneContext.models;
+        std::vector<TextureID>& textuers = sceneContext.textuers;
+    }
+    void Renderer::Draw_IlluminationPass(const StaticMeshComponent& staticMeshComponent, const VgMath::Transform& worldTransform, const SceneContext& sceneContext, const RendererContext& rendererContext)
+    {
+
+    }
 }

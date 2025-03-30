@@ -1,9 +1,10 @@
 #pragma once
 
+#include <vector>
+
 #include "renderableObject.h"
 #include "DROP/particles/particle.h"
-
-#include <vector>
+#include "DROP/rendering/staticMeshComponent.h"   
 #include "drawableBox.h"
 #include "line.h"
 
@@ -28,14 +29,22 @@
 #error windows.h was included!
 #endif
 
+// Libs includes
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Drop includes
 #include "DROP/rendering/shader.h"
 #include "DROP/utils/camera.h"
 #include "DROP/rendering/billboard.h"
+
+#define FULL_COLOR_SHADER 0
+#define ILLUMINATION_GGX_SHADER 1
+#define SHADOW_SHADER 2
+#define EMPTY_QUAD_SHADER 3
+#define BILLBOARD_SHADER 4
 
 namespace Drop
 {
@@ -45,9 +54,9 @@ namespace Drop
         glm::mat4& projection;
         glm::vec3& lightDir;
 
-        const std::vector<int>& textures;
-        const std::vector<Model>& models;
-        const std::vector<Material>& materials;
+        std::vector<Model>& models;
+        std::vector<Material>& materials;
+        std::vector<TextureID>& textuers;
 
         int width;
         int height;
@@ -70,43 +79,82 @@ namespace Drop
 
         glm::vec3 clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
 
-        bool m_DrawDebug = false;
+        bool drawDebug = false;
 
-        Shader m_ShadowShader = Shader(
-            "DROP\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
-            "DROP\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag");
+        std::vector<Shader> shaders{
+            //FULL_COLOR_SHADER
+            Shader( 
+                "DROP\\DROP\\src\\DROP\\shaders\\00_basic.vert",
+                "DROP\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag")
+            
+            , // ILLUMINATION_GGX_SHADER
+                Shader( 
+                "DROP\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
+                "DROP\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag")
 
-        Shader m_LightShader = Shader(
-            "DROP\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
-            "DROP\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag");
+            , // SHADOW_SHADER
+                Shader( 
+                "DROP\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
+                "DROP\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag")
+            
+            , // EMPTY_QUAD_SHADER
+                Shader( 
+                "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
+                "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
+                "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag")
+            
+            , // EMPTY_BOX_SHADER
+                Shader( 
+                "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
+                "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
+                "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.frag")
 
-        Shader m_DebugShader = Shader(
-            "DROP\\DROP\\src\\DROP\\shaders\\00_basic.vert",
-            "DROP\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag");
+            , // BILLBOARD_SHADER
+                Shader(
+                "DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
+                "DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
+                "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag")
+        };
 
-        Shader m_EmptyQuadShader = Shader(
-            "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
-            "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
-            "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
+        // USE FULL_COLOR_SHADER
+        //Shader m_DebugShader = Shader(
+        //    "DROP\\DROP\\src\\DROP\\shaders\\00_basic.vert",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag");
 
-        Shader m_EmptyBoxShader = Shader(
-            "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
-            "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
-            "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.frag");
+        // USE ILLUMINATION_GGX_SHADER
+        //Shader m_LightShader = Shader(
+        //    "DROP\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag");
 
-        Shader m_BillboardShader = Shader(
-            "DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
-            "DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
-            "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag");
+        // USE SHADOW_SHADER
+        //Shader m_ShadowShader = Shader(
+        //    "DROP\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag");
+
+        // USE EMPTY_QUAD_SHADER
+        //Shader m_EmptyQuadShader = Shader(
+        //    "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
+
+        // USE EMPTY_BOX_SHADER
+        //Shader m_EmptyBoxShader = Shader(
+        //    "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.frag");
+
+        // USE BILLBOARD_SHADER
+        //Shader m_BillboardShader = Shader(
+        //    "DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
+        //    "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag");
     };
 
-    class Renderer
+    namespace Renderer
     {
-    public:
-        Renderer();
-        static void Init(GLFWwindow* window, RendererContext& rendererContext);
-        ~Renderer();
-        static void RenderScene(
+        void Init(GLFWwindow* window, RendererContext& rendererContext);
+
+        void RenderScene(
             const SceneContext& sceneContext
             , const RendererContext& rendererContext
             , const std::vector<RenderableObject>& renderableObjects
@@ -115,37 +163,53 @@ namespace Drop
             , Shader* const illumination_shader
         );
 
-        static void RenderScene(
+        void RenderScene(
             const SceneContext& sceneContext
             , const std::vector<RenderableObject>& renderableObjects
             , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
             , Shader* const illumination_shader
         );
 
-        static void RenderParticles(
+        void RenderParticles(
             const SceneContext& sceneContext
             , std::vector<ParticleEmitter>& particleEmitters
             , Shader* const billboardShader
         );
 
-        static void RenderBillboard(
+        void RenderBillboard(
             const SceneContext& sceneContext
             , const std::vector<Billboard>& billboards
             , Shader* const billboardShader
         );
 
-        static void DrawDebug(
+        void DrawDebug(
             const SceneContext& sceneContext
             , Shader* const debugShader
             , std::vector<Line>& drawableLines
         );
 
-        static void DrawParticleEmitterSurface(
+        void DrawParticleEmitterSurface(
             const SceneContext& sceneContext
             , Shader* const debugShader
             , std::vector<ParticleEmitter>& drawableParticleEmitter
         );
 
-        static void Shutdown();
+        void Shutdown();
+
+        void Draw_ShadowPass(
+            const StaticMeshComponent& staticMeshComponent
+            , const VgMath::Transform& worldTransform
+            , const SceneContext& sceneContext
+            , const RendererContext& rendererContext
+        );
+
+        void Draw_IlluminationPass(
+            const StaticMeshComponent& staticMeshComponent
+            , const VgMath::Transform& worldTransform
+            , const SceneContext& sceneContext
+            , const RendererContext& rendererContext
+        );
+
+
     };
 }

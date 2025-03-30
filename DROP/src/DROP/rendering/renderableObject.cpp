@@ -20,7 +20,8 @@ void RenderableObject::Draw(
 
     const glm::mat4& view,
     const GLint render_pass, 
-    const GLuint depthMap) const
+    const GLuint depthMap
+) const
 {
     switch (render_pass)
     {
