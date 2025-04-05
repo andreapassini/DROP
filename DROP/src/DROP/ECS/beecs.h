@@ -156,7 +156,9 @@ namespace bseecs {
 			//return (index != tombstone) ? m_dense[index] : nullptr;
 		}
 
-
+		/*
+		* Get the entity id from the dense comp id
+		*/
 		EntityID GetEntity(EntityID compId)
 		{
 			return m_denseToEntity[compId];

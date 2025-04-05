@@ -48,6 +48,10 @@ namespace SceneGraph {
 		, const EntityID toMove
 		, const EntityID newParent = ROOT_ID
 	);
+	void RemoveNode(
+		ECS* const ecs
+		, const EntityID toRemove
+	);
 	void CalculateWorldTransforms(
 		ECS* const ecs
 	);

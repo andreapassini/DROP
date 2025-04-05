@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <future> 
 
+#include <DROP/utils/Log.h>
+
 // Calculate the cumulated transform starting from a local transform
 // it also calculated the model matrix.
 // It was not working with const ref
@@ -33,9 +35,41 @@ void SceneGraph::MoveNode(
 ) {
 	SparseSet<SceneGraphNode>& compPool = ecs->GetComponentPool<SceneGraphNode>();
 	SceneGraphNode* node = compPool.Get(toMove);
-	if (node) {
-		node->m_Parent = newParent;
+	if (!node) { LOG_CORE_ERROR("Node {0} not found", toMove);  return; }
+
+	SceneGraphNode* nodeParent = compPool.Get(node->m_Parent);
+	if (!nodeParent) { LOG_CORE_ERROR("NodeParent {0} not found", node->m_Parent); return; }
+
+	// recalculate the local transform so the cumulated is the same
+	VgMath::Transform parentLocalTransform = nodeParent->m_LocalTransform;
+	node->m_LocalTransform = node->m_LocalTransform * parentLocalTransform;
+		
+	node->m_Parent = newParent;
+}
+
+void SceneGraph::RemoveNode(
+	ECS* const ecs
+	, const EntityID toRemove
+) {
+	SparseSet<SceneGraphNode>& compPool = ecs->GetComponentPool<SceneGraphNode>();
+	SceneGraphNode* nodeToRemove = compPool.Get(toRemove);
+	if (!nodeToRemove) { LOG_CORE_ERROR("Node {0} not found", toRemove);  return; }
+
+	// Move every leaf into the parent
+	// "Get the those kids a step father."
+	std::vector<SceneGraphNode>& densePool = compPool.Data();
+	for (int32_t i = 0; i < densePool.size(); i++) {
+		auto& sceneGraphNode = densePool[i];
+		if (sceneGraphNode.m_Parent == toRemove) {
+			MoveNode(
+				ecs
+				, compPool.GetEntity(i)
+				, nodeToRemove->m_Parent
+			);
+		}
 	}
+
+	ecs->Remove<SceneGraphNode>(toRemove);
 }
 
 void SceneGraph::CalculateWorldTransforms(
