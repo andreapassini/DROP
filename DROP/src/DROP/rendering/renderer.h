@@ -84,36 +84,42 @@ namespace Drop
         std::vector<Shader> shaders{
             //FULL_COLOR_SHADER
             Shader( 
-                "DROP\\DROP\\src\\DROP\\shaders\\00_basic.vert",
-                "DROP\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag")
+                "DROP\\DROP\\src\\DROP\\shaders\\00_basic.vert"
+                , "DROP\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag"
+            )
             
             , // ILLUMINATION_GGX_SHADER
                 Shader( 
-                "DROP\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
-                "DROP\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag")
+                    "DROP\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
+                )
 
             , // SHADOW_SHADER
                 Shader( 
-                "DROP\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
-                "DROP\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag")
+                    "DROP\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag"
+                )
             
             , // EMPTY_QUAD_SHADER
                 Shader( 
-                "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
-                "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
-                "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag")
+                    "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag"
+                )
             
             , // EMPTY_BOX_SHADER
                 Shader( 
-                "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
-                "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
-                "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.frag")
+                    "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.vert"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.geom"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.frag"
+                )
 
             , // BILLBOARD_SHADER
                 Shader(
-                "DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
-                "DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
-                "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag")
+                    "DROP\\DROP\\src\\DROP\\shaders\\billboard.vert"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\billboard.geom"
+                    , "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag"
+                )
         };
 
         // USE FULL_COLOR_SHADER
