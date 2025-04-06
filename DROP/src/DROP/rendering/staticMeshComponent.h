@@ -8,7 +8,7 @@
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;
 
-struct StaticMeshComponent {
+struct MeshComponent {
 	ModelID modelId = 0;
 
 	// #TODO 

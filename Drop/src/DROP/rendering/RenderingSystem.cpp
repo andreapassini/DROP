@@ -10,8 +10,37 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	SceneContext& sceneContext = ecs.GetSingletonComponent<SceneContext>();
 	RendererContext& rendererContext = ecs.GetSingletonComponent<RendererContext>();
 
-	std::vector<RenderableObject>& rendereableObjects = ecs.GetComponentPool<RenderableObject>().Data();
-	std::vector<Model>& denseModels = ecs.GetComponentPool<Model>().Data();
+	std::vector<MeshComponent>& denseMeshComponents = ecs.GetComponentPool<MeshComponent>().Data();
+	SparseSet<Transform>& transformComponents = ecs.GetComponentPool<Transform>();
+
+	// enable depth -- done in renderer init
+	
+	// Shadow pass
+	Renderer::SetupShadowPass(
+		sceneContext
+		, rendererContext
+	);
+	// draw all the meshes
+	for (size_t i = 0; i < denseMeshComponents.size(); i++) {
+		MeshComponent& meshComponent = denseMeshComponents[i];
+		if (!meshComponent.bCastShadow) continue;
+
+		Transform& worldTransform = ecs.GetSibiling<MeshComponent, Transform>(i);
+
+		Renderer::DrawMesh(
+			meshComponent
+			, worldTransform
+			, sceneContext
+			, rendererContext
+		);
+	}
+	
+
+	
+	// set the color buffer
+	// draw all the mashes
+
+	// draw all the particles
 
 	Renderer::RenderScene(
 		sceneContext

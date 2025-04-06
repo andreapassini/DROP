@@ -121,39 +121,6 @@ namespace Drop
                     , "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag"
                 )
         };
-
-        // USE FULL_COLOR_SHADER
-        //Shader m_DebugShader = Shader(
-        //    "DROP\\DROP\\src\\DROP\\shaders\\00_basic.vert",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag");
-
-        // USE ILLUMINATION_GGX_SHADER
-        //Shader m_LightShader = Shader(
-        //    "DROP\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag");
-
-        // USE SHADOW_SHADER
-        //Shader m_ShadowShader = Shader(
-        //    "DROP\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag");
-
-        // USE EMPTY_QUAD_SHADER
-        //Shader m_EmptyQuadShader = Shader(
-        //    "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.vert",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.geom",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\quadFrustum.frag");
-
-        // USE EMPTY_BOX_SHADER
-        //Shader m_EmptyBoxShader = Shader(
-        //    "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.vert",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.geom",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\boxFrustum.frag");
-
-        // USE BILLBOARD_SHADER
-        //Shader m_BillboardShader = Shader(
-        //    "DROP\\DROP\\src\\DROP\\shaders\\billboard.vert",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\billboard.geom",
-        //    "DROP\\DROP\\src\\DROP\\shaders\\billboard.frag");
     };
 
     namespace Renderer
@@ -201,21 +168,17 @@ namespace Drop
         );
 
         void Shutdown();
-
-        void Draw_ShadowPass(
-            const StaticMeshComponent& staticMeshComponent
-            , const VgMath::Transform& worldTransform
-            , const SceneContext& sceneContext
-            , const RendererContext& rendererContext
+        
+        void SetupShadowPass(
+            const SceneContext& sceneContext
+            , RendererContext& rendererContext
         );
 
-        void Draw_IlluminationPass(
-            const StaticMeshComponent& staticMeshComponent
-            , const VgMath::Transform& worldTransform
-            , const SceneContext& sceneContext
-            , const RendererContext& rendererContext
+        void DrawMesh(
+            const MeshComponent& model
+            , VgMath::Transform& worldTransform
+            , SceneContext& sceneContext
+            , RendererContext& rendererContext
         );
-
-
     };
 }

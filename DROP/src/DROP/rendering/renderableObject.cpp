@@ -32,9 +32,9 @@ void RenderableObject::Draw(
             GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
             GLint f0Location = glGetUniformLocation(shader.Program, "F0");
 
-            glUniform1f(kdLocation, materials[m_MaterialId].kd);
-            glUniform1f(alphaLocation, materials[m_MaterialId].alpha);
-            glUniform1f(f0Location, materials[m_MaterialId].f0);
+            glUniform1f(kdLocation, material.kd);
+            glUniform1f(alphaLocation, material.alpha);
+            glUniform1f(f0Location, material.f0);
 
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -43,7 +43,7 @@ void RenderableObject::Draw(
         }
         break;
     case render_passes::SHADOWMAP:
-        if (materials[m_MaterialId].bCastShadow == false)
+        if (material.bCastShadow == false)
             return;
 
         break;
@@ -54,12 +54,12 @@ void RenderableObject::Draw(
     GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
 
 
-	if (materials[m_MaterialId].bUseTexture) {
+	if (material.bUseTexture) {
         // we activate the texture of the plane
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, (textuers).at(materials[m_MaterialId].textureId));
+        glBindTexture(GL_TEXTURE_2D, (textuers).at(material.textureId));
         glUniform1i(textureLocation, 0);
-        glUniform1f(repeatLocation, materials[m_MaterialId].UVRepeat);
+        glUniform1f(repeatLocation, material.UVRepeat);
     }
 
     VgMath::Transform& transform = m_CumulatedTransforms.find(m_ModelMatrixId)->second;
@@ -86,9 +86,9 @@ void RenderableObject::Draw(
     GLint alphaLocation = glGetUniformLocation(shader.Program, "alpha");
     GLint f0Location = glGetUniformLocation(shader.Program, "f0");
 
-    glUniform1f(kdLocation, materials[m_MaterialId].kd);
-    glUniform1f(alphaLocation, materials[m_MaterialId].alpha);
-    glUniform1f(f0Location, materials[m_MaterialId].f0);
+    glUniform1f(kdLocation, material.kd);
+    glUniform1f(alphaLocation, material.alpha);
+    glUniform1f(f0Location, material.f0);
 
     VgMath::Transform& transform = m_CumulatedTransforms.find(m_ModelMatrixId)->second;
     glm::mat4 modelMatrix(1.0f);

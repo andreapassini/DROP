@@ -145,11 +145,11 @@ namespace Drop
         // transformation matrix for the light
         lightSpaceMatrix = lightProjection * lightView;
         /// We "install" the  Shader Program for the shadow mapping creation
-        shadow_shader->Use();
+        shadow_shader.Use();
         // we pass the transformation matrix as uniform
         glUniformMatrix4fv(
             glGetUniformLocation(
-                shadow_shader->Program
+                shadow_shader.Program
                 , "lightSpaceMatrix"
             )
             , 1
@@ -605,21 +605,104 @@ namespace Drop
     }
 
     void Renderer::Shutdown() {}
-
-    void Renderer::Draw_ShadowPass(
-        const StaticMeshComponent& staticMeshComponent
-        , const VgMath::Transform& worldTransform
-        , const SceneContext& sceneContext
-        , const RendererContext& rendererContext
+    void Renderer::SetupShadowPass(
+        const SceneContext& sceneContext
+        , RendererContext& rendererContext
     ) {
-        std::vector<Shader>& shaders = rendererContext.shaders;
-        std::vector<Material>& materials = sceneContext.materials;
-        std::vector<Model>& models = sceneContext.models;
-        std::vector<TextureID>& textuers = sceneContext.textuers;
-    }
-    void Renderer::Draw_IlluminationPass(const StaticMeshComponent& staticMeshComponent, const VgMath::Transform& worldTransform, const SceneContext& sceneContext, const RendererContext& rendererContext)
-    {
+        /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
+        // we set view and projection matrix for the rendering using light as a camera
+        glm::mat4 lightProjection, lightView;
+        glm::mat4 lightSpaceMatrix;
+        GLfloat near_plane = -10.0f, far_plane = 10.0f;
+        GLfloat frustumSize = 5.0f;
+        // for a directional light, the projection is orthographic. For point lights, we should use a perspective projection
+        lightProjection = glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, near_plane, far_plane);
+        // the light is directional, so technically it has no position. We need a view matrix, so we consider a position on the the direction vector of the light
+        lightView = glm::lookAt(sceneContext.lightDir, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        // transformation matrix for the light
+        lightSpaceMatrix = lightProjection * lightView;
 
+        // We "install" the  Shader Program for the shadow mapping creation
+        std::vector<Shader>& shaders = rendererContext.shaders;
+        if (shaders.size() <= SHADOW_SHADER) {
+            LOG_ERROR("Shaders size {0} < SHADOW_SHADER {1}", shaders.size(), SHADOW_SHADER);
+            return;
+        }
+        Shader& shadow_shader = rendererContext.shaders[SHADOW_SHADER];
+        shadow_shader.Use();
+        // we pass the transformation matrix as uniform
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shadow_shader.Program
+                , "lightSpaceMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(lightSpaceMatrix)
+        );
+        // we set the viewport for the first rendering step = dimensions of the depth texture
+        glViewport(0, 0, rendererContext.SHADOW_WIDTH, rendererContext.SHADOW_HEIGHT);
+        // we activate the FBO for the depth map rendering
+        glBindFramebuffer(GL_FRAMEBUFFER, rendererContext.depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+    void Renderer::DrawMesh(
+        const MeshComponent& meshComponent
+        , VgMath::Transform& worldTransform
+        , SceneContext& sceneContext
+        , RendererContext& rendererContext
+    ) {
+        std::vector<Material>& materials = sceneContext.materials;
+        assert(materials.size() > meshComponent.materialId);
+        Material& material = materials[meshComponent.materialId];
+
+        std::vector<Shader>& shaders = rendererContext.shaders;
+        assert(shaders.size() > material.shaderID);
+        Shader& shader = shaders[meshComponent.materialId];
+        
+        std::vector<Model>& models = sceneContext.models;
+        assert(models.size() > meshComponent.modelId);
+        Model& model = models[meshComponent.modelId];
+
+        std::vector<TextureID>& textuers = sceneContext.textuers;
+
+        //{   // without this scope there is an error for the variable "**location" not used
+            GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+            GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
+            GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+
+            glUniform1f(kdLocation, material.kd);
+            glUniform1f(alphaLocation, material.alpha);
+            glUniform1f(f0Location, material.f0);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
+            GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
+            glUniform1i(shadowLocation, 2);
+        //}
+
+        // we pass the needed uniforms
+        GLint textureLocation = glGetUniformLocation(shader.Program, "tex");
+        GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
+
+        if (material.bUseTexture)
+        {
+            // we activate the texture of the plane
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, (textuers).at(material.textureId));
+            glUniform1i(textureLocation, 0);
+            glUniform1f(repeatLocation, material.UVRepeat);
+        }
+
+        VgMath::Transform& transform = worldTransform;
+        glm::mat4 modelMatrix(1.0f);
+        SceneGraph::TransformToMatrix(transform, modelMatrix);
+
+        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(sceneContext.view * modelMatrix));
+        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+        model.Draw();
     }
 
 //https://learnopengl.com/In-Practice/Debugging
