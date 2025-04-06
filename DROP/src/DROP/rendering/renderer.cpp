@@ -621,4 +621,31 @@ namespace Drop
     {
 
     }
+
+//https://learnopengl.com/In-Practice/Debugging
+//https://computergraphics.stackexchange.com/questions/23/how-can-i-debug-what-is-being-rendered-to-a-frame-buffer-object-in-opengl
+//    // XXX WARNING: Untested code follows
+//
+//// Blit from fbo...
+//    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+//    // ...to the front buffer.
+//    glBindFramebuffer(GL_WRITE_FRAMEBUFFER, GL_FRONT);
+//
+//    GLsizei HalfWindowWidth = (GLsizei)(WindowWidth / 2.0f);
+//    GLsizei HalfWindowHeight = (GLsizei)(WindowHeight / 2.0f);
+//
+//    // Blit attachment 0 to the lower-left quadrant of the window
+//    glReadBuffer(GL_COLOR_ATTACHMENT0);
+//    https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBlitFramebuffer.xhtml
+//    glBlitFramebuffer(0, 0, FboWidth, FboHeight,
+//        0, 0, HalfWindowWidth, HalfWindowHeight,
+//        GL_COLOR_BUFFER_BIT, GL_LINEAR);
+//
+//    // Blit attachment 1 to the lower-right quadrant of the window
+//    glReadBuffer(GL_COLOR_ATTACHMENT1);
+//    glBlitFramebuffer(0, 0, FboWidth, FboHeight,
+//        HalfWindowWidth, 0, WindowWidth, HalfWindowHeight,
+//        GL_COLOR_BUFFER_BIT, GL_LINEAR);
+//
+//    // ...and so on. You can switch FBOs if you have more than one to read from.
 }
