@@ -27,7 +27,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 
 		Transform& worldTransform = ecs.GetSibiling<MeshComponent, Transform>(i);
 
-		Renderer::DrawMesh(
+		Renderer::DrawMeshForShadow(
 			meshComponent
 			, worldTransform
 			, sceneContext

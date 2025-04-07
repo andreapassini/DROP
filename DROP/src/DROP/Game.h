@@ -43,5 +43,6 @@ namespace Drop
 		bool m_VSync = false;
 
 		glm::vec3 m_LightDir = glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::mat4 m_lightSpaceMatrix;
 	};
 }

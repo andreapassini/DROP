@@ -605,6 +605,21 @@ namespace Drop
     }
 
     void Renderer::Shutdown() {}
+
+    void Renderer::CalculateLightMatrix(
+        SceneContext& sceneContext
+    ) {
+        glm::mat4 lightProjection, lightView;
+        //glm::mat4 lightSpaceMatrix;
+        GLfloat near_plane = -10.0f, far_plane = 10.0f;
+        GLfloat frustumSize = 5.0f;
+        // for a directional light, the projection is orthographic. For point lights, we should use a perspective projection
+        lightProjection = glm::ortho(-frustumSize, frustumSize, -frustumSize, frustumSize, near_plane, far_plane);
+        // the light is directional, so technically it has no position. We need a view matrix, so we consider a position on the the direction vector of the light
+        lightView = glm::lookAt(sceneContext.lightDir, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        // transformation matrix for the light
+        sceneContext.lightSpaceMatrix = lightProjection * lightView;
+    }
     void Renderer::SetupShadowPass(
         const SceneContext& sceneContext
         , RendererContext& rendererContext
@@ -646,7 +661,8 @@ namespace Drop
         glBindFramebuffer(GL_FRAMEBUFFER, rendererContext.depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
     }
-    void Renderer::DrawMesh(
+
+    void Renderer::DrawMeshForShadow(
         const MeshComponent& meshComponent
         , VgMath::Transform& worldTransform
         , SceneContext& sceneContext
@@ -667,18 +683,138 @@ namespace Drop
         std::vector<TextureID>& textuers = sceneContext.textuers;
 
         //{   // without this scope there is an error for the variable "**location" not used
-            GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
-            GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
-            GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+            //GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+            //GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
+            //GLint f0Location = glGetUniformLocation(shader.Program, "F0");
 
-            glUniform1f(kdLocation, material.kd);
-            glUniform1f(alphaLocation, material.alpha);
-            glUniform1f(f0Location, material.f0);
+            //glUniform1f(kdLocation, material.kd);
+            //glUniform1f(alphaLocation, material.alpha);
+            //glUniform1f(f0Location, material.f0);
 
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
-            GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
-            glUniform1i(shadowLocation, 2);
+            //glActiveTexture(GL_TEXTURE2);
+            //glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
+            //GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
+            //glUniform1i(shadowLocation, 2);
+        //}
+
+        // we pass the needed uniforms
+        GLint textureLocation = glGetUniformLocation(shader.Program, "tex");
+        GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
+
+        if (material.bUseTexture)
+        {
+            // we activate the texture of the plane
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, (textuers).at(material.textureId));
+            glUniform1i(textureLocation, 0);
+            glUniform1f(repeatLocation, material.UVRepeat);
+        }
+
+        VgMath::Transform& transform = worldTransform;
+        glm::mat4 modelMatrix(1.0f);
+        SceneGraph::TransformToMatrix(transform, modelMatrix);
+
+        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(sceneContext.view * modelMatrix));
+        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+        model.Draw();
+    }
+
+    void Renderer::SetupColorPass(
+        const SceneContext& sceneContext
+        , RendererContext& rendererContext
+    ) {
+        /////////////////// STEP 2 - SCENE RENDERING FROM CAMERA ////////////////////////////////////////////////
+
+        // we activate back the standard Frame Buffer
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // we "clear" the frame and z buffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // we set the rendering mode
+        if (sceneContext.wireframe)
+            // Draw in wireframe
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        // we set the viewport for the final rendering step
+        glViewport(0, 0, sceneContext.width, sceneContext.height);
+    }
+
+    void Renderer::DrawMesh(
+        const MeshComponent& meshComponent
+        , VgMath::Transform& worldTransform
+        , SceneContext& sceneContext
+        , RendererContext& rendererContext
+    ) {
+        std::vector<Model>& models = sceneContext.models;
+        assert(models.size() > meshComponent.modelId);
+        Model& model = models[meshComponent.modelId];
+
+        std::vector<Material>& materials = sceneContext.materials;
+        assert(materials.size() > meshComponent.materialId);
+        Material& material = materials[meshComponent.materialId];
+
+        std::vector<Shader>& shaders = rendererContext.shaders;
+        assert(shaders.size() > meshComponent.materialId);
+        Shader& shader = shaders[material.shaderID];
+
+        // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
+        shader.Use();
+
+        // we pass projection and view matrices to the Shader Program
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shader.Program
+                , "projectionMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.projection)
+        );
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shader.Program
+                , "viewMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.view)
+        );
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shader.Program
+                , "lightSpaceMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.lightSpaceMatrix)
+        );
+
+        // we determine the position in the Shader Program of the uniform variables
+        GLint lightDirLocation = glGetUniformLocation(shader.Program, "lightVector");
+
+        // we assign the value to the uniform variables
+        glUniform3fv(lightDirLocation, 1, glm::value_ptr(sceneContext.lightDir));
+
+        std::vector<TextureID>& textuers = sceneContext.textuers;
+
+        //{   // without this scope there is an error for the variable "**location" not used
+        GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+        GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
+        GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+
+        glUniform1f(kdLocation, material.kd);
+        glUniform1f(alphaLocation, material.alpha);
+        glUniform1f(f0Location, material.f0);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
+        GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
+        glUniform1i(shadowLocation, 2);
         //}
 
         // we pass the needed uniforms

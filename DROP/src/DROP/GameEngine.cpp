@@ -137,6 +137,7 @@ namespace Drop
 			m_Game->m_Camera.GetViewMatrix()
 			, m_Game->m_Camera.GetProjectionMatrix()
 			, m_Game->m_LightDir
+			, m_Game->m_lightSpaceMatrix
 			, m_TextureIds
 			, m_Models
 			, m_Materials

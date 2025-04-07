@@ -49,10 +49,10 @@
 namespace Drop
 {
     struct SceneContext {
-        // removed const otherwise we could not change the camera
-        glm::mat4& view;
-        glm::mat4& projection;
-        glm::vec3& lightDir;
+        glm::mat4 view;
+        glm::mat4 projection;
+        glm::vec3 lightDir;
+        glm::mat4 lightSpaceMatrix;
 
         std::vector<Model>& models;
         std::vector<Material>& materials;
@@ -62,8 +62,6 @@ namespace Drop
         int height;
 
         GLboolean wireframe;
-
-        std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
     };
 
     struct RendererContext {
@@ -168,12 +166,26 @@ namespace Drop
         );
 
         void Shutdown();
+
+        void CalculateLightMatrix(
+            SceneContext& sceneContext
+        );
         
         void SetupShadowPass(
             const SceneContext& sceneContext
             , RendererContext& rendererContext
+        );        
+        void DrawMeshForShadow(
+            const MeshComponent& model
+            , VgMath::Transform& worldTransform
+            , SceneContext& sceneContext
+            , RendererContext& rendererContext
         );
 
+        void SetupColorPass(
+            const SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
         void DrawMesh(
             const MeshComponent& model
             , VgMath::Transform& worldTransform
