@@ -811,24 +811,35 @@ namespace Drop
         glUniform1f(alphaLocation, material.alpha);
         glUniform1f(f0Location, material.f0);
 
-        glActiveTexture(GL_TEXTURE2);
+        //glActiveTexture(GL_TEXTURE2); // old, now we set the system textures from 20th index
+        glActiveTexture(GL_TEXTURE20 + (GL_TEXTURE0 - GL_TEXTURE2));
         glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
         GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
-        glUniform1i(shadowLocation, 2);
+        glUniform1i(shadowLocation, MAX_USER_TEXTURES + GL_TEXTURE0 - GL_TEXTURE2);
         //}
 
-        // we pass the needed uniforms
-        GLint textureLocation = glGetUniformLocation(shader.Program, "tex");
-        GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
-
-        if (material.bUseTexture)
+        for (uint32_t  i = 0; i < MAX_USER_TEXTURES; i++)
         {
-            // we activate the texture of the plane
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, (textuers).at(material.textureId));
-            glUniform1i(textureLocation, 0);
-            glUniform1f(repeatLocation, material.UVRepeat);
+            TextureSpecification& currTexture = material.textures[i];
+            if (currTexture.textureId != TEXTURE_NOT_USED)
+            {
+                // we dont want to override systems textures (from index 20 to 31)
+                assert(currTexture.textureId <= MAX_USER_TEXTURES - 1);
+
+                // we pass the needed uniforms
+                std::string TextureName = "tex_" + std::to_string(i);
+                GLint textureLocation = glGetUniformLocation(shader.Program, TextureName.c_str());
+                std::string TextureName = "repeat_" + std::to_string(i);
+                GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
+
+                // we activate the texture of the plane
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(GL_TEXTURE_2D, (textuers).at(currTexture.textureId));
+                glUniform1i(textureLocation, i);
+                glUniform1f(repeatLocation, currTexture.UVRepeat);
+            }
         }
+
 
         VgMath::Transform& transform = worldTransform;
         glm::mat4 modelMatrix(1.0f);
