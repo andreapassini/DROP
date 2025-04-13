@@ -663,7 +663,7 @@ namespace Drop
     }
 
     void Renderer::DrawMeshForShadow(
-        const MeshComponent& meshComponent
+        const StaticMeshComponent& meshComponent
         , VgMath::Transform& worldTransform
         , SceneContext& sceneContext
         , RendererContext& rendererContext
@@ -741,7 +741,7 @@ namespace Drop
     }
 
     void Renderer::DrawMesh(
-        const MeshComponent& meshComponent
+        const StaticMeshComponent& meshComponent
         , VgMath::Transform& worldTransform
         , SceneContext& sceneContext
         , RendererContext& rendererContext

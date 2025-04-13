@@ -8,12 +8,13 @@
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;
 
-struct MeshComponent {
+struct StaticMeshComponent {
 	ModelID modelId = 0;
 
 	// #TODO 
 	// Maybe extend to an array of materials
 	// so each mesh of the model can have its material
+	// or simply add the Material inside each mesh of the model
 	MaterialID materialId = 0;
 
 	// how much data regarding rendering specifics

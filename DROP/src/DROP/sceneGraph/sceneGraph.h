@@ -46,17 +46,17 @@ namespace SceneGraph {
 
 	// THIS 2 NEEDS to be reworked
 	//void MoveNode(
-	//	ECS* const ecs
+	//	ECS& ecs
 	//	, const EntityID toMove
 	//	, const EntityID newParent = ROOT_ID
 	//);
 	//void RemoveNode(
-	//	ECS* const ecs
+	//	ECS& ecs
 	//	, const EntityID toRemove
 	//);
 
 	void CalculateWorldTransforms(
-		ECS* const ecs
+		ECS& ecs
 	);
 
 	void TransformToMatrix(
@@ -65,7 +65,7 @@ namespace SceneGraph {
 	);
 
 	void CalculateCumulatedTransform(
-		ECS* const ecs
+		ECS& ecs
 		, SceneGraphNode& node
 	);
 };

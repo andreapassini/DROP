@@ -12,7 +12,7 @@
 // it also calculated the model matrix.
 // It was not working with const ref
 void SceneGraph::CalculateCumulatedTransform(
-	ECS* const ecs
+	ECS& ecs
 	, SceneGraphNode& node
 ) {
 	SceneGraphNode* currNode = &node;
@@ -21,7 +21,7 @@ void SceneGraph::CalculateCumulatedTransform(
 	// Avoid recursion, saving stack
 	while (currNode->m_Parent != -1) {
 		cumulated = cumulated * currNode->m_LocalTransform;
-		currNode = ecs->GetComponentPool<SceneGraphNode>().Get(currNode->m_Parent);
+		currNode = ecs.GetComponentPool<SceneGraphNode>().Get(currNode->m_Parent);
 		if (!currNode) { break; }
 	}
 
@@ -72,10 +72,12 @@ void SceneGraph::CalculateCumulatedTransform(
 //	ecs->Remove<SceneGraphNode>(toRemove);
 //}
 
+// For each node of the graph, calculate the world transform
+//	Is parallel using futures 
 void SceneGraph::CalculateWorldTransforms(
-	ECS* const ecs
+	ECS& ecs
 ) {
-	std::vector<SceneGraphNode>& denseCompPool = ecs->GetComponentPool<SceneGraphNode>().Data();
+	std::vector<SceneGraphNode>& denseCompPool = ecs.GetComponentPool<SceneGraphNode>().Data();
 
 	std::vector<std::future<void>> futures;
 
