@@ -89,10 +89,10 @@ namespace Drop
 		LOG_CORE_INFO("Drop Engine starting");
 
 		// to be removed
-		m_WindowHandle = std::unique_ptr<Window>(Window::Create());
-		Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
+		m_ActiveWindowHandle = std::unique_ptr<Window>(Window::Create());
+		Input::m_ActiveWindowHandle = (GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow();
 
-		m_Renderer.Init((GLFWwindow*)m_WindowHandle->GetNativeWindow(), m_renderingContext);
+		m_Renderer.Init((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), m_renderingContext);
 
 		// ImGui SETUP
 		IMGUI_CHECKVERSION();
@@ -117,7 +117,7 @@ namespace Drop
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_WindowHandle->GetNativeWindow(), true);
+		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
 		// Testing ECS
@@ -138,28 +138,32 @@ namespace Drop
 			, m_Game->m_Camera.GetProjectionMatrix()
 			, m_Game->m_LightDir
 			, m_Game->m_lightSpaceMatrix
-			, m_TextureIds
 			, m_Models
 			, m_Materials
-			//, m_DrawableLines
-			, m_WindowHandle->GetWidth()
-			, m_WindowHandle->GetHeight()
+			, m_TextureIds
+			, m_ActiveWindowHandle->GetWidth()
+			, m_ActiveWindowHandle->GetHeight()
 			, m_Game->m_Wireframe
 		};	
 		
-		ParticleEmitter particleEmitter;
-		particleEmitter.spawningValues.lifeTime = 5.0f;
-		Transform spawningSurfaceTransform;
-		spawningSurfaceTransform.m_Translate = (0.0f, 1.0f, 0.0f);
-		particleEmitter.spawningValues.endsize = 0.0f;
-		particleEmitter.spawningValues.spawningSurface.m_Size.x = 5.0f;
-		particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
-		particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
-		float waitTime = 0.0f;
-		float spawnDelay = 2.5f;
+		RendererContext renderContext{
+			Input::m_ActiveWindowHandle
+			, 
+		}
+
+		//ParticleEmitter particleEmitter;
+		//particleEmitter.spawningValues.lifeTime = 5.0f;
+		//Transform spawningSurfaceTransform;
+		//spawningSurfaceTransform.m_Translate = (0.0f, 1.0f, 0.0f);
+		//particleEmitter.spawningValues.endsize = 0.0f;
+		//particleEmitter.spawningValues.spawningSurface.m_Size.x = 5.0f;
+		//particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
+		//particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
+		//float waitTime = 0.0f;
+		//float spawnDelay = 2.5f;
 
 		// Main loop
-		while (!m_WindowHandle->IsShouldClose())
+		while (!m_ActiveWindowHandle->IsShouldClose())
 		{
 			// we determine the time passed from the beginning
 			// and we calculate time difference between current frame rendering and the previous one
@@ -168,13 +172,13 @@ namespace Drop
 			m_LastFrameTime = currentTime;
 
 			// pooling events
-			m_WindowHandle->OnUpdate();
+			m_ActiveWindowHandle->OnUpdate();
 
 			m_Game->m_Camera.OnUpdate(m_DeltaTime);
-			m_Game->m_Camera.OnResize(m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
+			m_Game->m_Camera.OnResize(m_ActiveWindowHandle->GetWidth(), m_ActiveWindowHandle->GetHeight());
 
-			sceneContext.height = m_WindowHandle->GetHeight();
-			sceneContext.width = m_WindowHandle->GetWidth();
+			sceneContext.height = m_ActiveWindowHandle->GetHeight();
+			sceneContext.width = m_ActiveWindowHandle->GetWidth();
 			sceneContext.wireframe = m_Game->m_Wireframe;
 
 			// Update
@@ -231,7 +235,7 @@ namespace Drop
 			ImGui::End();		
 
 			ImGuiIO& io = ImGui::GetIO();
-			io.DisplaySize = ImVec2((float)m_WindowHandle->GetWidth(), (float)m_WindowHandle->GetHeight());
+			io.DisplaySize = ImVec2((float)m_ActiveWindowHandle->GetWidth(), (float)m_ActiveWindowHandle->GetHeight());
 
 			// Rendering ImGui
 			ImGui::Render();
@@ -246,7 +250,7 @@ namespace Drop
 			}
 
 			// Swapping back and front buffers
-			m_WindowHandle->OnEndFrame();
+			m_ActiveWindowHandle->OnEndFrame();
 		}
 	}
 
@@ -258,7 +262,7 @@ namespace Drop
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 
-		m_WindowHandle.reset(); // delete the object, leaving m_WindowHandle empty
+		m_ActiveWindowHandle.reset(); // delete the object, leaving m_WindowHandle empty
 
 		g_GameEngineRunning = false;
 	}
