@@ -92,7 +92,10 @@ namespace Drop
 		m_ActiveWindowHandle = std::unique_ptr<Window>(Window::Create());
 		Input::m_ActiveWindowHandle = (GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow();
 
-		m_Renderer.Init((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), m_renderingContext);
+		Renderer::Init(
+			(GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow()
+			, m_renderingContext
+		);
 
 		// ImGui SETUP
 		IMGUI_CHECKVERSION();
@@ -122,11 +125,18 @@ namespace Drop
 
 		// Testing ECS
 		g_ECS.RegisterComponent<Transform>();
-		g_ECS.RegisterComponent<Camera, Transform>();
-		g_ECS.RegisterComponent<Model, Transform>();
-		g_ECS.RegisterComponent<ParticleEmitter, Transform>();
-		g_ECS.RegisterComponent<Billboard, Transform>();
-		g_ECS.RegisterComponent<PhysicsObject>();
+
+		// #TODO 
+		// We will have multiple cameras, but only one active camera 
+		//	as a Singleton Component
+		//g_ECS.RegisterComponent<Camera, Transform>();
+
+		g_ECS.RegisterComponent<StaticMeshComponent, Transform>();
+
+		// #TODO to this later, for now focus on simp[le mesh rendering
+		//g_ECS.RegisterComponent<ParticleEmitter, Transform>();
+		//g_ECS.RegisterComponent<Billboard, Transform>();
+		//g_ECS.RegisterComponent<PhysicsObject>();
 	}
 
 	void GameEngine::Run()
@@ -148,9 +158,10 @@ namespace Drop
 		
 		RendererContext renderContext{
 			Input::m_ActiveWindowHandle
-			, 
-		}
+			,
+		};
 
+		// #TODO add particle components later
 		//ParticleEmitter particleEmitter;
 		//particleEmitter.spawningValues.lifeTime = 5.0f;
 		//Transform spawningSurfaceTransform;
@@ -207,21 +218,23 @@ namespace Drop
 				}
 			}
 
-			if (waitTime < currentTime) {
-				waitTime = currentTime + spawnDelay;
-				//particleEmitter.spawningValues.position.x += 1.0f;
-				EmitParticles(particleEmitter);
-			}
-			UpdateParticles(
-				particleEmitter.particles
-				, particleEmitter.numberOfParticles
-				, m_DeltaTime
-			);
+			//if (waitTime < currentTime) {
+			//	waitTime = currentTime + spawnDelay;
+			//	//particleEmitter.spawningValues.position.x += 1.0f;
+			//	EmitParticles(particleEmitter);
+			//}
+			//UpdateParticles(
+			//	particleEmitter.particles
+			//	, particleEmitter.numberOfParticles
+			//	, m_DeltaTime
+			//);
 
 			// Calculate world transform every time the transform in changed
-			m_SceneGraph.CalculateWorldTransforms(
-				m_CumulatedTransforms
-			);
+			//m_SceneGraph.CalculateWorldTransforms(
+			//	m_CumulatedTransforms
+			//);
+
+			SceneGraph::CalculateWorldTransforms(g_ECS);
 
 			// RENDERER
 			RenderingSystem::Update(g_ECS, m_DeltaTime);
