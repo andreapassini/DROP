@@ -43,18 +43,22 @@ public:
 };
 
 namespace SceneGraph {
-	void MoveNode(
-		ECS* const ecs
-		, const EntityID toMove
-		, const EntityID newParent = ROOT_ID
-	);
-	void RemoveNode(
-		ECS* const ecs
-		, const EntityID toRemove
-	);
+
+	// THIS 2 NEEDS to be reworked
+	//void MoveNode(
+	//	ECS* const ecs
+	//	, const EntityID toMove
+	//	, const EntityID newParent = ROOT_ID
+	//);
+	//void RemoveNode(
+	//	ECS* const ecs
+	//	, const EntityID toRemove
+	//);
+
 	void CalculateWorldTransforms(
 		ECS* const ecs
 	);
+
 	void TransformToMatrix(
 		const VgMath::Transform& inTransform
 		, glm::mat4& outModelMatrix
