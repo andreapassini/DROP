@@ -99,7 +99,7 @@ public:
             //        VgMath::Degrees(90.0), 
             //        VgMath::Vector3(0.0, 1.0, 0.0).normalized()
             //    );
-            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(sphereId);
             transform.m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
             transform.m_LocalTransform.m_Scale = 1.0f;
             transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
@@ -115,7 +115,7 @@ public:
             material.textures[0].UVRepeat = 1.0f;
             gameEngine->m_Materials.push_back(material);
 
-            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(sphereId);
             staticMesh.bCastShadow = true;
             staticMesh.materialId = gameEngine->m_Materials.size() - 1;
             staticMesh.modelId = 1;

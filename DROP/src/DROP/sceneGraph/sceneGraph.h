@@ -55,6 +55,8 @@ namespace SceneGraph {
 	//	, const EntityID toRemove
 	//);
 
+	// Calculate the cumulated Transform 
+	// of each node of the graph
 	void CalculateWorldTransforms(
 		ECS& ecs
 	);

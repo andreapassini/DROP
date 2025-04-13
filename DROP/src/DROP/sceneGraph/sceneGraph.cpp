@@ -19,7 +19,7 @@ void SceneGraph::CalculateCumulatedTransform(
 	VgMath::Transform cumulated = currNode->m_LocalTransform;
 
 	// Avoid recursion, saving stack
-	while (currNode->m_Parent != -1) {
+	while (currNode->m_Parent != ROOT_ID) {
 		cumulated = cumulated * currNode->m_LocalTransform;
 		currNode = ecs.GetComponentPool<TransformComponent>().Get(currNode->m_Parent);
 		if (!currNode) { break; }

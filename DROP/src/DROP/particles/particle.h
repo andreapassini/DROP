@@ -3,6 +3,8 @@
 #include "DROP/math/mat3.h"
 #include "DROP/math/surface.h"
 
+#include "DROP/rendering/material.h"
+
 using namespace VgMath;
 
 #define MAX_PARTICLES 100
@@ -20,7 +22,7 @@ struct Particle {
 	Vector3 color{ 1.0f, 1.0f, 1.0f };
 	float colorAlpha = 1.0f;
 
-	uint32_t textureID = 0;
+	TextureID textureID = 0;
 
 	float startsize = 1.0f;
 	float endsize = 0.0f;

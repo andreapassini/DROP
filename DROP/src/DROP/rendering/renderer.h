@@ -39,6 +39,8 @@
 #include "DROP/rendering/shader.h"
 #include "DROP/utils/camera.h"
 #include "DROP/rendering/billboard.h"
+#include "DROP/rendering/model.h"
+#include "DROP/rendering/material.h"
 
 #define FULL_COLOR_SHADER 0
 #define ILLUMINATION_GGX_SHADER 1
@@ -125,21 +127,21 @@ namespace Drop
     {
         void Init(GLFWwindow* window, RendererContext& rendererContext);
 
-        void RenderScene(
-            const SceneContext& sceneContext
-            , const RendererContext& rendererContext
-            , const std::vector<RenderableObject>& renderableObjects
-            , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
-            , Shader* const shadow_shader
-            , Shader* const illumination_shader
-        );
+        //void RenderScene(
+        //    const SceneContext& sceneContext
+        //    , const RendererContext& rendererContext
+        //    , const std::vector<RenderableObject>& renderableObjects
+        //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
+        //    , Shader* const shadow_shader
+        //    , Shader* const illumination_shader
+        //);
 
-        void RenderScene(
-            const SceneContext& sceneContext
-            , const std::vector<RenderableObject>& renderableObjects
-            , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
-            , Shader* const illumination_shader
-        );
+        //void RenderScene(
+        //    const SceneContext& sceneContext
+        //    , const std::vector<RenderableObject>& renderableObjects
+        //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
+        //    , Shader* const illumination_shader
+        //);
 
         void RenderParticles(
             const SceneContext& sceneContext

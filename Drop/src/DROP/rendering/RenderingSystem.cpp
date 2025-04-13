@@ -2,6 +2,7 @@
 
 #include "DROP/rendering/model.h"
 #include "DROP/rendering/renderer.h"
+#include "DROP/sceneGraph/sceneGraph.h"
 
 using namespace Drop;
 
@@ -10,8 +11,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	SceneContext& sceneContext = ecs.GetSingletonComponent<SceneContext>();
 	RendererContext& rendererContext = ecs.GetSingletonComponent<RendererContext>();
 
-	std::vector<MeshComponent>& denseMeshComponents = ecs.GetComponentPool<MeshComponent>().Data();
-	SparseSet<Transform>& transformComponents = ecs.GetComponentPool<Transform>();
+	std::vector<StaticMeshComponent>& denseMeshComponents = ecs.GetComponentPool<StaticMeshComponent>().Data();
 
 	// enable depth -- done in renderer init
 	
@@ -22,10 +22,11 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	);
 	// draw all the meshes
 	for (size_t i = 0; i < denseMeshComponents.size(); i++) {
-		MeshComponent& meshComponent = denseMeshComponents[i];
+		StaticMeshComponent& meshComponent = denseMeshComponents[i];
 		if (!meshComponent.bCastShadow) continue;
 
-		Transform& worldTransform = ecs.GetSibiling<MeshComponent, Transform>(i);
+		TransformComponent& transformComp = ecs.GetSibiling<StaticMeshComponent, TransformComponent>(i);
+		Transform& worldTransform = transformComp.m_CumulatedTransform;
 
 		Renderer::DrawMeshForShadow(
 			meshComponent
@@ -38,41 +39,61 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 
 	
 	// set the color buffer
+	Renderer::SetupColorPass(
+		sceneContext
+		, rendererContext
+	);
 	// draw all the mashes
+	for (size_t i = 0; i < denseMeshComponents.size(); i++)
+	{
+		StaticMeshComponent& meshComponent = denseMeshComponents[i];
+		if (!meshComponent.bCastShadow) continue;
+
+		TransformComponent& transformComp = ecs.GetSibiling<StaticMeshComponent, TransformComponent>(i);
+		Transform& worldTransform = transformComp.m_CumulatedTransform;
+
+		Renderer::DrawMesh(
+			meshComponent
+			, worldTransform
+			, sceneContext
+			, rendererContext
+		);
+	}
+
 
 	// draw all the particles
 
-	Renderer::RenderScene(
-		sceneContext
-		, rendererContext
-		, rendereableObjects
-		, sceneContext.m_CumulatedTransforms
-		, &(rendererContext.m_ShadowShader)
-		, &(rendererContext.m_LightShader)
-	);
+	//Renderer::RenderScene(
+	//	sceneContext
+	//	, rendererContext
+	//	, rendereableObjects
+	//	, sceneContext.m_CumulatedTransforms
+	//	, &(rendererContext.m_ShadowShader)
+	//	, &(rendererContext.m_LightShader)
+	//);
 
-	std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
+	//std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
 
-	Renderer::RenderParticles(
-		sceneContext
-		,denseParticleEmitters
-		, &rendererContext.m_BillboardShader
-	);
+	//Renderer::RenderParticles(
+	//	sceneContext
+	//	,denseParticleEmitters
+	//	, &rendererContext.m_BillboardShader
+	//);
 
-	if (rendererContext.m_DrawDebug)
-	{
-		//Renderer::DrawDebug(
-		//	sceneContext,
-		//	&(rendererContext.m_DebugShader),
-		//	sceneContext.drawableLines
-		//);
+	//if (rendererContext.m_DrawDebug)
+	//{
+	//	//Renderer::DrawDebug(
+	//	//	sceneContext,
+	//	//	&(rendererContext.m_DebugShader),
+	//	//	sceneContext.drawableLines
+	//	//);
 
-		Renderer::DrawParticleEmitterSurface(
-			sceneContext
-			, &(rendererContext.m_EmptyQuadShader),
-			denseParticleEmitters
-		);
-	}
+	//	Renderer::DrawParticleEmitterSurface(
+	//		sceneContext
+	//		, &(rendererContext.m_EmptyQuadShader),
+	//		denseParticleEmitters
+	//	);
+	//}
 
 }
 
