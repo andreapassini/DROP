@@ -11,6 +11,10 @@
 #define MAX_USER_TEXTURES 20
 #define TEXTURE_NOT_USED UINT32_MAX
 
+// System textures
+#define SHADOW_MAP_ACTIVE GL_TEXTURE20 + (GL_TEXTURE0 - GL_TEXTURE2)
+#define SHADOW_MAP_1i MAX_USER_TEXTURES + GL_TEXTURE0 - GL_TEXTURE2
+
 typedef uint32_t TextureID;
 typedef uint32_t ShaderID;
 

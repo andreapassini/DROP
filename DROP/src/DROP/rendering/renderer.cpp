@@ -87,7 +87,8 @@ namespace Drop
         //GLuint depthMap;
         glGenTextures(1, &rendererContext.depthMap);
         glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
-        // in the texture, we will save only the depth data of the fragments. Thus, we specify that we need to render only depth in the first rendering step
+        // in the texture, we will save only the depth data of the fragments. 
+        // Thus, we specify that we need to render only depth in the first rendering step
         glTexImage2D(
             GL_TEXTURE_2D
             , 0
@@ -97,7 +98,8 @@ namespace Drop
             , 0
             , GL_DEPTH_COMPONENT
             , GL_FLOAT
-            , NULL);
+            , NULL
+        );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         // we set to clamp the uv coordinates outside [0,1] to the color of the border
@@ -639,10 +641,8 @@ namespace Drop
 
         // We "install" the  Shader Program for the shadow mapping creation
         std::vector<Shader>& shaders = rendererContext.shaders;
-        if (shaders.size() <= SHADOW_SHADER) {
-            LOG_ERROR("Shaders size {0} < SHADOW_SHADER {1}", shaders.size(), SHADOW_SHADER);
-            return;
-        }
+        assert(shaders.size() > SHADOW_SHADER);
+
         Shader& shadow_shader = rendererContext.shaders[SHADOW_SHADER];
         shadow_shader.Use();
         // we pass the transformation matrix as uniform
@@ -682,32 +682,28 @@ namespace Drop
 
         std::vector<TextureID>& textuers = sceneContext.textuers;
 
-        //{   // without this scope there is an error for the variable "**location" not used
-            //GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
-            //GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
-            //GLint f0Location = glGetUniformLocation(shader.Program, "F0");
-
-            //glUniform1f(kdLocation, material.kd);
-            //glUniform1f(alphaLocation, material.alpha);
-            //glUniform1f(f0Location, material.f0);
-
-            //glActiveTexture(GL_TEXTURE2);
-            //glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
-            //GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
-            //glUniform1i(shadowLocation, 2);
-        //}
-
-        // we pass the needed uniforms
-        GLint textureLocation = glGetUniformLocation(shader.Program, "tex");
-        GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
-
-        if (material.bUseTexture)
+        for (uint32_t i = 0; i < MAX_USER_TEXTURES; i++)
         {
-            // we activate the texture of the plane
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, (textuers).at(material.textureId));
-            glUniform1i(textureLocation, 0);
-            glUniform1f(repeatLocation, material.UVRepeat);
+            TextureSpecification& currTexture = material.textures[i];
+            std::string textureName = "";
+            std::string repeatName = "";
+            if (currTexture.textureId != TEXTURE_NOT_USED)
+            {
+                // we dont want to override systems textures (from index 20 to 31)
+                assert(currTexture.textureId <= MAX_USER_TEXTURES - 1);
+
+                // we pass the needed uniforms
+                textureName = "tex_" + std::to_string(i);
+                GLint textureLocation = glGetUniformLocation(shader.Program, textureName.c_str());
+                repeatName = "repeat_" + std::to_string(i);
+                GLint repeatLocation = glGetUniformLocation(shader.Program, repeatName.c_str());
+
+                // we activate the texture of the plane
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(GL_TEXTURE_2D, (textuers).at(currTexture.textureId));
+                glUniform1i(textureLocation, i);
+                glUniform1f(repeatLocation, currTexture.UVRepeat);
+            }
         }
 
         VgMath::Transform& transform = worldTransform;
@@ -812,25 +808,27 @@ namespace Drop
         glUniform1f(f0Location, material.f0);
 
         //glActiveTexture(GL_TEXTURE2); // old, now we set the system textures from 20th index
-        glActiveTexture(GL_TEXTURE20 + (GL_TEXTURE0 - GL_TEXTURE2));
+        glActiveTexture(SHADOW_MAP_ACTIVE);
         glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
         GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
-        glUniform1i(shadowLocation, MAX_USER_TEXTURES + GL_TEXTURE0 - GL_TEXTURE2);
+        glUniform1i(shadowLocation, SHADOW_MAP_1i);
         //}
 
         for (uint32_t  i = 0; i < MAX_USER_TEXTURES; i++)
         {
             TextureSpecification& currTexture = material.textures[i];
+            std::string textureName = "";
+            std::string repeatName = "";
             if (currTexture.textureId != TEXTURE_NOT_USED)
             {
                 // we dont want to override systems textures (from index 20 to 31)
                 assert(currTexture.textureId <= MAX_USER_TEXTURES - 1);
 
                 // we pass the needed uniforms
-                std::string TextureName = "tex_" + std::to_string(i);
-                GLint textureLocation = glGetUniformLocation(shader.Program, TextureName.c_str());
-                std::string TextureName = "repeat_" + std::to_string(i);
-                GLint repeatLocation = glGetUniformLocation(shader.Program, "repeat");
+                textureName = "tex_" + std::to_string(i);
+                GLint textureLocation = glGetUniformLocation(shader.Program, textureName.c_str());
+                repeatName = "repeat_" + std::to_string(i);
+                GLint repeatLocation = glGetUniformLocation(shader.Program, repeatName.c_str());
 
                 // we activate the texture of the plane
                 glActiveTexture(GL_TEXTURE0 + i);

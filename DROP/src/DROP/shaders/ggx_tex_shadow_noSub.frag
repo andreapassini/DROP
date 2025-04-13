@@ -37,10 +37,10 @@ in vec2 interp_UV;
 in vec4 posLightSpace;
 
 // texture repetitions
-uniform float repeat;
+uniform float repeat_0;
 
 // texture sampler
-uniform sampler2D tex;
+uniform sampler2D tex_0;
 // texture sampler for the depth map
 uniform sampler2D shadowMap;
 
@@ -113,9 +113,9 @@ float G1(float angle, float alpha)
 ///////////// MAIN ////////////////////////////////////////////////
 void main()
 {
-    // we repeat the UVs and we sample the texture
-    vec2 repeated_UV = mod(interp_UV*repeat, 1.0);
-    vec4 surfaceColor = texture(tex, repeated_UV);
+    // we repeat_0 the UVs and we sample the texture
+    vec2 repeated_UV = mod(interp_UV*repeat_0, 1.0);
+    vec4 surfaceColor = texture(tex_0, repeated_UV);
 
     // normalization of the per-fragment normal
     vec3 N = normalize(vNormal);
