@@ -11,7 +11,7 @@ namespace Drop
 	class Input
 	{
 	public: 
-		static GLFWwindow* m_WindowHandle;
+		static GLFWwindow* m_ActiveWindowHandle;
 	public:
 		static bool IsKeyPressed(KeyCode keycode);
 		static bool IsKeyRepeated(KeyCode keycode);
