@@ -24,6 +24,8 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 - [ ] Move the Inputs into a Singleton Components 
 - [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
 - [ ] Fix the scene graph move and remove node, the error is not considering move from another branch
+- [ ] Add cube maps
+- [ ] Port the thread pool system from the Fall Engine
 
 
 # Arachitecture
