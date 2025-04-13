@@ -42,6 +42,10 @@ constexpr glm::vec3 COLOR_LIGHT_GREEN = glm::vec3(
     123.0f / 255.0f,
     239.0f / 255.0f,
     178.0f / 255.0f);
+constexpr glm::vec3 COLOR_LIME_GREEN = glm::vec3(
+    174.0f / 255.0f,
+    233.0f / 255.0f,
+    8.0f / 255.0f);
 constexpr glm::vec3 COLOR_OCEAN_GREEN = glm::vec3(
     77.0f / 255.0f,
     175.0f / 255.0f,
