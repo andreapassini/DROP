@@ -249,7 +249,7 @@ namespace bseecs {
 		// 
 		// Index into this array using the corresponding bit position
 		// found by using m_componentBitPosition
-		std::vector<std::unique_ptr<ISparseSet>> m_componentPools;
+		std::vector<ISparseSet*> m_componentPools;
 
 		struct ComponentInfo
 		{
@@ -397,7 +397,7 @@ namespace bseecs {
 				"(Internal): Attempting to index into m_componentPools with out of range bit position");
 
 			// Downcast the generic pointer to the specific sparse set
-			ISparseSet* genericPtr = m_componentPools[bitPos].get();
+			ISparseSet* genericPtr = m_componentPools[bitPos];
 			SparseSet<T>* pool = dynamic_cast<SparseSet<T>*>(genericPtr);
 			BSEECS_ASSERT(pool, "Dynamic cast failed for component pool '" << typeid(T).name() << "'");
 
@@ -486,7 +486,7 @@ namespace bseecs {
 			current.m_isRequiredInComponents = requiredCompMask;
 			current.m_requiredComponents = ComponentMask();
 
-			m_componentPools.push_back(std::make_unique<SparseSet<T>>());
+			m_componentPools.push_back(new SparseSet<T>());
 
 			// Hello I require you, so beware when you be removed
 			BroadcastRequirements<T, Components...>();

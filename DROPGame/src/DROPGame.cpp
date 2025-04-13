@@ -2,6 +2,7 @@
 #include "Drop/EntryPoint.h"
 
 #include "Drop/input/Input.h"
+#include "DROP/sceneGraph/sceneGraph.h"
 
 using namespace Drop;
 
