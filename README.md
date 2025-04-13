@@ -17,6 +17,14 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 - double click on "GenerateProjects.bat"
 
+# TODO List
+
+- [ ] Convert the scene into a ecs scene
+- [ ] Move the active camera to a singleton component
+- [ ] Move the Inputs into a Singleton Components 
+- [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
+
+
 # Arachitecture
 
 ![DROPArchitecture](https://github.com/user-attachments/assets/8edc2ab9-edb3-4983-beb6-bf3c770f03a7)
