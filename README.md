@@ -19,6 +19,7 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 # TODO List
 
+- [ ] convert the systems that get a transform to get a SceneGraphNode/TransformComponent
 - [ ] Convert the scene into a ecs scene
 - [ ] Move the active camera to a singleton component
 - [ ] Move the Inputs into a Singleton Components 

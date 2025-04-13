@@ -13,15 +13,15 @@
 // It was not working with const ref
 void SceneGraph::CalculateCumulatedTransform(
 	ECS& ecs
-	, SceneGraphNode& node
+	, TransformComponent& node
 ) {
-	SceneGraphNode* currNode = &node;
+	TransformComponent* currNode = &node;
 	VgMath::Transform cumulated = currNode->m_LocalTransform;
 
 	// Avoid recursion, saving stack
 	while (currNode->m_Parent != -1) {
 		cumulated = cumulated * currNode->m_LocalTransform;
-		currNode = ecs.GetComponentPool<SceneGraphNode>().Get(currNode->m_Parent);
+		currNode = ecs.GetComponentPool<TransformComponent>().Get(currNode->m_Parent);
 		if (!currNode) { break; }
 	}
 
@@ -77,7 +77,7 @@ void SceneGraph::CalculateCumulatedTransform(
 void SceneGraph::CalculateWorldTransforms(
 	ECS& ecs
 ) {
-	std::vector<SceneGraphNode>& denseCompPool = ecs.GetComponentPool<SceneGraphNode>().Data();
+	std::vector<TransformComponent>& denseCompPool = ecs.GetComponentPool<TransformComponent>().Data();
 
 	std::vector<std::future<void>> futures;
 

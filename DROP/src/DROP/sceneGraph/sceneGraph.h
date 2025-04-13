@@ -13,7 +13,7 @@ using namespace bseecs;
 
 constexpr EntityID ROOT_ID = -1;
 
-class SceneGraphNode {
+class TransformComponent {
 public:
 	//uint32_t m_Id; // this will be the ECS id so we dont need it
 	
@@ -23,18 +23,18 @@ public:
 	// -1 for is in world space
 	EntityID m_Parent = ROOT_ID;
 
-	SceneGraphNode() 
+	TransformComponent() 
 		: m_Parent(-1), m_LocalTransform() { }
 
-	SceneGraphNode(const VgMath::Transform& transform_val) 
+	TransformComponent(const VgMath::Transform& transform_val) 
 		: m_Parent(-1), m_LocalTransform(transform_val) { };
 
-	SceneGraphNode(const VgMath::Transform& transform_val, EntityID parent_val)
+	TransformComponent(const VgMath::Transform& transform_val, EntityID parent_val)
 		: m_Parent(parent_val), m_LocalTransform(transform_val) { };
 
-	~SceneGraphNode() {};
+	~TransformComponent() {};
 
-	void operator=(const SceneGraphNode& n) {
+	void operator=(const TransformComponent& n) {
 		// this mith be a mess, better fix it later
 		this->m_Parent = n.m_Parent;
 		this->m_LocalTransform = n.m_LocalTransform;
@@ -66,7 +66,7 @@ namespace SceneGraph {
 
 	void CalculateCumulatedTransform(
 		ECS& ecs
-		, SceneGraphNode& node
+		, TransformComponent& node
 	);
 };
 

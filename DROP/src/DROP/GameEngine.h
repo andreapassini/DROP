@@ -63,6 +63,8 @@ namespace Drop
 
 	public:
 
+		bseecs::ECS m_ECS;
+		
 		PhysicsEngine m_PhysicsEngine;
 
 		RendererContext m_renderingContext;
@@ -72,10 +74,7 @@ namespace Drop
 		std::vector<Model> m_Models;
 		std::vector<Material> m_Materials;
 
-		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
-
 		// GPU Particles
-
 
 	private:
 		void Init();

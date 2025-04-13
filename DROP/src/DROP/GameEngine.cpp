@@ -40,7 +40,7 @@ extern bool g_GameEngineRunning;
 #endif
 
 static Drop::GameEngine* s_Instance = nullptr;
-static bseecs::ECS g_ECS{};
+//static bseecs::ECS m_ECS{};
 
 namespace Drop
 {
@@ -122,21 +122,6 @@ namespace Drop
 
 		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 410");
-
-		// Testing ECS
-		g_ECS.RegisterComponent<Transform>();
-
-		// #TODO 
-		// We will have multiple cameras, but only one active camera 
-		//	as a Singleton Component
-		//g_ECS.RegisterComponent<Camera, Transform>();
-
-		g_ECS.RegisterComponent<StaticMeshComponent, Transform>();
-
-		// #TODO to this later, for now focus on simp[le mesh rendering
-		//g_ECS.RegisterComponent<ParticleEmitter, Transform>();
-		//g_ECS.RegisterComponent<Billboard, Transform>();
-		//g_ECS.RegisterComponent<PhysicsObject>();
 	}
 
 	void GameEngine::Run()
@@ -234,10 +219,10 @@ namespace Drop
 			//	m_CumulatedTransforms
 			//);
 
-			SceneGraph::CalculateWorldTransforms(g_ECS);
+			SceneGraph::CalculateWorldTransforms(m_ECS);
 
 			// RENDERER
-			RenderingSystem::Update(g_ECS, m_DeltaTime);
+			RenderingSystem::Update(m_ECS, m_DeltaTime);
 
 			// render your GUI
 			ImGui_ImplOpenGL3_NewFrame();

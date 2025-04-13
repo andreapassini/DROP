@@ -10,16 +10,6 @@ class ExampleGame : public Drop::Game
 public:
 	ExampleGame()
 	{
-		//m_ShadowShader = Shader(
-		//	"..\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert",
-		//	"..\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag"
-  //      );
-
-		//m_LightShader = Shader(
-		//	"..\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert",
-		//	"..\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
-  //      );
-
         GameEngine* gameEngine = GameEngine::GetInstance();
 
 		gameEngine->m_Models.emplace_back("..\\models\\cube.obj");
@@ -30,169 +20,258 @@ public:
         gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\UV_Grid_Sm.png"));
         gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\SoilCracked.png"));
 
-		gameEngine->m_SceneGraph.m_GameObjects[SceneGraph::ROOT_ID].m_LocalTransform.m_Rotate =
-			VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0),
-            VgMath::Vector3(0.0, 1.0, 0.0).normalized());
+        // Testing ECS
+        gameEngine->m_ECS.RegisterComponent<TransformComponent>();
 
+        // #TODO 
+        // We will have multiple cameras, but only one active camera 
+        //	as a Singleton Component
+        //gameEngine->m_ECS.RegisterComponent<Camera, Transform>();
+
+        gameEngine->m_ECS.RegisterComponent<StaticMeshComponent, TransformComponent>();
+
+        // #TODO to this later, for now focus on simple mesh rendering
+        //gameEngine->m_ECS.RegisterComponent<ParticleEmitter, Transform>();
+        //gameEngine->m_ECS.RegisterComponent<Billboard, Transform>();
+        //gameEngine->m_ECS.RegisterComponent<PhysicsObject>();
+
+
+  //      // Root
+		//gameEngine->m_SceneGraph.m_GameObjects[SceneGraph::ROOT_ID].m_LocalTransform.m_Rotate =
+		//	VgMath::Quaternion::angleAxis(VgMath::Degrees(0.0),
+  //          VgMath::Vector3(0.0, 1.0, 0.0).normalized());
 
 		// Plane
-        uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Translate = 
-            VgMath::Vector3(0.0f, -1.0f, 0.0f);
-        gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Scale = 10.0f;
-        gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Rotate =
-            VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0), 
-                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
-            );
-                    
-        Material materialPlane;
-        materialPlane.kd = 3.0f;
-        materialPlane.alpha = 0.2f;
-        materialPlane.f0 = 0.9f;
-        materialPlane.bCastShadow = false;
-        materialPlane.bUseTexture = true;
-        materialPlane.textureId = 1;
-        materialPlane.UVRepeat = 80.0f;
-
-        gameEngine->m_Materials.push_back(materialPlane);
-
-        RenderableObject renderableObjectPlane = RenderableObject{
-                planeSGHandle,
-                3,
-                (uint32_t)(gameEngine->m_Materials.size() - 1)
-        };
-        gameEngine->m_RendereableObjects.push_back(renderableObjectPlane);
-        
-
-
-        // Sphere
-        uint32_t sphereSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate = 
-            VgMath::Vector3(-3.0f, 1.0f, 0.0f);
-        gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Scale = 1.0f;
-        gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Rotate =
-            VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0), 
-                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
-            );
-        
         {
-            Material material = Material{
-                3.0f,   // kd 
-                0.2f,   // Alpha
-                0.9f,   
-                true,
-                true,   // UseTexture
-                0,      // TextureId
-                1.0f    // Repeat
-            };
+            //uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
+            bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+
+            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+            //gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Translate = 
+            //    VgMath::Vector3(0.0f, -1.0f, 0.0f);
+            transform.m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
+            //gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Scale = 10.0f;
+            transform.m_LocalTransform.m_Scale = 10.0f;
+            //gameEngine->m_SceneGraph.m_GameObjects[planeSGHandle].m_LocalTransform.m_Rotate =
+            //    VgMath::Quaternion::angleAxis(
+            //        VgMath::Degrees(90.0), 
+            //        VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+            //    );
+            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+                VgMath::Degrees(90.0),
+                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+            );
+
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            //material.bCastShadow = false;
+            //material.textureId = 1;
+            //material.UVRepeat = 80.0f;
+            material.textures[0].textureId = 1;
+            material.textures[0].UVRepeat = 80.0f;
             gameEngine->m_Materials.push_back(material);
 
-            RenderableObject renderableObject = RenderableObject{
-                sphereSGHandle,
-                1,
-                (uint32_t)(gameEngine->m_Materials.size() - 1)
-            };
-            gameEngine->m_RendereableObjects.push_back(renderableObject);
+            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+            staticMesh.bCastShadow = false;
+            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+            staticMesh.modelId = 3;
+
+            //RenderableObject renderableObjectPlane = RenderableObject{
+            //        planeSGHandle,
+            //        3,
+            //        (uint32_t)(gameEngine->m_Materials.size() - 1)
+            //};
+            //gameEngine->m_RendereableObjects.push_back(renderableObjectPlane);
+        }
+      
+
+        // Sphere
+        //uint32_t sphereSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
+        bseecs::EntityID sphereId = gameEngine->m_ECS.CreateEntity();
+        {
+            //gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Translate = 
+            //    VgMath::Vector3(-3.0f, 1.0f, 0.0f);
+            //gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Scale = 1.0f;
+            //gameEngine->m_SceneGraph.m_GameObjects[sphereSGHandle].m_LocalTransform.m_Rotate =
+            //    VgMath::Quaternion::angleAxis(
+            //        VgMath::Degrees(90.0), 
+            //        VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+            //    );
+            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+            transform.m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
+            transform.m_LocalTransform.m_Scale = 1.0f;
+            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+                VgMath::Degrees(90.0),
+                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+            );
+
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            material.textures[0].textureId = 0;
+            material.textures[0].UVRepeat = 1.0f;
+            gameEngine->m_Materials.push_back(material);
+
+            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+            staticMesh.bCastShadow = true;
+            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+            staticMesh.modelId = 1;
+
+            //RenderableObject renderableObject = RenderableObject{
+            //    sphereSGHandle,
+            //    1,
+            //    (uint32_t)(gameEngine->m_Materials.size() - 1)
+            //};
+            //gameEngine->m_RendereableObjects.push_back(renderableObject);
         }
 
 
         // Cube
-        uint32_t cubeSGHandle = gameEngine->m_SceneGraph.AddObject(sphereSGHandle);
-        gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Translate = 
-            VgMath::Vector3(3.0f, 1.0f, 0.0f);
-        gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Scale = 0.48f;
-        gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Rotate =
-            VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0), 
+        {
+            //uint32_t cubeSGHandle = gameEngine->m_SceneGraph.AddObject(sphereSGHandle);
+            bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+
+            //gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Translate = 
+            //    VgMath::Vector3(3.0f, 1.0f, 0.0f);
+            //gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Scale = 0.48f;
+            //gameEngine->m_SceneGraph.m_GameObjects[cubeSGHandle].m_LocalTransform.m_Rotate =
+            //    VgMath::Quaternion::angleAxis(
+            //        VgMath::Degrees(90.0), 
+            //        VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+            //    );
+            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+            transform.m_Parent = sphereId;
+            transform.m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+            transform.m_LocalTransform.m_Scale = 0.48f;
+            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+                VgMath::Degrees(90.0),
                 VgMath::Vector3(0.0, 1.0, 0.0).normalized()
             );
 
-        {
-            Material material = Material{
-                3.0f,   // kd  
-                0.2f,   // Alpha
-                0.9f,   // F0
-                false,  // CastShadow
-                true,   // UseTexture
-                0,      // TextureId
-                1.0f    // Repeat
-            };
+            //Material material = Material{
+            //    3.0f,   // kd  
+            //    0.2f,   // Alpha
+            //    0.9f,   // F0
+            //    false,  // CastShadow
+            //    true,   // UseTexture
+            //    0,      // TextureId
+            //    1.0f    // Repeat
+            //};
+            //gameEngine->m_Materials.push_back(material);
+
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            material.textures[0].textureId = 0;
+            material.textures[0].UVRepeat = 1.0f;
             gameEngine->m_Materials.push_back(material);
 
-            RenderableObject renderableObject = RenderableObject{
-                cubeSGHandle,
-                0,
-                (uint32_t)(gameEngine->m_Materials.size() - 1)
-            };
-            gameEngine->m_RendereableObjects.push_back(renderableObject);
+            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+            staticMesh.bCastShadow = false;
+            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+            staticMesh.modelId = 0;
+
+            //RenderableObject renderableObject = RenderableObject{
+            //    cubeSGHandle,
+            //    0,
+            //    (uint32_t)(gameEngine->m_Materials.size() - 1)
+            //};
+            //gameEngine->m_RendereableObjects.push_back(renderableObject);
         }
 
 
         // Bunny
-        uint32_t bunnySGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-        gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Translate = 
-            VgMath::Vector3(3.0f, 1.0f, 0.0f);
-        gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Scale = 0.3f;
-        gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Rotate =
-            VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(0.0), 
+        {
+            //uint32_t bunnySGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
+            bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+
+            //gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Translate = 
+            //    VgMath::Vector3(3.0f, 1.0f, 0.0f);
+            //gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Scale = 0.3f;
+            //gameEngine->m_SceneGraph.m_GameObjects[bunnySGHandle].m_LocalTransform.m_Rotate =
+            //    VgMath::Quaternion::angleAxis(
+            //        VgMath::Degrees(0.0), 
+            //        VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+            //    );
+            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+            transform.m_Parent = sphereId;
+            transform.m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+            transform.m_LocalTransform.m_Scale = 0.48f;
+            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+                VgMath::Degrees(90.0),
                 VgMath::Vector3(0.0, 1.0, 0.0).normalized()
             );
 
-        {
-            Material material = Material{
-                3.0f,
-                0.2f,
-                0.9f,
-                true,
-                true,           // UseTexture
-                0,              // TextureId
-                1.0f           // Repeat
-            };
+            //Material material = Material{
+            //    3.0f,
+            //    0.2f,
+            //    0.9f,
+            //    true,
+            //    true,           // UseTexture
+            //    0,              // TextureId
+            //    1.0f           // Repeat
+            //};
+            //gameEngine->m_Materials.push_back(material);
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            material.textures[0].textureId = 0;
+            material.textures[0].UVRepeat = 1.0f;
             gameEngine->m_Materials.push_back(material);
 
-            RenderableObject renderableObject = RenderableObject{
-                bunnySGHandle,
-                2,
-                (uint32_t)(gameEngine->m_Materials.size() - 1)
-            };
-            gameEngine->m_RendereableObjects.push_back(renderableObject);
+            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+            staticMesh.bCastShadow = false;
+            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+            staticMesh.modelId = 2;
+
+            //RenderableObject renderableObject = RenderableObject{
+            //    bunnySGHandle,
+            //    2,
+            //    (uint32_t)(gameEngine->m_Materials.size() - 1)
+            //};
+            //gameEngine->m_RendereableObjects.push_back(renderableObject);
         }
 
-        gameEngine->m_CumulatedTransforms.reserve(gameEngine->m_SceneGraph.m_GameObjects.size());
 
-		// Now the 2 maps have all the keys as the SceneGraph
-		for (auto& it : gameEngine->m_SceneGraph.m_GameObjects)
-		{
-            gameEngine->m_CumulatedTransforms[it.first] = VgMath::Transform();
-		}
+        //gameEngine->m_CumulatedTransforms.reserve(gameEngine->m_SceneGraph.m_GameObjects.size());
 
-        {
-            // when emplace_back at back, it will call destructor
-            // on the last element to use the new back
-            // https://www.youtube.com/watch?v=FdaYlWOV084
-            //gameEngine->m_DrawableLines.reserve(3);
-            // To avoid resizing we cancel the copy constructor
+        SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
 
-            gameEngine->m_DrawableLines.emplace_back(
-                glm::vec3(0),
-                glm::vec3(1)
-                , DEFAULT_HIT_COLOR
-            );
+		//// Now the 2 maps have all the keys as the SceneGraph
+		//for (auto& it : gameEngine->m_SceneGraph.m_GameObjects)
+		//{
+  //          gameEngine->m_CumulatedTransforms[it.first] = VgMath::Transform();
+		//}
 
-            gameEngine->m_DrawableLines.emplace_back(
-           glm::vec3(1.1),
-                glm::vec3(2)
-                , COLOR_AMBER
-            );
-            
-            gameEngine->m_DrawableLines.emplace_back(
-           glm::vec3(2.1),
-                glm::vec3(3)
-            );
-        }
+  //      {
+  //          // when emplace_back at back, it will call destructor
+  //          // on the last element to use the new back
+  //          // https://www.youtube.com/watch?v=FdaYlWOV084
+  //          //gameEngine->m_DrawableLines.reserve(3);
+  //          // To avoid resizing we cancel the copy constructor
+
+  //          gameEngine->m_DrawableLines.emplace_back(
+  //              glm::vec3(0),
+  //              glm::vec3(1)
+  //              , DEFAULT_HIT_COLOR
+  //          );
+
+  //          gameEngine->m_DrawableLines.emplace_back(
+  //         glm::vec3(1.1),
+  //              glm::vec3(2)
+  //              , COLOR_AMBER
+  //          );
+  //          
+  //          gameEngine->m_DrawableLines.emplace_back(
+  //         glm::vec3(2.1),
+  //              glm::vec3(3)
+  //          );
+  //      }
 
         m_VSync = gameEngine->GetWindowHandle().IsVSync();
 	}
@@ -225,7 +304,7 @@ public:
     virtual void OnUpdate(float deltaTime) {
 
         GameEngine* gameEngine = GameEngine::GetInstance();
-        Renderer& renderer = gameEngine->m_Renderer;
+        //Renderer& renderer = gameEngine->m_Renderer;
 
         gameEngine->GetWindowHandle().SetVSync(m_VSync);
 
