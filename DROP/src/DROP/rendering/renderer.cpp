@@ -394,7 +394,7 @@ namespace Drop
                 // we activate the texture of the plane
                 GLint textureLocation = glGetUniformLocation(billboardShader->Program, "tex0");
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, sceneContext.textuers[particle.textureID]);
+                glBindTexture(GL_TEXTURE_2D, (*sceneContext.textuers)[particle.textureID]);
                 glUniform1i(textureLocation, 0);
                 glCheckError();
 
@@ -479,7 +479,7 @@ namespace Drop
             // we activate the texture of the plane
             GLint textureLocation = glGetUniformLocation(billboardShader->Program, "tex0");
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, sceneContext.textuers[billboard.textureID]);
+            glBindTexture(GL_TEXTURE_2D, (*sceneContext.textuers)[billboard.textureID]);
             glUniform1i(textureLocation, 0);
             glCheckError();
 
@@ -668,7 +668,7 @@ namespace Drop
         , SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
-        std::vector<Material>& materials = sceneContext.materials;
+        std::vector<Material>& materials = *sceneContext.materials;
         assert(materials.size() > meshComponent.materialId);
         Material& material = materials[meshComponent.materialId];
 
@@ -676,11 +676,11 @@ namespace Drop
         assert(shaders.size() > material.shaderID);
         Shader& shader = shaders[meshComponent.materialId];
         
-        std::vector<Model>& models = sceneContext.models;
+        std::vector<Model>& models = *sceneContext.models;
         assert(models.size() > meshComponent.modelId);
         Model& model = models[meshComponent.modelId];
 
-        std::vector<TextureID>& textuers = sceneContext.textuers;
+        std::vector<TextureID>& textuers = *sceneContext.textuers;
 
         for (uint32_t i = 0; i < MAX_USER_TEXTURES; i++)
         {
@@ -746,11 +746,11 @@ namespace Drop
         , SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
-        std::vector<Model>& models = sceneContext.models;
+        std::vector<Model>& models = *sceneContext.models;
         assert(models.size() > meshComponent.modelId);
         Model& model = models[meshComponent.modelId];
 
-        std::vector<Material>& materials = sceneContext.materials;
+        std::vector<Material>& materials = *sceneContext.materials;
         assert(materials.size() > meshComponent.materialId);
         Material& material = materials[meshComponent.materialId];
 
@@ -796,7 +796,7 @@ namespace Drop
         // we assign the value to the uniform variables
         glUniform3fv(lightDirLocation, 1, glm::value_ptr(sceneContext.lightDir));
 
-        std::vector<TextureID>& textuers = sceneContext.textuers;
+        std::vector<TextureID>& textuers = *sceneContext.textuers;
 
         //{   // without this scope there is an error for the variable "**location" not used
         GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");

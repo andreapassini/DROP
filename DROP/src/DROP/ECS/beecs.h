@@ -219,7 +219,7 @@ namespace bseecs {
 	public:
 		SingletonComponent(Arena& arenaAllocator)
 		{
-			m_Component = Drop::Allocate<T>(arenaAllocator);
+			m_Component = Allocate<T>(arenaAllocator, sizeof(T));
 		};
 
 		T* m_Component = nullptr;

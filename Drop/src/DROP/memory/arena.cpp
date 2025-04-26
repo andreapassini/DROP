@@ -14,9 +14,9 @@ T* Allocate(Arena* const arena, const size_t size)
 	T* outPtr = nullptr;
 
 	Arena* currentArena = arena;
+	assert(currentArena);
 
 	// Arena doesn't have extra size
-	assert(currentArena);
 	while (!(currentArena->size + size <= currentArena->capacity))
 	{
 		if (!currentArena->nextArena)

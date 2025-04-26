@@ -122,29 +122,46 @@ namespace Drop
 
 		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 410");
+
+
 	}
 
 	void GameEngine::Run()
 	{
 		m_Running = true;
 
-		SceneContext sceneContext{
-			m_Game->m_Camera.GetViewMatrix()
-			, m_Game->m_Camera.GetProjectionMatrix()
-			, m_Game->m_LightDir
-			, m_Game->m_lightSpaceMatrix
-			, m_Models
-			, m_Materials
-			, m_TextureIds
-			, m_ActiveWindowHandle->GetWidth()
-			, m_ActiveWindowHandle->GetHeight()
-			, m_Game->m_Wireframe
-		};	
+		Arena arena;
+
+		m_ECS.RegisterSingletonComponent<SceneContext>(arena);
+
+		SceneContext& sceneContext = m_ECS.GetSingletonComponent<SceneContext>();
+
+		sceneContext.view = m_Game->m_Camera.GetViewMatrix();
+		sceneContext.projection = m_Game->m_Camera.GetProjectionMatrix();
+		sceneContext.lightDir = m_Game->m_LightDir;
+		sceneContext.lightSpaceMatrix = m_Game->m_lightSpaceMatrix;
 		
-		RendererContext renderContext{
-			Input::m_ActiveWindowHandle
-			,
-		};
+		sceneContext.models = &m_Models;
+		sceneContext.materials = &m_Materials;
+		sceneContext.textuers = &m_TextureIds;
+		sceneContext.wireframe = m_Game->m_Wireframe;
+
+		//{
+		//	
+		//	, m_Game->m_Camera.()
+		//	, m_Game->m_LightDir
+		//	, m_Game->m_lightSpaceMatrix
+		//	, m_Models
+		//	, m_Materials
+		//	, m_TextureIds
+		//	, m_ActiveWindowHandle->GetWidth()
+		//	, m_ActiveWindowHandle->GetHeight()
+		//	, m_Game->m_Wireframe
+		//};	
+		// = sceneContext;
+		
+		RendererContext renderContext{};
+		renderContext.window = Input::m_ActiveWindowHandle;
 
 		// #TODO add particle components later
 		//ParticleEmitter particleEmitter;
