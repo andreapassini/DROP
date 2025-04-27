@@ -482,8 +482,8 @@ namespace bseecs {
 
 			ComponentInfo& current = m_componentBitPosition[name];
 			current.m_bitPosition = m_componentPools.size();
-			current.m_isRequiredInComponents = requiredCompMask;
-			current.m_requiredComponents = ComponentMask();
+			current.m_requiredComponents = requiredCompMask;
+			current.m_isRequiredInComponents = ComponentMask();
 
 			m_componentPools.push_back(new SparseSet<T>());
 
