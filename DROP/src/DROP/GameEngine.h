@@ -67,7 +67,8 @@ namespace Drop
 		
 		PhysicsEngine m_PhysicsEngine;
 
-		RendererContext m_renderingContext;
+		// Memory
+		Arena arena;
 
 		// Assets
 		std::vector<TextureID> m_TextureIds;

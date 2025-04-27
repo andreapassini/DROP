@@ -92,11 +92,6 @@ namespace Drop
 		m_ActiveWindowHandle = std::unique_ptr<Window>(Window::Create());
 		Input::m_ActiveWindowHandle = (GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow();
 
-		Renderer::Init(
-			(GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow()
-			, m_renderingContext
-		);
-
 		// ImGui SETUP
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -124,15 +119,21 @@ namespace Drop
 		ImGui_ImplOpenGL3_Init("#version 410");
 
 
+		m_ECS.RegisterSingletonComponent<SceneContext>(arena);
+		m_ECS.RegisterSingletonComponent<RendererContext>(arena);
+
+		RendererContext* renderContext = &m_ECS.GetSingletonComponent<RendererContext>();
+
+		Renderer::Init(
+			(GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow()
+			, *renderContext
+		);
+
 	}
 
 	void GameEngine::Run()
 	{
 		m_Running = true;
-
-		Arena arena;
-
-		m_ECS.RegisterSingletonComponent<SceneContext>(arena);
 
 		SceneContext& sceneContext = m_ECS.GetSingletonComponent<SceneContext>();
 
@@ -145,22 +146,9 @@ namespace Drop
 		sceneContext.materials = &m_Materials;
 		sceneContext.textuers = &m_TextureIds;
 		sceneContext.wireframe = m_Game->m_Wireframe;
+	
+		RendererContext& renderContext = m_ECS.GetSingletonComponent<RendererContext>();
 
-		//{
-		//	
-		//	, m_Game->m_Camera.()
-		//	, m_Game->m_LightDir
-		//	, m_Game->m_lightSpaceMatrix
-		//	, m_Models
-		//	, m_Materials
-		//	, m_TextureIds
-		//	, m_ActiveWindowHandle->GetWidth()
-		//	, m_ActiveWindowHandle->GetHeight()
-		//	, m_Game->m_Wireframe
-		//};	
-		// = sceneContext;
-		
-		RendererContext renderContext{};
 		renderContext.window = Input::m_ActiveWindowHandle;
 
 		// #TODO add particle components later

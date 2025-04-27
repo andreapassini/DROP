@@ -20,7 +20,7 @@
 #ifndef BSEECS_ASSERTS
 	#define BSEECS_ASSERT(condition, msg) \
 		if (!(condition)) { \
-			std::cerr << "[BSEECS error]: " << msg << std::endl; \
+			std::cerr << "[BSEECS error] " << "\n" << __FILE__ << "(" << __LINE__ << ") "  << "\n" << __FUNCTION__ << ": " << "\n\t" << msg << std::endl; \
 			::abort(); \
 		}
 #endif
@@ -210,16 +210,15 @@ namespace bseecs {
 
 	class ISingletonComponent {
 	public:
-		ISingletonComponent(Arena& arenaAllocator) {};
+		ISingletonComponent() {};
 	};
 
 	template<typename T>
 	class SingletonComponent : public ISingletonComponent
 	{
 	public:
-		SingletonComponent(Arena& arenaAllocator)
-		{
-			m_Component = Allocate<T>(arenaAllocator, sizeof(T));
+		SingletonComponent() {
+			m_Component = new T;
 		};
 
 		T* m_Component = nullptr;
@@ -354,7 +353,7 @@ namespace bseecs {
 		template <typename DependentComponent, typename RequiredComponent>
 		void SetRequirements()
 		{
-			TypeName name = typeid(RequiredComponent).name();
+			TypeName name = typeid(DependentComponent).name();
 			ComponentMask& requiredCompMask = m_componentBitPosition.find(name)->second.m_isRequiredInComponents;
 			SetComponentBit<DependentComponent>(requiredCompMask, 1);
 		}
@@ -700,7 +699,7 @@ namespace bseecs {
 		{
 			size_t bitPos = GetSingletonComponentBitPosition<T>();
 
-			BSEECS_ASSERT(bitPos == tombstone
+			BSEECS_ASSERT(bitPos != tombstone
 				, "Attempting to operate on unregistered component '" << typeid(T).name() << "'");
 			
 
@@ -732,7 +731,7 @@ namespace bseecs {
 			SingletonComponentInfo& current = m_singeltonComponentBitPosition[name];
 			current.m_bitPosition = m_singletonComponents.size();
 
-			m_singletonComponents.push_back(new ISingletonComponent(arenaAllocator));
+			m_singletonComponents.push_back(new SingletonComponent<T>());
 
 			BSEECS_INFO("Registered component '" << name << "'");
 		}

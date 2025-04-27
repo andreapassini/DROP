@@ -15,49 +15,49 @@ public:
 
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             //FULL_COLOR_SHADER
-            Shader(
+            
                 "..\\DROP\\Drop\\src\\DROP\\shaders\\00_basic.vert"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\01_fullcolor.frag"
-            )            
+                        
         );
 
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             // ILLUMINATION_GGX_SHADER
-            Shader(
+            
                 "..\\DROP\\Drop\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
-            )
+            
         );
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             // SHADOW_SHADER
-            Shader(
+            
                 "..\\DROP\\Drop\\src\\DROP\\shaders\\19_shadowmap.vert"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\20_shadowmap.frag"
-            )
+            
         );
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             // EMPTY_QUAD_SHADER
-            Shader(
+            
                 "..\\DROP\\Drop\\src\\DROP\\shaders\\quadFrustum.vert"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\quadFrustum.geom"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\quadFrustum.frag"
-            )
+            
         );
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             // EMPTY_BOX_SHADER
-            Shader(
+            
                 "..\\DROP\\Drop\\src\\DROP\\shaders\\boxFrustum.vert"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\boxFrustum.geom"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\boxFrustum.frag"
-            )
+            
         );
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             // BILLBOARD_SHADER
-            Shader(
+            
                 "..\\DROP\\Drop\\src\\DROP\\shaders\\billboard.vert"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\billboard.geom"
                 , "..\\DROP\\Drop\\src\\DROP\\shaders\\billboard.frag"
-            )
+            
         );
 
         gameEngine->m_Models.emplace_back("..\\models\\cube.obj");
