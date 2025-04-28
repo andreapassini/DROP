@@ -46,7 +46,8 @@
 #define ILLUMINATION_GGX_SHADER 1
 #define SHADOW_SHADER 2
 #define EMPTY_QUAD_SHADER 3
-#define BILLBOARD_SHADER 4
+#define EMPTY_BOX_SHADER 4
+#define BILLBOARD_SHADER 5
 
 namespace Drop
 {
