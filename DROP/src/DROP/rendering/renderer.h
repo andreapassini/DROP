@@ -52,10 +52,12 @@
 namespace Drop
 {
     struct SceneContext {
-        glm::mat4 view;
-        glm::mat4 projection;
-        glm::vec3 lightDir;
+        Camera* camera;
+        //glm::mat4 view;
+        //glm::mat4 projection;
+        
         glm::mat4 lightSpaceMatrix;
+        glm::vec3 lightDir;
 
         std::vector<Model>* models;
         std::vector<Material>* materials;

@@ -15,41 +15,41 @@ public:
 
         //FULL_COLOR_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\DROP\\src\\DROP\\shaders\\00_basic.vert"
-            , "..\\DROP\\src\\DROP\\shaders\\01_fullcolor.frag"
+            "..\\Drop\\src\\DROP\\shaders\\00_basic.vert"
+            , "..\\Drop\\src\\DROP\\shaders\\01_fullcolor.frag"
         );
 
         // ILLUMINATION_GGX_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\DROP\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert"
-            , "..\\DROP\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
+            "..\\Drop\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert"
+            , "..\\Drop\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
         );
 
         // SHADOW_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\DROP\\src\\DROP\\shaders\\19_shadowmap.vert"
-            , "..\\DROP\\src\\DROP\\shaders\\20_shadowmap.frag"
+            "..\\Drop\\src\\DROP\\shaders\\19_shadowmap.vert"
+            , "..\\Drop\\src\\DROP\\shaders\\20_shadowmap.frag"
         );
 
         // EMPTY_QUAD_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\DROP\\src\\DROP\\shaders\\quadFrustum.vert"
-            , "..\\DROP\\src\\DROP\\shaders\\quadFrustum.geom"
-            , "..\\DROP\\src\\DROP\\shaders\\quadFrustum.frag"
+            "..\\Drop\\src\\DROP\\shaders\\quadFrustum.vert"
+            , "..\\Drop\\src\\DROP\\shaders\\quadFrustum.geom"
+            , "..\\Drop\\src\\DROP\\shaders\\quadFrustum.frag"
         );
 
         // EMPTY_BOX_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\DROP\\src\\DROP\\shaders\\boxFrustum.vert"
-            , "..\\DROP\\src\\DROP\\shaders\\boxFrustum.geom"
-            , "..\\DROP\\src\\DROP\\shaders\\boxFrustum.frag"
+            "..\\Drop\\src\\DROP\\shaders\\boxFrustum.vert"
+            , "..\\Drop\\src\\DROP\\shaders\\boxFrustum.geom"
+            , "..\\Drop\\src\\DROP\\shaders\\boxFrustum.frag"
         );
 
         // BILLBOARD_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\DROP\\src\\DROP\\shaders\\billboard.vert"
-            , "..\\DROP\\src\\DROP\\shaders\\billboard.geom"
-            , "..\\DROP\\src\\DROP\\shaders\\billboard.frag"
+            "..\\Drop\\src\\DROP\\shaders\\billboard.vert"
+            , "..\\Drop\\src\\DROP\\shaders\\billboard.geom"
+            , "..\\Drop\\src\\DROP\\shaders\\billboard.frag"
         );
 
         gameEngine->m_Models.emplace_back("..\\models\\cube.obj");
@@ -94,6 +94,7 @@ public:
             material.f0 = 0.9f;
             material.textures[0].textureId = 1;
             material.textures[0].UVRepeat = 80.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
 
             StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
@@ -120,6 +121,7 @@ public:
             material.f0 = 0.9f;
             material.textures[0].textureId = 0;
             material.textures[0].UVRepeat = 1.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
 
             StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(sphereId);
@@ -135,7 +137,7 @@ public:
 
             TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
             transform.m_Parent = sphereId;
-            transform.m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+            transform.m_LocalTransform.m_Translate = VgMath::Vector3(7.0f, 1.0f, 0.0f);
             transform.m_LocalTransform.m_Scale = 0.48f;
             transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
                 VgMath::Degrees(90.0),
@@ -148,6 +150,7 @@ public:
             material.f0 = 0.9f;
             material.textures[0].textureId = 0;
             material.textures[0].UVRepeat = 1.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
 
             StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
@@ -176,6 +179,7 @@ public:
             material.f0 = 0.9f;
             material.textures[0].textureId = 0;
             material.textures[0].UVRepeat = 1.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
 
             StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
@@ -273,6 +277,8 @@ public:
         m_SumDeltaTime += m_DebugDeltaTime;
         m_Frames += 1;
         averageDeltaTime = m_SumDeltaTime / m_Frames;
+
+        //std::cin.get();
     }
 
     void Callbacks()

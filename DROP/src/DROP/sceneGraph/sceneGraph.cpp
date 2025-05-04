@@ -17,6 +17,7 @@ void SceneGraph::CalculateCumulatedTransform(
 ) {
 	TransformComponent* currNode = &node;
 	VgMath::Transform cumulated = currNode->m_LocalTransform;
+	//VgMath::Transform cumulated;
 
 	// Avoid recursion, saving stack
 	while (currNode->m_Parent != ROOT_ID) {
@@ -79,20 +80,26 @@ void SceneGraph::CalculateWorldTransforms(
 ) {
 	std::vector<TransformComponent>& denseCompPool = ecs.GetComponentPool<TransformComponent>().Data();
 
-	std::vector<std::future<void>> futures;
+	//std::vector<std::future<void>> futures;
+	//for (TransformComponent& it : denseCompPool) {
+	//	futures.push_back(
+	//		std::async(std::launch::async, 
+	//			CalculateCumulatedTransform
+	//			, ecs
+	//			, it
+	//		)
+	//	);		
+	//}
+	//for (auto& handle : futures) {
+	//	handle.wait();
+	//}
 
-	for (auto& it : denseCompPool) {
-		futures.push_back(
-			std::async(std::launch::async, 
-				CalculateCumulatedTransform
-				, ecs
-				, it
-			)
-		);		
-	}
-
-	for (auto& handle : futures) {
-		handle.wait();
+	for (TransformComponent& it : denseCompPool)
+	{
+		CalculateCumulatedTransform(
+			ecs
+			, it
+		);
 	}
 }
 

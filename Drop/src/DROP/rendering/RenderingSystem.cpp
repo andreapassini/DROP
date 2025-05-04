@@ -36,7 +36,6 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		);
 	}
 	
-
 	
 	// set the color buffer
 	Renderer::SetupColorPass(
@@ -47,7 +46,6 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	for (size_t i = 0; i < denseMeshComponents.size(); i++)
 	{
 		StaticMeshComponent& meshComponent = denseMeshComponents[i];
-		if (!meshComponent.bCastShadow) continue;
 
 		TransformComponent& transformComp = ecs.GetSibiling<StaticMeshComponent, TransformComponent>(i);
 		Transform& worldTransform = transformComp.m_CumulatedTransform;
@@ -94,7 +92,6 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	//		denseParticleEmitters
 	//	);
 	//}
-
 }
 
 //// Move this function into the RenderingSystem::Update function

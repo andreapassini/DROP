@@ -174,7 +174,7 @@ namespace Drop
     //            sceneContext.models,
     //            sceneContext.materials,
     //            cumulatedTransforms,
-    //            sceneContext.view,
+    //            sceneContext.camera->GetViewMatrix(),
     //            (renderableObjects)[i].SHADOWMAP,
     //            rendererContext.depthMap
     //        );
@@ -209,7 +209,7 @@ namespace Drop
     //        )
     //        , 1
     //        , GL_FALSE
-    //        , glm::value_ptr(sceneContext.projection)
+    //        , glm::value_ptr(sceneContext.camera->GetProjectionMatrix())
     //    );
     //    glUniformMatrix4fv(
     //        glGetUniformLocation(
@@ -218,7 +218,7 @@ namespace Drop
     //        )
     //        , 1
     //        , GL_FALSE
-    //        , glm::value_ptr(sceneContext.view)
+    //        , glm::value_ptr(sceneContext.camera->GetViewMatrix())
     //    );
     //    glUniformMatrix4fv(
     //        glGetUniformLocation(
@@ -246,7 +246,7 @@ namespace Drop
     //            sceneContext.models,
     //            sceneContext.materials,
     //            cumulatedTransforms,
-    //            sceneContext.view,
+    //            sceneContext.camera->GetViewMatrix(),
     //            (renderableObjects)[i].RENDER,
     //            rendererContext.depthMap
     //        );
@@ -289,7 +289,7 @@ namespace Drop
     //        )
     //        , 1
     //        , GL_FALSE
-    //        , glm::value_ptr(sceneContext.projection)
+    //        , glm::value_ptr(sceneContext.camera->GetProjectionMatrix())
     //    );
     //    glUniformMatrix4fv(
     //        glGetUniformLocation(
@@ -298,7 +298,7 @@ namespace Drop
     //        )
     //        , 1
     //        , GL_FALSE
-    //        , glm::value_ptr(sceneContext.view)
+    //        , glm::value_ptr(sceneContext.camera->GetViewMatrix())
     //    );
 
     //    // we render the scene
@@ -311,7 +311,7 @@ namespace Drop
     //            sceneContext.models,
     //            sceneContext.materials,
     //            cumulatedTransforms,
-    //            sceneContext.view
+    //            sceneContext.camera->GetViewMatrix()
     //        );
     //    }
     //}
@@ -334,11 +334,11 @@ namespace Drop
 
         // we pass projection and view matrices to the Shader Program
         GLint projectionMatrixLocation = glGetUniformLocation(billboardShader->Program, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetProjectionMatrix()));
         glCheckError();
 
         GLint viewMatrixLocation = glGetUniformLocation(billboardShader->Program, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.view));
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetViewMatrix()));
         glCheckError();
 
         //// VAO is made "active"
@@ -427,11 +427,11 @@ namespace Drop
 
         // we pass projection and view matrices to the Shader Program
         GLint projectionMatrixLocation = glGetUniformLocation(billboardShader->Program, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetProjectionMatrix()));
         glCheckError();
 
         GLint viewMatrixLocation = glGetUniformLocation(billboardShader->Program, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.view));
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetViewMatrix()));
         glCheckError();
 
         //// VAO is made "active"
@@ -501,9 +501,9 @@ namespace Drop
         debugShader->Use();
 
         GLint projectionMatrixLocation = glGetUniformLocation(debugShader->Program, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetProjectionMatrix()));
         GLint viewMatrixLocation = glGetUniformLocation(debugShader->Program, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.view));
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetViewMatrix()));
 
         for (size_t i = 0; i < drawableLines.size(); i++)
         {
@@ -539,11 +539,11 @@ namespace Drop
 
         // we pass projection and view matrices to the Shader Program
         GLint projectionMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.projection));
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetProjectionMatrix()));
         glCheckError();
 
         GLint viewMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.view));
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetViewMatrix()));
         glCheckError();
 
         //// VAO is made "active"
@@ -626,6 +626,8 @@ namespace Drop
         const SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
+        LOG_INFO("--- SetupShadowPass ---");
+
         /////////////////// STEP 1 - SHADOW MAP: RENDERING OF SCENE FROM LIGHT POINT OF VIEW ////////////////////////////////////////////////
         // we set view and projection matrix for the rendering using light as a camera
         glm::mat4 lightProjection, lightView;
@@ -668,14 +670,21 @@ namespace Drop
         , SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
+        // Clear prev error
+        glCheckError();
+
         std::vector<Material>& materials = *sceneContext.materials;
         assert(materials.size() > meshComponent.materialId);
         Material& material = materials[meshComponent.materialId];
 
+        LOG_INFO("Material ID in use: {0}", meshComponent.materialId);
+
         std::vector<Shader>& shaders = rendererContext.shaders;
-        assert(shaders.size() > material.shaderID);
-        Shader& shader = shaders[meshComponent.materialId];
+        assert(shaders.size() > SHADOW_SHADER);
+        Shader& shader = shaders[SHADOW_SHADER];
         
+        LOG_INFO("Shader ID in use: {0}", SHADOW_SHADER);
+
         std::vector<Model>& models = *sceneContext.models;
         assert(models.size() > meshComponent.modelId);
         Model& model = models[meshComponent.modelId];
@@ -695,8 +704,11 @@ namespace Drop
                 // we pass the needed uniforms
                 textureName = "tex_" + std::to_string(i);
                 GLint textureLocation = glGetUniformLocation(shader.Program, textureName.c_str());
+                glCheckError();
+
                 repeatName = "repeat_" + std::to_string(i);
                 GLint repeatLocation = glGetUniformLocation(shader.Program, repeatName.c_str());
+                glCheckError();
 
                 // we activate the texture of the plane
                 glActiveTexture(GL_TEXTURE0 + i);
@@ -710,9 +722,12 @@ namespace Drop
         glm::mat4 modelMatrix(1.0f);
         SceneGraph::TransformToMatrix(transform, modelMatrix);
 
-        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(sceneContext.view * modelMatrix));
+        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(sceneContext.camera->GetViewMatrix() * modelMatrix));
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glCheckError();
+
         glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
+        glCheckError();
 
         model.Draw();
     }
@@ -721,6 +736,8 @@ namespace Drop
         const SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
+        LOG_INFO("--- SetupColorPass ---");
+
         /////////////////// STEP 2 - SCENE RENDERING FROM CAMERA ////////////////////////////////////////////////
 
         // we activate back the standard Frame Buffer
@@ -750,13 +767,19 @@ namespace Drop
         assert(models.size() > meshComponent.modelId);
         Model& model = models[meshComponent.modelId];
 
+        LOG_INFO("Model ID in use: {0}", meshComponent.modelId);
+
         std::vector<Material>& materials = *sceneContext.materials;
         assert(materials.size() > meshComponent.materialId);
         Material& material = materials[meshComponent.materialId];
 
+        LOG_INFO("\tMaterial ID in use: {0}", meshComponent.materialId);
+
         std::vector<Shader>& shaders = rendererContext.shaders;
         assert(shaders.size() > meshComponent.materialId);
         Shader& shader = shaders[material.shaderID];
+
+        LOG_INFO("\tShader ID in use: {0}", material.shaderID);
 
         // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
         shader.Use();
@@ -769,7 +792,7 @@ namespace Drop
             )
             , 1
             , GL_FALSE
-            , glm::value_ptr(sceneContext.projection)
+            , glm::value_ptr(sceneContext.camera->GetProjectionMatrix())
         );
         glUniformMatrix4fv(
             glGetUniformLocation(
@@ -778,7 +801,7 @@ namespace Drop
             )
             , 1
             , GL_FALSE
-            , glm::value_ptr(sceneContext.view)
+            , glm::value_ptr(sceneContext.camera->GetViewMatrix())
         );
         glUniformMatrix4fv(
             glGetUniformLocation(
@@ -795,24 +818,37 @@ namespace Drop
 
         // we assign the value to the uniform variables
         glUniform3fv(lightDirLocation, 1, glm::value_ptr(sceneContext.lightDir));
+        glCheckError();
 
         std::vector<TextureID>& textuers = *sceneContext.textuers;
 
-        //{   // without this scope there is an error for the variable "**location" not used
-        GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
-        GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
-        GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+        {   // without this scope there is an error for the variable "**location" not used
+            GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+            GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
+            GLint f0Location = glGetUniformLocation(shader.Program, "F0");
 
-        glUniform1f(kdLocation, material.kd);
-        glUniform1f(alphaLocation, material.alpha);
-        glUniform1f(f0Location, material.f0);
+            glUniform1f(kdLocation, material.kd);
+            glCheckError();
 
-        //glActiveTexture(GL_TEXTURE2); // old, now we set the system textures from 20th index
-        glActiveTexture(SHADOW_MAP_ACTIVE);
-        glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
-        GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
-        glUniform1i(shadowLocation, SHADOW_MAP_1i);
-        //}
+            glUniform1f(alphaLocation, material.alpha);
+            glCheckError();
+
+            glUniform1f(f0Location, material.f0);
+            glCheckError();
+
+            //glActiveTexture(GL_TEXTURE2); // old, now we set the system textures from 20th index
+            glActiveTexture(SHADOW_MAP_ACTIVE);
+            glCheckError();
+
+            glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
+            glCheckError();
+
+            GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
+            glCheckError();
+
+            glUniform1i(shadowLocation, SHADOW_MAP_1i);
+            glCheckError();
+        }
 
         for (uint32_t  i = 0; i < MAX_USER_TEXTURES; i++)
         {
@@ -827,14 +863,25 @@ namespace Drop
                 // we pass the needed uniforms
                 textureName = "tex_" + std::to_string(i);
                 GLint textureLocation = glGetUniformLocation(shader.Program, textureName.c_str());
+                glCheckError();
+
                 repeatName = "repeat_" + std::to_string(i);
                 GLint repeatLocation = glGetUniformLocation(shader.Program, repeatName.c_str());
+                glCheckError();
 
                 // we activate the texture of the plane
+
                 glActiveTexture(GL_TEXTURE0 + i);
+                glCheckError();
+
                 glBindTexture(GL_TEXTURE_2D, (textuers).at(currTexture.textureId));
+                glCheckError();
+
                 glUniform1i(textureLocation, i);
+                glCheckError();
+
                 glUniform1f(repeatLocation, currTexture.UVRepeat);
+                glCheckError();
             }
         }
 
@@ -843,9 +890,12 @@ namespace Drop
         glm::mat4 modelMatrix(1.0f);
         SceneGraph::TransformToMatrix(transform, modelMatrix);
 
-        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(sceneContext.view * modelMatrix));
+        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(sceneContext.camera->GetViewMatrix() * modelMatrix));
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glCheckError();
+
         glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
+        glCheckError();
 
         model.Draw();
     }

@@ -137,8 +137,10 @@ namespace Drop
 
 		SceneContext& sceneContext = m_ECS.GetSingletonComponent<SceneContext>();
 
-		sceneContext.view = m_Game->m_Camera.GetViewMatrix();
-		sceneContext.projection = m_Game->m_Camera.GetProjectionMatrix();
+		//sceneContext.view = m_Game->m_Camera.GetViewMatrix();
+		//sceneContext.projection = m_Game->m_Camera.GetProjectionMatrix();
+		sceneContext.camera = &m_Game->m_Camera;
+
 		sceneContext.lightDir = m_Game->m_LightDir;
 		sceneContext.lightSpaceMatrix = m_Game->m_lightSpaceMatrix;
 		
@@ -226,7 +228,6 @@ namespace Drop
 
 			SceneGraph::CalculateWorldTransforms(m_ECS);
 
-			// RENDERER
 			RenderingSystem::Update(m_ECS, m_DeltaTime);
 
 			// render your GUI
