@@ -767,6 +767,7 @@ namespace Drop
         assert(models.size() > meshComponent.modelId);
         Model& model = models[meshComponent.modelId];
 
+        LOG_INFO(" --- ");
         LOG_INFO("Model ID in use: {0}", meshComponent.modelId);
 
         std::vector<Material>& materials = *sceneContext.materials;
@@ -774,6 +775,9 @@ namespace Drop
         Material& material = materials[meshComponent.materialId];
 
         LOG_INFO("\tMaterial ID in use: {0}", meshComponent.materialId);
+        LOG_INFO("\t\tkd: {0}", material.kd);
+        LOG_INFO("\t\talpha: {0}", material.alpha);
+        LOG_INFO("\t\tF0: {0}", material.f0);
 
         std::vector<Shader>& shaders = rendererContext.shaders;
         assert(shaders.size() > meshComponent.materialId);
