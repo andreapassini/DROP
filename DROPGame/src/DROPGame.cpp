@@ -13,52 +13,55 @@ public:
 	{
         GameEngine* gameEngine = GameEngine::GetInstance();
 
+#pragma region ShaderSetup
         //FULL_COLOR_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\00_basic.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\01_fullcolor.frag"
+            "..\\..\\..\\Drop\\src\\DROP\\shaders\\00_basic.vert"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\01_fullcolor.frag"
         );
 
         // ILLUMINATION_GGX_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
+            "..\\..\\..\\Drop\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
         );
 
         // SHADOW_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\19_shadowmap.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\20_shadowmap.frag"
+            "..\\..\\..\\Drop\\src\\DROP\\shaders\\19_shadowmap.vert"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\20_shadowmap.frag"
         );
 
         // EMPTY_QUAD_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\quadFrustum.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\quadFrustum.geom"
-            , "..\\Drop\\src\\DROP\\shaders\\quadFrustum.frag"
+            "..\\..\\..\\Drop\\src\\DROP\\shaders\\quadFrustum.vert"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\quadFrustum.geom"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\quadFrustum.frag"
         );
 
         // EMPTY_BOX_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\boxFrustum.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\boxFrustum.geom"
-            , "..\\Drop\\src\\DROP\\shaders\\boxFrustum.frag"
+            "..\\..\\..\\Drop\\src\\DROP\\shaders\\boxFrustum.vert"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\boxFrustum.geom"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\boxFrustum.frag"
         );
 
         // BILLBOARD_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\billboard.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\billboard.geom"
-            , "..\\Drop\\src\\DROP\\shaders\\billboard.frag"
+            "..\\..\\..\\Drop\\src\\DROP\\shaders\\billboard.vert"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\billboard.geom"
+            , "..\\..\\..\\Drop\\src\\DROP\\shaders\\billboard.frag"
         );
+#pragma endregion
 
-        gameEngine->m_Models.emplace_back("..\\models\\cube.obj");
-        gameEngine->m_Models.emplace_back("..\\models\\sphere.obj");
-        gameEngine->m_Models.emplace_back("..\\models\\bunny_lp.obj");
-        gameEngine->m_Models.emplace_back("..\\models\\plane.obj");
 
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\UV_Grid_Sm.png"));
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\SoilCracked.png"));
+        gameEngine->m_Models.emplace_back("..\\..\\..\\models\\cube.obj");
+        gameEngine->m_Models.emplace_back("..\\..\\..\\models\\sphere.obj");
+        gameEngine->m_Models.emplace_back("..\\..\\..\\models\\bunny_lp.obj");
+        gameEngine->m_Models.emplace_back("..\\..\\..\\models\\plane.obj");
+
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\..\\..\\textures\\UV_Grid_Sm.png"));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\..\\..\\textures\\SoilCracked.png"));
 
         // Testing ECS
         gameEngine->m_ECS.RegisterComponent<TransformComponent>();
@@ -98,7 +101,7 @@ public:
             gameEngine->m_Materials.push_back(material);
 
             StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
-            staticMesh.bCastShadow = false;
+            staticMesh.bCastShadow = true;
             staticMesh.materialId = gameEngine->m_Materials.size() - 1;
             staticMesh.modelId = 3;
         }
@@ -154,7 +157,7 @@ public:
             gameEngine->m_Materials.push_back(material);
 
             StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
-            staticMesh.bCastShadow = false;
+            staticMesh.bCastShadow = true;
             staticMesh.materialId = gameEngine->m_Materials.size() - 1;
             staticMesh.modelId = 0;
         }
