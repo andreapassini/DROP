@@ -127,7 +127,7 @@ namespace Drop
     }
 
     //void Renderer::RenderScene(
-    //    const SceneContext& sceneContext
+    //    SceneContext& sceneContext
     //    , const RendererContext& rendererContext
     //    , const std::vector<RenderableObject>& renderableObjects
     //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
@@ -255,7 +255,7 @@ namespace Drop
     //}
 
     //void Renderer::RenderScene(
-    //    const SceneContext& sceneContext
+    //    SceneContext& sceneContext
     //    , const std::vector<RenderableObject>& renderableObjects
     //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
     //    , Shader* const illumination_shader
@@ -317,7 +317,7 @@ namespace Drop
     //}
 
     void Renderer::RenderParticles(
-        const SceneContext& sceneContext
+        SceneContext& sceneContext
         , std::vector<ParticleEmitter>& particleEmitters
         , Shader* const billboardShader
     ) {
@@ -410,7 +410,7 @@ namespace Drop
     }
 
     void Renderer::RenderBillboard(
-        const SceneContext& sceneContext
+        SceneContext& sceneContext
         , const std::vector<Billboard>& billboards
         , Shader* const billboardShader
     ) {
@@ -494,7 +494,7 @@ namespace Drop
     }
 
     void Renderer::DrawDebug(
-        const SceneContext& sceneContext
+        SceneContext& sceneContext
         , Shader* const debugShader
         , std::vector<Line>& drawableLines
     ) {
@@ -522,7 +522,7 @@ namespace Drop
     }
 
     void Renderer::DrawParticleEmitterSurface(
-        const SceneContext& sceneContext
+        SceneContext& sceneContext
         , Shader* const emptyQuadGeomShader
         , std::vector<ParticleEmitter>& drawableParticleEmitter
     ) {
@@ -623,7 +623,7 @@ namespace Drop
         sceneContext.lightSpaceMatrix = lightProjection * lightView;
     }
     void Renderer::SetupShadowPass(
-        const SceneContext& sceneContext
+        SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
         LOG_INFO("--- SetupShadowPass ---");
@@ -640,6 +640,7 @@ namespace Drop
         lightView = glm::lookAt(sceneContext.lightDir, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         // transformation matrix for the light
         lightSpaceMatrix = lightProjection * lightView;
+        sceneContext.lightSpaceMatrix = lightSpaceMatrix;
 
         // We "install" the  Shader Program for the shadow mapping creation
         std::vector<Shader>& shaders = rendererContext.shaders;
@@ -733,7 +734,7 @@ namespace Drop
     }
 
     void Renderer::SetupColorPass(
-        const SceneContext& sceneContext
+        SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
         LOG_INFO("--- SetupColorPass ---");

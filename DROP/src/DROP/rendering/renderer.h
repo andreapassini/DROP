@@ -92,7 +92,7 @@ namespace Drop
         void Init(GLFWwindow* window, RendererContext& rendererContext);
 
         //void RenderScene(
-        //    const SceneContext& sceneContext
+        //    SceneContext& sceneContext
         //    , const RendererContext& rendererContext
         //    , const std::vector<RenderableObject>& renderableObjects
         //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
@@ -101,32 +101,32 @@ namespace Drop
         //);
 
         //void RenderScene(
-        //    const SceneContext& sceneContext
+        //    SceneContext& sceneContext
         //    , const std::vector<RenderableObject>& renderableObjects
         //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
         //    , Shader* const illumination_shader
         //);
 
         void RenderParticles(
-            const SceneContext& sceneContext
+            SceneContext& sceneContext
             , std::vector<ParticleEmitter>& particleEmitters
             , Shader* const billboardShader
         );
 
         void RenderBillboard(
-            const SceneContext& sceneContext
+            SceneContext& sceneContext
             , const std::vector<Billboard>& billboards
             , Shader* const billboardShader
         );
 
         void DrawDebug(
-            const SceneContext& sceneContext
+            SceneContext& sceneContext
             , Shader* const debugShader
             , std::vector<Line>& drawableLines
         );
 
         void DrawParticleEmitterSurface(
-            const SceneContext& sceneContext
+            SceneContext& sceneContext
             , Shader* const debugShader
             , std::vector<ParticleEmitter>& drawableParticleEmitter
         );
@@ -138,7 +138,7 @@ namespace Drop
         );
         
         void SetupShadowPass(
-            const SceneContext& sceneContext
+            SceneContext& sceneContext
             , RendererContext& rendererContext
         );        
         void DrawMeshForShadow(
@@ -149,7 +149,7 @@ namespace Drop
         );
 
         void SetupColorPass(
-            const SceneContext& sceneContext
+            SceneContext& sceneContext
             , RendererContext& rendererContext
         );
         void DrawMesh(
