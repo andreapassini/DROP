@@ -29,6 +29,7 @@
 
 #include "DROP/ECS/beecs.h"
 #include "rendering/RenderingSystem.h"
+#include "particles/particleSystem.h"
 
 extern bool g_GameEngineRunning;
 
@@ -210,16 +211,7 @@ namespace Drop
 				}
 			}
 
-			//if (waitTime < currentTime) {
-			//	waitTime = currentTime + spawnDelay;
-			//	//particleEmitter.spawningValues.position.x += 1.0f;
-			//	EmitParticles(particleEmitter);
-			//}
-			//UpdateParticles(
-			//	particleEmitter.particles
-			//	, particleEmitter.numberOfParticles
-			//	, m_DeltaTime
-			//);
+			ParticleSystem::Update(m_ECS, m_DeltaTime);
 
 			// Calculate world transform every time the transform in changed
 			//m_SceneGraph.CalculateWorldTransforms(

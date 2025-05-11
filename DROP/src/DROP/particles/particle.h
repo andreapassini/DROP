@@ -37,7 +37,7 @@ struct Particle {
 struct ParticleStartValues {
 	Surface spawningSurface;
 
-	// In Milliseconds
+	// In seconds
 	float lifeTime = 10.0f;
 
 	float startsize = 1.0f;
@@ -51,7 +51,7 @@ struct ParticleStartValues {
 	float startColorAlpha = 1.0f;
 	float endColorAlpha = 0.0f;
 
-	uint32_t textureID = 0;
+	TextureID textureID = 0;
 };
 
 struct ParticleEmitter {
@@ -67,7 +67,7 @@ struct ParticleEmitter {
 	ParticleStartValues spawningValues;
 };
 
-void EmitParticles(ParticleEmitter& particleEmitter);
+void EmitParticles(ParticleEmitter& particleEmitter, Transform& transform);
 
 void UpdateParticles(
 	Particle* const particles

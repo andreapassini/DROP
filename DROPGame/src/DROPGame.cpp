@@ -74,7 +74,7 @@ public:
         gameEngine->m_ECS.RegisterComponent<StaticMeshComponent, TransformComponent>();
 
         // #TODO to this later, for now focus on simple mesh rendering
-        //gameEngine->m_ECS.RegisterComponent<ParticleEmitter, Transform>();
+        gameEngine->m_ECS.RegisterComponent<ParticleEmitter, TransformComponent>();
         //gameEngine->m_ECS.RegisterComponent<Billboard, Transform>();
         //gameEngine->m_ECS.RegisterComponent<PhysicsObject>();
 
@@ -191,6 +191,26 @@ public:
             staticMesh.modelId = 2;
         }
 
+        
+        // Particle Emitter
+        {
+            particleEmitterID = gameEngine->m_ECS.CreateEntity();
+
+            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(particleEmitterID);
+            transform.m_LocalTransform.m_Translate = VgMath::Vector3(-5.0f, 0.0f, 0.0f);
+            transform.m_LocalTransform.m_Scale = 0.48f;
+            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+                VgMath::Degrees(90.0),
+                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+            );
+            
+            ParticleEmitter& particleEmitter = gameEngine->m_ECS.Add<ParticleEmitter, TransformComponent>(particleEmitterID);
+            particleEmitter.particleToEmitEachTime = 25;
+            particleEmitter.spawningValues.textureID = 0;
+            particleEmitter.spawningValues.spawningSurface.m_Size.x = 10.0f;
+            particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
+        }
+
 
         SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
 
@@ -281,6 +301,18 @@ public:
         m_Frames += 1;
         averageDeltaTime = m_SumDeltaTime / m_Frames;
 
+        // Particle logic
+        if (waitTime < m_SumDeltaTime) {
+        	waitTime = m_SumDeltaTime + spawnDelay;
+
+            ParticleEmitter& particleEmitter = gameEngine->m_ECS.Get<ParticleEmitter>(particleEmitterID);
+            TransformComponent& particleEmitterTransform = gameEngine->m_ECS.Get<TransformComponent>(particleEmitterID);
+            // this is done inside the Emit function, not super clean
+            //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
+            EmitParticles(particleEmitter, particleEmitterTransform.m_CumulatedTransform);
+            std::cout << "Emit" << std::endl;
+        }
+
         if (m_StopEachFrame)
         {
             std::cin.get();
@@ -307,6 +339,11 @@ public:
     uint64_t m_Frames = 0;
 
     bool m_DrawDebug = true;
+
+    // Particles Logic
+    float waitTime = 0.0f;
+    float spawnDelay = 5.0f;
+    EntityID particleEmitterID = NULL_ENTITY;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)

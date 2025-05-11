@@ -70,13 +70,13 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	//	, &(rendererContext.m_LightShader)
 	//);
 
-	//std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
+	std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
 
-	//Renderer::RenderParticles(
-	//	sceneContext
-	//	,denseParticleEmitters
-	//	, &rendererContext.m_BillboardShader
-	//);
+	Renderer::RenderParticles(
+		sceneContext
+		,denseParticleEmitters
+		, &rendererContext.shaders[BILLBOARD_SHADER]
+	);
 
 	//if (rendererContext.m_DrawDebug)
 	//{
@@ -86,12 +86,12 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	//	//	sceneContext.drawableLines
 	//	//);
 
-	//	Renderer::DrawParticleEmitterSurface(
-	//		sceneContext
-	//		, &(rendererContext.m_EmptyQuadShader),
-	//		denseParticleEmitters
-	//	);
-	//}
+	Renderer::DrawParticleEmitterSurface(
+		sceneContext
+		, &(rendererContext.shaders[EMPTY_QUAD_SHADER]),
+		denseParticleEmitters
+	);
+	
 }
 
 //// Move this function into the RenderingSystem::Update function
