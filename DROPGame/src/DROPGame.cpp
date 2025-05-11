@@ -281,7 +281,10 @@ public:
         m_Frames += 1;
         averageDeltaTime = m_SumDeltaTime / m_Frames;
 
-        //std::cin.get();
+        if (m_StopEachFrame)
+        {
+            std::cin.get();
+        }
     }
 
     void Callbacks()
