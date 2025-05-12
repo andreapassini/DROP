@@ -23,6 +23,8 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
     - [x] Static mesh component
     - [x] Transform component
     - [x] Particle system porting
+    - [ ] Add multithreading to transform updates
+    - [ ] Add multithreading to particle update
 - [ ] Move the active camera to a singleton component (Scene context)
 - [ ] Move the Inputs into a Singleton Components (TBD)
 - [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
