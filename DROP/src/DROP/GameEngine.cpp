@@ -171,9 +171,9 @@ namespace Drop
 		{
 			// we determine the time passed from the beginning
 			// and we calculate time difference between current frame rendering and the previous one
-			float currentTime = GetTime();
-			m_DeltaTime = currentTime - m_LastFrameTime;
-			m_LastFrameTime = currentTime;
+			m_CurrentTime = GetTime();
+			m_DeltaTime = m_CurrentTime - m_LastFrameTime;
+			m_LastFrameTime = m_CurrentTime;
 
 			// pooling events
 			m_ActiveWindowHandle->OnUpdate();
@@ -190,7 +190,7 @@ namespace Drop
 
 			// Fixed Update
 			uint32_t physIter = 0;
-			while (!m_PhysicsEngine.m_IsPaused && currentTime > m_PhysicsEngine.GetVirtualTIme())
+			while (!m_PhysicsEngine.m_IsPaused && m_CurrentTime > m_PhysicsEngine.GetVirtualTIme())
 			{
 				//physicsEngine.AddForceToAll(glm::vec3(0.0f, gravity, 0.0f));
 
@@ -206,7 +206,7 @@ namespace Drop
 				if (physIter > m_PhysicsEngine.maxIter)
 				{
 					std::cout << "Physics Simulation lagging " << std::endl;
-					m_PhysicsEngine.SynchVirtualTime(currentTime);
+					m_PhysicsEngine.SynchVirtualTime(m_CurrentTime);
 					break;
 				}
 			}

@@ -205,10 +205,13 @@ public:
             );
             
             ParticleEmitter& particleEmitter = gameEngine->m_ECS.Add<ParticleEmitter, TransformComponent>(particleEmitterID);
-            particleEmitter.particleToEmitEachTime = 25;
+            particleEmitter.particleToEmitEachTime = 10;
             particleEmitter.spawningValues.textureID = 0;
             particleEmitter.spawningValues.spawningSurface.m_Size.x = 10.0f;
             particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
+            particleEmitter.spawningValues.startsize = 1.0f;
+            particleEmitter.spawningValues.endsize = 0.0f;
+
         }
 
 
@@ -302,8 +305,8 @@ public:
         averageDeltaTime = m_SumDeltaTime / m_Frames;
 
         // Particle logic
-        if (waitTime < m_SumDeltaTime) {
-        	waitTime = m_SumDeltaTime + spawnDelay;
+        if (waitTime < gameEngine->m_CurrentTime) {
+        	waitTime = gameEngine->m_CurrentTime + spawnDelay;
 
             ParticleEmitter& particleEmitter = gameEngine->m_ECS.Get<ParticleEmitter>(particleEmitterID);
             TransformComponent& particleEmitterTransform = gameEngine->m_ECS.Get<TransformComponent>(particleEmitterID);
@@ -342,7 +345,7 @@ public:
 
     // Particles Logic
     float waitTime = 0.0f;
-    float spawnDelay = 5.0f;
+    float spawnDelay = 0.50f;
     EntityID particleEmitterID = NULL_ENTITY;
 };
 

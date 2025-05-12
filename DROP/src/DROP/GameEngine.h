@@ -77,6 +77,12 @@ namespace Drop
 
 		// GPU Particles
 
+		// time
+		float m_DeltaTime = 0.0f;
+		float m_LastFrameTime = 0.0f;
+		float m_CurrentTime = .0f;
+
+
 	private:
 		void Init();
 		void Shutdown();
@@ -84,9 +90,6 @@ namespace Drop
 		GameEngineSpecification m_Specification;
 		std::unique_ptr<Window> m_ActiveWindowHandle = nullptr;
 		bool m_Running = false;
-
-		float m_DeltaTime = 0.0f;
-		float m_LastFrameTime = 0.0f;
 
 		std::shared_ptr<Game> m_Game;
 		std::function<void()> m_MenubarCallback;
