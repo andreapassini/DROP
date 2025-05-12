@@ -313,7 +313,6 @@ public:
             // this is done inside the Emit function, not super clean
             //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
             EmitParticles(particleEmitter, particleEmitterTransform.m_CumulatedTransform);
-            std::cout << "Emit" << std::endl;
         }
 
         if (m_StopEachFrame)
