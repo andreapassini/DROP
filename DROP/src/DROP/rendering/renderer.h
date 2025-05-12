@@ -1,9 +1,10 @@
 #pragma once
 
-#include "renderableObject.h"
-#include "../particles/particle.h"
-
 #include <vector>
+
+#include "renderableObject.h"
+#include "DROP/particles/particle.h"
+#include "DROP/rendering/staticMeshComponent.h"   
 #include "drawableBox.h"
 #include "line.h"
 
@@ -28,26 +29,39 @@
 #error windows.h was included!
 #endif
 
+// Libs includes
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../rendering/shader.h"
-#include "../utils/camera.h"
-#include "../rendering/billboard.h"
+// Drop includes
+#include "DROP/rendering/shader.h"
+#include "DROP/utils/camera.h"
+#include "DROP/rendering/billboard.h"
+#include "DROP/rendering/model.h"
+#include "DROP/rendering/material.h"
+
+#define FULL_COLOR_SHADER 0
+#define ILLUMINATION_GGX_SHADER 1
+#define SHADOW_SHADER 2
+#define EMPTY_QUAD_SHADER 3
+#define EMPTY_BOX_SHADER 4
+#define BILLBOARD_SHADER 5
 
 namespace Drop
 {
-    struct SceneContext
-    {
-        const glm::mat4& view;
-        const glm::mat4& projection;
-        const glm::vec3& lightDir;
+    struct SceneContext {
+        Camera* camera;
+        //glm::mat4 view;
+        //glm::mat4 projection;
+        
+        glm::mat4 lightSpaceMatrix;
+        glm::vec3 lightDir;
 
-        const std::vector<int>& textures;
-        const std::vector<Model>& models;
-        const std::vector<Material>& materials;
+        std::vector<Model>* models;
+        std::vector<Material>* materials;
+        std::vector<TextureID>* textuers;
 
         int width;
         int height;
@@ -55,66 +69,94 @@ namespace Drop
         GLboolean wireframe;
     };
 
-    class Renderer
-    {
-    public:
-        Renderer();
-        void Init(GLFWwindow* window);
-        ~Renderer();
-        void RenderScene(
-            const SceneContext& sceneContext
-            , const std::vector<RenderableObject>& renderableObjects
-            , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
-            , Shader* const shadow_shader
-            , Shader* const illumination_shader
-            , const GLuint depthMapFBO
-            , const GLuint depthMap
-        ) const ;
+    struct RendererContext {
+        GLFWwindow* window = nullptr;
 
-        void RenderScene(
-            const SceneContext& sceneContext
-            , const std::vector<RenderableObject>& renderableObjects
-            , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
-            , Shader* const illumination_shader
-        ) const;
+        GLuint depthMapFBO = 0;
+        GLuint depthMap = 0;
 
-        void RenderParticles(
-            const SceneContext& sceneContext
-            , const Particle* const particles
-            , const uint32_t numberOfParticles
-            , Shader* const billboardShader
-        ) const;
-
-        void RenderBillboard(
-            const SceneContext& sceneContext
-            , const std::vector<Billboard>& billboards
-            , Shader* const billboardShader
-        ) const;
-
-        void DrawDebug(
-            const SceneContext& sceneContext
-            , Shader* const debugShader
-            , std::vector<Line>& drawableLines
-        ) const;
-
-        void DrawParticleEmitterSurface(
-            const SceneContext& sceneContext
-            , Shader* const debugShader
-            , std::vector<ParticleEmitter>& drawableParticleEmitter
-        ) const;
-
-        void Shutdown();
-
-    public:
-
-        GLFWwindow* m_Window = nullptr;
-
-        GLuint m_DepthMapFBO = 0;
-        GLuint m_DepthMap = 0;
-
+        // Can we extend shadow to a Cascade Shadow Maps?
+        // or even to Virtual texture Shadow Map
         const GLuint SHADOW_WIDTH = 1024;
         const GLuint SHADOW_HEIGHT = 1024;
 
-        glm::vec3 m_clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
+        glm::vec3 clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
+
+        bool drawDebug = false;
+
+        std::vector<Shader> shaders{};
+    };
+
+    namespace Renderer
+    {
+        void Init(GLFWwindow* window, RendererContext& rendererContext);
+
+        //void RenderScene(
+        //    SceneContext& sceneContext
+        //    , const RendererContext& rendererContext
+        //    , const std::vector<RenderableObject>& renderableObjects
+        //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
+        //    , Shader* const shadow_shader
+        //    , Shader* const illumination_shader
+        //);
+
+        //void RenderScene(
+        //    SceneContext& sceneContext
+        //    , const std::vector<RenderableObject>& renderableObjects
+        //    , const std::unordered_map<uint32_t, VgMath::Transform>& cumulatedTransforms
+        //    , Shader* const illumination_shader
+        //);
+
+        void RenderParticles(
+            SceneContext& sceneContext
+            , std::vector<ParticleEmitter>& particleEmitters
+            , Shader* const billboardShader
+        );
+
+        void RenderBillboard(
+            SceneContext& sceneContext
+            , const std::vector<Billboard>& billboards
+            , Shader* const billboardShader
+        );
+
+        void DrawDebug(
+            SceneContext& sceneContext
+            , Shader* const debugShader
+            , std::vector<Line>& drawableLines
+        );
+
+        void DrawParticleEmitterSurface(
+            SceneContext& sceneContext
+            , Shader* const debugShader
+            , std::vector<ParticleEmitter>& drawableParticleEmitter
+        );
+
+        void Shutdown();
+
+        void CalculateLightMatrix(
+            SceneContext& sceneContext
+        );
+        
+        void SetupShadowPass(
+            SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );        
+        void DrawMeshForShadow(
+            const StaticMeshComponent& model
+            , VgMath::Transform& worldTransform
+            , SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
+
+        void SetupColorPass(
+            SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
+        void DrawMesh(
+            const StaticMeshComponent& model
+            , VgMath::Transform& worldTransform
+            , SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
     };
 }

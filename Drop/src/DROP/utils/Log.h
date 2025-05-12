@@ -24,12 +24,12 @@ namespace Drop
 #define LOG_CORE_TRACE(...)    ::Drop::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define LOG_CORE_INFO(...)     ::Drop::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define LOG_CORE_WARN(...)     ::Drop::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define LOG_CORE_ERROR(...)    ::Drop::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define LOG_CORE_FATAL(...)    ::Drop::Log::GetCoreLogger()->fatal(__VA_ARGS__)
+#define LOG_CORE_ERROR(...)    ::Drop::Log::GetCoreLogger()->error(__FILE__, "\t", __FUNCTION__, "\t", __LINE__, "\t", __VA_ARGS__)
+#define LOG_CORE_FATAL(...)    ::Drop::Log::GetCoreLogger()->fatal(__FILE__, "\t", __FUNCTION__, "\t", __LINE__, "\t", __VA_ARGS__)
 
 // Client log macros
 #define LOG_TRACE(...)	      ::Drop::Log::GetClientLogger()->trace(__VA_ARGS__)
 #define LOG_INFO(...)	      ::Drop::Log::GetClientLogger()->info(__VA_ARGS__)
 #define LOG_WARN(...)	      ::Drop::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define LOG_ERROR(...)	      ::Drop::Log::GetClientLogger()->error(__VA_ARGS__)
-#define LOG_FATAL(...)	      ::Drop::Log::GetClientLogger()->fatal(__VA_ARGS__)
+#define LOG_ERROR(...)	      ::Drop::Log::GetClientLogger()->error(__FILE__, "\t", __FUNCTION__, "\t", __LINE__, "\t", __VA_ARGS__)
+#define LOG_FATAL(...)	      ::Drop::Log::GetClientLogger()->fatal(__FILE__, "\t", __FUNCTION__, "\t", __LINE__, "\t", __VA_ARGS__)

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../math/mat3.h"
-#include "../math/surface.h"
+#include "DROP/math/mat3.h"
+#include "DROP/math/surface.h"
 #include "glm/glm.hpp"
 #include "glm/gtx/quaternion.hpp"
 
-#include "../rendering/shader.h"
+#include "DROP/rendering/shader.h"
 
 using namespace VgMath;
 

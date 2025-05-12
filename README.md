@@ -17,6 +17,30 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 - double click on "GenerateProjects.bat"
 
+# TODO List
+- [x] ECS porting (branch ECS_Setup)
+    - [x] Renderer refactoring
+    - [x] Static mesh component
+    - [x] Transform component
+    - [x] Particle system porting
+    - [ ] Add multithreading to transform updates
+    - [ ] Add multithreading to particle update
+- [ ] Move the active camera to a singleton component (Scene context)
+- [ ] Move the Inputs into a Singleton Components (TBD)
+- [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
+- [ ] Code cleanup:
+    - [ ] rename Scene and Renderer context into state
+    - [ ] add a Game State to singleton components
+    - [ ] Add time state
+- [ ] Add debug main view, render normals in color channel
+- [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
+- [ ] Consider reworking the material to use a map for textures 
+- [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
+- [ ] Fix the scene graph move and remove node, the error is not considering move from another branch
+- [ ] Add cube maps
+- [ ] Port the thread pool system from the Fall Engine
+
+
 # Arachitecture
 
 ![DROPArchitecture](https://github.com/user-attachments/assets/8edc2ab9-edb3-4983-beb6-bf3c770f03a7)

@@ -52,7 +52,7 @@ namespace Drop
 		void Close();
 
 		inline static GameEngine& Get();
-		inline Window& GetWindowHandle() const { return *m_WindowHandle; }
+		inline Window& GetWindowHandle() const { return *m_ActiveWindowHandle; }
 		static GameEngine* GetInstance();
 
 		float GetTime();
@@ -62,21 +62,25 @@ namespace Drop
 		inline void SetDrawDebug(bool debug) { m_DrawDebug = debug; }
 
 	public:
-		SceneGraph m_SceneGraph = (RESERVE);
 
+		bseecs::ECS m_ECS;
+		
 		PhysicsEngine m_PhysicsEngine;
-		std::vector<PhysicsObject> m_PhysicsObjects;
 
-		Renderer m_Renderer;
-		std::vector<RenderableObject> m_RendereableObjects;
-		std::vector<int> m_TextureIds;
+		// Memory
+		Arena arena;
+
+		// Assets
+		std::vector<TextureID> m_TextureIds;
 		std::vector<Model> m_Models;
 		std::vector<Material> m_Materials;
-		std::vector<Line> m_DrawableLines;
-
-		std::unordered_map<uint32_t, VgMath::Transform> m_CumulatedTransforms;
 
 		// GPU Particles
+
+		// time
+		float m_DeltaTime = 0.0f;
+		float m_LastFrameTime = 0.0f;
+		float m_CurrentTime = .0f;
 
 
 	private:
@@ -84,11 +88,8 @@ namespace Drop
 		void Shutdown();
 	private:
 		GameEngineSpecification m_Specification;
-		std::unique_ptr<Window> m_WindowHandle = nullptr;
+		std::unique_ptr<Window> m_ActiveWindowHandle = nullptr;
 		bool m_Running = false;
-
-		float m_DeltaTime = 0.0f;
-		float m_LastFrameTime = 0.0f;
 
 		std::shared_ptr<Game> m_Game;
 		std::function<void()> m_MenubarCallback;

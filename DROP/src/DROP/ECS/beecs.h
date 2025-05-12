@@ -14,13 +14,13 @@
 #include <cassert>
 
 // project includes
-#include "../memory/arena.h"
+#include "DROP/memory/arena.h"
 
 // Can replace these defines with custom macros elsewhere
 #ifndef BSEECS_ASSERTS
 	#define BSEECS_ASSERT(condition, msg) \
 		if (!(condition)) { \
-			std::cerr << "[BSEECS error]: " << msg << std::endl; \
+			std::cerr << "[BSEECS error] " << "\n" << __FILE__ << "(" << __LINE__ << ") "  << "\n" << __FUNCTION__ << ": " << "\n\t" << msg << std::endl; \
 			::abort(); \
 		}
 #endif
@@ -156,7 +156,9 @@ namespace bseecs {
 			//return (index != tombstone) ? m_dense[index] : nullptr;
 		}
 
-
+		/*
+		* Get the entity id from the dense comp id
+		*/
 		EntityID GetEntity(EntityID compId)
 		{
 			return m_denseToEntity[compId];
@@ -206,24 +208,20 @@ namespace bseecs {
 
 	};
 
-	class ISingletonComponent
-	{
-		ISingletonComponent(Arena& arenaAllocator);
+	class ISingletonComponent {
+	public:
+		ISingletonComponent() {};
 	};
 
 	template<typename T>
 	class SingletonComponent : public ISingletonComponent
 	{
 	public:
-
-		template<typename Temp>
-		SingletonComponent(Arena& arenaAllocator)
-		{
-			BSEECS_ASSERT(std::is_same<Temp, T>::value);
-			m_Ptr = Allocate<Temp>(arenaAllocator);
+		SingletonComponent() {
+			m_Component = new T;
 		};
 
-		T* m_Ptr = nullptr;
+		T* m_Component = nullptr;
 	};
 
 
@@ -250,7 +248,7 @@ namespace bseecs {
 		// 
 		// Index into this array using the corresponding bit position
 		// found by using m_componentBitPosition
-		std::vector<std::unique_ptr<ISparseSet>> m_componentPools;
+		std::vector<ISparseSet*> m_componentPools;
 
 		struct ComponentInfo
 		{
@@ -355,7 +353,7 @@ namespace bseecs {
 		template <typename DependentComponent, typename RequiredComponent>
 		void SetRequirements()
 		{
-			TypeName name = typeid(RequiredComponent).name();
+			TypeName name = typeid(DependentComponent).name();
 			ComponentMask& requiredCompMask = m_componentBitPosition.find(name)->second.m_isRequiredInComponents;
 			SetComponentBit<DependentComponent>(requiredCompMask, 1);
 		}
@@ -398,7 +396,7 @@ namespace bseecs {
 				"(Internal): Attempting to index into m_componentPools with out of range bit position");
 
 			// Downcast the generic pointer to the specific sparse set
-			ISparseSet* genericPtr = m_componentPools[bitPos].get();
+			ISparseSet* genericPtr = m_componentPools[bitPos];
 			SparseSet<T>* pool = dynamic_cast<SparseSet<T>*>(genericPtr);
 			BSEECS_ASSERT(pool, "Dynamic cast failed for component pool '" << typeid(T).name() << "'");
 
@@ -484,10 +482,10 @@ namespace bseecs {
 
 			ComponentInfo& current = m_componentBitPosition[name];
 			current.m_bitPosition = m_componentPools.size();
-			current.m_isRequiredInComponents = requiredCompMask;
-			current.m_requiredComponents = ComponentMask();
+			current.m_requiredComponents = requiredCompMask;
+			current.m_isRequiredInComponents = ComponentMask();
 
-			m_componentPools.push_back(std::make_unique<SparseSet<T>>());
+			m_componentPools.push_back(new SparseSet<T>());
 
 			// Hello I require you, so beware when you be removed
 			BroadcastRequirements<T, Components...>();
@@ -693,7 +691,7 @@ namespace bseecs {
 			if (it == m_singeltonComponentBitPosition.end())
 				return tombstone;
 
-			return it->second.m_singeltonComponentBitPosition;
+			return it->second.m_bitPosition;
 		}
 
 		template <typename T>
@@ -701,7 +699,7 @@ namespace bseecs {
 		{
 			size_t bitPos = GetSingletonComponentBitPosition<T>();
 
-			BSEECS_ASSERT(bitPos == tombstone
+			BSEECS_ASSERT(bitPos != tombstone
 				, "Attempting to operate on unregistered component '" << typeid(T).name() << "'");
 			
 
@@ -709,12 +707,12 @@ namespace bseecs {
 				, "(Internal): Attempting to index into m_componentPools with out of range bit position");
 
 			// Downcast the generic pointer to the specific sparse set
-			ISingletonComponent* genericPtr = m_singletonComponents[bitPos].get();
-			SingletonComponent<T>* tempComp = dynamic_cast<T>(genericPtr);
-			T* comp = dynamic_cast<T>(tempComp.m_Ptr);
-			BSEECS_ASSERT(comp, "Dynamic cast failed for component pool '" << typeid(T).name() << "'");
+			ISingletonComponent* genericPtr = m_singletonComponents[bitPos];
+			SingletonComponent<T>* tempComp = static_cast<SingletonComponent<T>*>(genericPtr);
+			//T* comp = dynamic_cast<T>(tempComp.m_Component);
+			//BSEECS_ASSERT(comp, "Dynamic cast failed for component pool '" << typeid(T).name() << "'");
 
-			return *comp;
+			return *(tempComp->m_Component);
 		}
 
 		/*
@@ -733,32 +731,33 @@ namespace bseecs {
 			SingletonComponentInfo& current = m_singeltonComponentBitPosition[name];
 			current.m_bitPosition = m_singletonComponents.size();
 
-			m_singletonComponents.push_back(new ISingletonComponent(arenaAllocator));
+			m_singletonComponents.push_back(new SingletonComponent<T>());
 
 			BSEECS_INFO("Registered component '" << name << "'");
 		}
 	};
 
-	// Main comp should require all the other components
-	template<typename MainComponent, typename... Components>
-	class ISystem
-	{
-	public:
-		ISystem(ECS& ecs)
-			: m_Ecs(ecs), 
-			m_MainComps(ecs.GetComponentPool<MainComponent>()),
-			m_MainDense(ecs.GetComponentPool<MainComponent>().Data())
-		{
-			for (size_t i = 0; i < m_MainDense.size(); i++)
-			{
-				ecs.HasAllRequired<Components...>(i);
-			}
-		}
-	protected:
-		ECS& m_Ecs;
-		std::vector<MainComponent>& m_MainDense;
-		SparseSet<MainComponent>& m_MainComps;
-	};
+	//// Main comp should require all the other components
+	//template<typename MainComponent, typename... Components>
+	//class ISystem
+	//{
+	//public:
+	//	ISystem(ECS& ecs)
+	//		: m_Ecs(ecs), 
+	//		m_MainComps(ecs.GetComponentPool<MainComponent>()),
+	//		m_MainDense(ecs.GetComponentPool<MainComponent>().Data())
+	//	{
+	//		for (size_t i = 0; i < m_MainDense.size(); i++)
+	//		{
+	//			ecs.HasAllRequired<Components...>(i);
+	//		}
+	//	}
+	//protected:
+	//	ECS& m_Ecs;
+	//	std::vector<MainComponent>& m_MainDense;
+	//	SparseSet<MainComponent>& m_MainComps;
+	//};
+
 }
 
 #endif

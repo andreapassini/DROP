@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../math/mat3.h"
-#include "../math/surface.h"
+#include "DROP/math/mat3.h"
+#include "DROP/math/surface.h"
+
+#include "DROP/rendering/material.h"
 
 using namespace VgMath;
 
@@ -20,7 +22,7 @@ struct Particle {
 	Vector3 color{ 1.0f, 1.0f, 1.0f };
 	float colorAlpha = 1.0f;
 
-	uint32_t textureID = 0;
+	TextureID textureID = 0;
 
 	float startsize = 1.0f;
 	float endsize = 0.0f;
@@ -35,7 +37,7 @@ struct Particle {
 struct ParticleStartValues {
 	Surface spawningSurface;
 
-	// In Milliseconds
+	// In seconds
 	float lifeTime = 10.0f;
 
 	float startsize = 1.0f;
@@ -49,11 +51,15 @@ struct ParticleStartValues {
 	float startColorAlpha = 1.0f;
 	float endColorAlpha = 0.0f;
 
-	uint32_t textureID = 0;
+	TextureID textureID = 0;
 };
 
 struct ParticleEmitter {
-	Particle particles[MAX_PARTICLES];
+	//  If we keep a particle pool for each particleEmitter, 
+	//	 we can operate only on those specific particles, like terminating them
+	//	 maybe we can have a particle arena in order to have different particle pool size 
+	//	 depending on the different effects we want
+	Particle particles[MAX_PARTICLES]; 
 	uint32_t numberOfParticles = MAX_PARTICLES;
 	uint32_t particleToEmitEachTime = 10;
 	uint32_t lastIndex = 0;
@@ -61,7 +67,7 @@ struct ParticleEmitter {
 	ParticleStartValues spawningValues;
 };
 
-void EmitParticles(ParticleEmitter& particleEmitter);
+void EmitParticles(ParticleEmitter& particleEmitter, Transform& transform);
 
 void UpdateParticles(
 	Particle* const particles

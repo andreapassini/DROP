@@ -23,11 +23,13 @@
 
 // we include the library for images loading
 #define STB_IMAGE_IMPLEMENTATION
-//#include "../../dependencies/stb_img/include/stb_image/stb_image.h"
+//#include "DROP/../dependencies/stb_img/include/stb_image/stb_image.h"
 #include <stb_image/stb_image.h>
 #define stringify( name ) #name
 
 #include "DROP/ECS/beecs.h"
+#include "rendering/RenderingSystem.h"
+#include "particles/particleSystem.h"
 
 extern bool g_GameEngineRunning;
 
@@ -39,7 +41,7 @@ extern bool g_GameEngineRunning;
 #endif
 
 static Drop::GameEngine* s_Instance = nullptr;
-static bseecs::ECS g_ECS{};
+//static bseecs::ECS m_ECS{};
 
 namespace Drop
 {
@@ -88,10 +90,8 @@ namespace Drop
 		LOG_CORE_INFO("Drop Engine starting");
 
 		// to be removed
-		m_WindowHandle = std::unique_ptr<Window>(Window::Create());
-		Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
-
-		m_Renderer.Init((GLFWwindow*)m_WindowHandle->GetNativeWindow());
+		m_ActiveWindowHandle = std::unique_ptr<Window>(Window::Create());
+		Input::m_ActiveWindowHandle = (GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow();
 
 		// ImGui SETUP
 		IMGUI_CHECKVERSION();
@@ -116,67 +116,73 @@ namespace Drop
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_WindowHandle->GetNativeWindow(), true);
+		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
-		// Testing ECS
-		g_ECS.RegisterComponent<Transform>();
-		g_ECS.RegisterComponent<Camera, Transform>();
-		g_ECS.RegisterComponent<Model, Transform>();
-		g_ECS.RegisterComponent<ParticleEmitter, Transform>();
-		g_ECS.RegisterComponent<Billboard, Transform>();
-		g_ECS.RegisterComponent<PhysicsObject>();
+
+		m_ECS.RegisterSingletonComponent<SceneContext>(arena);
+		m_ECS.RegisterSingletonComponent<RendererContext>(arena);
+
+		RendererContext* renderContext = &m_ECS.GetSingletonComponent<RendererContext>();
+
+		Renderer::Init(
+			(GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow()
+			, *renderContext
+		);
+
 	}
 
 	void GameEngine::Run()
 	{
 		m_Running = true;
 
-		Shader billboardShader = Shader(
-			"..\\DROP\\src\\DROP\\shaders\\billboard.vert",
-			"..\\DROP\\src\\DROP\\shaders\\billboard.geom",
-			"..\\DROP\\src\\DROP\\shaders\\billboard.frag");
+		SceneContext& sceneContext = m_ECS.GetSingletonComponent<SceneContext>();
 
-		SceneContext sceneContext{
-			m_Game->m_Camera.GetViewMatrix()
-			, m_Game->m_Camera.GetProjectionMatrix()
-			, m_Game->m_LightDir
-			, m_TextureIds
-			, m_Models
-			, m_Materials
-			, m_WindowHandle->GetWidth()
-			, m_WindowHandle->GetHeight()
-			, m_Game->m_Wireframe
-		};	
+		//sceneContext.view = m_Game->m_Camera.GetViewMatrix();
+		//sceneContext.projection = m_Game->m_Camera.GetProjectionMatrix();
+		sceneContext.camera = &m_Game->m_Camera;
+
+		sceneContext.lightDir = m_Game->m_LightDir;
+		sceneContext.lightSpaceMatrix = m_Game->m_lightSpaceMatrix;
 		
-		ParticleEmitter particleEmitter;
-		particleEmitter.spawningValues.lifeTime = 5.0f;
-		Transform spawningSurfaceTransform;
-		spawningSurfaceTransform.m_Translate = (0.0f, 1.0f, 0.0f);
-		particleEmitter.spawningValues.endsize = 0.0f;
-		particleEmitter.spawningValues.spawningSurface.m_Size.x = 5.0f;
-		particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
-		particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
-		float waitTime = 0.0f;
-		float spawnDelay = 2.5f;
+		sceneContext.models = &m_Models;
+		sceneContext.materials = &m_Materials;
+		sceneContext.textuers = &m_TextureIds;
+		sceneContext.wireframe = m_Game->m_Wireframe;
+	
+		RendererContext& renderContext = m_ECS.GetSingletonComponent<RendererContext>();
+
+		renderContext.window = Input::m_ActiveWindowHandle;
+
+		// #TODO add particle components later
+		//ParticleEmitter particleEmitter;
+		//particleEmitter.spawningValues.lifeTime = 5.0f;
+		//Transform spawningSurfaceTransform;
+		//spawningSurfaceTransform.m_Translate = (0.0f, 1.0f, 0.0f);
+		//particleEmitter.spawningValues.endsize = 0.0f;
+		//particleEmitter.spawningValues.spawningSurface.m_Size.x = 5.0f;
+		//particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
+		//particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
+		//float waitTime = 0.0f;
+		//float spawnDelay = 2.5f;
 
 		// Main loop
-		while (!m_WindowHandle->IsShouldClose())
+		while (!m_ActiveWindowHandle->IsShouldClose())
 		{
 			// we determine the time passed from the beginning
 			// and we calculate time difference between current frame rendering and the previous one
-			float currentTime = GetTime();
-			m_DeltaTime = currentTime - m_LastFrameTime;
-			m_LastFrameTime = currentTime;
+			m_CurrentTime = GetTime();
+			m_DeltaTime = m_CurrentTime - m_LastFrameTime;
+			m_LastFrameTime = m_CurrentTime;
 
 			// pooling events
-			m_WindowHandle->OnUpdate();
+			m_ActiveWindowHandle->OnUpdate();
 
 			m_Game->m_Camera.OnUpdate(m_DeltaTime);
-			m_Game->m_Camera.OnResize(m_WindowHandle->GetWidth(), m_WindowHandle->GetHeight());
+			m_Game->m_Camera.OnResize(m_ActiveWindowHandle->GetWidth(), m_ActiveWindowHandle->GetHeight());
 
-			sceneContext.height = m_WindowHandle->GetHeight();
-			sceneContext.width = m_WindowHandle->GetWidth();
+			sceneContext.height = m_ActiveWindowHandle->GetHeight();
+			sceneContext.width = m_ActiveWindowHandle->GetWidth();
 			sceneContext.wireframe = m_Game->m_Wireframe;
 
 			// Update
@@ -184,7 +190,7 @@ namespace Drop
 
 			// Fixed Update
 			uint32_t physIter = 0;
-			while (!m_PhysicsEngine.m_IsPaused && currentTime > m_PhysicsEngine.GetVirtualTIme())
+			while (!m_PhysicsEngine.m_IsPaused && m_CurrentTime > m_PhysicsEngine.GetVirtualTIme())
 			{
 				//physicsEngine.AddForceToAll(glm::vec3(0.0f, gravity, 0.0f));
 
@@ -200,68 +206,21 @@ namespace Drop
 				if (physIter > m_PhysicsEngine.maxIter)
 				{
 					std::cout << "Physics Simulation lagging " << std::endl;
-					m_PhysicsEngine.SynchVirtualTime(currentTime);
+					m_PhysicsEngine.SynchVirtualTime(m_CurrentTime);
 					break;
 				}
 			}
 
-			if (waitTime < currentTime) {
-				waitTime = currentTime + spawnDelay;
-				//particleEmitter.spawningValues.position.x += 1.0f;
-				EmitParticles(particleEmitter);
-			}
-			UpdateParticles(
-				particleEmitter.particles
-				, particleEmitter.numberOfParticles
-				, m_DeltaTime
-			);
+			ParticleSystem::Update(m_ECS, m_DeltaTime);
 
 			// Calculate world transform every time the transform in changed
-			m_SceneGraph.CalculateWorldTransforms(
-				m_CumulatedTransforms
-			);
-
-			m_Renderer.RenderScene(
-				sceneContext,
-				m_RendereableObjects,
-				m_CumulatedTransforms,
-				&(m_Game->m_ShadowShader),
-				&(m_Game->m_LightShader),
-				m_Renderer.m_DepthMapFBO,
-				m_Renderer.m_DepthMap
-			);
-
-			//// Draw Normal as vectors
-			//m_Renderer.RenderScene(
-			//	sceneContext,
-			//	m_RendereableObjects,
-			//	m_CumulatedTransforms,
-			//	&(displayNormalShader)
+			//m_SceneGraph.CalculateWorldTransforms(
+			//	m_CumulatedTransforms
 			//);
 
-			m_Renderer.RenderParticles(
-				sceneContext
-				, particleEmitter.particles
-				, particleEmitter.numberOfParticles
-				, &billboardShader
-			);
+			SceneGraph::CalculateWorldTransforms(m_ECS);
 
-			if (m_DrawDebug)
-			{
-				m_Renderer.DrawDebug(
-					sceneContext, 
-					&(m_Game->m_DebugShader),
-					m_DrawableLines
-				);
-
-				std::vector<ParticleEmitter> ParticleEmitters;
-				ParticleEmitters.push_back(particleEmitter);
-				m_Renderer.DrawParticleEmitterSurface(
-					sceneContext
-					, &(m_Game->m_EmptyQuadShader),
-					ParticleEmitters
-				);
-			}
+			RenderingSystem::Update(m_ECS, m_DeltaTime);
 
 			// render your GUI
 			ImGui_ImplOpenGL3_NewFrame();
@@ -272,7 +231,7 @@ namespace Drop
 			ImGui::End();		
 
 			ImGuiIO& io = ImGui::GetIO();
-			io.DisplaySize = ImVec2((float)m_WindowHandle->GetWidth(), (float)m_WindowHandle->GetHeight());
+			io.DisplaySize = ImVec2((float)m_ActiveWindowHandle->GetWidth(), (float)m_ActiveWindowHandle->GetHeight());
 
 			// Rendering ImGui
 			ImGui::Render();
@@ -287,7 +246,7 @@ namespace Drop
 			}
 
 			// Swapping back and front buffers
-			m_WindowHandle->OnEndFrame();
+			m_ActiveWindowHandle->OnEndFrame();
 		}
 	}
 
@@ -299,7 +258,7 @@ namespace Drop
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 
-		m_WindowHandle.reset(); // delete the object, leaving m_WindowHandle empty
+		m_ActiveWindowHandle.reset(); // delete the object, leaving m_WindowHandle empty
 
 		g_GameEngineRunning = false;
 	}
