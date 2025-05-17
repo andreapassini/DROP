@@ -2,11 +2,16 @@
 
 #include <string>
 
+// Source
+// https://stackoverflow.com/questions/1528298/get-path-of-executable
+
 std::string GetExecutablePath();
 std::string GetExecutableDir();
 std::string MergePaths(std::string pathA, std::string pathB);
 bool CheckIfFileExists(const std::string& filePath);
 
+// Get the full path of the file, 
+// (descending from exe dir. Beware to add all the relative folders as done in ShaderSetup)
 std::string GetFullPath(const std::string& relativeFilePath);
 
 // get the relative path, 
