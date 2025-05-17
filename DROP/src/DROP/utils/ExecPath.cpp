@@ -58,18 +58,6 @@ std::string MergePaths(std::string pathA, std::string pathB)
     return mergedPath;
 }
 
-//std::string GetRelativePath()
-//{
-//    std::string executableDir = GetExecutablePath();
-//    char* exeDir = new char[executableDir.length()];
-//    strcpy(exeDir, executableDir.c_str());
-//    
-//
-//
-//    std::string relativePath = std::string(exeDir);
-//    return relativePath;
-//}
-
 #endif
 
 #ifdef __linux__
