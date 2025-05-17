@@ -9,13 +9,13 @@ This set-up works for **Windows x64**
 
 ### 1. Download static libraries
 
-Download the directory "dependencies"
+Download the directory "dependencies", paste assimp.lib into the project dependencies folder.
 
 https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sharing
 
 ### 2. Generate the vs solutions and projects
 
-- double click on "GenerateProjects.bat"
+- double click on "scripts\\Setup.bat"
 
 # TODO List
 - [x] ECS porting (branch ECS_Setup)
