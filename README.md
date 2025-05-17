@@ -25,20 +25,20 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
     - [x] Particle system porting
     - [ ] Add multithreading to transform updates
     - [ ] Add multithreading to particle update
-- [ ] Move the active camera to a singleton component (Scene context)
-- [ ] Move the Inputs into a Singleton Components (TBD)
-- [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
-- [ ] Code cleanup:
     - [ ] rename Scene and Renderer context into state
     - [ ] add a Game State to singleton components
     - [ ] Add time state
+    - [ ] Move the active camera to a singleton component (Scene context)
+    - [ ] Move the Inputs into a Singleton Components (TBD)
+    - [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
+- [x] Code cleanup:
+    - [x] Fix relative path for assets, using path from exe 
 - [ ] Add debug main view, render normals in color channel
 - [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
 - [ ] Consider reworking the material to use a map for textures 
 - [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
 - [ ] Fix the scene graph move and remove node, the error is not considering move from another branch
 - [ ] Add cube maps
-- [ ] Port the thread pool system from the Fall Engine
 
 
 # Arachitecture
