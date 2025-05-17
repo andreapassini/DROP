@@ -27,25 +27,27 @@ project "Drop"
 
    links
    {
-      "glad",
+      "glad"
       
-      "GLFW",
+      , "GLFW"
       
-      "ImGui",
+      , "ImGui"
 
       -- ASSIMP
-      "assimp-vc143-mt.lib",
-      "draco.lib",
-      "kubazip.lib",
-      "minizip.lib",
-      "poly2tri.lib",
-      "pugixml.lib",
-      "zlib.lib",
+      , "assimp-vc143-mt.lib"
+      , "draco.lib"
+      , "kubazip.lib"
+      , "minizip.lib"
+      , "poly2tri.lib"
+      , "pugixml.lib"
+      , "zlib.lib"
 
-      "gdi32.lib",
-      "user32.lib",
-      "Shell32.lib",
-      "Advapi32.lib"
+      , "gdi32.lib"
+      , "user32.lib"
+      , "Shell32.lib"
+      , "Advapi32.lib"
+
+      , "shlwapi.lib"
    }
 
    targetdir ("bin/" .. outputdir .. "/%{prj.name}")

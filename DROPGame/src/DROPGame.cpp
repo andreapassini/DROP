@@ -3,6 +3,7 @@
 
 #include "Drop/input/Input.h"
 #include "DROP/sceneGraph/sceneGraph.h"
+#include "DROP/utils/ExecPath.h"
 
 using namespace Drop;
 
@@ -54,7 +55,10 @@ public:
         );
 #pragma endregion
 
-
+        std::cout << "GetExecutableDir" << GetExecutableDir() << std::endl;
+        std::cout << "GetExecutablePath" << GetExecutablePath() << std::endl;
+        std::cout << "GetRelativeProjectPath" << GetRelativeProjectPath() << std::endl;
+        
         gameEngine->m_Models.emplace_back("..\\models\\cube.obj");
         gameEngine->m_Models.emplace_back("..\\models\\sphere.obj");
         gameEngine->m_Models.emplace_back("..\\models\\bunny_lp.obj");
@@ -73,7 +77,6 @@ public:
 
         gameEngine->m_ECS.RegisterComponent<StaticMeshComponent, TransformComponent>();
 
-        // #TODO to this later, for now focus on simple mesh rendering
         gameEngine->m_ECS.RegisterComponent<ParticleEmitter, TransformComponent>();
         //gameEngine->m_ECS.RegisterComponent<Billboard, Transform>();
         //gameEngine->m_ECS.RegisterComponent<PhysicsObject>();
