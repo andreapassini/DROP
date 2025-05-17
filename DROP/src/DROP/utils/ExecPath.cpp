@@ -5,6 +5,7 @@
 #include <Shlwapi.h>
 #include <io.h> 
 
+// https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/access-s-waccess-s?view=msvc-170
 #define access _access_s
 #endif
 
