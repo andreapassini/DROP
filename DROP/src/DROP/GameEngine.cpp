@@ -154,18 +154,6 @@ namespace Drop
 
 		renderContext.window = Input::m_ActiveWindowHandle;
 
-		// #TODO add particle components later
-		//ParticleEmitter particleEmitter;
-		//particleEmitter.spawningValues.lifeTime = 5.0f;
-		//Transform spawningSurfaceTransform;
-		//spawningSurfaceTransform.m_Translate = (0.0f, 1.0f, 0.0f);
-		//particleEmitter.spawningValues.endsize = 0.0f;
-		//particleEmitter.spawningValues.spawningSurface.m_Size.x = 5.0f;
-		//particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
-		//particleEmitter.spawningValues.spawningSurface.m_Transform = &spawningSurfaceTransform;
-		//float waitTime = 0.0f;
-		//float spawnDelay = 2.5f;
-
 		// Main loop
 		while (!m_ActiveWindowHandle->IsShouldClose())
 		{
@@ -212,11 +200,6 @@ namespace Drop
 			}
 
 			ParticleSystem::Update(m_ECS, m_DeltaTime);
-
-			// Calculate world transform every time the transform in changed
-			//m_SceneGraph.CalculateWorldTransforms(
-			//	m_CumulatedTransforms
-			//);
 
 			SceneGraph::CalculateWorldTransforms(m_ECS);
 

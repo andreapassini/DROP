@@ -17,41 +17,41 @@ public:
 #pragma region ShaderSetup
         //FULL_COLOR_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\00_basic.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\01_fullcolor.frag"
+            GetFullPath("\\DROP\\src\\Drop\\shaders\\00_basic.vert").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\01_fullcolor.frag").c_str()
         );
 
         // ILLUMINATION_GGX_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\21_ggx_tex_shadow.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\ggx_tex_shadow_noSub.frag"
+            GetFullPath("\\DROP\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag").c_str()
         );
 
         // SHADOW_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\19_shadowmap.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\20_shadowmap.frag"
+            GetFullPath("\\DROP\\src\\Drop\\shaders\\19_shadowmap.vert").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\20_shadowmap.frag").c_str()
         );
 
         // EMPTY_QUAD_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\quadFrustum.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\quadFrustum.geom"
-            , "..\\Drop\\src\\DROP\\shaders\\quadFrustum.frag"
+            GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.vert").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.geom").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.frag").c_str()
         );
 
         // EMPTY_BOX_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\boxFrustum.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\boxFrustum.geom"
-            , "..\\Drop\\src\\DROP\\shaders\\boxFrustum.frag"
+            GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.vert").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.geom").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.frag").c_str()
         );
 
         // BILLBOARD_SHADER
         gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            "..\\Drop\\src\\DROP\\shaders\\billboard.vert"
-            , "..\\Drop\\src\\DROP\\shaders\\billboard.geom"
-            , "..\\Drop\\src\\DROP\\shaders\\billboard.frag"
+            GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.vert").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.geom").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.frag").c_str()
         );
 #pragma endregion
 
@@ -59,13 +59,15 @@ public:
         std::cout << "GetExecutablePath" << GetExecutablePath() << std::endl;
         std::cout << "GetRelativeProjectPath" << GetRelativeProjectPath() << std::endl;
         
-        gameEngine->m_Models.emplace_back("..\\models\\cube.obj");
-        gameEngine->m_Models.emplace_back("..\\models\\sphere.obj");
-        gameEngine->m_Models.emplace_back("..\\models\\bunny_lp.obj");
-        gameEngine->m_Models.emplace_back("..\\models\\plane.obj");
+        gameEngine->m_Models.emplace_back(GetFullPath("\\models\\cube.obj"));
+        gameEngine->m_Models.emplace_back(GetFullPath("\\models\\sphere.obj"));
+        gameEngine->m_Models.emplace_back(GetFullPath("\\models\\bunny_lp.obj"));
+        gameEngine->m_Models.emplace_back(GetFullPath("\\models\\plane.obj"));
 
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\UV_Grid_Sm.png"));
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture("..\\textures\\SoilCracked.png"));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(GetFullPath("\\textures\\UV_Grid_Sm.png").c_str()));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(GetFullPath("\\textures\\SoilCracked.png").c_str()));
+
+        std::cin.get();
 
         // Testing ECS
         gameEngine->m_ECS.RegisterComponent<TransformComponent>();
