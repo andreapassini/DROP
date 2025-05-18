@@ -42,21 +42,33 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
     - [x] Renderer refactoring
     - [x] Render translucent objects
     - [x] back-face culling, fix the CCW(for mesh) and CW(for billboards)
-    - [ ] Add debug main view, render normals in color channel
-    - [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
+    - Debug
+        - [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
+        - [ ] Add debug main view, render normals in color channel
+        - [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
     - [ ] Consider reworking the material to use a map for textures 
-    - [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
     - [ ] Add Normale, Specular, Bump and Displacement maps
     - [ ] Add cube maps
 
+## Next Big Features Roadmap
 
-# Arachitecture
+- Vertex Animations for Grass
+- Outline and stencil buffer
+- Collision Detection & Response System
+- Physics simulation for rigid bodies made of particles (rework and how to convert particle pos into transform?)
+- Skeletal animations
+- Cloth simulation (just a rework)
+- Fluid simulation (Look at Doom:DarkAges video https://youtu.be/Ed4vNNQwCDU?si=3qRpfoFei1mSx-Qn)
+- RayMarching for clouds and fog (https://youtu.be/Ed4vNNQwCDU?si=3qRpfoFei1mSx-Qn)
+- Vulkan and renderer rework (winter is coming)
+
+# Architecture
 ![DROPArchitecture](https://github.com/user-attachments/assets/8edc2ab9-edb3-4983-beb6-bf3c770f03a7)
 
 # Shadows
 
 In order to create shadows we need to put the camera on the light position with the same orientation as the direction of the light.
-We do a first render pass, witout calculating the color, in order to find the surfaces that are hidden by the objects.
+We do a first render pass, without calculating the color, in order to find the surfaces that are hidden by the objects.
 We do a second render pass, this time we calculate the color of the fragments keeping in consideration also the area obscured by the shadows.
 
 # Scene Graph
@@ -64,7 +76,7 @@ We do a second render pass, this time we calculate the color of the fragments ke
 Implementing the scene graph using a tree.
 We will store the transform in local coordinates and the cumulated transform in world coordinates.
 Local transform for the transformations related to the single object.
-The cumulated one for the scale, orientation and postion of the object in world space, to be used by the other components.
+The cumulated one for the scale, orientation and position of the object in world space, to be used by the other components.
 
 # Particle System
 
