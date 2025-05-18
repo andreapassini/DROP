@@ -75,6 +75,25 @@ namespace Drop
         // we enable Z test
         glEnable(GL_DEPTH_TEST);
 
+        // Backface culling
+        if (rendererContext.backFaceCulling)
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_FRONT);
+            switch (rendererContext.clockWiseOrder)
+            {
+            case EClockWise::CLOCKWISE:
+                glFrontFace(GL_CW);
+                break;
+            case EClockWise::COUNTER_CLOCKWISE:
+                glFrontFace(GL_CCW);
+                break;
+            default:
+                glFrontFace(GL_CCW);
+                break;
+            }
+        }
+
         //the "clear" color for the frame buffer
         glClearColor(DEFAULT_CLEAR_COLOR.r, DEFAULT_CLEAR_COLOR.g, DEFAULT_CLEAR_COLOR.b, 1.0f);
 
@@ -123,7 +142,6 @@ namespace Drop
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        ///////////////////////////////////////////////////////////////////
     }
 
     void Renderer::RenderParticles(

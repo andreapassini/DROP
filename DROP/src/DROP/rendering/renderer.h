@@ -51,6 +51,11 @@
 
 namespace Drop
 {
+    enum EClockWise {
+        COUNTER_CLOCKWISE
+        , CLOCKWISE
+    };
+
     struct SceneContext {
         Camera* camera;
         //glm::mat4 view;
@@ -82,6 +87,9 @@ namespace Drop
         const GLuint SHADOW_HEIGHT = 1024;
 
         glm::vec3 clearColor = glm::vec3(0.26f, 0.46f, 0.98f);
+
+        bool backFaceCulling = true;
+        EClockWise clockWiseOrder = EClockWise::COUNTER_CLOCKWISE;
 
         bool drawDebug = false;
 

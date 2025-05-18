@@ -125,6 +125,12 @@ namespace Drop
 
 		RendererContext* renderContext = &m_ECS.GetSingletonComponent<RendererContext>();
 
+		renderContext->backFaceCulling = false;
+
+		// #TODO Fix this, since meshes are clockwise and particles(billboards) counterclockwise
+		//renderContext->backFaceCulling = true;
+		//renderContext->clockWiseOrder = EClockWise::CLOCKWISE;
+
 		Renderer::Init(
 			(GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow()
 			, *renderContext

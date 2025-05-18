@@ -18,32 +18,36 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 - double click on "scripts\\Setup.bat"
 
 # TODO List
-- [x] ECS porting (branch ECS_Setup)
-    - [x] Renderer refactoring
+- ECS porting
     - [x] Static mesh component
     - [x] Transform component
     - [x] Particle system porting
     - [ ] Add multithreading to transform updates
     - [ ] Add multithreading to particle update
+    - [ ] Fix the scene graph move and remove node, the error is not considering move from another branch
     - [ ] rename Scene and Renderer context into state
     - [ ] add a Game State to singleton components
     - [ ] Add time state
     - [ ] Move the active camera to a singleton component (Scene context)
     - [ ] Move the Inputs into a Singleton Components (TBD)
     - [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
-- [x] Code cleanup:
+    
+- Code cleanup:
     - [x] Fix relative path for assets, using path from exe 
-- [x] Rendering translucent things
-- [ ] Add debug main view, render normals in color channel
-- [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
-- [ ] Consider reworking the material to use a map for textures 
-- [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
-- [ ] Fix the scene graph move and remove node, the error is not considering move from another branch
-- [ ] Add cube maps
+
+- Rendering
+    - [x] Renderer refactoring
+    - [x] Render translucent objects
+    - [x] back-face culling, fix the CCW(for mesh) and CW(for billboards)
+    - [ ] Add debug main view, render normals in color channel
+    - [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
+    - [ ] Consider reworking the material to use a map for textures 
+    - [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
+    - [ ] Add Normale, Specular, Bump and Displacement maps
+    - [ ] Add cube maps
 
 
 # Arachitecture
-
 ![DROPArchitecture](https://github.com/user-attachments/assets/8edc2ab9-edb3-4983-beb6-bf3c770f03a7)
 
 # Shadows
