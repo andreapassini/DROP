@@ -33,6 +33,7 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
     - [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
 - [x] Code cleanup:
     - [x] Fix relative path for assets, using path from exe 
+- [x] Rendering translucent things
 - [ ] Add debug main view, render normals in color channel
 - [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
 - [ ] Consider reworking the material to use a map for textures 
