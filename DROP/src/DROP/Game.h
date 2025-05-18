@@ -41,7 +41,6 @@ namespace Drop
 
 		bool m_Wireframe = false;
 		bool m_VSync = false;
-		bool m_StopEachFrame = false;
 
 		glm::vec3 m_LightDir = glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::mat4 m_lightSpaceMatrix;

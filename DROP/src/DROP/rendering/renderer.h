@@ -63,10 +63,11 @@ namespace Drop
         std::vector<Material>* materials;
         std::vector<TextureID>* textuers;
 
-        int width;
-        int height;
+        int32_t width;
+        int32_t height;
 
-        GLboolean wireframe;
+        bool wireframe;
+        bool vSync = false;
     };
 
     struct RendererContext {

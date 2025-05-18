@@ -58,18 +58,6 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		);
 	}
 
-
-	// draw all the particles
-
-	//Renderer::RenderScene(
-	//	sceneContext
-	//	, rendererContext
-	//	, rendereableObjects
-	//	, sceneContext.m_CumulatedTransforms
-	//	, &(rendererContext.m_ShadowShader)
-	//	, &(rendererContext.m_LightShader)
-	//);
-
 	std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
 
 	Renderer::RenderParticles(

@@ -28,10 +28,12 @@ struct Particle {
 	float endsize = 0.0f;
 	Vector3 startSpeed{ 1.0f };
 	Vector3 endSpeed{ 0.0f };
+
+	// #TODO Implement a Vector4 and dont use this shit
 	Vector3 startColor{ 1.0f, 1.0f, 1.0f };
 	Vector3 endColor{ 1.0f, 1.0f, 1.0f };
 	float startColorAlpha = 1.0f;
-	float endColorAlpha = 1.0f;
+	float endColorAlpha = 0.0f;
 };
 
 struct ParticleStartValues {

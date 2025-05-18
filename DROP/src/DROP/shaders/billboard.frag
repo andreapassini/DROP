@@ -1,6 +1,8 @@
 #version 430 core
 
 uniform sampler2D tex_0;
+uniform float alphaCutOut;
+
 in vec2 Vertex_UV;
 in vec4 Vertex_Color;
 
@@ -11,8 +13,18 @@ void main (void)
 {
   vec2 uv = Vertex_UV.xy;
   uv.y *= -1.0;
-  vec3 t = texture(tex_0,uv).rgb;
+  vec4 t = texture(tex_0,uv).rgba;
 
-  // colorFrag = vec4(1.0, 0.5, 0.5, 1.0);
-  colorFrag = vec4(t, 1.0) * Vertex_Color;
+  colorFrag = t * Vertex_Color;
+
+  if(colorFrag.a < alphaCutOut){
+//	// Debug purpose
+//	colorFrag.r = alphaCutOut;
+//	colorFrag.g = 0.0;
+//	colorFrag.b = 0.0;
+//	colorFrag.a = 1.0;
+//	// ----
+
+	discard;
+  }
 }

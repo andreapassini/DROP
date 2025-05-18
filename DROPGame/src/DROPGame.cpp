@@ -5,6 +5,11 @@
 #include "DROP/sceneGraph/sceneGraph.h"
 #include "DROP/utils/ExecPath.h"
 
+#define UV_GRID_SIM_DIFFUSE_MAP 0
+#define CRACKED_SOIL_DIFFUSE_MAP 1
+#define WIDOWS_LOGO_DIFFUSE_MAP 2
+#define GRASS_DIFFUSE_MAP 3
+
 using namespace Drop;
 
 class ExampleGame : public Drop::Game
@@ -59,17 +64,23 @@ public:
         std::cout << "GetExecutablePath" << GetExecutablePath() << std::endl;
         std::cout << "GetRelativeProjectPath" << GetRelativeProjectPath() << std::endl;
         
+#pragma region Assets
         gameEngine->m_Models.emplace_back(GetFullPath("\\models\\cube.obj"));
         gameEngine->m_Models.emplace_back(GetFullPath("\\models\\sphere.obj"));
         gameEngine->m_Models.emplace_back(GetFullPath("\\models\\bunny_lp.obj"));
         gameEngine->m_Models.emplace_back(GetFullPath("\\models\\plane.obj"));
 
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(GetFullPath("\\textures\\UV_Grid_Sm.png").c_str()));
-        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(GetFullPath("\\textures\\SoilCracked.png").c_str()));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(
+            GetFullPath("\\textures\\UV_Grid_Sm.png").c_str()));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(
+            GetFullPath("\\textures\\SoilCracked.png").c_str()));
 
-        std::cin.get();
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(
+            GetFullPath("\\textures\\windowsLogo\\diffuse.png").c_str()));
+        gameEngine->m_TextureIds.push_back(GameEngine::LoadTexture(
+            GetFullPath("\\textures\\grass\\diffuse.png").c_str()));
+#pragma endregion
 
-        // Testing ECS
         gameEngine->m_ECS.RegisterComponent<TransformComponent>();
 
         // #TODO 
@@ -100,7 +111,7 @@ public:
             material.kd = 3.0f;
             material.alpha = 0.2f;
             material.f0 = 0.9f;
-            material.textures[0].textureId = 1;
+            material.textures[0].textureId = CRACKED_SOIL_DIFFUSE_MAP;
             material.textures[0].UVRepeat = 80.0f;
             material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
@@ -127,7 +138,7 @@ public:
             material.kd = 3.0f;
             material.alpha = 0.2f;
             material.f0 = 0.9f;
-            material.textures[0].textureId = 0;
+            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
             material.textures[0].UVRepeat = 1.0f;
             material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
@@ -156,7 +167,7 @@ public:
             material.kd = 3.0f;
             material.alpha = 0.2f;
             material.f0 = 0.9f;
-            material.textures[0].textureId = 0;
+            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
             material.textures[0].UVRepeat = 1.0f;
             material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
@@ -185,7 +196,7 @@ public:
             material.kd = 3.0f;
             material.alpha = 0.2f;
             material.f0 = 0.9f;
-            material.textures[0].textureId = 0;
+            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
             material.textures[0].UVRepeat = 1.0f;
             material.shaderID = ILLUMINATION_GGX_SHADER;
             gameEngine->m_Materials.push_back(material);
@@ -210,8 +221,8 @@ public:
             );
             
             ParticleEmitter& particleEmitter = gameEngine->m_ECS.Add<ParticleEmitter, TransformComponent>(particleEmitterID);
-            particleEmitter.particleToEmitEachTime = 10;
-            particleEmitter.spawningValues.textureID = 0;
+            particleEmitter.particleToEmitEachTime = 25;
+            particleEmitter.spawningValues.textureID = WIDOWS_LOGO_DIFFUSE_MAP;
             particleEmitter.spawningValues.spawningSurface.m_Size.x = 10.0f;
             particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
             particleEmitter.spawningValues.startsize = 1.0f;
@@ -219,39 +230,32 @@ public:
 
         }
 
-
         SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
 
-		//// Now the 2 maps have all the keys as the SceneGraph
-		//for (auto& it : gameEngine->m_SceneGraph.m_GameObjects)
-		//{
-  //          gameEngine->m_CumulatedTransforms[it.first] = VgMath::Transform();
-		//}
+//      {
+//          // when emplace_back at back, it will call destructor
+//          // on the last element to use the new back
+//          // https://www.youtube.com/watch?v=FdaYlWOV084
+//          //gameEngine->m_DrawableLines.reserve(3);
+//          // To avoid resizing we cancel the copy constructor
 
-  //      {
-  //          // when emplace_back at back, it will call destructor
-  //          // on the last element to use the new back
-  //          // https://www.youtube.com/watch?v=FdaYlWOV084
-  //          //gameEngine->m_DrawableLines.reserve(3);
-  //          // To avoid resizing we cancel the copy constructor
+//          gameEngine->m_DrawableLines.emplace_back(
+//              glm::vec3(0),
+//              glm::vec3(1)
+//              , DEFAULT_HIT_COLOR
+//          );
 
-  //          gameEngine->m_DrawableLines.emplace_back(
-  //              glm::vec3(0),
-  //              glm::vec3(1)
-  //              , DEFAULT_HIT_COLOR
-  //          );
-
-  //          gameEngine->m_DrawableLines.emplace_back(
-  //         glm::vec3(1.1),
-  //              glm::vec3(2)
-  //              , COLOR_AMBER
-  //          );
-  //          
-  //          gameEngine->m_DrawableLines.emplace_back(
-  //         glm::vec3(2.1),
-  //              glm::vec3(3)
-  //          );
-  //      }
+//          gameEngine->m_DrawableLines.emplace_back(
+//         glm::vec3(1.1),
+//              glm::vec3(2)
+//              , COLOR_AMBER
+//          );
+//          
+//          gameEngine->m_DrawableLines.emplace_back(
+//         glm::vec3(2.1),
+//              glm::vec3(3)
+//          );
+//      }
 
         m_VSync = gameEngine->GetWindowHandle().IsVSync();
 	}
@@ -264,6 +268,11 @@ public:
 
         ImGui::Text("Fps: %d", (int)(1.0f/m_DebugDeltaTime));
         ImGui::Text("Average Fps: %d\n\tevery %.2f sec ", m_AverageFPS, m_FrameAverageCalulationDuration);
+
+        ImGui::Separator();
+        ImGui::Checkbox("Pause Particle Update", &m_PauseParticleUpdate);
+
+        ImGui::Separator();
         ImGui::Checkbox("VSync", &m_VSync);
 
         ImGui::Separator();
@@ -289,6 +298,7 @@ public:
         gameEngine->GetWindowHandle().SetVSync(m_VSync);
 
         gameEngine->SetDrawDebug(m_DrawDebug);
+        gameEngine->m_PauseParticleUpdate = m_PauseParticleUpdate;
 
         Callbacks();
 
@@ -310,19 +320,17 @@ public:
         averageDeltaTime = m_SumDeltaTime / m_Frames;
 
         // Particle logic
-        if (waitTime < gameEngine->m_CurrentTime) {
-        	waitTime = gameEngine->m_CurrentTime + spawnDelay;
-
-            ParticleEmitter& particleEmitter = gameEngine->m_ECS.Get<ParticleEmitter>(particleEmitterID);
-            TransformComponent& particleEmitterTransform = gameEngine->m_ECS.Get<TransformComponent>(particleEmitterID);
-            // this is done inside the Emit function, not super clean
-            //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
-            EmitParticles(particleEmitter, particleEmitterTransform.m_CumulatedTransform);
-        }
-
-        if (m_StopEachFrame)
+        if (!m_PauseParticleUpdate)
         {
-            std::cin.get();
+            if (waitTime < gameEngine->m_CurrentTime) {
+        	    waitTime = gameEngine->m_CurrentTime + spawnDelay;
+
+                ParticleEmitter& particleEmitter = gameEngine->m_ECS.Get<ParticleEmitter>(particleEmitterID);
+                TransformComponent& particleEmitterTransform = gameEngine->m_ECS.Get<TransformComponent>(particleEmitterID);
+                // this is done inside the Emit function, not super clean
+                //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
+                EmitParticles(particleEmitter, particleEmitterTransform.m_CumulatedTransform);
+            }
         }
     }
 
@@ -346,6 +354,7 @@ public:
     uint64_t m_Frames = 0;
 
     bool m_DrawDebug = true;
+    bool m_PauseParticleUpdate = false;
 
     // Particles Logic
     float waitTime = 0.0f;

@@ -33,9 +33,12 @@ struct Material {
 	ShaderID shaderID = 0;
 
 	// Illumination shader parameters
-	GLfloat kd = 3.0f;		// weight for the diffusive component
-	GLfloat alpha = 0.2f;	// roughness index for GGX shader
-	GLfloat f0 = 0.9f;		// Fresnel reflectance at 0 degree (Schlik's approximation)
+	float kd = 3.0f;		// weight for the diffusive component
+	float alpha = 0.2f;	// roughness index for GGX shader
+	float f0 = 0.9f;		// Fresnel reflectance at 0 degree (Schlik's approximation)
+
+	// -- 
+	float alphaCutOut = 0.1f;
 
 	// Texture parameters
 	TextureSpecification textures[MAX_USER_TEXTURES];

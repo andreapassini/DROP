@@ -199,7 +199,10 @@ namespace Drop
 				}
 			}
 
-			ParticleSystem::Update(m_ECS, m_DeltaTime);
+			if (!m_PauseParticleUpdate)
+			{
+				ParticleSystem::Update(m_ECS, m_DeltaTime);
+			}
 
 			SceneGraph::CalculateWorldTransforms(m_ECS);
 
@@ -248,12 +251,16 @@ namespace Drop
 
 	int GameEngine::LoadTexture(const char* path)
 	{
+		std::cout << path << std::endl;
+
 		GLuint textureImage = 0;
 		int w, h, channels;
 		unsigned char* image;
-		image = stbi_load(path, &w, &h, &channels, STBI_rgb);
+		//image = stbi_load(path, &w, &h, &channels, STBI_rgb);
+		//image = stbi_load(path, &w, &h, &channels, STBI_rgb_alpha);
+		image = stbi_load(path, &w, &h, &channels, STBI_default); //    STBI_default = 0, // only used for desired_channels
 
-		if (image == nullptr)
+		if (image == nullptr)\
 			std::cout << "Failed to load texture!" << std::endl;
 
 		glGenTextures(1, &textureImage);
@@ -263,6 +270,7 @@ namespace Drop
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 		else if (channels == 4)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
 		glGenerateMipmap(GL_TEXTURE_2D);
 		// we set how to consider UVs outside [0,1] range
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

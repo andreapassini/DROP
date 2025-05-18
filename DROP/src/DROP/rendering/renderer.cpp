@@ -131,6 +131,14 @@ namespace Drop
         , std::vector<ParticleEmitter>& particleEmitters
         , Shader* const billboardShader
     ) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+        // Even if they are transparent the depth test will fail
+        // Sol1 - just disable depth test
+        // Sol2 - Sort the elements from distance with the camera, this may create some strange effects depending on how the interlaps
+        glDisable(GL_DEPTH_TEST);
+
         // Clear errors
         glCheckError();
 
@@ -166,16 +174,6 @@ namespace Drop
                 }
                 activeParticle++;
 
-                //GLint positionLocation = glGetUniformLocation(billboardShader->Program, "position");
-                //glCheckError();
-                //glUniform3fv(positionLocation, 1, glm::value_ptr(
-                //    glm::vec3(particle.position.x
-                //        , particle.position.y
-                //        , particle.position.z
-                //    )
-                //));
-                //glCheckError();
-
                 glm::mat4 modelMatrix(1.0f);
                 VgMath::Transform testTransform;
                 testTransform.m_Translate = particle.position.asVector3();
@@ -187,6 +185,12 @@ namespace Drop
                 GLint particleSizeLocation = glGetUniformLocation(billboardShader->Program, "particle_size");
                 glCheckError();
                 glUniform1f(particleSizeLocation, particle.size);
+                glCheckError();
+
+                // #TODO Rework this better, do not hardcode the value
+                GLint alphaCutOutLocation = glGetUniformLocation(billboardShader->Program, "alphaCutOut");
+                glCheckError();
+                glUniform1f(alphaCutOutLocation, 0.5f);
                 glCheckError();
 
                 GLint colorLocation = glGetUniformLocation(billboardShader->Program, "colorIn");
@@ -217,6 +221,10 @@ namespace Drop
         // VAO is "detached"
         glBindVertexArray(0);
         glCheckError();
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
     }
 
     void Renderer::RenderBillboard(

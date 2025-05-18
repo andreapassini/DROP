@@ -75,7 +75,8 @@ namespace Drop
 		std::vector<Model> m_Models;
 		std::vector<Material> m_Materials;
 
-		// GPU Particles
+		// Particles
+		bool m_PauseParticleUpdate = false;
 
 		// time
 		float m_DeltaTime = 0.0f;
