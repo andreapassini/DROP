@@ -41,7 +41,6 @@ extern bool g_GameEngineRunning;
 #endif
 
 static Drop::GameEngine* s_Instance = nullptr;
-//static bseecs::ECS m_ECS{};
 
 namespace Drop
 {
