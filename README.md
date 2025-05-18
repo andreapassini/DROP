@@ -19,7 +19,7 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 # TODO List
 - Math
-    - [ ] Vector4
+    - [x] Vector4
 
 - ECS porting
     - [x] Static mesh component
@@ -34,6 +34,9 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
     - [ ] Move the active camera to a singleton component (Scene context)
     - [ ] Move the Inputs into a Singleton Components (TBD)
     - [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
+
+- Particles
+  - [ ] GPU Particles
 
 - Code cleanup:
     - [x] Fix relative path for assets, using path from exe 
