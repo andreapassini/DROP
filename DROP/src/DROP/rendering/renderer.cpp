@@ -150,12 +150,15 @@ namespace Drop
         , Shader* const billboardShader
     ) {
         glEnable(GL_BLEND);
+
+        // Make it glow
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
         // Even if they are transparent the depth test will fail
-        // Sol1 - just disable depth test
+        // Sol1 - just disable depth test, but it creates artifacts since we render on top of everything
         // Sol2 - Sort the elements from distance with the camera, this may create some strange effects depending on how the interlaps
-        glDisable(GL_DEPTH_TEST);
+        // (Using this) Sol3 - read from depth but dont write (https://stackoverflow.com/questions/5793354/how-to-write-prevent-writing-to-opengl-depth-buffer-in-glsl)
+        glDepthMask(false);
 
         // Clear errors
         glCheckError();
@@ -208,7 +211,7 @@ namespace Drop
                 // #TODO Rework this better, do not hardcode the value
                 GLint alphaCutOutLocation = glGetUniformLocation(billboardShader->Program, "alphaCutOut");
                 glCheckError();
-                glUniform1f(alphaCutOutLocation, 0.5f);
+                glUniform1f(alphaCutOutLocation, 0.1f);
                 glCheckError();
 
                 GLint colorLocation = glGetUniformLocation(billboardShader->Program, "colorIn");
@@ -219,7 +222,6 @@ namespace Drop
                         , particle.color.b
                         , particle.colorAlpha
                     )
-                    //glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
                 ));
                 glCheckError();
 
@@ -242,7 +244,7 @@ namespace Drop
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
+        glDepthMask(true);
     }
 
     void Renderer::RenderBillboard(

@@ -42,6 +42,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		sceneContext
 		, rendererContext
 	);
+
 	// draw all the mashes
 	for (size_t i = 0; i < denseMeshComponents.size(); i++)
 	{
@@ -59,10 +60,9 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	}
 
 	std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
-
 	Renderer::RenderParticles(
 		sceneContext
-		,denseParticleEmitters
+		, denseParticleEmitters
 		, &rendererContext.shaders[BILLBOARD_SHADER]
 	);
 
