@@ -35,4 +35,9 @@ inline Scalar randomBetween(const Scalar min, const Scalar max) {
     return lerp(min, max, random0to1);
 }
 
+inline Scalar RandomBetween0and1() {
+    Scalar random0to1 = (Scalar)std::rand() / RAND_MAX;
+    return random0to1;
+}
+
 };

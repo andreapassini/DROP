@@ -21,7 +21,8 @@ void EmitParticles(
 		spawningValues.spawningSurface.m_Transform = &transform;
 		particle.position = spawningValues.spawningSurface.RandomPointOnSurface();
 
-		particle.lifeTime = spawningValues.lifeTime;
+		// this could be done better, but this is simpler 
+		particle.lifeTime = (0.5f * spawningValues.lifeTime) + (0.5f * spawningValues.lifeTime) * RandomBetween0and1();
 
 		particle.startsize = spawningValues.startsize;
 		particle.endsize = spawningValues.endsize;
@@ -29,8 +30,6 @@ void EmitParticles(
 		particle.endSpeed = spawningValues.endSpeed;
 		particle.startColor = spawningValues.startColor;
 		particle.endColor = spawningValues.endColor;
-		particle.startColorAlpha = spawningValues.startColorAlpha;
-		particle.endColorAlpha = spawningValues.endColorAlpha;
 
 		particle.textureID = spawningValues.textureID;
 	}
@@ -62,6 +61,5 @@ void UpdateParticles(
 		particle.size = particle.startsize + particle.lerpFactor * (particle.endsize - particle.startsize);
 		particle.speed = particle.startSpeed + particle.lerpFactor * (particle.endSpeed - particle.startSpeed);
 		particle.color = particle.startColor + particle.lerpFactor * (particle.endColor - particle.startColor);
-		particle.colorAlpha = particle.startColorAlpha + particle.lerpFactor * (particle.endColorAlpha - particle.startColorAlpha);
 	}
 }

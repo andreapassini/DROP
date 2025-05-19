@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DROP/math/mat3.h"
+#include "DROP/math/vector4.h"
 #include "DROP/math/surface.h"
 
 #include "DROP/rendering/material.h"
@@ -19,8 +20,7 @@ struct Particle {
 	float lerpFactor = 0.0f;
 	bool isActive = false;
 
-	Vector3 color{ 1.0f, 1.0f, 1.0f };
-	float colorAlpha = 1.0f;
+	Vector4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
 
 	TextureID textureID = 0;
 
@@ -29,11 +29,8 @@ struct Particle {
 	Vector3 startSpeed{ 1.0f };
 	Vector3 endSpeed{ 0.0f };
 
-	// #TODO Implement a Vector4 and dont use this shit
-	Vector3 startColor{ 1.0f, 1.0f, 1.0f };
-	Vector3 endColor{ 1.0f, 1.0f, 1.0f };
-	float startColorAlpha = 1.0f;
-	float endColorAlpha = 0.0f;
+	Vector4 startColor{ 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector4 endColor{ 1.0f, 1.0f, 1.0f, 0.0f };
 };
 
 struct ParticleStartValues {
@@ -48,10 +45,8 @@ struct ParticleStartValues {
 	Vector3 startSpeed{ 0.0f, 5.0f, 0.0f };
 	Vector3 endSpeed{ 0.0f, 0.0f, 0.0f };
 
-	Vector3 startColor{ 1.0f, 1.0f, 1.0f };
-	Vector3 endColor{ 1.0f, 1.0f, 1.0f };
-	float startColorAlpha = 1.0f;
-	float endColorAlpha = 0.0f;
+	Vector4 startColor{ 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector4 endColor{ 1.0f, 1.0f, 1.0f, 0.0f };
 
 	TextureID textureID = 0;
 };

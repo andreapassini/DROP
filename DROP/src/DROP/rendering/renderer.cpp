@@ -220,7 +220,7 @@ namespace Drop
                         particle.color.r
                         , particle.color.g
                         , particle.color.b
-                        , particle.colorAlpha
+                        , particle.color.a
                     )
                 ));
                 glCheckError();
