@@ -19,12 +19,8 @@ std::string GetExecutablePath()
 std::string GetExecutableDir()
 {
     std::string executablePath = GetExecutablePath();
-    char* exePath = new char[executablePath.length()];
-    strcpy(exePath, executablePath.c_str());
-    PathRemoveFileSpecA(exePath);
-    std::string directory = std::string(exePath);
-    delete[] exePath;
-    return directory;
+    executablePath = executablePath.substr(0, executablePath.find_last_of("\\/"));
+    return executablePath;
 }
 
 std::string MergePaths(std::string pathA, std::string pathB)
