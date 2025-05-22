@@ -19,6 +19,8 @@ project "Drop"
       "../dependencies/stb_img/include",
       "../dependencies/assimp/includes",
       "../dependencies/spdlog/include",
+      "../dependencies/yaml-cpp/include"
+      -- "%{IncludeDir.yaml_cpp}"
    }
 
    libdirs { 
@@ -31,7 +33,11 @@ project "Drop"
       
       , "GLFW"
       
+      -- GUI
       , "ImGui"
+
+      -- Yaml
+      , "yaml-cpp"
 
       -- ASSIMP
       , "assimp-vc143-mt.lib"
@@ -47,6 +53,7 @@ project "Drop"
       , "Shell32.lib"
       , "Advapi32.lib"
 
+      -- Windows specific
       , "shlwapi.lib"
    }
 
