@@ -1,11 +1,16 @@
 #include "SceneSerializer.h"
 
+// Dependencies includes
 #include <yaml-cpp/yaml.h>
 
+// std includes
 #include <fstream>
 
+// Engine includes
 #include "Drop/sceneGraph/sceneGraph.h"
 #include "Drop/rendering/staticMeshComponent.h"
+#include "Drop/particles/particle.h"
+
 
 // To Be Removed
 struct Scene
@@ -29,6 +34,10 @@ void SceneSerializer::SerializeEntityAsText(
 
 	}	
 	if (ecs.Has<StaticMeshComponent>(entityId))
+	{
+
+	}
+	if (ecs.Has<ParticleEmitter>(entityId))
 	{
 
 	}

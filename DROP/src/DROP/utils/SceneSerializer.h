@@ -6,7 +6,7 @@
 struct Scene;
 
 // forward decl of namespace first
-#include "Drop/ECS/beecs.h"
+#include "DROP/ECS/beecs.h"
 namespace YAML { class Emitter; }
 
 namespace SceneSerializer

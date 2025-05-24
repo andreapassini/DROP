@@ -11,12 +11,10 @@
 
 using namespace bseecs;
 
-constexpr EntityID ROOT_ID = -1;
+constexpr bseecs::EntityID ROOT_ID = -1;
 
 class TransformComponent {
 public:
-	//uint32_t m_Id; // this will be the ECS id so we dont need it
-	
 	VgMath::Transform m_LocalTransform;
 	VgMath::Transform m_CumulatedTransform; // cumulated transform
 

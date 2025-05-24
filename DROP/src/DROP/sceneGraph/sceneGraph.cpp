@@ -1,3 +1,4 @@
+#include "sceneGraph.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -6,6 +7,7 @@
 #include <future> 
 
 #include <DROP/utils/Log.h>
+
 
 // Calculate the cumulated transform starting from a local transform
 // it also calculated the model matrix.
