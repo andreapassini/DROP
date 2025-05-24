@@ -373,6 +373,16 @@ namespace bseecs {
 
 		ECS() = default;
 
+		EntityID GetMaxEntity()
+		{
+			return m_maxEntityID;
+		}
+				
+		const std::vector<EntityID>& GetAvailableEntities()
+		{
+			return m_availableEntities;
+		}
+
 		/*
 		* Retrieves reference for the specific component pool given a component name
 		*/
