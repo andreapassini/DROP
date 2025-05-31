@@ -12,4 +12,4 @@
 # Binaries
 **/bin/
 bin-int/
-dependencies/assimp/libs/assimp-vc143-mt.lib
+DROP/dependencies/assimp/libs/assimp-vc143-mt.lib
