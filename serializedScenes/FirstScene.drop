@@ -1,0 +1,98 @@
+Scene: FirstScene
+Entities:
+  - Entity: 0
+    Tag:
+      Tag name: Plane
+    TransformComponent:
+      LocalTransform:
+        Translate: [0, -1, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 10
+      Parent: 18446744073709551615
+      Cumulative Transform:
+        Translate: [0, -1, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 10
+    StaticMeshComponent:
+      modelId: 3
+      materialId: 0
+      bCastShadow: true
+  - Entity: 1
+    Tag:
+      Tag name: Sphere
+    TransformComponent:
+      LocalTransform:
+        Translate: [-3, 1, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 1
+      Parent: 18446744073709551615
+      Cumulative Transform:
+        Translate: [-3, 1, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 1
+    StaticMeshComponent:
+      modelId: 1
+      materialId: 1
+      bCastShadow: true
+  - Entity: 2
+    Tag:
+      Tag name: Cube
+    TransformComponent:
+      LocalTransform:
+        Translate: [7, 1, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+      Parent: 1
+      Cumulative Transform:
+        Translate: [3.6400000751018524, 1.4799999892711639, 0]
+        Rotate: [[0, 1.0000000000000002, 0], 0]
+        Scale: 0.2303999897003175
+    StaticMeshComponent:
+      modelId: 0
+      materialId: 2
+      bCastShadow: true
+  - Entity: 3
+    Tag:
+      Tag name: Bunny
+    TransformComponent:
+      LocalTransform:
+        Translate: [3, 1, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+      Parent: 1
+      Cumulative Transform:
+        Translate: [1.5600000321865082, 1.4799999892711639, 0]
+        Rotate: [[0, 1.0000000000000002, 0], 0]
+        Scale: 0.2303999897003175
+    StaticMeshComponent:
+      modelId: 2
+      materialId: 3
+      bCastShadow: false
+  - Entity: 4
+    Tag:
+      Tag name: Particle Emitter
+    TransformComponent:
+      LocalTransform:
+        Translate: [-5, 0, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+      Parent: 18446744073709551615
+      Cumulative Transform:
+        Translate: [-5, 0, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+    ParticleEmitter:
+      numberOfParticles: 1000
+      particleToEmitEachTime: 25
+      lastIndex: 0
+      spawningValues:
+        spawningSurface:
+          m_Size: [10, 10]
+        lifeTime: 10
+        startsize: 1
+        endsize: 0
+        startSpeed: [0, 5, 0]
+        endSpeed: [0, 0, 0]
+        startColor: [1, 1, 1, 1]
+        endColor: [1, 1, 1, 0]
+        textureID: 2

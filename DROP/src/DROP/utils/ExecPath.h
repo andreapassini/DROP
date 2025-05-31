@@ -22,4 +22,4 @@ std::string GetRelativeProjectPath();
 // get the relative path, 
 // use the file path a marker.
 // Ex: GetRelativeProjectPathWithMarker("\\models\\cube.obj")
-std::string GetRelativeProjectPathWithMarker(std::string markerFilePath = "ProjRelativePathMarker.txt");
+std::string GetRelativeProjectPathWithMarker(std::string markerFilePath = "\\ProjRelativePathMarker.txt");

@@ -6,6 +6,7 @@
 #include "Drop/sceneGraph/scene.h"
 #include "Drop/utils/ExecPath.h"
 #include "Drop/utils/SceneSerializer.h"
+#include "DROP/tags/tag.h"
 
 #define UV_GRID_SIM_DIFFUSE_MAP 0
 #define CRACKED_SOIL_DIFFUSE_MAP 1
@@ -83,6 +84,7 @@ public:
             GetFullPath("\\textures\\grass\\diffuse.png").c_str()));
 #pragma endregion
 
+        gameEngine->m_ECS.RegisterComponent<Tag>();
         gameEngine->m_ECS.RegisterComponent<TransformComponent>();
 
         // #TODO 
@@ -100,6 +102,9 @@ public:
         {
             //uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
             bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+
+            Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+            tag.tagName = "Plane";
 
             TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
             transform.m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
@@ -128,6 +133,9 @@ public:
         // Sphere
         bseecs::EntityID sphereId = gameEngine->m_ECS.CreateEntity();
         {
+            Tag& tag = gameEngine->m_ECS.Add<Tag>(sphereId);
+            tag.tagName = "Sphere";
+
             TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(sphereId);
             transform.m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
             transform.m_LocalTransform.m_Scale = 1.0f;
@@ -155,6 +163,9 @@ public:
         // Cube
         {
             bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+
+            Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+            tag.tagName = "Cube";
 
             TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
             transform.m_Parent = sphereId;
@@ -185,6 +196,9 @@ public:
         {
             bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
 
+            Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+            tag.tagName = "Bunny";
+
             TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
             transform.m_Parent = sphereId;
             transform.m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
@@ -214,6 +228,9 @@ public:
         {
             particleEmitterID = gameEngine->m_ECS.CreateEntity();
 
+            Tag& tag = gameEngine->m_ECS.Add<Tag>(particleEmitterID);
+            tag.tagName = "Particle Emitter";
+
             TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(particleEmitterID);
             transform.m_LocalTransform.m_Translate = VgMath::Vector3(-5.0f, 0.0f, 0.0f);
             transform.m_LocalTransform.m_Scale = 0.48f;
@@ -235,10 +252,10 @@ public:
         SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
                 
         Scene currScene;
-        currScene.sceneName = "A scene";
+        currScene.sceneName = "FirstScene";
         currScene.ecs = gameEngine->m_ECS;
 
-        std::string scenePath = "FirstScene.drop";
+        std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene.sceneName + ".drop";
         SceneSerializer::SerializeSceneAsText(
             scenePath
             , &currScene
@@ -297,7 +314,7 @@ public:
         ImGui::Begin("Drop Scene");
         ImGui::Separator();
         ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
-
+            
 		ImGui::End();
 
 		//ImGui::ShowDemoWindow();

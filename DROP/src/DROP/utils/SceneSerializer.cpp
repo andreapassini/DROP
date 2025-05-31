@@ -11,6 +11,7 @@
 #include "Drop/rendering/staticMeshComponent.h"
 #include "Drop/particles/particle.h"
 #include "Drop/sceneGraph/scene.h"
+#include "Drop/tags/tag.h"
 
 namespace Drop
 {
@@ -90,14 +91,24 @@ namespace SceneSerializer
 
 		// For each components: serialize
 #pragma region SerializeComponents
+		if (ecs.Has<Tag>(entityId))
+		{
+			out << YAML::Key << "Tag";
+			
+			out << YAML::BeginMap;
+			Tag& currentTag = ecs.Get<Tag>(entityId);
+			out << YAML::Key << "Tag name" << YAML::Value << currentTag.tagName;
+			out << YAML::EndMap;
+		}		
 		if (ecs.Has<TransformComponent>(entityId))
 		{
 			out << YAML::Key << "TransformComponent";
 
 			out << YAML::BeginMap;
 			TransformComponent& currentTransformComp = ecs.Get<TransformComponent>(entityId);
-			out << YAML::Key << "LocalTransform" << YAML::Value << currentTransformComp.m_CumulatedTransform;
+			out << YAML::Key << "LocalTransform" << YAML::Value << currentTransformComp.m_LocalTransform;
 			out << YAML::Key << "Parent" << YAML::Value << currentTransformComp.m_Parent;
+			out << YAML::Key << "Cumulative Transform" << YAML::Value << currentTransformComp.m_CumulatedTransform;
 			out << YAML::EndMap;
 
 		}
@@ -113,7 +124,7 @@ namespace SceneSerializer
 		}
 		if (ecs.Has<ParticleEmitter>(entityId))
 		{
-			out << YAML::Key << "StaticMeshComponent";
+			out << YAML::Key << "ParticleEmitter";
 			out << YAML::BeginMap;
 			ParticleEmitter& p = ecs.Get<ParticleEmitter>(entityId);
 			out << YAML::Key << "numberOfParticles" << YAML::Value << p.numberOfParticles;
