@@ -2,8 +2,10 @@
 #include "Drop/EntryPoint.h"
 
 #include "Drop/input/Input.h"
-#include "DROP/sceneGraph/sceneGraph.h"
-#include "DROP/utils/ExecPath.h"
+#include "Drop/sceneGraph/sceneGraph.h"
+#include "Drop/sceneGraph/scene.h"
+#include "Drop/utils/ExecPath.h"
+#include "Drop/utils/SceneSerializer.h"
 
 #define UV_GRID_SIM_DIFFUSE_MAP 0
 #define CRACKED_SOIL_DIFFUSE_MAP 1
@@ -231,7 +233,18 @@ public:
         }
 
         SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
+                
+        Scene currScene;
+        currScene.sceneName = "A scene";
+        currScene.ecs = gameEngine->m_ECS;
 
+        std::string scenePath = "FirstScene.drop";
+        SceneSerializer::SerializeSceneAsText(
+            scenePath
+            , &currScene
+        );
+
+//      // #TODO Add line component
 //      {
 //          // when emplace_back at back, it will call destructor
 //          // on the last element to use the new back

@@ -2,33 +2,43 @@ project "DropGame"
    kind "ConsoleApp"
    language "C++"
    cppdialect "C++17"
-   targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "src/**.h", "src/**.cpp" }
+   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+  
+   files 
+   { 
+      "src/**.h"
+      , "src/**.cpp"
+      , "src/**.hpp"
+   }
+
+   defines
+	{
+      "_CRT_SECURE_NO_WARNINGS"
+      , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
+	}
 
    includedirs
    {
-      "../dependencies/glad/include",
-      "../dependencies/GLFW/include",
-      "../dependencies/IMGUI",
-      "../dependencies/glm/include",
-      "../dependencies/stb_img/include",
-      "../dependencies/assimp/includes",
+      "%{wks.location}/Drop/dependencies/spdlog/include"
+      , "%{wks.location}/Drop/src"
+      , "%{wks.location}/Drop/dependencies"
 
-      "../Drop/src",
-        "../dependencies",
-
-      -- "%{IncludeDir.glm}",
+      -- , "%{IncludeDir.Glad}"
+      -- , "%{IncludeDir.GLFW}"
+      -- , "%{IncludeDir.ImGui}"
+      , "%{IncludeDir.glm}"
+      -- , "%{IncludeDir.stb_image}"
+      , "%{IncludeDir.assimp}"
+      -- , "%{IncludeDir.yaml_cpp}"
    }
 
    links
    {
       "Drop"
    }
-
-   targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
-   objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
 
    filter "system:windows"
       systemversion "latest"
@@ -37,7 +47,9 @@ project "DropGame"
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }
       runtime "Debug"
+      optimize "Off"
       symbols "On"
+      -- buildoptions "/MDd"
       buildoptions "/MT"
 
    filter "configurations:Release"
@@ -45,6 +57,7 @@ project "DropGame"
       runtime "Release"
       optimize "On"
       symbols "On"
+      -- buildoptions "/MD"
       buildoptions "/MT"
 
    filter "configurations:Dist"
@@ -52,4 +65,5 @@ project "DropGame"
       runtime "Release"
       optimize "On"
       symbols "Off"
+      -- buildoptions "/MD"
       buildoptions "/MT"

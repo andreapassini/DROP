@@ -2,8 +2,8 @@
 
 #include <vector>
 
+#include "../dependencies/Glad/include/GLAD/glad.h"
 #include <glm/glm.hpp>
-#include <GLAD/glad.h>
 
 // Arbitrary chose, from glad we could use up to 32 textures
 // but some of them I will like to make them system texture index 20 - 31

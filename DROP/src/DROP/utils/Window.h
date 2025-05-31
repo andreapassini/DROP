@@ -4,7 +4,7 @@
 #include "functional"
 
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include "../dependencies/GLFW/include/GLFW/glfw3.h"
 
 namespace Drop
 {

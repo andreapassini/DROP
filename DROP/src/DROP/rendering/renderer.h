@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "renderableObject.h"
-#include "DROP/particles/particle.h"
-#include "DROP/rendering/staticMeshComponent.h"   
+#include "Drop/particles/particle.h"
+#include "Drop/rendering/staticMeshComponent.h"   
 #include "drawableBox.h"
 #include "line.h"
 
@@ -18,10 +18,10 @@
 #endif
 
 #define GLFW_INCLUDE_NONE
-#include <glad/glad.h>
+#include "../dependencies/GLAD/include/GLAD/glad.h"
 
 // GLFW library to create window and to manage I/O
-#include <glfw/glfw3.h>
+#include "../dependencies/GLFW/include/GLFW/glfw3.h"
 
 // another check related to OpenGL loader
 // confirm that GLAD didn't include windows.h

@@ -2,34 +2,52 @@ project "Drop"
    kind "StaticLib"
    language "C++"
    cppdialect "C++17"
-   targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "src/**.h", "src/**.cpp" }
+   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+
+   files 
+   { 
+      "src/**.h"
+      , "src/**.cpp"
+   
+      , "dependencies/stb_image/**.h"
+		, "dependencies/stb_image/**.cpp"
+		, "dependencies/glm/glm/**.hpp"
+		, "dependencies/glm/glm/**.inl"
+   }
+
+   defines
+	{
+		"GLM_ENABLE_EXPERIMENTAL"
+      ,  "_CRT_SECURE_NO_WARNINGS"
+      , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
+	}
+
 
    includedirs
    {
-      "src",
+      "src"
       
-      "../dependencies/glad/include",
-      "../dependencies/GLFW/include",
-      "../dependencies/imgui",
-      
-      "../dependencies/glm/include",
-      "../dependencies/stb_img/include",
-      "../dependencies/assimp/includes",
-      "../dependencies/spdlog/include",
-      "../dependencies/yaml-cpp/include"
-      -- "%{IncludeDir.yaml_cpp}"
+      , "dependencies/spdlog/include"
+
+      , "%{IncludeDir.GLFW}"
+		, "%{IncludeDir.Glad}"
+		, "%{IncludeDir.ImGui}"
+		, "%{IncludeDir.glm}"
+		, "%{IncludeDir.stb_image}"
+      , "%{IncludeDir.assimp}"
+		, "%{IncludeDir.yaml_cpp}"
    }
 
    libdirs { 
-      "../dependencies/assimp/libs"
+      "dependencies/assimp/libs"
    }
 
    links
    {
-      "glad"
+      "Glad"
       
       , "GLFW"
       
@@ -57,8 +75,6 @@ project "Drop"
       , "shlwapi.lib"
    }
 
-   targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-   objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
 
    filter "system:windows"
       systemversion "latest"
@@ -67,7 +83,10 @@ project "Drop"
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }
       runtime "Debug"
+      optimize "Off"
       symbols "On"
+		-- buildoptions "/MDd"
+      -- buildoptions "/MD"
       buildoptions "/MT"
 
    filter "configurations:Release"
@@ -75,6 +94,7 @@ project "Drop"
       runtime "Release"
       optimize "On"
       symbols "On"
+      -- buildoptions "/MD"
       buildoptions "/MT"
 
    filter "configurations:Dist"
@@ -82,4 +102,5 @@ project "Drop"
       runtime "Release"
       optimize "On"
       symbols "Off"
+      -- buildoptions "/MD"
       buildoptions "/MT"

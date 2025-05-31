@@ -23,13 +23,13 @@
 
 // we include the library for images loading
 #define STB_IMAGE_IMPLEMENTATION
-//#include "DROP/../dependencies/stb_img/include/stb_image/stb_image.h"
-#include <stb_image/stb_image.h>
+#include "../dependencies/stb_img/include/stb_image/stb_image.h"
 #define stringify( name ) #name
 
 #include "DROP/ECS/beecs.h"
 #include "rendering/RenderingSystem.h"
 #include "particles/particleSystem.h"
+#include "sceneGraph/scene.h"
 
 extern bool g_GameEngineRunning;
 
@@ -135,6 +135,15 @@ namespace Drop
 			, *renderContext
 		);
 
+		//Scene currScene;
+		//currScene.sceneName = "A scene";
+		//currScene.ecs = m_ECS;
+
+		//std::string scenePath = "FirstScene.drop";
+		//SceneSerializer::SerializeSceneAsText(
+		//	scenePath
+		//	, &currScene
+		//);
 	}
 
 	void GameEngine::Run()
