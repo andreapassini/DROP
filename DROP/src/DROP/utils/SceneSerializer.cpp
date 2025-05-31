@@ -12,6 +12,7 @@
 #include "Drop/particles/particle.h"
 #include "Drop/sceneGraph/scene.h"
 #include "Drop/tags/tag.h"
+#include "DROP/utils/Log.h"
 
 namespace Drop
 {
@@ -143,6 +144,8 @@ namespace SceneSerializer
 		, Scene* const scene
 	)
 	{
+		LOG_CORE_TRACE("Serializing Scene: {0}", scene->sceneName);
+
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << scene->sceneName.c_str();
@@ -182,7 +185,50 @@ namespace SceneSerializer
 		, Scene* const scene
 	)
 	{
-		return false;
+		std::ifstream stream(filePath);
+		std::stringstream strStream;
+		strStream << stream.rdbuf();
+
+		YAML::Node data = YAML::Load(strStream.str());
+		if (!data["Scene"]) { 
+			LOG_CORE_ERROR("Cannot deserialize file: '{0}', missing 'Scene'", filePath);
+			return false; 
+		}
+
+		std::string sceneName = data["Scene"].as<std::string>();
+		LOG_CORE_TRACE("Deserializing Scene: '{0}'", sceneName);
+
+		auto entities = data["Entities"];
+		if (!entities)
+		{
+			LOG_CORE_ERROR("Cannot deserialize file: '{0}', missing 'Entities'", filePath);
+			return false;
+		}
+
+		for (auto entity : entities) {
+			EntityID entityID = entity["Entity"].as<EntityID>();
+			LOG_CORE_TRACE("\tDeserializing Entity: '{0}'", entityID);
+
+			// #TODO
+			// For now we assume that at start no gap between EntityID exists
+			EntityID deserializedEntity = scene->ecs.CreateEntity();
+
+			if (auto transformComponent = entity["TransformComponent"]) {
+				//TransformComponent& transformComp = scene->ecs.Add<deserializedEntity>(deserializedEntity);
+				//transformComp.m_LocalTransform.m_Translate = transformComponent["LocalTransform"];
+			}
+			if (entity["TransformComponent"]) {
+
+			}
+			if (entity["StaticMeshComponent"]) {
+
+			}
+			if (entity["ParticleEmitter"]) {
+
+			}
+		}
+
+		return true;
 	}
 
 }
