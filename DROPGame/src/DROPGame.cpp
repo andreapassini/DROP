@@ -262,6 +262,11 @@ public:
   //      );
 
         Scene currScene;
+        currScene.ecs.RegisterComponent<Tag>();
+        currScene.ecs.RegisterComponent<TransformComponent>();
+        currScene.ecs.RegisterComponent<StaticMeshComponent, TransformComponent>();
+        currScene.ecs.RegisterComponent<ParticleEmitter, TransformComponent>();
+
         std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene.sceneName + ".drop";
         SceneSerializer::DeserializeSceneFromText(
             scenePath

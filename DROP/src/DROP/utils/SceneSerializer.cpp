@@ -14,6 +14,90 @@
 #include "Drop/tags/tag.h"
 #include "DROP/utils/Log.h"
 
+using namespace VgMath;
+
+namespace YAML
+{
+	template<>
+	struct convert<VgMath::Vector2>
+	{
+		static Node encode(const VgMath::Vector2& rhs)
+		{
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+		}
+		static bool decode(const Node& node, VgMath::Vector2& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+			
+			rhs.x = node[0].as<VgMath::Scalar>();
+			rhs.y = node[1].as<VgMath::Scalar>();
+		}
+	};
+	template<>
+	struct convert<VgMath::Vector3>
+	{
+		static Node encode(const VgMath::Vector3& rhs)
+		{
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+		}
+		static bool decode(const Node& node, VgMath::Vector3& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs.x = node[0].as<VgMath::Scalar>();
+			rhs.y = node[1].as<VgMath::Scalar>();
+			rhs.z = node[2].as<VgMath::Scalar>();
+		}
+	};
+	template<>
+	struct convert<VgMath::Vector4>
+	{
+		static Node encode(const VgMath::Vector4& rhs)
+		{
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.push_back(rhs.w);
+		}
+		static bool decode(const Node& node, VgMath::Vector4& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs.x = node[0].as<VgMath::Scalar>();
+			rhs.y = node[1].as<VgMath::Scalar>();
+			rhs.z = node[2].as<VgMath::Scalar>();
+			rhs.w = node[3].as<VgMath::Scalar>();
+		}
+	};
+	template<>
+	struct convert<VgMath::Quaternion>
+	{
+		static Node encode(const VgMath::Quaternion& rhs)
+		{
+			Node node;
+			node.push_back(rhs.im);
+			node.push_back(rhs.re);
+		}
+		static bool decode(const Node& node, VgMath::Quaternion& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs.im = node[0].as<VgMath::Vector3>();
+			rhs.re = node[1].as<VgMath::Scalar>();
+		}
+	};
+}
+
 namespace Drop
 {
 
@@ -254,10 +338,10 @@ namespace SceneSerializer
 					particleEmitter.spawningValues.lifeTime = spawningValuesNode["lifeTime"].as<float>();
 					particleEmitter.spawningValues.startsize = spawningValuesNode["startsize"].as<float>();
 					particleEmitter.spawningValues.endsize = spawningValuesNode["endsize"].as<float>();
-					particleEmitter.spawningValues.startSpeed = spawningValuesNode["startSpeed"].as<Vector3>();
-					particleEmitter.spawningValues.endSpeed = spawningValuesNode["endSpeed"].as<Vector3>();
-					particleEmitter.spawningValues.startColor = spawningValuesNode["startColor"].as<Vector4>();
-					particleEmitter.spawningValues.endColor = spawningValuesNode["endColor"].as<Vector4>();
+					particleEmitter.spawningValues.startSpeed = spawningValuesNode["startSpeed"].as<VgMath::Vector3>();
+					particleEmitter.spawningValues.endSpeed = spawningValuesNode["endSpeed"].as<VgMath::Vector3>();
+					particleEmitter.spawningValues.startColor = spawningValuesNode["startColor"].as<VgMath::Vector4>();
+					particleEmitter.spawningValues.endColor = spawningValuesNode["endColor"].as<VgMath::Vector4>();
 					particleEmitter.spawningValues.textureID = spawningValuesNode["textureID"].as<TextureID>();
 				}
 			}
