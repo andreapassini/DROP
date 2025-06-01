@@ -51,9 +51,9 @@ namespace SceneSerializer
 	YAML::Emitter& operator<<(YAML::Emitter& out, VgMath::Transform& transform)
 	{
 		out << YAML::BeginMap;
-		out << YAML::Key << "Translate" << YAML::Value << transform.m_Translate;
-		out << YAML::Key << "Rotate" << YAML::Value << transform.m_Rotate;
-		out << YAML::Key << "Scale" << YAML::Value << transform.m_Scale;
+		out << YAML::Key << "Translate" << YAML::Value << transform.translate;
+		out << YAML::Key << "Rotate" << YAML::Value << transform.rotate;
+		out << YAML::Key << "Scale" << YAML::Value << transform.scale;
 		out << YAML::EndMap;
 		return out;
 	}
@@ -107,9 +107,9 @@ namespace SceneSerializer
 
 			out << YAML::BeginMap;
 			TransformComponent& currentTransformComp = ecs.Get<TransformComponent>(entityId);
-			out << YAML::Key << "LocalTransform" << YAML::Value << currentTransformComp.m_LocalTransform;
-			out << YAML::Key << "Parent" << YAML::Value << currentTransformComp.m_Parent;
-			out << YAML::Key << "Cumulative Transform" << YAML::Value << currentTransformComp.m_CumulatedTransform;
+			out << YAML::Key << "LocalTransform" << YAML::Value << currentTransformComp.localTransform;
+			out << YAML::Key << "Parent" << YAML::Value << currentTransformComp.parent;
+			out << YAML::Key << "CumulativeTransform" << YAML::Value << currentTransformComp.cumulatedTransform;
 			out << YAML::EndMap;
 
 		}
@@ -213,18 +213,53 @@ namespace SceneSerializer
 			// For now we assume that at start no gap between EntityID exists
 			EntityID deserializedEntity = scene->ecs.CreateEntity();
 
-			if (auto transformComponent = entity["TransformComponent"]) {
-				//TransformComponent& transformComp = scene->ecs.Add<deserializedEntity>(deserializedEntity);
-				//transformComp.m_LocalTransform.m_Translate = transformComponent["LocalTransform"];
-			}
-			if (entity["TransformComponent"]) {
+			if (auto transformCompNode = entity["TransformComponent"]) {
+				TransformComponent& transformComp = scene->ecs.Add<TransformComponent>(deserializedEntity);
+				if (auto localTransformNode = transformCompNode["LocalTransform"]) {
+					transformComp.localTransform.translate = localTransformNode["Translate"].as<VgMath::Vector3>();
+					transformComp.localTransform.rotate = localTransformNode["Rotate"].as<VgMath::Quaternion>();
+#if ANISOTROPIC_SCALING
+					transformComp.m_LocalTransform.scale = localTransformNode["Scale"].as<VgMath::Vector3>();
+#else
+					transformComp.localTransform.scale = localTransformNode["Scale"].as<VgMath::Scalar>();
+#endif
+				}
+				transformComp.parent = transformCompNode["Parent"].as<EntityID>();
+				if (auto cumulativeTransformNode = transformCompNode["CumulativeTransform"])
+				{
+					transformComp.cumulatedTransform.translate = cumulativeTransformNode["Translate"].as<VgMath::Vector3>();
+					transformComp.cumulatedTransform.rotate = cumulativeTransformNode["Rotate"].as<VgMath::Quaternion>();
+#if ANISOTROPIC_SCALING
+					transformComp.m_CumulatedTransform.scale = cumulativeTransformNode["Scale"].as<VgMath::Vector3>();
+#else
+					transformComp.cumulatedTransform.scale = cumulativeTransformNode["Scale"].as<VgMath::Scalar>();
+#endif
+				}
 
 			}
-			if (entity["StaticMeshComponent"]) {
-
+			if (auto staticMeshCompNode = entity["StaticMeshComponent"]) {
+				StaticMeshComponent& staticMeshComp = scene->ecs.Add<StaticMeshComponent>(deserializedEntity);
+				staticMeshComp.modelId = staticMeshCompNode["modelId"].as<ModelID>();
+				staticMeshComp.materialId = staticMeshCompNode["materialId"].as<MaterialID>();
+				staticMeshComp.bCastShadow = staticMeshCompNode["bCastShadow"].as<bool>();
 			}
-			if (entity["ParticleEmitter"]) {
-
+			if (auto particleEmitterNode = entity["ParticleEmitter"]) {
+				ParticleEmitter& particleEmitter = scene->ecs.Add<ParticleEmitter>(deserializedEntity);
+				particleEmitter.numberOfParticles = particleEmitterNode["numberOfParticles"].as<uint32_t>();
+				particleEmitter.particleToEmitEachTime = particleEmitterNode["particleToEmitEachTime"].as<uint32_t>();
+				particleEmitter.lastIndex = particleEmitterNode["lastIndex"].as<uint32_t>();
+				if (auto spawningValuesNode = particleEmitterNode["spawningValues"])
+				{
+					particleEmitter.spawningValues.spawningSurface.m_Size = spawningValuesNode["m_Size"].as<VgMath::Vector2>();
+					particleEmitter.spawningValues.lifeTime = spawningValuesNode["lifeTime"].as<float>();
+					particleEmitter.spawningValues.startsize = spawningValuesNode["startsize"].as<float>();
+					particleEmitter.spawningValues.endsize = spawningValuesNode["endsize"].as<float>();
+					particleEmitter.spawningValues.startSpeed = spawningValuesNode["startSpeed"].as<Vector3>();
+					particleEmitter.spawningValues.endSpeed = spawningValuesNode["endSpeed"].as<Vector3>();
+					particleEmitter.spawningValues.startColor = spawningValuesNode["startColor"].as<Vector4>();
+					particleEmitter.spawningValues.endColor = spawningValuesNode["endColor"].as<Vector4>();
+					particleEmitter.spawningValues.textureID = spawningValuesNode["textureID"].as<TextureID>();
+				}
 			}
 		}
 

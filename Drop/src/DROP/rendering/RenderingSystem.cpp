@@ -26,7 +26,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		if (!meshComponent.bCastShadow) continue;
 
 		TransformComponent& transformComp = ecs.GetSibiling<StaticMeshComponent, TransformComponent>(i);
-		Transform& worldTransform = transformComp.m_CumulatedTransform;
+		Transform& worldTransform = transformComp.cumulatedTransform;
 
 		Renderer::DrawMeshForShadow(
 			meshComponent
@@ -49,7 +49,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		StaticMeshComponent& meshComponent = denseMeshComponents[i];
 
 		TransformComponent& transformComp = ecs.GetSibiling<StaticMeshComponent, TransformComponent>(i);
-		Transform& worldTransform = transformComp.m_CumulatedTransform;
+		Transform& worldTransform = transformComp.cumulatedTransform;
 
 		Renderer::DrawMesh(
 			meshComponent

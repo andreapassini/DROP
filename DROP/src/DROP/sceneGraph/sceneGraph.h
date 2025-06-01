@@ -15,28 +15,28 @@ constexpr bseecs::EntityID ROOT_ID = -1;
 
 class TransformComponent {
 public:
-	VgMath::Transform m_LocalTransform;
-	VgMath::Transform m_CumulatedTransform; // cumulated transform
+	VgMath::Transform localTransform;
+	VgMath::Transform cumulatedTransform; // cumulated transform
 
 	// -1 for is in world space
-	EntityID m_Parent = ROOT_ID;
+	EntityID parent = ROOT_ID;
 
 	TransformComponent() 
-		: m_Parent(-1), m_LocalTransform() { }
+		: parent(-1), localTransform() { }
 
 	TransformComponent(const VgMath::Transform& transform_val) 
-		: m_Parent(-1), m_LocalTransform(transform_val) { };
+		: parent(-1), localTransform(transform_val) { };
 
 	TransformComponent(const VgMath::Transform& transform_val, EntityID parent_val)
-		: m_Parent(parent_val), m_LocalTransform(transform_val) { };
+		: parent(parent_val), localTransform(transform_val) { };
 
 	~TransformComponent() {};
 
 	void operator=(const TransformComponent& n) {
 		// this mith be a mess, better fix it later
-		this->m_Parent = n.m_Parent;
-		this->m_LocalTransform = n.m_LocalTransform;
-		this->m_CumulatedTransform = n.m_CumulatedTransform;
+		this->parent = n.parent;
+		this->localTransform = n.localTransform;
+		this->cumulatedTransform = n.cumulatedTransform;
 	}
 };
 

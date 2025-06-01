@@ -17,17 +17,17 @@ void SceneGraph::CalculateCumulatedTransform(
 	, TransformComponent& node
 ) {
 	TransformComponent* currNode = &node;
-	VgMath::Transform cumulated = currNode->m_LocalTransform;
+	VgMath::Transform cumulated = currNode->localTransform;
 	//VgMath::Transform cumulated;
 
 	// Avoid recursion, saving stack
-	while (currNode->m_Parent != ROOT_ID) {
-		cumulated = cumulated * currNode->m_LocalTransform;
-		currNode = ecs.GetComponentPool<TransformComponent>().Get(currNode->m_Parent);
+	while (currNode->parent != ROOT_ID) {
+		cumulated = cumulated * currNode->localTransform;
+		currNode = ecs.GetComponentPool<TransformComponent>().Get(currNode->parent);
 		if (!currNode) { break; }
 	}
 
-	node.m_CumulatedTransform = cumulated;
+	node.cumulatedTransform = cumulated;
 }
 
 //void SceneGraph::MoveNode(
@@ -114,19 +114,19 @@ void SceneGraph::TransformToMatrix(
 	outModelMatrix = glm::translate(
 		outModelMatrix,
 		glm::vec3(
-			inTransform.m_Translate.x,
-			inTransform.m_Translate.y,
-			inTransform.m_Translate.z
+			inTransform.translate.x,
+			inTransform.translate.y,
+			inTransform.translate.z
 		)
 	);
 
 	outModelMatrix = glm::rotate(
 		outModelMatrix,
-		(float)(inTransform.m_Rotate.getAngleRadians()),
+		(float)(inTransform.rotate.getAngleRadians()),
 		glm::vec3(
-			(float)(inTransform.m_Rotate.getAxis().x),
-			(float)(inTransform.m_Rotate.getAxis().y),
-			(float)(inTransform.m_Rotate.getAxis().z)
+			(float)(inTransform.rotate.getAxis().x),
+			(float)(inTransform.rotate.getAxis().y),
+			(float)(inTransform.rotate.getAxis().z)
 		)
 	);
 
@@ -140,9 +140,9 @@ void SceneGraph::TransformToMatrix(
 		)
 #else
 		glm::vec3(
-			(float)inTransform.m_Scale,
-			(float)inTransform.m_Scale,
-			(float)inTransform.m_Scale
+			(float)inTransform.scale,
+			(float)inTransform.scale,
+			(float)inTransform.scale
 		)
 #endif
 	);

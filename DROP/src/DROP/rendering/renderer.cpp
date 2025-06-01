@@ -197,7 +197,7 @@ namespace Drop
 
                 glm::mat4 modelMatrix(1.0f);
                 VgMath::Transform testTransform;
-                testTransform.m_Translate = particle.position.asVector3();
+                testTransform.translate = particle.position.asVector3();
                 SceneGraph::TransformToMatrix(testTransform, modelMatrix);
                 GLint modelMatrixLocation = glGetUniformLocation(billboardShader->Program, "modelMatrix");
                 glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
@@ -291,7 +291,7 @@ namespace Drop
             //glCheckError();
 
             glm::mat4 modelMatrix(1.0f);
-            billboard.transform->m_Translate = billboard.transform->m_Translate * billboard.postion;
+            billboard.transform->translate = billboard.transform->translate * billboard.postion;
             SceneGraph::TransformToMatrix(*billboard.transform, modelMatrix);
             GLint modelMatrixLocation = glGetUniformLocation(billboardShader->Program, "modelMatrix");
             glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));

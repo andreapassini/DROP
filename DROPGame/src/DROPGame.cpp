@@ -7,6 +7,7 @@
 #include "Drop/utils/ExecPath.h"
 #include "Drop/utils/SceneSerializer.h"
 #include "DROP/tags/tag.h"
+#include "DROP/utils/Log.h"
 
 #define UV_GRID_SIM_DIFFUSE_MAP 0
 #define CRACKED_SOIL_DIFFUSE_MAP 1
@@ -63,10 +64,10 @@ public:
         );
 #pragma endregion
 
-        std::cout << "GetExecutableDir" << GetExecutableDir() << std::endl;
-        std::cout << "GetExecutablePath" << GetExecutablePath() << std::endl;
-        std::cout << "GetRelativeProjectPath" << GetRelativeProjectPath() << std::endl;
-        
+        LOG_TRACE("GetExecutableDir: " + GetExecutableDir());
+        LOG_TRACE("GetExecutablePath: " + GetExecutablePath());
+        LOG_TRACE("GetRelativeProjectPath: " + GetRelativeProjectPath());
+                
 #pragma region Assets
         gameEngine->m_Models.emplace_back(GetFullPath("\\models\\cube.obj"));
         gameEngine->m_Models.emplace_back(GetFullPath("\\models\\sphere.obj"));
@@ -98,168 +99,178 @@ public:
         //gameEngine->m_ECS.RegisterComponent<Billboard, Transform>();
         //gameEngine->m_ECS.RegisterComponent<PhysicsObject>();
 
-		// Plane
-        {
-            //uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-            bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+		//// Plane
+  //      {
+  //          //uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
+  //          bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
 
-            Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
-            tag.tagName = "Plane";
+  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+  //          tag.tagName = "Plane";
 
-            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
-            transform.m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
-            transform.m_LocalTransform.m_Scale = 10.0f;
-            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0),
-                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
-            );
+  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+  //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
+  //          transform.m_LocalTransform.m_Scale = 10.0f;
+  //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+  //              VgMath::Degrees(90.0),
+  //              VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+  //          );
 
-            Material material;
-            material.kd = 3.0f;
-            material.alpha = 0.2f;
-            material.f0 = 0.9f;
-            material.textures[0].textureId = CRACKED_SOIL_DIFFUSE_MAP;
-            material.textures[0].UVRepeat = 80.0f;
-            material.shaderID = ILLUMINATION_GGX_SHADER;
-            gameEngine->m_Materials.push_back(material);
+  //          Material material;
+  //          material.kd = 3.0f;
+  //          material.alpha = 0.2f;
+  //          material.f0 = 0.9f;
+  //          material.textures[0].textureId = CRACKED_SOIL_DIFFUSE_MAP;
+  //          material.textures[0].UVRepeat = 80.0f;
+  //          material.shaderID = ILLUMINATION_GGX_SHADER;
+  //          gameEngine->m_Materials.push_back(material);
 
-            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
-            staticMesh.bCastShadow = true;
-            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
-            staticMesh.modelId = 3;
-        }
-      
+  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+  //          staticMesh.bCastShadow = true;
+  //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+  //          staticMesh.modelId = 3;
+  //      }
+  //    
 
-        // Sphere
-        bseecs::EntityID sphereId = gameEngine->m_ECS.CreateEntity();
-        {
-            Tag& tag = gameEngine->m_ECS.Add<Tag>(sphereId);
-            tag.tagName = "Sphere";
+  //      // Sphere
+  //      bseecs::EntityID sphereId = gameEngine->m_ECS.CreateEntity();
+  //      {
+  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(sphereId);
+  //          tag.tagName = "Sphere";
 
-            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(sphereId);
-            transform.m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
-            transform.m_LocalTransform.m_Scale = 1.0f;
-            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0),
-                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
-            );
+  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(sphereId);
+  //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
+  //          transform.m_LocalTransform.m_Scale = 1.0f;
+  //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+  //              VgMath::Degrees(90.0),
+  //              VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+  //          );
 
-            Material material;
-            material.kd = 3.0f;
-            material.alpha = 0.2f;
-            material.f0 = 0.9f;
-            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
-            material.textures[0].UVRepeat = 1.0f;
-            material.shaderID = ILLUMINATION_GGX_SHADER;
-            gameEngine->m_Materials.push_back(material);
+  //          Material material;
+  //          material.kd = 3.0f;
+  //          material.alpha = 0.2f;
+  //          material.f0 = 0.9f;
+  //          material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
+  //          material.textures[0].UVRepeat = 1.0f;
+  //          material.shaderID = ILLUMINATION_GGX_SHADER;
+  //          gameEngine->m_Materials.push_back(material);
 
-            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(sphereId);
-            staticMesh.bCastShadow = true;
-            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
-            staticMesh.modelId = 1;
-        }
-
-
-        // Cube
-        {
-            bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
-
-            Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
-            tag.tagName = "Cube";
-
-            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
-            transform.m_Parent = sphereId;
-            transform.m_LocalTransform.m_Translate = VgMath::Vector3(7.0f, 1.0f, 0.0f);
-            transform.m_LocalTransform.m_Scale = 0.48f;
-            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0),
-                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
-            );
-
-            Material material;
-            material.kd = 3.0f;
-            material.alpha = 0.2f;
-            material.f0 = 0.9f;
-            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
-            material.textures[0].UVRepeat = 1.0f;
-            material.shaderID = ILLUMINATION_GGX_SHADER;
-            gameEngine->m_Materials.push_back(material);
-
-            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
-            staticMesh.bCastShadow = true;
-            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
-            staticMesh.modelId = 0;
-        }
+  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(sphereId);
+  //          staticMesh.bCastShadow = true;
+  //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+  //          staticMesh.modelId = 1;
+  //      }
 
 
-        // Bunny
-        {
-            bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+  //      // Cube
+  //      {
+  //          bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
 
-            Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
-            tag.tagName = "Bunny";
+  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+  //          tag.tagName = "Cube";
 
-            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
-            transform.m_Parent = sphereId;
-            transform.m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
-            transform.m_LocalTransform.m_Scale = 0.48f;
-            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0),
-                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
-            );
+  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+  //          transform.m_Parent = sphereId;
+  //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(7.0f, 1.0f, 0.0f);
+  //          transform.m_LocalTransform.m_Scale = 0.48f;
+  //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+  //              VgMath::Degrees(90.0),
+  //              VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+  //          );
 
-            Material material;
-            material.kd = 3.0f;
-            material.alpha = 0.2f;
-            material.f0 = 0.9f;
-            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
-            material.textures[0].UVRepeat = 1.0f;
-            material.shaderID = ILLUMINATION_GGX_SHADER;
-            gameEngine->m_Materials.push_back(material);
+  //          Material material;
+  //          material.kd = 3.0f;
+  //          material.alpha = 0.2f;
+  //          material.f0 = 0.9f;
+  //          material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
+  //          material.textures[0].UVRepeat = 1.0f;
+  //          material.shaderID = ILLUMINATION_GGX_SHADER;
+  //          gameEngine->m_Materials.push_back(material);
 
-            StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
-            staticMesh.bCastShadow = false;
-            staticMesh.materialId = gameEngine->m_Materials.size() - 1;
-            staticMesh.modelId = 2;
-        }
+  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+  //          staticMesh.bCastShadow = true;
+  //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+  //          staticMesh.modelId = 0;
+  //      }
 
-        
-        // Particle Emitter
-        {
-            particleEmitterID = gameEngine->m_ECS.CreateEntity();
 
-            Tag& tag = gameEngine->m_ECS.Add<Tag>(particleEmitterID);
-            tag.tagName = "Particle Emitter";
+  //      // Bunny
+  //      {
+  //          bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
 
-            TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(particleEmitterID);
-            transform.m_LocalTransform.m_Translate = VgMath::Vector3(-5.0f, 0.0f, 0.0f);
-            transform.m_LocalTransform.m_Scale = 0.48f;
-            transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
-                VgMath::Degrees(90.0),
-                VgMath::Vector3(0.0, 1.0, 0.0).normalized()
-            );
-            
-            ParticleEmitter& particleEmitter = gameEngine->m_ECS.Add<ParticleEmitter, TransformComponent>(particleEmitterID);
-            particleEmitter.particleToEmitEachTime = 25;
-            particleEmitter.spawningValues.textureID = WIDOWS_LOGO_DIFFUSE_MAP;
-            particleEmitter.spawningValues.spawningSurface.m_Size.x = 10.0f;
-            particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
-            particleEmitter.spawningValues.startsize = 1.0f;
-            particleEmitter.spawningValues.endsize = 0.0f;
+  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+  //          tag.tagName = "Bunny";
 
-        }
+  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+  //          transform.m_Parent = sphereId;
+  //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
+  //          transform.m_LocalTransform.m_Scale = 0.48f;
+  //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+  //              VgMath::Degrees(90.0),
+  //              VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+  //          );
 
-        SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
-                
+  //          Material material;
+  //          material.kd = 3.0f;
+  //          material.alpha = 0.2f;
+  //          material.f0 = 0.9f;
+  //          material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
+  //          material.textures[0].UVRepeat = 1.0f;
+  //          material.shaderID = ILLUMINATION_GGX_SHADER;
+  //          gameEngine->m_Materials.push_back(material);
+
+  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+  //          staticMesh.bCastShadow = false;
+  //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
+  //          staticMesh.modelId = 2;
+  //      }
+
+  //      
+  //      // Particle Emitter
+  //      {
+  //          particleEmitterID = gameEngine->m_ECS.CreateEntity();
+
+  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(particleEmitterID);
+  //          tag.tagName = "Particle Emitter";
+
+  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(particleEmitterID);
+  //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(-5.0f, 0.0f, 0.0f);
+  //          transform.m_LocalTransform.m_Scale = 0.48f;
+  //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
+  //              VgMath::Degrees(90.0),
+  //              VgMath::Vector3(0.0, 1.0, 0.0).normalized()
+  //          );
+  //          
+  //          ParticleEmitter& particleEmitter = gameEngine->m_ECS.Add<ParticleEmitter, TransformComponent>(particleEmitterID);
+  //          particleEmitter.particleToEmitEachTime = 25;
+  //          particleEmitter.spawningValues.textureID = WIDOWS_LOGO_DIFFUSE_MAP;
+  //          particleEmitter.spawningValues.spawningSurface.m_Size.x = 10.0f;
+  //          particleEmitter.spawningValues.spawningSurface.m_Size.y = 10.0f;
+  //          particleEmitter.spawningValues.startsize = 1.0f;
+  //          particleEmitter.spawningValues.endsize = 0.0f;
+
+  //      }
+
+  //              
+  //      Scene currScene;
+  //      currScene.sceneName = "FirstScene";
+  //      currScene.ecs = gameEngine->m_ECS;
+
+  //      std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene.sceneName + ".drop";
+  //      SceneSerializer::SerializeSceneAsText(
+  //          scenePath
+  //          , &currScene
+  //      );
+
         Scene currScene;
-        currScene.sceneName = "FirstScene";
-        currScene.ecs = gameEngine->m_ECS;
-
         std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene.sceneName + ".drop";
-        SceneSerializer::SerializeSceneAsText(
+        SceneSerializer::DeserializeSceneFromText(
             scenePath
             , &currScene
         );
+
+        // TODO Dont pass it via copy
+        gameEngine->m_ECS = currScene.ecs;
+        SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
 
 //      // #TODO Add line component
 //      {
@@ -359,7 +370,7 @@ public:
                 TransformComponent& particleEmitterTransform = gameEngine->m_ECS.Get<TransformComponent>(particleEmitterID);
                 // this is done inside the Emit function, not super clean
                 //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
-                EmitParticles(particleEmitter, particleEmitterTransform.m_CumulatedTransform);
+                EmitParticles(particleEmitter, particleEmitterTransform.cumulatedTransform);
             }
         }
     }

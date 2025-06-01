@@ -17,34 +17,34 @@ namespace VgMath{
 class Transform{
 public:
     //glm::vec3 translate;
-    Vector3 m_Translate;
+    Vector3 translate;
 #if ANISOTROPIC_SCALING
     Vector3 scale; // (NON-UNIFORM or ANISOTROPIC) scaling
 #else
-    Scalar m_Scale; // (UNIFORM or ISOTROPIC) scaling
+    Scalar scale; // (UNIFORM or ISOTROPIC) scaling
 #endif
-    Quaternion m_Rotate;
+    Quaternion rotate;
 
 public:
     // empty constructor: returns identity transform
 #if ANISOTROPIC_SCALING
     Transform(): translate(0,0,0), scale(1,1,1),  rotate() {}
 #else
-    Transform(): m_Translate(0,0,0), m_Scale(1),  m_Rotate(Quaternion::angleAxis(Degrees(0.0), Vector3(0.0, 1.0, 0.0).normalized())) {}
+    Transform(): translate(0,0,0), scale(1),  rotate(Quaternion::angleAxis(Degrees(0.0), Vector3(0.0, 1.0, 0.0).normalized())) {}
     //Transform(): translate(0,0,0), scale(1),  rotate() {}
 #endif
 
     Vector3 operator() (const Vector3& v) const {
-        return m_Rotate.apply(m_Scale * v);
+        return rotate.apply(scale * v);
     }
     Versor3 operator() (const Versor3& d) const {
-        return m_Rotate.apply( d );
+        return rotate.apply( d );
     }
     Point3 operator() (const Point3& p) const {
-        return m_Rotate.apply(p.scaled(m_Scale)) + m_Translate;
+        return rotate.apply(p.scaled(scale)) + translate;
     }
     Scalar operator() (const Scalar& d) const {
-        return d*m_Scale;
+        return d*scale;
     }
 
     Versor3 Up() const;
@@ -58,10 +58,10 @@ public:
 #if ANISOTROPIC_SCALING
         res.scale = Vector3( 1/scale.x, 1/scale.y, 1/scale.z ) ;
 #else
-        res.m_Scale = 1.0 /m_Scale;
+        res.scale = 1.0 /scale;
 #endif
-        res.m_Rotate = m_Rotate.inverse();
-        res.m_Translate = res.m_Rotate.apply( -m_Translate * res.m_Scale );
+        res.rotate = rotate.inverse();
+        res.translate = res.rotate.apply( -translate * res.scale );
         return res;
     }
 
@@ -85,18 +85,18 @@ inline void Transform::Up(Versor3& outUp) const {
 inline Transform Transform::operator * (const Transform & b) const 
 {
     Transform c;
-    c.m_Scale = m_Scale * b.m_Scale;
-    c.m_Rotate = m_Rotate * b.m_Rotate;
-    c.m_Translate = m_Translate + c.m_Rotate.apply( b.m_Translate * m_Scale);
+    c.scale = scale * b.scale;
+    c.rotate = rotate * b.rotate;
+    c.translate = translate + c.rotate.apply( b.translate * scale);
 
     return c;
 }
 
 inline bool areEqual(const Transform &a , const Transform &b )
 {
-    return areEqual( a.m_Scale ,    b.m_Scale )
-        && areEqual( a.m_Translate, b.m_Translate )
-        && areEquivalent( a.m_Rotate,    b.m_Rotate );
+    return areEqual( a.scale ,    b.scale )
+        && areEqual( a.translate, b.translate )
+        && areEquivalent( a.rotate,    b.rotate );
 }
 
 }; // end of namespace definition
