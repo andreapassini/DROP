@@ -18,6 +18,7 @@ project "DropGame"
 	{
       "_CRT_SECURE_NO_WARNINGS"
       , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
+      , "GLFW_INCLUDE_NONE"
 	}
 
    includedirs

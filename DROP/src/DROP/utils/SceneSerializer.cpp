@@ -13,6 +13,7 @@
 #include "Drop/sceneGraph/scene.h"
 #include "Drop/tags/tag.h"
 #include "DROP/utils/Log.h"
+#include "ExecPath.h"
 
 using namespace VgMath;
 
@@ -29,7 +30,7 @@ namespace YAML
 		}
 		static bool decode(const Node& node, VgMath::Vector2& rhs)
 		{
-			if (!node.IsSequence() || node.size() != 3)
+			if (!node.IsSequence() || node.size() != 2)
 				return false;
 			
 			rhs.x = node[0].as<VgMath::Scalar>();
@@ -69,7 +70,7 @@ namespace YAML
 		}
 		static bool decode(const Node& node, VgMath::Vector4& rhs)
 		{
-			if (!node.IsSequence() || node.size() != 3)
+			if (!node.IsSequence() || node.size() != 4)
 				return false;
 
 			rhs.x = node[0].as<VgMath::Scalar>();
@@ -89,7 +90,7 @@ namespace YAML
 		}
 		static bool decode(const Node& node, VgMath::Quaternion& rhs)
 		{
-			if (!node.IsSequence() || node.size() != 3)
+			if (!node.IsSequence() || node.size() != 2)
 				return false;
 
 			rhs.im = node[0].as<VgMath::Vector3>();
@@ -322,19 +323,24 @@ namespace SceneSerializer
 
 			}
 			if (auto staticMeshCompNode = entity["StaticMeshComponent"]) {
-				StaticMeshComponent& staticMeshComp = scene->ecs.Add<StaticMeshComponent>(deserializedEntity);
+				StaticMeshComponent& staticMeshComp = scene->ecs.Add<StaticMeshComponent, TransformComponent>(deserializedEntity);
 				staticMeshComp.modelId = staticMeshCompNode["modelId"].as<ModelID>();
 				staticMeshComp.materialId = staticMeshCompNode["materialId"].as<MaterialID>();
 				staticMeshComp.bCastShadow = staticMeshCompNode["bCastShadow"].as<bool>();
 			}
 			if (auto particleEmitterNode = entity["ParticleEmitter"]) {
-				ParticleEmitter& particleEmitter = scene->ecs.Add<ParticleEmitter>(deserializedEntity);
+				ParticleEmitter& particleEmitter = scene->ecs.Add<ParticleEmitter, TransformComponent>(deserializedEntity);
 				particleEmitter.numberOfParticles = particleEmitterNode["numberOfParticles"].as<uint32_t>();
 				particleEmitter.particleToEmitEachTime = particleEmitterNode["particleToEmitEachTime"].as<uint32_t>();
 				particleEmitter.lastIndex = particleEmitterNode["lastIndex"].as<uint32_t>();
 				if (auto spawningValuesNode = particleEmitterNode["spawningValues"])
 				{
-					particleEmitter.spawningValues.spawningSurface.m_Size = spawningValuesNode["m_Size"].as<VgMath::Vector2>();
+					// we need the spawning surface 
+					if (auto spawningSurface = spawningValuesNode["spawningSurface"])
+					{
+						particleEmitter.spawningValues.spawningSurface.m_Size = spawningSurface["m_Size"].as<VgMath::Vector2>();
+					}
+
 					particleEmitter.spawningValues.lifeTime = spawningValuesNode["lifeTime"].as<float>();
 					particleEmitter.spawningValues.startsize = spawningValuesNode["startsize"].as<float>();
 					particleEmitter.spawningValues.endsize = spawningValuesNode["endsize"].as<float>();

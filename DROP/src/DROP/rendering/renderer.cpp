@@ -1,26 +1,26 @@
 #include "renderer.h"
 
-// Loader for OpenGL extensions
-// http://glad.dav1d.de/
-// THIS IS OPTIONAL AND NOT REQUIRED, ONLY USE THIS IF YOU DON'T WANT GLAD TO INCLUDE windows.h
-// GLAD will include windows.h for APIENTRY if it was not previously defined.
-// Make sure you have the correct definition for APIENTRY for platforms which define _WIN32 but don't use __stdcall
-#ifdef _WIN32
-#define APIENTRY __stdcall
-#endif
+//// Loader for OpenGL extensions
+//// http://glad.dav1d.de/
+//// THIS IS OPTIONAL AND NOT REQUIRED, ONLY USE THIS IF YOU DON'T WANT GLAD TO INCLUDE windows.h
+//// GLAD will include windows.h for APIENTRY if it was not previously defined.
+//// Make sure you have the correct definition for APIENTRY for platforms which define _WIN32 but don't use __stdcall
+//#ifdef _WIN32
+//#define APIENTRY __stdcall
+//#endif
 
 
-#define GLFW_INCLUDE_NONE
-#include <glad/glad.h>
+//#define GLFW_INCLUDE_NONE
+//#include <glad/glad.h>
+//
+//// GLFW library to create window and to manage I/O
+//#include <glfw/glfw3.h>
 
-// GLFW library to create window and to manage I/O
-#include <glfw/glfw3.h>
-
-// another check related to OpenGL loader
-// confirm that GLAD didn't include windows.h
-#ifdef _WINDOWS_
-#error windows.h was included!
-#endif
+//// another check related to OpenGL loader
+//// confirm that GLAD didn't include windows.h
+//#ifdef _WINDOWS_
+//#error windows.h was included!
+//#endif
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -56,7 +56,7 @@ GLenum glCheckErrorExt(const char* file, int line)
         case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
         case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+        LOG_CORE_ERROR("{0} | {1} ({2})", error, file, line);
     }
     return errorCode;
 }
@@ -95,7 +95,8 @@ namespace Drop
         }
 
         //the "clear" color for the frame buffer
-        glClearColor(DEFAULT_CLEAR_COLOR.r, DEFAULT_CLEAR_COLOR.g, DEFAULT_CLEAR_COLOR.b, 1.0f);
+        //glClearColor(DEFAULT_CLEAR_COLOR.r, DEFAULT_CLEAR_COLOR.g, DEFAULT_CLEAR_COLOR.b, 1.0f);
+        glClearColor(DEFAULT_CLEAR_COLOR.r, DEFAULT_CLEAR_COLOR.g, DEFAULT_CLEAR_COLOR.b, 0.5f);
 
         /////////////////// CREATION OF BUFFER FOR THE  DEPTH MAP /////////////////////////////////////////
         // buffer dimension: too large -> performance may slow down if we have many lights; too small -> strong aliasing

@@ -13,21 +13,20 @@
 // THIS IS OPTIONAL AND NOT REQUIRED, ONLY USE THIS IF YOU DON'T WANT GLAD TO INCLUDE windows.h
 // GLAD will include windows.h for APIENTRY if it was not previously defined.
 // Make sure you have the correct definition for APIENTRY for platforms which define _WIN32 but don't use __stdcall
-#ifdef _WIN32
-#define APIENTRY __stdcall
-#endif
+//#ifdef _WIN32
+//#define APIENTRY __stdcall
+//#endif
 
-#define GLFW_INCLUDE_NONE
 #include "../dependencies/GLAD/include/GLAD/glad.h"
 
 // GLFW library to create window and to manage I/O
 #include "../dependencies/GLFW/include/GLFW/glfw3.h"
 
-// another check related to OpenGL loader
-// confirm that GLAD didn't include windows.h
-#ifdef _WINDOWS_
-#error windows.h was included!
-#endif
+//// another check related to OpenGL loader
+//// confirm that GLAD didn't include windows.h
+//#ifdef _WINDOWS_
+//#error windows.h was included!
+//#endif
 
 // Libs includes
 #include <glm/glm.hpp>

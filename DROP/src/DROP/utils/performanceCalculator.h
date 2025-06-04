@@ -47,13 +47,17 @@ public:
     }
 
     void LogStatus() const {
-        std::cout << "Log of the Performance Calculator" << std::endl;
-        std::cout << "Size: " << this->measurements.size() << std::endl;
-        std::cout << "Framerate: " << this->framerate << std::endl;
+        LOG_CORE_TRACE(
+            "---START Performance Calculator LOG STATUS---"
+            "\n\tSize: {0}"
+            "\n\tFramerate: {1}"
+            , measurements.size()
+            , framerate
+        );
         for(size_t i = 0; i < this->measurements.size(); i++){
-            std::cout << "Elm " << i << " :" << this->measurements[i] << std::endl;
+            LOG_CORE_TRACE("\n\tElm {0}: {1}", i, measurements[i]);
         }
-        std::cout << "---END Performance Calculator LOG STATUS ---" << std::endl;
-        std::cout << std::endl;
+
+        LOG_CORE_TRACE("---END Performance Calculator LOG STATUS---");
     }
 };

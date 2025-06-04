@@ -2,7 +2,6 @@
 #include "Log.h"
 #include "Window.h"
 
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <GL/GL.h>

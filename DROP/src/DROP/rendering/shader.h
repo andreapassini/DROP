@@ -23,6 +23,7 @@ using namespace std;
 
 // to be removed
 #include <filesystem>
+#include <DROP/utils/Log.h>
 
 
 class Shader
@@ -37,8 +38,11 @@ public:
         , const GLchar* const fragmentPath
     )
     {
-        std::cout << std::filesystem::current_path() << std::endl;
-        cout << "Vertex: " << vertexPath << "\nFragment: " << fragmentPath << endl;
+        LOG_CORE_TRACE(
+            "Vertex: {0}, \nFragment: {1}"
+            , vertexPath
+            , fragmentPath
+        );
 
         // Step 1: we retrieve shaders source code from provided filepaths
         string vertexCode;
@@ -111,10 +115,13 @@ public:
         , const GLchar* const fragmentPath
     )
     {
-        std::cout << std::filesystem::current_path() << std::endl;
-        cout << "Vertex: " << vertexPath 
-            << "\nGeometry: " << geometryPath
-            << "\nFragment: " << fragmentPath << endl;
+        LOG_CORE_TRACE(
+            "Vertex: {0}, \nGeometry: {1}, \nFragment: {2}"
+            , vertexPath
+            , geometryPath
+            , fragmentPath
+        );
+
 
         // Step 1: we retrieve shaders source code from provided filepaths
         string vertexCode;
@@ -204,8 +211,11 @@ public:
         const GLchar* const computePath
     )
     {
-        std::cout << std::filesystem::current_path() << std::endl;
-        cout << "Computer " << computePath << endl;
+        LOG_CORE_TRACE(
+            "Compute: {0}"
+            , computePath
+        );
+
 
         // Step 1: we retrieve shaders source code from provided filepaths
         string computeCode;

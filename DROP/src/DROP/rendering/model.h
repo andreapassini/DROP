@@ -34,6 +34,7 @@ using namespace std;
 
 // we include the Mesh class, which manages the "OpenGL side" (= creation and allocation of VBO, VAO, EBO buffers) of the loading of models
 #include "DROP/rendering/mesh.h"
+#include <DROP/utils/Log.h>
 
 /////////////////// MODEL class ///////////////////////
 class Model
@@ -103,7 +104,7 @@ private:
         // check for errors (see comment above)
         if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
-            cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
+            LOG_CORE_ERROR("ERROR::ASSIMP:: {0}", importer.GetErrorString());
             return;
         }
 
@@ -187,7 +188,7 @@ private:
             }
             else{
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-                cout << "WARNING::ASSIMP:: MODEL WITHOUT UV COORDINATES -> TANGENT AND BITANGENT ARE = 0" << endl;
+                LOG_CORE_WARN("WARNING::ASSIMP:: MODEL WITHOUT UV COORDINATES -> TANGENT AND BITANGENT ARE = 0");
             }
             // we add the vertex to the list
             vertices.emplace_back(vertex);

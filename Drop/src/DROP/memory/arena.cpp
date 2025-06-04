@@ -1,4 +1,5 @@
 #include "arena.h"
+#include <DROP/utils/Log.h>
 
 void InitArena(Arena* const arena, const size_t capacity)
 {
@@ -24,7 +25,7 @@ T* Allocate(Arena* const arena, const size_t size)
 			size_t NextCapacity = currentArena->capacity >= size ? currentArena->capacity : size * RESIZE_MULTIPLIER;
 			currentArena->nextArena = (Arena*)malloc(sizeof(Arena));
 			InitArena(currentArena->nextArena, NextCapacity);
-			std::cout << "Init NextArena w/ cap = " << NextCapacity << std::endl;
+			LOG_CORE_TRACE("Init NextArena w/ cap = {0}", NextCapacity);
 		}
 
 		currentArena = currentArena->nextArena;
@@ -82,10 +83,14 @@ void PrintArena(const Arena* const arena)
 {
 	uint8_t* NextData = (arena->data + ((sizeof(arena->data) * arena->size)));
 
-	std::cout << "Arena.size = " << arena->size <<
-		"\n Arena.capacity = " << arena->capacity <<
-		"\n Arena.data = " << (void*)arena->data <<
-		"\n Arena.NextData = " << (void*)NextData << std::endl;
+	LOG_CORE_INFO(" Arena.size {0} \n \
+			Arena.data = {1} \n \
+			Arena.NextData {2}"
+			, arena->size
+			, arena->capacity
+			, (void*)arena->data
+			, (void*)NextData
+	);
 
 	if (arena->nextArena)
 	{

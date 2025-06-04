@@ -1,6 +1,5 @@
 #include "line.h"
 
-#define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 

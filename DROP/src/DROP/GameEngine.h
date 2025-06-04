@@ -62,9 +62,11 @@ namespace Drop
 		inline const bool IsDrawDebug() const { return m_DrawDebug;  }
 		inline void SetDrawDebug(bool debug) { m_DrawDebug = debug; }
 
+		//Scene& InitializeScene(const std::string& sceneName);
+
 	public:
 
-		bseecs::ECS m_ECS;
+		//bseecs::ECS m_ECS;
 		
 		PhysicsEngine m_PhysicsEngine;
 
@@ -83,6 +85,8 @@ namespace Drop
 		float m_DeltaTime = 0.0f;
 		float m_LastFrameTime = 0.0f;
 		float m_CurrentTime = .0f;
+
+		static Scene* g_activeScene;
 
 
 	private:

@@ -5,7 +5,6 @@
 #include <stdlib.h>         // abort
 #include <iostream>
 
-#define GLFW_INCLUDE_NONE
 #include <glfw/glfw3.h>
 #include <glad/glad.h>
 
@@ -41,6 +40,7 @@ extern bool g_GameEngineRunning;
 #endif
 
 static Drop::GameEngine* s_Instance = nullptr;
+Scene* Drop::GameEngine::g_activeScene = nullptr;
 
 namespace Drop
 {
@@ -118,11 +118,15 @@ namespace Drop
 		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
+		g_activeScene = new Scene();
 
-		m_ECS.RegisterSingletonComponent<SceneContext>(arena);
-		m_ECS.RegisterSingletonComponent<RendererContext>(arena);
+		g_activeScene->ecs.RegisterSingletonComponent<SceneContext>(arena);
+		g_activeScene->ecs.RegisterSingletonComponent<RendererContext>(arena);
 
-		RendererContext* renderContext = &m_ECS.GetSingletonComponent<RendererContext>();
+		//g_activeScene->ecs.RegisterSingletonComponent<SceneContext>(arena);
+		//g_activeScene->ecs.RegisterSingletonComponent<RendererContext>(arena);
+
+		RendererContext* renderContext = &g_activeScene->ecs.GetSingletonComponent<RendererContext>();
 
 		renderContext->backFaceCulling = false;
 
@@ -137,7 +141,7 @@ namespace Drop
 
 		//Scene currScene;
 		//currScene.sceneName = "A scene";
-		//currScene.ecs = m_ECS;
+		//currScene.ecs = g_activeScene->ecs;
 
 		//std::string scenePath = "FirstScene.drop";
 		//SceneSerializer::SerializeSceneAsText(
@@ -150,7 +154,7 @@ namespace Drop
 	{
 		m_Running = true;
 
-		SceneContext& sceneContext = m_ECS.GetSingletonComponent<SceneContext>();
+		SceneContext& sceneContext = g_activeScene->ecs.GetSingletonComponent<SceneContext>();
 
 		//sceneContext.view = m_Game->m_Camera.GetViewMatrix();
 		//sceneContext.projection = m_Game->m_Camera.GetProjectionMatrix();
@@ -164,7 +168,7 @@ namespace Drop
 		sceneContext.textuers = &m_TextureIds;
 		sceneContext.wireframe = m_Game->m_Wireframe;
 	
-		RendererContext& renderContext = m_ECS.GetSingletonComponent<RendererContext>();
+		RendererContext& renderContext = g_activeScene->ecs.GetSingletonComponent<RendererContext>();
 
 		renderContext.window = Input::m_ActiveWindowHandle;
 
@@ -207,7 +211,7 @@ namespace Drop
 
 				if (physIter > m_PhysicsEngine.maxIter)
 				{
-					std::cout << "Physics Simulation lagging " << std::endl;
+					LOG_CORE_WARN("Physics Simulation lagging");
 					m_PhysicsEngine.SynchVirtualTime(m_CurrentTime);
 					break;
 				}
@@ -215,12 +219,12 @@ namespace Drop
 
 			if (!m_PauseParticleUpdate)
 			{
-				ParticleSystem::Update(m_ECS, m_DeltaTime);
+				ParticleSystem::Update(g_activeScene->ecs, m_DeltaTime);
 			}
 
-			SceneGraph::CalculateWorldTransforms(m_ECS);
+			SceneGraph::CalculateWorldTransforms(g_activeScene->ecs);
 
-			RenderingSystem::Update(m_ECS, m_DeltaTime);
+			RenderingSystem::Update(g_activeScene->ecs, m_DeltaTime);
 
 			// render your GUI
 			ImGui_ImplOpenGL3_NewFrame();
@@ -265,7 +269,7 @@ namespace Drop
 
 	int GameEngine::LoadTexture(const char* path)
 	{
-		std::cout << path << std::endl;
+		LOG_CORE_TRACE(path);
 
 		GLuint textureImage = 0;
 		int w, h, channels;
@@ -274,8 +278,8 @@ namespace Drop
 		//image = stbi_load(path, &w, &h, &channels, STBI_rgb_alpha);
 		image = stbi_load(path, &w, &h, &channels, STBI_default); //    STBI_default = 0, // only used for desired_channels
 
-		if (image == nullptr)\
-			std::cout << "Failed to load texture!" << std::endl;
+		if (image == nullptr)
+			LOG_CORE_ERROR("Failed to load texture: {0}", path);
 
 		glGenTextures(1, &textureImage);
 		glBindTexture(GL_TEXTURE_2D, textureImage);
@@ -301,4 +305,15 @@ namespace Drop
 
 		return textureImage;
 	}
+
+	//Scene& GameEngine::InitializeScene(const std::string& sceneName)
+	//{
+	//	g_activeScene = new Scene;
+	//	g_activeScene->sceneName = sceneName;
+
+	//	// we assume that we want to use the renderer
+	//	//g_activeScene->ecs.RegisterSingletonComponent<>();
+
+	//	return *g_activeScene;
+	//}
 }

@@ -25,39 +25,39 @@ public:
 
 #pragma region ShaderSetup
         //FULL_COLOR_SHADER
-        gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
+        gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             GetFullPath("\\DROP\\src\\Drop\\shaders\\00_basic.vert").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\01_fullcolor.frag").c_str()
         );
 
         // ILLUMINATION_GGX_SHADER
-        gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
+        gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             GetFullPath("\\DROP\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag").c_str()
         );
 
         // SHADOW_SHADER
-        gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
+        gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             GetFullPath("\\DROP\\src\\Drop\\shaders\\19_shadowmap.vert").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\20_shadowmap.frag").c_str()
         );
 
         // EMPTY_QUAD_SHADER
-        gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
+        gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.vert").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.geom").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.frag").c_str()
         );
 
         // EMPTY_BOX_SHADER
-        gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
+        gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.vert").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.geom").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.frag").c_str()
         );
 
         // BILLBOARD_SHADER
-        gameEngine->m_ECS.GetSingletonComponent<RendererContext>().shaders.emplace_back(
+        gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
             GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.vert").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.geom").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.frag").c_str()
@@ -85,29 +85,73 @@ public:
             GetFullPath("\\textures\\grass\\diffuse.png").c_str()));
 #pragma endregion
 
-        gameEngine->m_ECS.RegisterComponent<Tag>();
-        gameEngine->m_ECS.RegisterComponent<TransformComponent>();
+#pragma region Materials
+        {
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            material.textures[0].textureId = CRACKED_SOIL_DIFFUSE_MAP;
+            material.textures[0].UVRepeat = 80.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
+            gameEngine->m_Materials.push_back(material);
+        }
+        {
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
+            material.textures[0].UVRepeat = 1.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
+            gameEngine->m_Materials.push_back(material);
+
+        }
+        {
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
+            material.textures[0].UVRepeat = 1.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
+            gameEngine->m_Materials.push_back(material);
+        }
+        {
+            Material material;
+            material.kd = 3.0f;
+            material.alpha = 0.2f;
+            material.f0 = 0.9f;
+            material.textures[0].textureId = UV_GRID_SIM_DIFFUSE_MAP;
+            material.textures[0].UVRepeat = 1.0f;
+            material.shaderID = ILLUMINATION_GGX_SHADER;
+            gameEngine->m_Materials.push_back(material);
+        }
+#pragma endregion
+
+        gameEngine->g_activeScene->ecs.RegisterComponent<Tag>();
+        gameEngine->g_activeScene->ecs.RegisterComponent<TransformComponent>();
 
         // #TODO 
         // We will have multiple cameras, but only one active camera 
         //	as a Singleton Component
-        //gameEngine->m_ECS.RegisterComponent<Camera, Transform>();
+        //gameEngine->g_activeScene->ecs.RegisterComponent<Camera, Transform>();
 
-        gameEngine->m_ECS.RegisterComponent<StaticMeshComponent, TransformComponent>();
+        gameEngine->g_activeScene->ecs.RegisterComponent<StaticMeshComponent, TransformComponent>();
 
-        gameEngine->m_ECS.RegisterComponent<ParticleEmitter, TransformComponent>();
-        //gameEngine->m_ECS.RegisterComponent<Billboard, Transform>();
-        //gameEngine->m_ECS.RegisterComponent<PhysicsObject>();
+        gameEngine->g_activeScene->ecs.RegisterComponent<ParticleEmitter, TransformComponent>();
+        //gameEngine->g_activeScene->ecs.RegisterComponent<Billboard, Transform>();
+        //gameEngine->g_activeScene->ecs.RegisterComponent<PhysicsObject>();
 
 		//// Plane
   //      {
   //          //uint32_t planeSGHandle = gameEngine->m_SceneGraph.AddObject(SceneGraph::ROOT_ID);
-  //          bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+  //          bseecs::EntityID id = gameEngine->g_activeScene->ecs.CreateEntity();
 
-  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+  //          Tag& tag = gameEngine->g_activeScene->ecs.Add<Tag>(id);
   //          tag.tagName = "Plane";
 
-  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+  //          TransformComponent& transform = gameEngine->g_activeScene->ecs.Add<TransformComponent>(id);
   //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(0.0f, -1.0f, 0.0f);
   //          transform.m_LocalTransform.m_Scale = 10.0f;
   //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
@@ -124,7 +168,7 @@ public:
   //          material.shaderID = ILLUMINATION_GGX_SHADER;
   //          gameEngine->m_Materials.push_back(material);
 
-  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+  //          StaticMeshComponent& staticMesh = gameEngine->g_activeScene->ecs.Add<StaticMeshComponent, TransformComponent>(id);
   //          staticMesh.bCastShadow = true;
   //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
   //          staticMesh.modelId = 3;
@@ -132,12 +176,12 @@ public:
   //    
 
   //      // Sphere
-  //      bseecs::EntityID sphereId = gameEngine->m_ECS.CreateEntity();
+  //      bseecs::EntityID sphereId = gameEngine->g_activeScene->ecs.CreateEntity();
   //      {
-  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(sphereId);
+  //          Tag& tag = gameEngine->g_activeScene->ecs.Add<Tag>(sphereId);
   //          tag.tagName = "Sphere";
 
-  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(sphereId);
+  //          TransformComponent& transform = gameEngine->g_activeScene->ecs.Add<TransformComponent>(sphereId);
   //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(-3.0f, 1.0f, 0.0f);
   //          transform.m_LocalTransform.m_Scale = 1.0f;
   //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
@@ -154,7 +198,7 @@ public:
   //          material.shaderID = ILLUMINATION_GGX_SHADER;
   //          gameEngine->m_Materials.push_back(material);
 
-  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(sphereId);
+  //          StaticMeshComponent& staticMesh = gameEngine->g_activeScene->ecs.Add<StaticMeshComponent, TransformComponent>(sphereId);
   //          staticMesh.bCastShadow = true;
   //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
   //          staticMesh.modelId = 1;
@@ -163,12 +207,12 @@ public:
 
   //      // Cube
   //      {
-  //          bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+  //          bseecs::EntityID id = gameEngine->g_activeScene->ecs.CreateEntity();
 
-  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+  //          Tag& tag = gameEngine->g_activeScene->ecs.Add<Tag>(id);
   //          tag.tagName = "Cube";
 
-  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+  //          TransformComponent& transform = gameEngine->g_activeScene->ecs.Add<TransformComponent>(id);
   //          transform.m_Parent = sphereId;
   //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(7.0f, 1.0f, 0.0f);
   //          transform.m_LocalTransform.m_Scale = 0.48f;
@@ -186,7 +230,7 @@ public:
   //          material.shaderID = ILLUMINATION_GGX_SHADER;
   //          gameEngine->m_Materials.push_back(material);
 
-  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+  //          StaticMeshComponent& staticMesh = gameEngine->g_activeScene->ecs.Add<StaticMeshComponent, TransformComponent>(id);
   //          staticMesh.bCastShadow = true;
   //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
   //          staticMesh.modelId = 0;
@@ -195,12 +239,12 @@ public:
 
   //      // Bunny
   //      {
-  //          bseecs::EntityID id = gameEngine->m_ECS.CreateEntity();
+  //          bseecs::EntityID id = gameEngine->g_activeScene->ecs.CreateEntity();
 
-  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(id);
+  //          Tag& tag = gameEngine->g_activeScene->ecs.Add<Tag>(id);
   //          tag.tagName = "Bunny";
 
-  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(id);
+  //          TransformComponent& transform = gameEngine->g_activeScene->ecs.Add<TransformComponent>(id);
   //          transform.m_Parent = sphereId;
   //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(3.0f, 1.0f, 0.0f);
   //          transform.m_LocalTransform.m_Scale = 0.48f;
@@ -218,7 +262,7 @@ public:
   //          material.shaderID = ILLUMINATION_GGX_SHADER;
   //          gameEngine->m_Materials.push_back(material);
 
-  //          StaticMeshComponent& staticMesh = gameEngine->m_ECS.Add<StaticMeshComponent, TransformComponent>(id);
+  //          StaticMeshComponent& staticMesh = gameEngine->g_activeScene->ecs.Add<StaticMeshComponent, TransformComponent>(id);
   //          staticMesh.bCastShadow = false;
   //          staticMesh.materialId = gameEngine->m_Materials.size() - 1;
   //          staticMesh.modelId = 2;
@@ -227,12 +271,12 @@ public:
   //      
   //      // Particle Emitter
   //      {
-  //          particleEmitterID = gameEngine->m_ECS.CreateEntity();
+  //          particleEmitterID = gameEngine->g_activeScene->ecs.CreateEntity();
 
-  //          Tag& tag = gameEngine->m_ECS.Add<Tag>(particleEmitterID);
+  //          Tag& tag = gameEngine->g_activeScene->ecs.Add<Tag>(particleEmitterID);
   //          tag.tagName = "Particle Emitter";
 
-  //          TransformComponent& transform = gameEngine->m_ECS.Add<TransformComponent>(particleEmitterID);
+  //          TransformComponent& transform = gameEngine->g_activeScene->ecs.Add<TransformComponent>(particleEmitterID);
   //          transform.m_LocalTransform.m_Translate = VgMath::Vector3(-5.0f, 0.0f, 0.0f);
   //          transform.m_LocalTransform.m_Scale = 0.48f;
   //          transform.m_LocalTransform.m_Rotate = VgMath::Quaternion::angleAxis(
@@ -240,7 +284,7 @@ public:
   //              VgMath::Vector3(0.0, 1.0, 0.0).normalized()
   //          );
   //          
-  //          ParticleEmitter& particleEmitter = gameEngine->m_ECS.Add<ParticleEmitter, TransformComponent>(particleEmitterID);
+  //          ParticleEmitter& particleEmitter = gameEngine->g_activeScene->ecs.Add<ParticleEmitter, TransformComponent>(particleEmitterID);
   //          particleEmitter.particleToEmitEachTime = 25;
   //          particleEmitter.spawningValues.textureID = WIDOWS_LOGO_DIFFUSE_MAP;
   //          particleEmitter.spawningValues.spawningSurface.m_Size.x = 10.0f;
@@ -253,7 +297,7 @@ public:
   //              
   //      Scene currScene;
   //      currScene.sceneName = "FirstScene";
-  //      currScene.ecs = gameEngine->m_ECS;
+  //      currScene.ecs = gameEngine->g_activeScene->ecs;
 
   //      std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene.sceneName + ".drop";
   //      SceneSerializer::SerializeSceneAsText(
@@ -261,21 +305,16 @@ public:
   //          , &currScene
   //      );
 
-        Scene currScene;
-        currScene.ecs.RegisterComponent<Tag>();
-        currScene.ecs.RegisterComponent<TransformComponent>();
-        currScene.ecs.RegisterComponent<StaticMeshComponent, TransformComponent>();
-        currScene.ecs.RegisterComponent<ParticleEmitter, TransformComponent>();
+        Scene* currScene = gameEngine->g_activeScene;
+        currScene->sceneName = "FirstScene";
 
-        std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene.sceneName + ".drop";
+        std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene->sceneName + ".drop";
         SceneSerializer::DeserializeSceneFromText(
             scenePath
-            , &currScene
+            , currScene
         );
 
-        // TODO Dont pass it via copy
-        gameEngine->m_ECS = currScene.ecs;
-        SceneGraph::CalculateWorldTransforms(gameEngine->m_ECS);
+        SceneGraph::CalculateWorldTransforms(gameEngine->g_activeScene->ecs);
 
 //      // #TODO Add line component
 //      {
@@ -371,8 +410,8 @@ public:
             if (waitTime < gameEngine->m_CurrentTime) {
         	    waitTime = gameEngine->m_CurrentTime + spawnDelay;
 
-                ParticleEmitter& particleEmitter = gameEngine->m_ECS.Get<ParticleEmitter>(particleEmitterID);
-                TransformComponent& particleEmitterTransform = gameEngine->m_ECS.Get<TransformComponent>(particleEmitterID);
+                ParticleEmitter& particleEmitter = gameEngine->g_activeScene->ecs.Get<ParticleEmitter>(particleEmitterID);
+                TransformComponent& particleEmitterTransform = gameEngine->g_activeScene->ecs.Get<TransformComponent>(particleEmitterID);
                 // this is done inside the Emit function, not super clean
                 //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
                 EmitParticles(particleEmitter, particleEmitterTransform.cumulatedTransform);
@@ -405,7 +444,8 @@ public:
     // Particles Logic
     float waitTime = 0.0f;
     float spawnDelay = 0.50f;
-    EntityID particleEmitterID = NULL_ENTITY;
+    //EntityID particleEmitterID = NULL_ENTITY;
+    EntityID particleEmitterID = 4;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)
