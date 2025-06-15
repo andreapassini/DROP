@@ -96,3 +96,28 @@ Entities:
         startColor: [1, 1, 1, 1]
         endColor: [1, 1, 1, 0]
         textureID: 2
+  - Entity: 5
+    Tag:
+      Tag name: PB Particle Emitter
+    TransformComponent:
+      LocalTransform:
+        Translate: [10, 0, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+      Parent: 18446744073709551615
+      CumulativeTransform:
+        Translate: [10, 0, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+    ParticleEmitter:
+      numberOfParticles: 1000
+      particleToEmitEachTime: 250
+      lastIndex: 0
+      spawningValues:
+        spawningSurface:
+          m_Size: [10, 10]
+        lifeTime: 10
+        minMass: 2
+        maxMass: 12
+        startingColor: [0, 1, 0, 1]
+        textureID: 2

@@ -7,7 +7,7 @@ void PhysicsObject::AddForce(VgMath::Vector3 force_val)
 
 void PhysicsObject::PhysicsStep()
 {
-	if (!m_IsStatic) {
+	if (m_IsStatic) {
 		this->m_Force = VgMath::Vector3(0.0, 0.0, 0.0);
 		return;
 	}

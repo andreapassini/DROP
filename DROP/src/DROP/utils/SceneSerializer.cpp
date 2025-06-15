@@ -14,6 +14,7 @@
 #include "Drop/tags/tag.h"
 #include "DROP/utils/Log.h"
 #include "ExecPath.h"
+#include "Drop/particles/physicsBasedParticle.h"
 
 using namespace VgMath;
 
@@ -164,6 +165,18 @@ namespace SceneSerializer
 		out << YAML::Key << "textureID" << s.textureID;
 		out << YAML::EndMap;
 		return out;
+	}	
+	YAML::Emitter& operator<<(YAML::Emitter& out, PBParticleSpawningValue& s)
+	{
+		out << YAML::BeginMap;
+		out << YAML::Key << "spawningSurface" << s.spawningSurface;
+		out << YAML::Key << "lifeTime" << s.lifeTime;
+		out << YAML::Key << "minMass" << s.minMass;
+		out << YAML::Key << "maxMass" << s.maxMass;
+		out << YAML::Key << "startingColor" << s.startingColor;
+		out << YAML::Key << "textureID" << s.textureID;
+		out << YAML::EndMap;
+		return out;
 	}
 
 	static void SerializeEntityAsText(
@@ -213,6 +226,17 @@ namespace SceneSerializer
 			out << YAML::Key << "ParticleEmitter";
 			out << YAML::BeginMap;
 			ParticleEmitter& p = ecs.Get<ParticleEmitter>(entityId);
+			out << YAML::Key << "numberOfParticles" << YAML::Value << p.numberOfParticles;
+			out << YAML::Key << "particleToEmitEachTime" << YAML::Value << p.particleToEmitEachTime;
+			out << YAML::Key << "lastIndex" << YAML::Value << p.lastIndex;
+			out << YAML::Key << "spawningValues" << YAML::Value << p.spawningValues;
+			out << YAML::EndMap;
+		}
+		if (ecs.Has<PBParticleEmitter>(entityId))
+		{
+			out << YAML::Key << "ParticleEmitter";
+			out << YAML::BeginMap;
+			PBParticleEmitter& p = ecs.Get<PBParticleEmitter>(entityId);
 			out << YAML::Key << "numberOfParticles" << YAML::Value << p.numberOfParticles;
 			out << YAML::Key << "particleToEmitEachTime" << YAML::Value << p.particleToEmitEachTime;
 			out << YAML::Key << "lastIndex" << YAML::Value << p.lastIndex;
@@ -348,6 +372,27 @@ namespace SceneSerializer
 					particleEmitter.spawningValues.endSpeed = spawningValuesNode["endSpeed"].as<VgMath::Vector3>();
 					particleEmitter.spawningValues.startColor = spawningValuesNode["startColor"].as<VgMath::Vector4>();
 					particleEmitter.spawningValues.endColor = spawningValuesNode["endColor"].as<VgMath::Vector4>();
+					particleEmitter.spawningValues.textureID = spawningValuesNode["textureID"].as<TextureID>();
+				}
+			}
+			if (auto particleEmitterNode = entity["PBParticleEmitter"])
+			{
+				PBParticleEmitter& particleEmitter = scene->ecs.Add<PBParticleEmitter, TransformComponent>(deserializedEntity);
+				particleEmitter.numberOfParticles = particleEmitterNode["numberOfParticles"].as<uint32_t>();
+				particleEmitter.particleToEmitEachTime = particleEmitterNode["particleToEmitEachTime"].as<uint32_t>();
+				particleEmitter.lastIndex = particleEmitterNode["lastIndex"].as<uint32_t>();
+				if (auto spawningValuesNode = particleEmitterNode["spawningValues"])
+				{
+					// we need the spawning surface 
+					if (auto spawningSurface = spawningValuesNode["spawningSurface"])
+					{
+						particleEmitter.spawningValues.spawningSurface.m_Size = spawningSurface["m_Size"].as<VgMath::Vector2>();
+					}
+
+					particleEmitter.spawningValues.lifeTime = spawningValuesNode["lifeTime"].as<float>();
+					particleEmitter.spawningValues.minMass = spawningValuesNode["minMass"].as<float>();
+					particleEmitter.spawningValues.maxMass = spawningValuesNode["maxMass"].as<float>();
+					particleEmitter.spawningValues.startingColor = spawningValuesNode["startingColor"].as<VgMath::Vector4>();
 					particleEmitter.spawningValues.textureID = spawningValuesNode["textureID"].as<TextureID>();
 				}
 			}

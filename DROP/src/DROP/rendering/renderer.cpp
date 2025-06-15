@@ -248,6 +248,111 @@ namespace Drop
         glDepthMask(true);
     }
 
+    void Renderer::RenderParticles(
+        SceneContext& sceneContext
+        , std::vector<PBParticleEmitter>& particleEmitters
+        , Shader* const billboardShader
+    )
+    {
+        glEnable(GL_BLEND);
+
+        // Make it glow
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+        // Even if they are transparent the depth test will fail
+        // Sol1 - just disable depth test, but it creates artifacts since we render on top of everything
+        // Sol2 - Sort the elements from distance with the camera, this may create some strange effects depending on how the interlaps
+        // (Using this) Sol3 - read from depth but dont write (https://stackoverflow.com/questions/5793354/how-to-write-prevent-writing-to-opengl-depth-buffer-in-glsl)
+        glDepthMask(false);
+
+        // Clear errors
+        glCheckError();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // we set the viewport for the final rendering step
+        glViewport(0, 0, sceneContext.width, sceneContext.height);
+        billboardShader->Use();
+
+        glCheckError();
+
+        // we pass projection and view matrices to the Shader Program
+        GLint projectionMatrixLocation = glGetUniformLocation(billboardShader->Program, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetProjectionMatrix()));
+        glCheckError();
+
+        GLint viewMatrixLocation = glGetUniformLocation(billboardShader->Program, "viewMatrix");
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetViewMatrix()));
+        glCheckError();
+
+        //// VAO is made "active"
+        //glBindVertexArray(m_billboardVAO);
+        //glCheckError();
+
+        for (PBParticleEmitter& particleEmitter : particleEmitters)
+        {
+            uint32_t activeParticle = 0;
+            for (uint32_t i = 0; i < particleEmitter.numberOfParticles; i++)
+            {
+                const PhysicsBasedParticle& particle = particleEmitter.particles[i];
+
+                if (!particle.bIsActive) {
+                    continue;
+                }
+                activeParticle++;
+
+                glm::mat4 modelMatrix(1.0f);
+                VgMath::Transform testTransform;
+                testTransform.translate = particle.position;
+                SceneGraph::TransformToMatrix(testTransform, modelMatrix);
+                GLint modelMatrixLocation = glGetUniformLocation(billboardShader->Program, "modelMatrix");
+                glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+                glCheckError();
+
+                GLint particleSizeLocation = glGetUniformLocation(billboardShader->Program, "particle_size");
+                glCheckError();
+                glUniform1f(particleSizeLocation, particle.size);
+                glCheckError();
+
+                // #TODO Rework this better, do not hardcode the value
+                GLint alphaCutOutLocation = glGetUniformLocation(billboardShader->Program, "alphaCutOut");
+                glCheckError();
+                glUniform1f(alphaCutOutLocation, 0.1f);
+                glCheckError();
+
+                GLint colorLocation = glGetUniformLocation(billboardShader->Program, "colorIn");
+                glUniform4fv(colorLocation, 1, glm::value_ptr(
+                    glm::vec4(
+                        particle.color.r
+                        , particle.color.g
+                        , particle.color.b
+                        , particle.color.a
+                    )
+                ));
+                glCheckError();
+
+                // we activate the texture of the plane
+                GLint textureLocation = glGetUniformLocation(billboardShader->Program, "tex0");
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, (*sceneContext.textuers)[particle.textureID]);
+                glUniform1i(textureLocation, 0);
+                glCheckError();
+
+                // rendering data
+                glDrawArrays(GL_POINTS, 0, 1);
+                glCheckError();
+            }
+        }
+
+        // VAO is "detached"
+        glBindVertexArray(0);
+        glCheckError();
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_BLEND);
+        glDepthMask(true);
+    }
+
     void Renderer::RenderBillboard(
         SceneContext& sceneContext
         , const std::vector<Billboard>& billboards

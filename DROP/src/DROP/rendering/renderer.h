@@ -40,6 +40,8 @@
 #include "DROP/rendering/billboard.h"
 #include "DROP/rendering/model.h"
 #include "DROP/rendering/material.h"
+#include "DROP/particles/particle.h"
+#include "DROP/particles/physicsBasedParticle.h"
 
 #define FULL_COLOR_SHADER 0
 #define ILLUMINATION_GGX_SHADER 1
@@ -118,6 +120,11 @@ namespace Drop
         void RenderParticles(
             SceneContext& sceneContext
             , std::vector<ParticleEmitter>& particleEmitters
+            , Shader* const billboardShader
+        );
+        void RenderParticles(
+            SceneContext& sceneContext
+            , std::vector<PBParticleEmitter>& particleEmitters
             , Shader* const billboardShader
         );
 

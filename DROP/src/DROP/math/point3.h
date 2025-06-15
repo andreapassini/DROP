@@ -90,6 +90,10 @@ public:
     //friend class Vector3;
     friend Point3 Vector3::asPoint3() const;
 
+    operator Vector3() const {
+        return Vector3(x, y, z);
+    }
+
 }; // end of class Point3
 
 

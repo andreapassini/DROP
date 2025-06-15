@@ -3,6 +3,7 @@
 #include "DROP/rendering/model.h"
 #include "DROP/rendering/renderer.h"
 #include "DROP/sceneGraph/sceneGraph.h"
+#include "DROP/particles/physicsBasedParticle.h"
 
 using namespace Drop;
 
@@ -60,6 +61,13 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	}
 
 	std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();
+	Renderer::RenderParticles(
+		sceneContext
+		, denseParticleEmitters
+		, &rendererContext.shaders[BILLBOARD_SHADER]
+	);
+
+	std::vector<PBParticleEmitter>& densePBParticleEmitters = ecs.GetComponentPool<PBParticleEmitter>().Data();
 	Renderer::RenderParticles(
 		sceneContext
 		, denseParticleEmitters
