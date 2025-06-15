@@ -70,7 +70,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	std::vector<PBParticleEmitter>& densePBParticleEmitters = ecs.GetComponentPool<PBParticleEmitter>().Data();
 	Renderer::RenderParticles(
 		sceneContext
-		, denseParticleEmitters
+		, densePBParticleEmitters
 		, &rendererContext.shaders[BILLBOARD_SHADER]
 	);
 

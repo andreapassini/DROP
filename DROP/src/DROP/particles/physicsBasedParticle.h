@@ -58,12 +58,12 @@ struct PBParticleEmitter {
 	PBParticleSpawningValue spawningValues;
 };
 
-void EmitParticle(
+void EmitParticles(
 	PBParticleEmitter& particleEmitter
 	, Transform& emitterTransform
 );
 
-void UpdateParticle(
+void UpdateParticles(
 	PhysicsBasedParticle* const particles
 	, const uint32_t size
 	, const float deltaTime

@@ -64,7 +64,10 @@ struct ParticleEmitter {
 	ParticleStartValues spawningValues;
 };
 
-void EmitParticles(ParticleEmitter& particleEmitter, Transform& transform);
+void EmitParticles(
+	ParticleEmitter& particleEmitter
+	, Transform& transform
+);
 
 void UpdateParticles(
 	Particle* const particles

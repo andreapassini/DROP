@@ -8,6 +8,8 @@
 #include "Drop/utils/SceneSerializer.h"
 #include "DROP/tags/tag.h"
 #include "DROP/utils/Log.h"
+#include "Drop/particles/particle.h"
+#include "Drop/particles/physicsBasedParticle.h"
 
 #define UV_GRID_SIM_DIFFUSE_MAP 0
 #define CRACKED_SOIL_DIFFUSE_MAP 1
@@ -416,6 +418,10 @@ public:
                 // this is done inside the Emit function, not super clean
                 //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
                 EmitParticles(particleEmitter, particleEmitterTransform.cumulatedTransform);
+
+                PBParticleEmitter& pbParticleEmitter = gameEngine->g_activeScene->ecs.Get<PBParticleEmitter>(pbParticleEmitterID);
+                TransformComponent& pbParticleEmitterTransform = gameEngine->g_activeScene->ecs.Get<TransformComponent>(pbParticleEmitterID);
+                EmitParticles(pbParticleEmitter, pbParticleEmitterTransform.cumulatedTransform);
             }
         }
     }
@@ -444,9 +450,10 @@ public:
 
     // Particles Logic
     float waitTime = 0.0f;
-    float spawnDelay = 0.50f;
+    float spawnDelay = 10.0f;
     //EntityID particleEmitterID = NULL_ENTITY;
     EntityID particleEmitterID = 4;
+    EntityID pbParticleEmitterID = 5;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)

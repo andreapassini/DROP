@@ -1,6 +1,6 @@
 #include "physicsBasedParticle.h"
 
-void EmitParticle(
+void EmitParticles(
 	PBParticleEmitter& particleEmitter
 	, Transform& emitterTransform
 ) {
@@ -17,7 +17,7 @@ void EmitParticle(
 		spawningValues.spawningSurface.m_Transform = &emitterTransform;
 		particle.oldPosition = (Vector3)spawningValues.spawningSurface.RandomPointOnSurface();
 		particle.position = particle.oldPosition;
-
+		particle.force = Vector3{ 0.0 };
 		particle.mass = lerp(
 			spawningValues.minMass
 			, spawningValues.maxMass
@@ -39,7 +39,7 @@ void EmitParticle(
 	}
 }
 
-void UpdateParticle(
+void UpdateParticles(
 	PhysicsBasedParticle* const particles
 	, const uint32_t size
 	, const float deltaTime
@@ -62,14 +62,19 @@ void UpdateParticle(
 			particle.force = Vector3(0.0, 0.0, 0.0);
 			return;
 		}
+		
+		// TO BE REMOVED
+		particle.force.y = (GRAVITY_ACCELERATION * particle.mass);
+		//
 
 		Vector3 tempPos = particle.position;
 		Vector3 accel = particle.force / particle.mass;
-		particle.position = 
+		Vector3 newPos = 
 			((2.0f - particle.DAMPING) * particle.position)
 			- ((1.0f - particle.DAMPING) * particle.oldPosition)
 			+ (accel * particle.FIXED_TIME_STEP2);
 
+		particle.position = newPos;
 		particle.oldPosition = tempPos;
 
 		particle.force = VgMath::Vector3(0.0, 0.0, 0.0);

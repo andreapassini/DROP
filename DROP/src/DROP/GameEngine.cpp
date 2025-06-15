@@ -207,6 +207,10 @@ namespace Drop
 
 				m_PhysicsEngine.PhysicsStep();
 
+				if (!m_PauseParticleUpdate) {
+					ParticleSystem::UpdatePB(g_activeScene->ecs, m_DeltaTime);
+				}
+
 				physIter++;
 
 				if (physIter > m_PhysicsEngine.maxIter)
