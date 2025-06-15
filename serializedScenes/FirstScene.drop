@@ -109,9 +109,9 @@ Entities:
         Translate: [10, 0, 0]
         Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 0.47999998927116394
-    ParticleEmitter:
+    PBParticleEmitter:
       numberOfParticles: 1000
-      particleToEmitEachTime: 250
+      particleToEmitEachTime: 10
       lastIndex: 0
       spawningValues:
         spawningSurface:

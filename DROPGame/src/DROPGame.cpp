@@ -140,6 +140,7 @@ public:
         gameEngine->g_activeScene->ecs.RegisterComponent<StaticMeshComponent, TransformComponent>();
 
         gameEngine->g_activeScene->ecs.RegisterComponent<ParticleEmitter, TransformComponent>();
+        gameEngine->g_activeScene->ecs.RegisterComponent<PBParticleEmitter, TransformComponent>();
         //gameEngine->g_activeScene->ecs.RegisterComponent<Billboard, Transform>();
         //gameEngine->g_activeScene->ecs.RegisterComponent<PhysicsObject>();
 

@@ -144,6 +144,12 @@ namespace Drop
             SceneContext& sceneContext
             , Shader* const debugShader
             , std::vector<ParticleEmitter>& drawableParticleEmitter
+        );        
+        
+        void DrawParticleEmitterSurface(
+            SceneContext& sceneContext
+            , Shader* const debugShader
+            , std::vector<PBParticleEmitter>& drawableParticleEmitter
         );
 
         void Shutdown();

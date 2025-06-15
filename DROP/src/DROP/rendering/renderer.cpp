@@ -550,6 +550,93 @@ namespace Drop
         glCheckError();
     }
 
+    void Renderer::DrawParticleEmitterSurface(
+        SceneContext& sceneContext
+        , Shader* const emptyQuadGeomShader
+        , std::vector<PBParticleEmitter>& drawableParticleEmitter
+    )
+    {
+        // Clear errors
+        glCheckError();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // we set the viewport for the final rendering step
+        glViewport(0, 0, sceneContext.width, sceneContext.height);
+        emptyQuadGeomShader->Use();
+
+        glCheckError();
+
+        // we pass projection and view matrices to the Shader Program
+        GLint projectionMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetProjectionMatrix()));
+        glCheckError();
+
+        GLint viewMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "viewMatrix");
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetViewMatrix()));
+        glCheckError();
+
+        //// VAO is made "active"
+        //glBindVertexArray(m_billboardVAO);
+        //glCheckError();
+
+        for (uint32_t i = 0; i < drawableParticleEmitter.size(); i++)
+        {
+            const PBParticleEmitter& particleEmitter = drawableParticleEmitter[i];
+
+            //GLint positionLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "position");
+            //glCheckError();
+            //glUniform3fv(positionLocation, 1, glm::value_ptr(
+            //    glm::vec3(particleEmitter.position.x
+            //        , particleEmitter.position.y
+            //        , particleEmitter.position.z
+            //    )
+            //));
+            //glCheckError();
+
+            glm::mat4 modelMatrix(1.0f);
+            const VgMath::Transform& testTransform = *(particleEmitter.spawningValues.spawningSurface.m_Transform);
+            SceneGraph::TransformToMatrix(testTransform, modelMatrix);
+            GLint modelMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "modelMatrix");
+            glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+            glCheckError();
+
+            GLint particleSizeLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "size");
+            glCheckError();
+            glUniform2fv(
+                particleSizeLocation
+                , 1
+                , glm::value_ptr(
+                    glm::vec2(
+                        particleEmitter.spawningValues.spawningSurface.m_Size.x
+                        , particleEmitter.spawningValues.spawningSurface.m_Size.y
+                    )
+                )
+            );
+            glCheckError();
+
+            GLint colorLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "colorIn");
+            glUniform4fv(colorLocation, 1, glm::value_ptr(
+                glm::vec4(
+                    COLOR_POURPLE_RED.r
+                    , COLOR_POURPLE_RED.g
+                    , COLOR_POURPLE_RED.b
+                    , 1.0f
+                )
+            ));
+            glCheckError();
+
+            // rendering data
+            glDrawArrays(GL_POINTS, 0, 1);
+            glCheckError();
+        }
+
+        // VAO is "detached"
+        glBindVertexArray(0);
+        glCheckError();
+    }
+
+
     void Renderer::Shutdown() {}
 
     void Renderer::CalculateLightMatrix(

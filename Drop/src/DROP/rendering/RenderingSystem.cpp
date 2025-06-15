@@ -86,6 +86,12 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		sceneContext
 		, &(rendererContext.shaders[EMPTY_QUAD_SHADER]),
 		denseParticleEmitters
+	);	
+	
+	Renderer::DrawParticleEmitterSurface(
+		sceneContext
+		, &(rendererContext.shaders[EMPTY_QUAD_SHADER]),
+		densePBParticleEmitters
 	);
 	
 }
