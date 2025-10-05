@@ -26,20 +26,32 @@ struct TextureSpecification {
 	// maybe arr char with fixed size
 	// or a better string with hashing
 
-	// here we could specify the filter to use
+	// here we could specify
+	//	- color space
+	//	- filter
 };
 
 struct Material {
 	ShaderID shaderID = 0;
 
-	// Illumination shader parameters
-	float kd = 3.0f;		// weight for the diffusive component
-	float alpha = 0.2f;	// roughness index for GGX shader
-	float f0 = 0.9f;		// Fresnel reflectance at 0 degree (Schlik's approximation)
+	//// Illumination shader parameters
+	//float kd = 3.0f;		// weight for the diffusive component
+	//float alpha = 0.2f;	// roughness index for GGX shader
+	//float f0 = 0.9f;		// Fresnel reflectance at 0 degree (Schlik's approximation)
 
-	// -- 
-	float alphaCutOut = 0.1f;
+	//// -- 
+	//float alphaCutOut = 0.1f;
 
-	// Texture parameters
-	TextureSpecification textures[MAX_USER_TEXTURES];
+	//// Texture parameters
+	//TextureSpecification textures[MAX_USER_TEXTURES];
+
+	// Simpler implementation - hash map
+	//		maybe use an hashed string as key (like an FName)
+	// since we will loop on all the parameters
+	// , a memory tight implementation should be better 
+	std::unordered_map<std::string, float> floats;
+	std::unordered_map<std::string, VgMath::Vector2> vec2s;
+	std::unordered_map<std::string, VgMath::Vector3> vec3s;
+	std::unordered_map<std::string, VgMath::Vector4> vec4s;
+	std::unordered_map<std::string, TextureSpecification> textures;
 };
