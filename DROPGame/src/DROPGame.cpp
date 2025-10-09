@@ -1,6 +1,4 @@
 #include "Drop/GameEngine.h"
-#include "Drop/EntryPoint.h"
-
 #include "Drop/input/Input.h"
 #include "Drop/sceneGraph/sceneGraph.h"
 #include "Drop/sceneGraph/scene.h"
@@ -456,27 +454,62 @@ public:
     EntityID pbParticleEmitterID = 5;
 };
 
-Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)
+#ifdef DROP_PLATFORM_WINDOWS
+
+extern Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv);
+
+namespace Drop
 {
-	Drop::GameEngineSpecification spec;
-	spec.Name = "Drop Example";
+
+int Main(int argc, char** argv)
+{
+    // Add scene/layer thing
+    // just build allocate the engine
+    // And return gameEngine->Run();
+
+    Drop::GameEngineSpecification spec;
+    spec.Name = "Drop Example";
     spec.Width = 1600;
     spec.Height = 900;
 
-	Drop::GameEngine* gameEngine = new Drop::GameEngine(spec);
+    Drop::GameEngine gameEngine(spec);
 
-    gameEngine->SetGame<ExampleGame>();
-	gameEngine->SetMenubarCallback([gameEngine]()
- 	{
- 		if (ImGui::BeginMenu("File"))
- 		{
- 			if (ImGui::MenuItem("Exit"))
- 			{
- 				gameEngine->Close();
- 			}
- 			ImGui::EndMenu();
- 		}
- 	});
+    gameEngine.SetGame<ExampleGame>();
+    gameEngine.SetMenubarCallback([&gameEngine]()
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Exit"))
+                {
+                    gameEngine.Close();
+                }
+                ImGui::EndMenu();
+            }
+        });
 
-	return gameEngine;
+    gameEngine.Run();
+    
+    return 0;
 }
+
+}
+
+#ifdef DROP_DIST
+
+#include <Windows.h>
+
+int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
+{
+    return Drop::Main(__argc, __argv);
+}
+
+#else
+
+int main(int argc, char** argv)
+{
+    return Drop::Main(argc, argv);
+}
+
+#endif // DROP_DIST
+
+#endif // DROP_PLATFORM_WINDOWS
