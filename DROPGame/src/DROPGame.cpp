@@ -456,8 +456,6 @@ public:
 
 #ifdef DROP_PLATFORM_WINDOWS
 
-extern Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv);
-
 namespace Drop
 {
 

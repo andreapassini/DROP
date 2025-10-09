@@ -102,7 +102,4 @@ namespace Drop
 
 		bool m_DrawDebug = true;
 	};
-
-	// Implemented by CLIENT
-	GameEngine* CreateGameEngine(int argc, char** argv);
 }
