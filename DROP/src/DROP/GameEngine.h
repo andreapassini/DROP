@@ -33,7 +33,7 @@ namespace Drop
 	class GameEngine
 	{
 	public:
-		GameEngine(const GameEngineSpecification& specification = GameEngineSpecification());
+		GameEngine(const GameEngineSpecification& specification, int argc, char** argv);
 		~GameEngine();
 
 
@@ -90,7 +90,7 @@ namespace Drop
 
 
 	private:
-		void Init();
+		void Init(int argc, char** argv);
 		void Shutdown();
 	private:
 		GameEngineSpecification m_Specification;

@@ -121,7 +121,7 @@ namespace bseecs {
 
 		SparseSet() {
 			// Avoids initial copies/allocation, feel free to alter size
-			m_dense.reserve(100);
+			m_dense.reserve(1'000);
 		}
 
 		T* Set(EntityID id, T obj) {

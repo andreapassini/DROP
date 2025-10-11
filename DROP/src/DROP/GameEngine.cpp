@@ -42,14 +42,14 @@ Scene* Drop::GameEngine::g_activeScene = nullptr;
 
 namespace Drop
 {
-	GameEngine::GameEngine(const GameEngineSpecification& specification)
+	GameEngine::GameEngine(const GameEngineSpecification& specification, int argc, char** argv)
 		: m_Specification(specification),
 		m_PhysicsEngine(0.0, 123)
 	{
 		assert(!s_Instance, "Game Engine already Exists");
 		s_Instance = this;
 
-		Init();
+		Init(argc, argv);
 	}
 
 	GameEngine::~GameEngine()
@@ -79,7 +79,7 @@ namespace Drop
 		return s_Instance;
 	}
 
-	void GameEngine::Init()
+	void GameEngine::Init(int argc, char** argv)
 	{
 		Drop::Log::Init();
 		LOG_CORE_WARN("Initialized Log!");

@@ -462,15 +462,15 @@ namespace Drop
 int Main(int argc, char** argv)
 {
     // Add scene/layer thing
-    // just build allocate the engine
-    // And return gameEngine->Run();
 
+    // Add ECS specifications in this structure
+    // Page size and Max entities
     Drop::GameEngineSpecification spec;
     spec.Name = "Drop Example";
     spec.Width = 1600;
     spec.Height = 900;
 
-    Drop::GameEngine gameEngine(spec);
+    Drop::GameEngine gameEngine(spec, argc, argv);
 
     gameEngine.SetGame<ExampleGame>();
     gameEngine.SetMenubarCallback([&gameEngine]()
