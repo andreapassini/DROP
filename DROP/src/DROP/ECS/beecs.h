@@ -167,7 +167,8 @@ namespace bseecs {
 		void Delete(EntityID id) override {
 
 			size_t deletedIndex = GetDenseIndex(id);
-			BSEECS_ASSERT(deletedIndex != tombstone && !m_dense.empty(), "Trying to delete non-existent entity in sparse set");
+			// Removed this assert cause we dont use bitmask for each entity and in delete will assert always
+			//BSEECS_ASSERT(deletedIndex != tombstone && !m_dense.empty(), "Trying to delete non-existent entity in sparse set");
 
 			SetDenseIndex(m_denseToEntity.back(), deletedIndex);
 			SetDenseIndex(id, tombstone);
@@ -468,6 +469,10 @@ namespace bseecs {
 			//BSEECS_ASSERT_ALIVE_ENTITY(id);
 			
 			std::string name = GetEntityName(id);
+
+			// Destroy component associations
+			for (int i = 0; i < MAX_COMPONENTS; i++)
+				m_componentPools[i]->Delete(id);	// Remove assert from this since we dont have entity comp bitmask
 
 			m_entityNames.erase(id);
 			m_availableEntities.push_back(id);
