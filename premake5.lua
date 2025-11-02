@@ -3,16 +3,16 @@ include "DROPExternal.lua"
 
 workspace "Drop"
    architecture "x86_64"
-   startproject "DropGame"
+   startproject "Drop"
    configurations { "Debug", "Release", "Dist" }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
-   include "Drop/dependencies/GLFW"
-	include "Drop/dependencies/Glad"
-   include "Drop/dependencies/ImGui"
-   include "Drop/dependencies/yaml-cpp"
+   -- include "Drop/dependencies/GLFW"
+	-- include "Drop/dependencies/Glad"
+   -- include "Drop/dependencies/ImGui"
+   -- include "Drop/dependencies/yaml-cpp"
 group ""
 
 group "Core"

@@ -1,12 +1,15 @@
 project "DropGame"
-   kind "ConsoleApp"
+   kind "SharedLib"
    language "C++"
    cppdialect "C++17"
    staticruntime "off"
 
-   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
-  
+   -- targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+	-- objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+   -- DLL in the same dir as executable, the simplest solution
+   targetdir ("%{wks.location}/bin/" .. outputdir .. "/Drop")
+	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/Drop")
+
    files 
    { 
       "src/**.h"
@@ -23,23 +26,28 @@ project "DropGame"
 
    includedirs
    {
-      "%{wks.location}/Drop/dependencies/spdlog/include"
-      , "%{wks.location}/Drop/src"
-      , "%{wks.location}/Drop/dependencies"
+      "src"
+   }
+
+   -- includedirs
+   -- {
+      -- "%{wks.location}/Drop/dependencies/spdlog/include"
+      -- , "%{wks.location}/Drop/src"
+      -- , "%{wks.location}/Drop/dependencies"
 
       -- , "%{IncludeDir.Glad}"
       -- , "%{IncludeDir.GLFW}"
       -- , "%{IncludeDir.ImGui}"
-      , "%{IncludeDir.glm}"
+      -- , "%{IncludeDir.glm}"
       -- , "%{IncludeDir.stb_image}"
-      , "%{IncludeDir.assimp}"
+      -- , "%{IncludeDir.assimp}"
       -- , "%{IncludeDir.yaml_cpp}"
-   }
+   -- }
 
-   links
-   {
-      "Drop"
-   }
+   -- links
+   -- {
+   --    "Drop"
+   -- }
 
    filter "system:windows"
       systemversion "latest"
@@ -50,21 +58,18 @@ project "DropGame"
       runtime "Debug"
       optimize "Off"
       symbols "On"
-      -- buildoptions "/MDd"
-      buildoptions "/MT"
+      buildoptions "/MT /LD"
 
    filter "configurations:Release"
       defines { "DROP_RELEASE" }
       runtime "Release"
       optimize "On"
       symbols "On"
-      -- buildoptions "/MD"
-      buildoptions "/MT"
+      buildoptions "/MT /LD"
 
    filter "configurations:Dist"
       defines { "DROP_DIST" }
       runtime "Release"
       optimize "On"
       symbols "Off"
-      -- buildoptions "/MD"
-      buildoptions "/MT"
+      buildoptions "/MT /LD"
