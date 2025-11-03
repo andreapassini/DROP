@@ -17,7 +17,7 @@ bool g_GameEngineRunning = true;
 
 namespace Drop {
 
-int Main(int argc, char** argv)
+void LinkGameLibrary()
 {
     HINSTANCE hinstLib;
     BOOL fFreeResult, fRunTimeLinkSuccess = FALSE;
@@ -49,7 +49,11 @@ int Main(int argc, char** argv)
     // If unable to call the DLL function, use an alternative.
     if (!fRunTimeLinkSuccess)
         printf("Message printed from executable\n");
+}
 
+int Main(int argc, char** argv)
+{
+    LinkGameLibrary();
 
     GameFunctions.StartGame();
 
