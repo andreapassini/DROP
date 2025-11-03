@@ -21,6 +21,8 @@ struct DLLEXPORT DropGameInfo {
 	
 };
 
+void DLLEXPORT PrintNumber(const int InNumber);
+
 void DLLEXPORT StartGame();
 
 void DLLEXPORT UpdateGame(const float deltaTime);

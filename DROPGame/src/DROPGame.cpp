@@ -4,6 +4,11 @@
 
 #include <iostream>
 
+void PrintNumber(const int InNumber)
+{
+	std::cout << "PrintNumber " << InNumber << std::endl;
+}
+
 void StartGame()
 {
 	std::cout << "StartGame" << std::endl;
