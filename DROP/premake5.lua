@@ -8,7 +8,8 @@ project "Drop"
 	-- objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
    -- DLL in the same dir as executable, the simplest solution
    targetdir ("%{wks.location}/bin/" .. outputdir .. "/Drop")
-	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/Drop")
+   objdir ("%{wks.location}/bin-int/" .. outputdir .. "/Drop")
+   -- symbolspath '$(ProjectName)-$([System.Guid]::NewGuid()).pdb'
 
    files 
    {

@@ -22,10 +22,18 @@ struct DLLEXPORT DropGameInfo {
 };
 
 void DLLEXPORT PrintNumber(const int InNumber);
+// Stub
+void PrintNumberStub(const int InNumber) {};
+
 
 void DLLEXPORT StartGame();
+// Stub
+void StartGameStub() {};
+
 
 void DLLEXPORT UpdateGame(const float deltaTime);
+// Stub
+void UpdateGameStub(const float deltaTime) {};
 
 
 

@@ -10,57 +10,82 @@
 
 #include <windows.h> 
 
-// https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
-static GameDLLProAdresses GameFunctions;
-
 bool g_GameEngineRunning = true;
 
 namespace Drop {
 
-void LinkGameLibrary()
+// https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
+void LinkGameLibrary(HINSTANCE& inHinstLib, GameDLLProAdresses& InGameFunctions)
 {
-    HINSTANCE hinstLib;
     BOOL fFreeResult, fRunTimeLinkSuccess = FALSE;
 
-    // Get a handle to the DLL module.
+    InGameFunctions.bIsValid = false;
 
-    hinstLib = LoadLibrary(GAME_DLL_NAME);
+    // Get a handle to the DLL module
+    inHinstLib = LoadLibrary(GAME_DLL_NAME);
 
     // If the handle is valid, try to get the function address.
 
-    if (hinstLib != NULL)
+    if (NULL != inHinstLib)
     {
-        GameFunctions.PrintNumber = (PRINT_NUMBER)GetProcAddress(hinstLib, GameFunctions.PrintNumberName);
-        GameFunctions.StartGame = (START_GAME)GetProcAddress(hinstLib, GameFunctions.StartGameName);
-        GameFunctions.UpdateGame = (UPDATE_GAME)GetProcAddress(hinstLib, GameFunctions.UpdateGameName);
+        InGameFunctions.PrintNumber = (PRINT_NUMBER)GetProcAddress(inHinstLib, InGameFunctions.PrintNumberName);
+        InGameFunctions.StartGame = (START_GAME)GetProcAddress(inHinstLib, InGameFunctions.StartGameName);
+        InGameFunctions.UpdateGame = (UPDATE_GAME)GetProcAddress(inHinstLib, InGameFunctions.UpdateGameName);
 
         // If the function address is valid, call the function.
-
-        if (NULL != GameFunctions.PrintNumber)
-        {
-            fRunTimeLinkSuccess = TRUE;
-            (GameFunctions.PrintNumber)(999);
+        fRunTimeLinkSuccess = TRUE;
+        if (NULL == InGameFunctions.PrintNumber) {
+            fRunTimeLinkSuccess = FALSE;
         }
-        // Free the DLL module.
+        // Check error
 
-        //fFreeResult = FreeLibrary(hinstLib);
+        if (NULL == InGameFunctions.StartGame) {
+            fRunTimeLinkSuccess = FALSE;
+        }
+        // Check error
+
+        if (NULL == InGameFunctions.UpdateGame) {
+            fRunTimeLinkSuccess = FALSE;
+        }
+        // Check error
+
+        if (fRunTimeLinkSuccess == TRUE) {
+            InGameFunctions.bIsValid = true;
+        }
     }
 
     // If unable to call the DLL function, use an alternative.
-    if (!fRunTimeLinkSuccess)
+    if (NULL != fRunTimeLinkSuccess)
         printf("Message printed from executable\n");
+}
+
+// https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
+void FreeGameLibrary(HINSTANCE& inHinstLib, GameDLLProAdresses& InGameFunctions)
+{
+    BOOL fFreeResult;
+
+    if (NULL != inHinstLib) {
+        // Free the DLL module.
+        fFreeResult = FreeLibrary(inHinstLib);
+    }
+    
+    InGameFunctions.bIsValid = false;
+    InGameFunctions.PrintNumber = PrintNumberStub;
+    InGameFunctions.StartGame = StartGameStub;
+    InGameFunctions.UpdateGame = UpdateGameStub;
 }
 
 int Main(int argc, char** argv)
 {
-    LinkGameLibrary();
+    GameDLLProAdresses GameFunctions;
+    HINSTANCE hinstLib;
+    LinkGameLibrary(hinstLib, GameFunctions);
 
     GameFunctions.StartGame();
-
+    
     while (g_GameEngineRunning)
     {
         GameFunctions.UpdateGame(0.0166f);
-        
     }
 
     return 0;

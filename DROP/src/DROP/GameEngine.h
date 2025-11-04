@@ -9,6 +9,8 @@ typedef void(DLLFUN* START_GAME)(void);
 typedef void(DLLFUN* UPDATE_GAME)(const float);
 
 struct GameDLLProAdresses {
+	bool bIsValid = false;
+
 	PRINT_NUMBER PrintNumber = {};
 	char* PrintNumberName = "PrintNumber";
 

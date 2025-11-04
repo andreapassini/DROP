@@ -8,7 +8,8 @@ project "DropGame"
 	-- objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
    -- DLL in the same dir as executable, the simplest solution
    targetdir ("%{wks.location}/bin/" .. outputdir .. "/Drop")
-	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/Drop")
+   objdir ("%{wks.location}/bin-int/" .. outputdir .. "/Drop")
+   symbolspath ("%{wks.location}/bin/" .. outputdir .. "/Drop/$(ProjectName)-$([System.Guid]::NewGuid()).pdb")
 
    files 
    { 
@@ -18,11 +19,11 @@ project "DropGame"
    }
 
    defines
-	{
-      "_CRT_SECURE_NO_WARNINGS"
-      , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
-      , "GLFW_INCLUDE_NONE"
-	}
+    {
+        "_CRT_SECURE_NO_WARNINGS"
+        , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
+        , "GLFW_INCLUDE_NONE"
+    }
 
    includedirs
    {
@@ -58,7 +59,7 @@ project "DropGame"
       runtime "Debug"
       optimize "Off"
       symbols "On"
-      buildoptions "/MT /LD"
+      buildoptions "/MTd /LD"
 
    filter "configurations:Release"
       defines { "DROP_RELEASE" }
