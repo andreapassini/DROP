@@ -52,14 +52,15 @@ GOTO Done
 
 :Compile
 dependencies\premake-5.0.0-beta2-windows\premake5.exe cleanPdb
-
+msbuild Drop.sln
 GOTO Done
 
 :CompileGame
 dependencies\premake-5.0.0-beta2-windows\premake5.exe cleanPdb
-REM msbuild /build DROPGame/DropGame.vcxproj
-REM msbuild Drop.sln /t:DropGame /p:Configuration="Debug" /p:Platform="x86" /p:BuildProjectReferences=false
-msbuild Drop.sln /t:DropGame
+REM Use Solution folders and dont use back slashes in path
+REM https://learn.microsoft.com/it-it/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170
+msbuild Drop.sln /t:Tools\DropGame
+REM for dll error, copy the dll code into temp_dll file
 GOTO Done
 
 :Done

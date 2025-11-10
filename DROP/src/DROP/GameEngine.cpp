@@ -3,6 +3,7 @@
 #include <stdio.h>          // printf, fprintf
 #include <stdlib.h>         // abort
 #include <iostream>
+#include <assert.h>
 
 #include "DROPGame.h"
 
@@ -14,16 +15,41 @@ bool g_GameEngineRunning = true;
 
 namespace Drop {
 
+inline FILETIME Win32_GetLastWriteTime(
+    char* Filename
+) {
+    FILETIME LastWriteTime = {};
+
+    WIN32_FIND_DATAA FindData;
+    HANDLE FindHandle = FindFirstFileA(Filename, &FindData);
+    if (FindHandle != INVALID_HANDLE_VALUE)
+    {
+        LastWriteTime = FindData.ftLastWriteTime;
+        FindClose(FindHandle);
+    }
+
+    return(LastWriteTime);
+}
+
 // MOVE THE WINDOWS STUFF TO PLATFORM LAYER
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
-void LinkGameLibrary(HINSTANCE& inHinstLib, GameDLLProAdresses& InGameFunctions)
-{
-    BOOL fFreeResult, fRunTimeLinkSuccess = FALSE;
+void Win32_LoadGameLibrary(
+    HINSTANCE& inHinstLib
+    , GameDLLProAdresses& InGameFunctions
+    , char* SourceDLLName
+    , char* TempDLLName
+) {
+    BOOL /*fFreeResult,*/ fRunTimeLinkSuccess = FALSE;
 
     InGameFunctions.bIsValid = false;
 
+    InGameFunctions.DLLLastWriteTime = Win32_GetLastWriteTime(SourceDLLName);
+    //CopyFile(T_GAME_DLL_NAME, T_GAME_DLL_TEMP_NAME, FALSE);
+    CopyFileA(SourceDLLName, TempDLLName, FALSE);
+
     // Get a handle to the DLL module
-    inHinstLib = LoadLibrary(GAME_DLL_NAME);
+    //inHinstLib = LoadLibrary(T_GAME_DLL_NAME);
+    inHinstLib = LoadLibraryA(TempDLLName);
 
     // If the handle is valid, try to get the function address.
 
@@ -61,8 +87,10 @@ void LinkGameLibrary(HINSTANCE& inHinstLib, GameDLLProAdresses& InGameFunctions)
 }
 
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
-void FreeGameLibrary(HINSTANCE& inHinstLib, GameDLLProAdresses& InGameFunctions)
-{
+void Win32_UnloadGameCode(
+    HINSTANCE& inHinstLib
+    , GameDLLProAdresses& InGameFunctions
+) {
     BOOL fFreeResult;
 
     if (NULL != inHinstLib) {
@@ -76,22 +104,24 @@ void FreeGameLibrary(HINSTANCE& inHinstLib, GameDLLProAdresses& InGameFunctions)
     InGameFunctions.UpdateGame = UpdateGameStub;
 }
 
-static void CatStrings(size_t SourceACount, char* SourceA,
-    size_t SourceBCount, char* SourceB,
-    size_t DestCount, char* Dest)
-{
-    // TODO(casey): Dest bounds checking!
+static void ConcatStrings(
+    size_t SourceACount, char* SourceA
+    , size_t SourceBCount, char* SourceB
+    , size_t DestCount, char* Dest
+) {
+    // dest must be SourceACount + SourceBCount + 1 (for the null terminator)
+    if (DestCount <= SourceACount + SourceBCount) 
+    {
+        assert(0);
+        return;
+    }
 
-    for (int Index = 0;
-        Index < SourceACount;
-        ++Index)
+    for (int Index = 0; Index < SourceACount; ++Index)
     {
         *Dest++ = *SourceA++;
     }
 
-    for (int Index = 0;
-        Index < SourceBCount;
-        ++Index)
+    for (int Index = 0; Index < SourceBCount; ++Index)
     {
         *Dest++ = *SourceB++;
     }
@@ -99,21 +129,6 @@ static void CatStrings(size_t SourceACount, char* SourceA,
     *Dest++ = 0;
 }
 
-
-inline FILETIME Win32GetLastWriteTime(char* Filename)
-{
-    FILETIME LastWriteTime = {};
-
-    WIN32_FIND_DATA FindData;
-    HANDLE FindHandle = FindFirstFileA(Filename, &FindData);
-    if (FindHandle != INVALID_HANDLE_VALUE)
-    {
-        LastWriteTime = FindData.ftLastWriteTime;
-        FindClose(FindHandle);
-    }
-
-    return(LastWriteTime);
-}
 // MOVE THE WINDOWS STUFF TO PLATFORM LAYER
 
 int Main(int argc, char** argv)
@@ -133,37 +148,50 @@ int Main(int argc, char** argv)
         }
     }
 
-    char SourceGameCodeDLLFilename[] = "handmade.dll";
+    char SourceGameCodeDLLFilename[] = GAME_DLL_NAME;
     char SourceGameCodeDLLFullPath[MAX_PATH];
-    CatStrings(OnePastLastSlash - EXEFileName, EXEFileName,
+    ConcatStrings(OnePastLastSlash - EXEFileName, EXEFileName,
         sizeof(SourceGameCodeDLLFilename) - 1, SourceGameCodeDLLFilename,
         sizeof(SourceGameCodeDLLFullPath), SourceGameCodeDLLFullPath);
 
-    char TempGameCodeDLLFilename[] = "handmade_temp.dll";
+    char TempGameCodeDLLFilename[] = GAME_DLL_TEMP_NAME;
     char TempGameCodeDLLFullPath[MAX_PATH];
-    CatStrings(OnePastLastSlash - EXEFileName, EXEFileName,
+    ConcatStrings(OnePastLastSlash - EXEFileName, EXEFileName,
         sizeof(TempGameCodeDLLFilename) - 1, TempGameCodeDLLFilename,
         sizeof(TempGameCodeDLLFullPath), TempGameCodeDLLFullPath);
 
-    GameDLLProAdresses GameFunctions;
+    uint32_t LoadCounter = 0;
+    GameDLLProAdresses gameFunctions;
     HINSTANCE hinstLib;
-    LinkGameLibrary(hinstLib, GameFunctions);
+    Win32_LoadGameLibrary(
+        hinstLib
+        , gameFunctions
+        , SourceGameCodeDLLFullPath
+        , TempGameCodeDLLFullPath
+    );
 
-    GameFunctions.StartGame();
+    gameFunctions.StartGame();
     
     while (g_GameEngineRunning)
     {
-        FILETIME NewDLLWriteTime = Win32GetLastWriteTime(SourceGameCodeDLLFullPath);
-        if (CompareFileTime(&NewDLLWriteTime, &Game.DLLLastWriteTime) != 0)
+        FILETIME NewDLLWriteTime = Win32_GetLastWriteTime(SourceGameCodeDLLFullPath);
+        if (CompareFileTime(&NewDLLWriteTime, &gameFunctions.DLLLastWriteTime) != 0)
         {
-            Win32UnloadGameCode(&Game);
-            Game = Win32LoadGameCode(SourceGameCodeDLLFullPath,
-                TempGameCodeDLLFullPath);
+            // Something is wrong with this, i cannot, without bp, update the DLL
+            // https://hero.handmade.network/forums/code-discussion/t/3266-weird_bug_with_live_code_editing
+            // Fix for now - look at episode 39, the blog quoted a fix
+            Sleep(30);
+            Win32_UnloadGameCode(hinstLib, gameFunctions);
+            Win32_LoadGameLibrary(
+                hinstLib
+                , gameFunctions
+                , SourceGameCodeDLLFullPath
+                , TempGameCodeDLLFullPath
+            );
             LoadCounter = 0;
         }
 
-
-        GameFunctions.UpdateGame(0.0166f);
+        gameFunctions.UpdateGame(0.0166f);
     }
 
     return 0;

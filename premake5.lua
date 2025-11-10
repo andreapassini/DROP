@@ -10,7 +10,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
    -- include "Drop/dependencies/GLFW"
-	-- include "Drop/dependencies/Glad"
+   -- include "Drop/dependencies/Glad"
    -- include "Drop/dependencies/ImGui"
    -- include "Drop/dependencies/yaml-cpp"
 group ""
@@ -49,6 +49,7 @@ newaction {
     execute = function()
         print("Removing .pdb")
         os.remove("**.pdb")
+        os.remove("**.idb")
         print("Done")
     end
 }

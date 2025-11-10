@@ -39,11 +39,11 @@ project "Drop"
 
    links
    {
-      -- Game specific
-      "DropGame"
-
       -- Windows specific
-      , "shlwapi.lib"
+      "shlwapi.lib"
+
+      -- Game specific
+      -- , "DropGame"
    }
 
 
@@ -56,7 +56,7 @@ project "Drop"
       runtime "Debug"
       optimize "Off"
       symbols "On"
-      buildoptions "/MT"
+      buildoptions {"/MT", "/nologo", "/Gm", "/GR", "/EH", "/Od", "/Oi", "/WX", "/W4", "/wd4201", "/wd4100", "/wd4189", "/LD"}
 
    filter "configurations:Release"
       defines { "DROP_RELEASE" }
