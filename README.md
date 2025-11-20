@@ -93,3 +93,52 @@ The cumulated one for the scale, orientation and position of the object in world
 
 
 
+# Live Coding
+
+By having the game as a DLL we can:
+- Edit the code at runtime
+- Rebuild the game DLL (*)
+- Detach the old DLL and Attach the new one (*)
+
+## Caveat
+
+- We cannot allocate memory on the DLL and hope to be available again   
+
+### Satic on DLL
+Statics on DLL will be whiped  
+**Ex:**  
+Using a std::vector as static value
+
+At the first run
+```c++
+static std::vector<int32_t> Vector;
+```
+```c++
+DLL_PROCESS_ATTACH
+Message printed from executable
+<<< StartGame
+        Number: 1
+        Number: 1
+UpdateGame with deltaTime: 0.0166
+Vector:
+         size: 6
+         ptr to raw data: 000002B1E9E7B740
+         Content:
+                 - at 0, value: 1
+                 - at 1, value: 1
+                 - at 2, value: 1
+                 - at 3, value: 1
+                 - at 4, value: 1
+                 - at 5, value: 1
+```
+
+After rebuilding DLL
+```c++
+DLL_PROCESS_DETACH
+DLL_PROCESS_ATTACH
+Message printed from executable
+        Number: 1
+UpdateGame with deltaTime: 0.0166
+Vector:
+         size: 0
+```

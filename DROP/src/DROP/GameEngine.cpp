@@ -4,6 +4,7 @@
 #include <stdlib.h>         // abort
 #include <iostream>
 #include <assert.h>
+#include "Memory/memoryAllocator.h"
 
 #include "DROPGame.h"
 
@@ -171,6 +172,8 @@ int Main(int argc, char** argv)
     );
 
     gameFunctions.StartGame();
+
+    std::vector<int32_t, ALLOCATOR<int32_t>> myVec;
     
     while (g_GameEngineRunning)
     {
