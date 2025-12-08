@@ -1,6 +1,5 @@
 #include "DROPGame.h"
 
-#include "Windows.h"
 
 #include <iostream>
 #include <vector>
@@ -26,6 +25,10 @@ void UpdateGame(const float deltaTime)
         bFirstExe = false;
 	}
 }
+
+#ifdef DROP_PLATFORM_WINDOWS
+
+#include "Windows.h"
 
 BOOL WINAPI DllMain(
     HINSTANCE hinstDLL, // handle to DLL module
@@ -59,3 +62,5 @@ BOOL WINAPI DllMain(
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
+
+#endif // DROP_PLATFORM_WINDOWS
