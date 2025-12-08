@@ -65,6 +65,8 @@ REM Use Solution folders and dont use back slashes in path
 REM https://learn.microsoft.com/it-it/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170
 msbuild Drop.sln /t:Tools\DropGame
 REM for dll error, copy the dll code into temp_dll file
+REM Add msbuild to env var PATH (%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin) 
+REM and RESTART
 GOTO Done
 
 :Done
