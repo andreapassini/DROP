@@ -13,6 +13,8 @@ typedef void(DLLFUN* PRINT_NUMBER)(int);
 typedef void(DLLFUN* START_GAME)(void);
 typedef void(DLLFUN* UPDATE_GAME)(const float);
 
+static bool g_GameEngineRunning = true;
+
 struct GameDLLProAdresses {
 	FILETIME DLLLastWriteTime;
 
