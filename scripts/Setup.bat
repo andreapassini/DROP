@@ -54,6 +54,10 @@ GOTO Done
 dependencies\premake-5.0.0-beta2-windows\premake5.exe cleanPdb
 msbuild Drop.sln
 GOTO Done
+REM If 'msbuild' is not recognized as an internal or external command
+REM https://softchief.com/2022/06/11/solved-msbuild-is-not-recognized-as-an-internal-or-external-command-operable-program-or-batch-file-while-working-with-pcf/
+REM Add msbuild to env var PATH (%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin) 
+REM and RESTART
 
 :CompileGame
 dependencies\premake-5.0.0-beta2-windows\premake5.exe cleanPdb
