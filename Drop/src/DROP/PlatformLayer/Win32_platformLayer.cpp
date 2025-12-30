@@ -10,6 +10,7 @@
 #include "DROP/GameEngine.h"
 #include "DROPGame.h"
 #include "DROP/Memory/memoryAllocator.h"
+#include "DROP/Strings/stringUtils.h"
 
 #include "DROP/PlatformLayer/platformLayer.h"
 
@@ -109,31 +110,6 @@ void Win32_UnloadGameCode(
     InGameFunctions.UpdateGame = UpdateGameStub;
 }
 
-static void ConcatStrings(
-    size_t SourceACount, char* SourceA
-    , size_t SourceBCount, char* SourceB
-    , size_t DestCount, char* Dest
-) {
-    // dest must be SourceACount + SourceBCount + 1 (for the null terminator)
-    if (DestCount <= SourceACount + SourceBCount)
-    {
-        assert(0);
-        return;
-    }
-
-    for (int Index = 0; Index < SourceACount; ++Index)
-    {
-        *Dest++ = *SourceA++;
-    }
-
-    for (int Index = 0; Index < SourceBCount; ++Index)
-    {
-        *Dest++ = *SourceB++;
-    }
-
-    *Dest++ = 0;
-}
-
 int Main(int argc, char** argv)
 {
     // NOTE(casey): Never use MAX_PATH in code that is user-facing, because it
@@ -153,15 +129,19 @@ int Main(int argc, char** argv)
 
     char SourceGameCodeDLLFilename[] = GAME_DLL_NAME;
     char SourceGameCodeDLLFullPath[MAX_PATH];
-    ConcatStrings(OnePastLastSlash - EXEFileName, EXEFileName,
+    ConcatStrings(
+        OnePastLastSlash - EXEFileName, EXEFileName,
         sizeof(SourceGameCodeDLLFilename) - 1, SourceGameCodeDLLFilename,
-        sizeof(SourceGameCodeDLLFullPath), SourceGameCodeDLLFullPath);
+        sizeof(SourceGameCodeDLLFullPath), SourceGameCodeDLLFullPath
+    );
 
     char TempGameCodeDLLFilename[] = GAME_DLL_TEMP_NAME;
     char TempGameCodeDLLFullPath[MAX_PATH];
-    ConcatStrings(OnePastLastSlash - EXEFileName, EXEFileName,
+    ConcatStrings(
+        OnePastLastSlash - EXEFileName, EXEFileName,
         sizeof(TempGameCodeDLLFilename) - 1, TempGameCodeDLLFilename,
-        sizeof(TempGameCodeDLLFullPath), TempGameCodeDLLFullPath);
+        sizeof(TempGameCodeDLLFullPath), TempGameCodeDLLFullPath
+    );
 
     uint32_t LoadCounter = 0;
     GameDLLProAdresses gameFunctions;
@@ -174,8 +154,6 @@ int Main(int argc, char** argv)
     );
 
     gameFunctions.StartGame();
-
-    //std::vector<int32_t, ALLOCATOR<int32_t>> myVec;
 
     // MainLoop
     while (g_GameEngineRunning)

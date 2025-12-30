@@ -18,6 +18,10 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 - double click on "scripts\\Setup.bat"
 
 # TODO List
+- Project structure
+    - [ ] Link libs with GE
+    - [ ] Expose all the libs call via a GE layer to the game
+
 - Math
     - [x] Vector4
 
