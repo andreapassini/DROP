@@ -13,6 +13,7 @@
 #include "DROP/Strings/stringUtils.h"
 
 #include "DROP/PlatformLayer/platformLayer.h"
+#include "DROP/Types/Types.h"
 
 namespace Drop {
 
@@ -110,10 +111,10 @@ void Win32_UnloadGameCode(
     InGameFunctions.UpdateGame = UpdateGameStub;
 }
 
-int Main(int argc, char** argv)
-{
-    // NOTE(casey): Never use MAX_PATH in code that is user-facing, because it
-    // can be dangerous and lead to bad results.
+void Win32_CleanDLLPath(
+    size_t OutSourceGameCodeDLLFullPathSize, char* OutSourceGameCodeDLLFullPath
+    , size_t OutTempGameCodeDLLFullPathSize, char* OutTempGameCodeDLLFullPath
+) {
     char EXEFileName[MAX_PATH];
     DWORD SizeOfFilename = GetModuleFileNameA(0, EXEFileName, sizeof(EXEFileName));
     char* OnePastLastSlash = EXEFileName;
@@ -127,20 +128,55 @@ int Main(int argc, char** argv)
         }
     }
 
+    size_t SizeOfOutSourceGameCodeDLLFullPath = sizeof(OutSourceGameCodeDLLFullPath);
+
     char SourceGameCodeDLLFilename[] = GAME_DLL_NAME;
-    char SourceGameCodeDLLFullPath[MAX_PATH];
     ConcatStrings(
         OnePastLastSlash - EXEFileName, EXEFileName,
         sizeof(SourceGameCodeDLLFilename) - 1, SourceGameCodeDLLFilename,
-        sizeof(SourceGameCodeDLLFullPath), SourceGameCodeDLLFullPath
+        OutSourceGameCodeDLLFullPathSize, OutSourceGameCodeDLLFullPath
     );
 
     char TempGameCodeDLLFilename[] = GAME_DLL_TEMP_NAME;
-    char TempGameCodeDLLFullPath[MAX_PATH];
     ConcatStrings(
         OnePastLastSlash - EXEFileName, EXEFileName,
         sizeof(TempGameCodeDLLFilename) - 1, TempGameCodeDLLFilename,
-        sizeof(TempGameCodeDLLFullPath), TempGameCodeDLLFullPath
+        OutTempGameCodeDLLFullPathSize, OutTempGameCodeDLLFullPath
+    );
+}
+
+void Win32_CheckAndUpdateGameDLL(
+    HINSTANCE& hinstLib
+    , GameDLLProAdresses& gameFunctions
+    , uint32 LoadCounter
+    , char* InSourceGameCodeDLLFullPath
+    , char* InTempGameCodeDLLFullPath
+) {
+    FILETIME NewDLLWriteTime = Win32_GetLastWriteTime(InSourceGameCodeDLLFullPath);
+    if (CompareFileTime(&NewDLLWriteTime, &gameFunctions.DLLLastWriteTime) != 0)
+    {
+        // Something is wrong with this, i cannot, without bp, update the DLL
+        // https://hero.handmade.network/forums/code-discussion/t/3266-weird_bug_with_live_code_editing
+        // Fix for now - look at episode 39, the blog quoted a fix
+        Sleep(30);
+        Win32_UnloadGameCode(hinstLib, gameFunctions);
+        Win32_LoadGameLibrary(
+            hinstLib
+            , gameFunctions
+            , InSourceGameCodeDLLFullPath
+            , InTempGameCodeDLLFullPath
+        );
+        LoadCounter = 0;
+    }
+}
+
+int Main(int argc, char** argv)
+{
+    char SourceGameCodeDLLFullPath[MAX_PATH];
+    char TempGameCodeDLLFullPath[MAX_PATH];
+    Win32_CleanDLLPath(
+        sizeof(SourceGameCodeDLLFullPath), SourceGameCodeDLLFullPath
+        , sizeof(TempGameCodeDLLFullPath), TempGameCodeDLLFullPath
     );
 
     uint32_t LoadCounter = 0;
@@ -158,22 +194,13 @@ int Main(int argc, char** argv)
     // MainLoop
     while (g_GameEngineRunning)
     {
-        FILETIME NewDLLWriteTime = Win32_GetLastWriteTime(SourceGameCodeDLLFullPath);
-        if (CompareFileTime(&NewDLLWriteTime, &gameFunctions.DLLLastWriteTime) != 0)
-        {
-            // Something is wrong with this, i cannot, without bp, update the DLL
-            // https://hero.handmade.network/forums/code-discussion/t/3266-weird_bug_with_live_code_editing
-            // Fix for now - look at episode 39, the blog quoted a fix
-            Sleep(30);
-            Win32_UnloadGameCode(hinstLib, gameFunctions);
-            Win32_LoadGameLibrary(
-                hinstLib
-                , gameFunctions
-                , SourceGameCodeDLLFullPath
-                , TempGameCodeDLLFullPath
-            );
-            LoadCounter = 0;
-        }
+        Win32_CheckAndUpdateGameDLL(
+            hinstLib
+            , gameFunctions
+            , LoadCounter
+            , SourceGameCodeDLLFullPath
+            , TempGameCodeDLLFullPath
+        );
 
         gameFunctions.UpdateGame(0.0166f);
     }
