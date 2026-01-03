@@ -7,6 +7,9 @@
 #include <iostream>
 #include <assert.h>
 
+// Platform includes
+#include "Win32_platformLayer.h"
+
 #include "DROP/GameEngine.h"
 #include "DROPGame.h"
 #include "DROP/Memory/memoryAllocator.h"
@@ -14,6 +17,10 @@
 
 #include "DROP/PlatformLayer/platformLayer.h"
 #include "DROP/Types/Types.h"
+
+//#define GLFW_INCLUDE_NONE
+#include <glfw/glfw3.h>
+
 
 namespace Drop {
 
@@ -37,7 +44,7 @@ inline FILETIME Win32_GetLastWriteTime(
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
 void Win32_LoadGameLibrary(
     HINSTANCE& inHinstLib
-    , GameDLLProAdresses& InGameFunctions
+    , GameDLLProcAdresses& InGameFunctions
     , char* SourceDLLName
     , char* TempDLLName
 ) {
@@ -95,7 +102,7 @@ void Win32_LoadGameLibrary(
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
 void Win32_UnloadGameCode(
     HINSTANCE& inHinstLib
-    , GameDLLProAdresses& InGameFunctions
+    , GameDLLProcAdresses& InGameFunctions
 ) {
     BOOL fFreeResult;
 
@@ -147,7 +154,7 @@ void Win32_CleanDLLPath(
 
 void Win32_CheckAndUpdateGameDLL(
     HINSTANCE& hinstLib
-    , GameDLLProAdresses& gameFunctions
+    , GameDLLProcAdresses& gameFunctions
     , uint32 LoadCounter
     , char* InSourceGameCodeDLLFullPath
     , char* InTempGameCodeDLLFullPath
@@ -167,7 +174,14 @@ void Win32_CheckAndUpdateGameDLL(
             , InTempGameCodeDLLFullPath
         );
         LoadCounter = 0;
+
+        std::cout << "Time: " << (float)glfwGetTime() << std::endl;
     }
+}
+
+void GetTime()
+{
+    std::cout << "Time: " << (float)glfwGetTime() << std::endl;
 }
 
 int Main(int argc, char** argv)
@@ -180,7 +194,7 @@ int Main(int argc, char** argv)
     );
 
     uint32_t LoadCounter = 0;
-    GameDLLProAdresses gameFunctions;
+    GameDLLProcAdresses gameFunctions;
     HINSTANCE hinstLib;
     Win32_LoadGameLibrary(
         hinstLib
@@ -188,6 +202,8 @@ int Main(int argc, char** argv)
         , SourceGameCodeDLLFullPath
         , TempGameCodeDLLFullPath
     );
+    DropEngineCalls EngineCalls;
+    EngineCalls.engineCall = GetTime;
 
     gameFunctions.StartGame();
 
@@ -202,7 +218,8 @@ int Main(int argc, char** argv)
             , TempGameCodeDLLFullPath
         );
 
-        gameFunctions.UpdateGame(0.0166f);
+        if(gameFunctions.UpdateGame)
+            gameFunctions.UpdateGame(0.0166f, &EngineCalls);
     }
 
     return 0;

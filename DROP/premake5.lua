@@ -31,6 +31,7 @@ project "Drop"
    {
       "src"
       , "%{wks.location}/DropGame/src"
+      , "%{IncludeDir.GLFW}"
    }
 
    libdirs { 
@@ -44,6 +45,9 @@ project "Drop"
 
       -- Game specific
       -- , "DropGame"
+
+      -- Libs
+      , "GLFW"
    }
 
 

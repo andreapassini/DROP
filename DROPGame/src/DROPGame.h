@@ -10,11 +10,19 @@
 #define DLLEXPORT __declspec(dllimport)  
 #endif
 
+// Engine side Functions Declarations
+#define ENGINE_CALL(name) void(*name)(void)
+typedef ENGINE_CALL(EngineCall);
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
+struct DLLEXPORT DropEngineCalls
+{
+	EngineCall engineCall = {};
+};
 
 struct DLLEXPORT DropGameInfo {
 	float SomeData = 0.0f;
@@ -31,9 +39,9 @@ void DLLEXPORT StartGame();
 void StartGameStub() {};
 
 
-void DLLEXPORT UpdateGame(const float deltaTime);
+void DLLEXPORT UpdateGame(const float deltaTime, DropEngineCalls* EngineCalls);
 // Stub
-void UpdateGameStub(const float deltaTime) {};
+void UpdateGameStub(const float deltaTime, DropEngineCalls* EngineCalls) {};
 
 
 

@@ -18,12 +18,14 @@ void StartGame()
     bFirstExe = true;
 }
 
-void UpdateGame(const float deltaTime)
+void UpdateGame(const float deltaTime, DropEngineCalls* EngineCalls)
 {	
 	if (bFirstExe) {
         
         bFirstExe = false;
 	}
+
+    EngineCalls->engineCall();
 }
 
 #ifdef DROP_PLATFORM_WINDOWS

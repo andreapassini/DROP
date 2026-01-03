@@ -30,20 +30,20 @@ project "DropGame"
       "src"
    }
 
-   -- includedirs
-   -- {
+   includedirs
+   {
       -- "%{wks.location}/Drop/dependencies/spdlog/include"
       -- , "%{wks.location}/Drop/src"
       -- , "%{wks.location}/Drop/dependencies"
 
       -- , "%{IncludeDir.Glad}"
-      -- , "%{IncludeDir.GLFW}"
+      "%{IncludeDir.GLFW}"
       -- , "%{IncludeDir.ImGui}"
       -- , "%{IncludeDir.glm}"
       -- , "%{IncludeDir.stb_image}"
       -- , "%{IncludeDir.assimp}"
       -- , "%{IncludeDir.yaml_cpp}"
-   -- }
+   }
 
    -- links
    -- {
