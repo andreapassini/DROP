@@ -32,6 +32,8 @@ project "Drop"
       "src"
       , "%{wks.location}/DropGame/src"
       , "%{IncludeDir.GLFW}"
+      , "%{IncludeDir.glad}"
+      , "%{IncludeDir.spdlog}"
    }
 
    libdirs { 
@@ -48,6 +50,7 @@ project "Drop"
 
       -- Libs
       , "GLFW"
+      , "glad"
    }
 
 
@@ -60,7 +63,8 @@ project "Drop"
       runtime "Debug"
       optimize "Off"
       symbols "On"
-      buildoptions {"/MT", "/nologo", "/Gm", "/GR", "/EH", "/Od", "/Oi", "/WX", "/W4", "/wd4201", "/wd4100", "/wd4189", "/LD"}
+      -- buildoptions {"/MT", "/nologo", "/Gm", "/GR", "/EH", "/Od", "/Oi", "/WX", "/W4", "/wd4201", "/wd4100", "/wd4189", "/LD"}
+      buildoptions {"/MT", "/nologo", "/Gm", "/GR", "/EH", "/Od", "/Oi", "/W4", "/wd4201", "/wd4100", "/wd4189", "/LD"}
 
    filter "configurations:Release"
       defines { "DROP_RELEASE" }

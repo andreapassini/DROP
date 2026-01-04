@@ -18,9 +18,6 @@
 #include "DROP/PlatformLayer/platformLayer.h"
 #include "DROP/Types/Types.h"
 
-//#define GLFW_INCLUDE_NONE
-#include <glfw/glfw3.h>
-
 
 namespace Drop {
 
@@ -204,6 +201,9 @@ int Main(int argc, char** argv)
     );
     DropEngineCalls EngineCalls;
     EngineCalls.engineCall = GetTime;
+
+    // Setup Engine
+    GameEngine::StartEngine();
 
     gameFunctions.StartGame();
 
