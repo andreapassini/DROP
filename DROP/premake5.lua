@@ -21,7 +21,7 @@ project "Drop"
    defines
 	{
 		"GLM_ENABLE_EXPERIMENTAL"
-      ,  "_CRT_SECURE_NO_WARNINGS"
+      , "_CRT_SECURE_NO_WARNINGS"
       , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
       , "GLFW_INCLUDE_NONE"
 	}
@@ -33,11 +33,16 @@ project "Drop"
       , "%{wks.location}/DropGame/src"
       , "%{IncludeDir.GLFW}"
       , "%{IncludeDir.glad}"
+      , "%{IncludeDir.ImGui}"
+      , "%{IncludeDir.glm}"
+      , "%{IncludeDir.stb_img}"
+      , "%{IncludeDir.assimp}"
       , "%{IncludeDir.spdlog}"
+      , "%{IncludeDir.yaml_cpp}"
    }
 
    libdirs { 
-      
+      "%{IncludeDir.assimp_lib}"
    }
 
    links
@@ -51,6 +56,22 @@ project "Drop"
       -- Libs
       , "GLFW"
       , "glad"
+      , "ImGui"
+      , "yaml-cpp"
+
+      -- ASSIMP
+      , "assimp-vc143-mt.lib"
+      , "draco.lib"
+      , "kubazip.lib"
+      , "minizip.lib"
+      , "poly2tri.lib"
+      , "pugixml.lib"
+      , "zlib.lib"
+
+      , "gdi32.lib"
+      , "user32.lib"
+      , "Shell32.lib"
+      , "Advapi32.lib"
    }
 
 

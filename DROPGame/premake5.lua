@@ -38,11 +38,11 @@ project "DropGame"
 
       "%{IncludeDir.glad}"
       , "%{IncludeDir.GLFW}"
-      -- , "%{IncludeDir.ImGui}"
-      -- , "%{IncludeDir.glm}"
-      -- , "%{IncludeDir.stb_image}"
-      -- , "%{IncludeDir.assimp}"
-      -- , "%{IncludeDir.yaml_cpp}"
+      , "%{IncludeDir.ImGui}"
+      , "%{IncludeDir.glm}"
+      , "%{IncludeDir.stb_image}"
+      , "%{IncludeDir.assimp}"
+      , "%{IncludeDir.yaml_cpp}"
    }
 
    -- links
