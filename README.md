@@ -17,6 +17,13 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 - double click on "scripts\\Setup.bat"
 
+# How to Add Image to this README
+
+- Open Github Web
+- Create an issue
+- Paste the image
+- Copy the link
+
 # TODO List
 - Project structure
     - [ ] Link libs with GE
@@ -146,3 +153,7 @@ UpdateGame with deltaTime: 0.0166
 Vector:
          size: 0
 ```
+
+# Enhanced Project Structure: Engine with Live Coding
+
+![image](https://github.com/user-attachments/assets/8f8bf45f-4e4a-4739-94ff-022e97789bd3)
