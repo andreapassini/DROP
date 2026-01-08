@@ -20,6 +20,7 @@ group ""
 
 group "Core"
    include "Drop"
+   include "DropEngine"
 group ""
 
 group "Tools"
