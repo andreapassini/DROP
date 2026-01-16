@@ -19,15 +19,25 @@ project "DropEngine"
    }
 
    defines
-    {
-        "_CRT_SECURE_NO_WARNINGS"
-        , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
-        , "GLFW_INCLUDE_NONE"
-    }
+   {
+		"GLM_ENABLE_EXPERIMENTAL"
+      , "_CRT_SECURE_NO_WARNINGS"
+      , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
+      , "GLFW_INCLUDE_NONE"
+   }
 
    includedirs
    {
       "src"
+      , "%{wks.location}/DropGame/src"
+      , "%{IncludeDir.GLFW}"
+      , "%{IncludeDir.glad}"
+      , "%{IncludeDir.ImGui}"
+      , "%{IncludeDir.glm}"
+      , "%{IncludeDir.stb_img}"
+      , "%{IncludeDir.assimp}"
+      , "%{IncludeDir.spdlog}"
+      , "%{IncludeDir.yaml_cpp}"
    }
 
    includedirs
@@ -45,10 +55,40 @@ project "DropEngine"
       , "%{IncludeDir.yaml_cpp}"
    }
 
-   -- links
-   -- {
-   --    "Drop"
-   -- }
+   libdirs 
+   { 
+      "%{IncludeDir.assimp_lib}"
+   }
+
+   links
+   {
+      -- Windows specific
+      "shlwapi.lib"
+
+      -- Game specific
+      -- , "DropGame"
+
+      -- Libs
+      , "GLFW"
+      , "glad"
+      , "ImGui"
+      , "yaml-cpp"
+
+      -- ASSIMP
+      , "assimp-vc143-mt.lib"
+      , "draco.lib"
+      , "kubazip.lib"
+      , "minizip.lib"
+      , "poly2tri.lib"
+      , "pugixml.lib"
+      , "zlib.lib"
+
+      , "gdi32.lib"
+      , "user32.lib"
+      , "Shell32.lib"
+      , "Advapi32.lib"
+   }
+
 
    filter "system:windows"
       systemversion "latest"

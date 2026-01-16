@@ -21,17 +21,6 @@
 
 namespace Drop {
 
-struct DropFileTime
-{
-    FILETIME fileTime;
-};
-
-inline void GetLastTimeFileWrite(
-    DropFileTime* OutFileTime
-    , char* Filename
-) {
-    OutFileTime->fileTime = Win32_GetLastWriteTime(Filename);
-}
 inline FILETIME Win32_GetLastWriteTime(
     char* Filename
 ) {
@@ -47,7 +36,6 @@ inline FILETIME Win32_GetLastWriteTime(
 
     return(LastWriteTime);
 }
-
 
 // MOVE THE WINDOWS STUFF TO PLATFORM LAYER
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
@@ -127,24 +115,9 @@ void Win32_UnloadGameCode(
     InGameFunctions.UpdateGame = UpdateGameStub;
 }
 
-void CleanDLLPath(
-    size_t OutSourceGameCodeDLLFullPathSize, char* OutSourceGameCodeDLLFullPath
-    , size_t OutTempGameCodeDLLFullPathSize, char* OutTempGameCodeDLLFullPath
-    , size_t InDLLNameSize, char* InDLLName
-    , size_t InDLLTempNameSize, char* InDLLTempName
-) {
-    Win32_CleanDLLPath(
-        OutSourceGameCodeDLLFullPathSize, OutSourceGameCodeDLLFullPath
-        , OutTempGameCodeDLLFullPathSize, OutTempGameCodeDLLFullPath
-        , InDLLNameSize, InDLLName
-        , InDLLTempNameSize, InDLLTempName
-    );
-}
 void Win32_CleanDLLPath(
     size_t OutSourceGameCodeDLLFullPathSize, char* OutSourceGameCodeDLLFullPath
     , size_t OutTempGameCodeDLLFullPathSize, char* OutTempGameCodeDLLFullPath
-    , size_t InDLLNameSize, char* InDLLName
-    , size_t InDLLTempNameSize, char* InDLLTempName
 ) {
     char EXEFileName[MAX_PATH];
     DWORD SizeOfFilename = GetModuleFileNameA(0, EXEFileName, sizeof(EXEFileName));
@@ -161,17 +134,17 @@ void Win32_CleanDLLPath(
 
     size_t SizeOfOutSourceGameCodeDLLFullPath = sizeof(OutSourceGameCodeDLLFullPath);
 
-    char* SourceGameCodeDLLFilename = InDLLName;
+    char SourceGameCodeDLLFilename[] = GAME_DLL_NAME;
     ConcatStrings(
         OnePastLastSlash - EXEFileName, EXEFileName,
-        InDLLNameSize, SourceGameCodeDLLFilename,
+        sizeof(SourceGameCodeDLLFilename) - 1, SourceGameCodeDLLFilename,
         OutSourceGameCodeDLLFullPathSize, OutSourceGameCodeDLLFullPath
     );
 
-    char* TempGameCodeDLLFilename = InDLLTempName;
+    char TempGameCodeDLLFilename[] = GAME_DLL_TEMP_NAME;
     ConcatStrings(
         OnePastLastSlash - EXEFileName, EXEFileName,
-        InDLLTempNameSize, TempGameCodeDLLFilename,
+        sizeof(TempGameCodeDLLFilename) - 1, TempGameCodeDLLFilename,
         OutTempGameCodeDLLFullPathSize, OutTempGameCodeDLLFullPath
     );
 }
@@ -212,13 +185,9 @@ int Main(int argc, char** argv)
 {
     char SourceGameCodeDLLFullPath[MAX_PATH];
     char TempGameCodeDLLFullPath[MAX_PATH];
-    char DLLName[] = GAME_DLL_NAME;
-    char DLLTempName[] = GAME_DLL_TEMP_NAME;
     Win32_CleanDLLPath(
         sizeof(SourceGameCodeDLLFullPath), SourceGameCodeDLLFullPath
         , sizeof(TempGameCodeDLLFullPath), TempGameCodeDLLFullPath
-        , sizeof(DLLName) - 1, DLLName
-        , sizeof(DLLTempName) - 1, DLLTempName
     );
 
     uint32_t LoadCounter = 0;
@@ -255,8 +224,6 @@ int Main(int argc, char** argv)
 
     return 0;
 }
-
-
 
 }
 

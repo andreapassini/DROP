@@ -30,19 +30,11 @@ project "Drop"
    includedirs
    {
       "src"
-      , "%{wks.location}/DropGame/src"
-      , "%{IncludeDir.GLFW}"
-      , "%{IncludeDir.glad}"
-      , "%{IncludeDir.ImGui}"
-      , "%{IncludeDir.glm}"
-      , "%{IncludeDir.stb_img}"
-      , "%{IncludeDir.assimp}"
-      , "%{IncludeDir.spdlog}"
-      , "%{IncludeDir.yaml_cpp}"
+      , "%{wks.location}/DropEngine/src"
    }
 
-   libdirs { 
-      "%{IncludeDir.assimp_lib}"
+   libdirs 
+   { 
    }
 
    links
@@ -50,28 +42,8 @@ project "Drop"
       -- Windows specific
       "shlwapi.lib"
 
-      -- Game specific
-      -- , "DropGame"
-
-      -- Libs
-      , "GLFW"
-      , "glad"
-      , "ImGui"
-      , "yaml-cpp"
-
-      -- ASSIMP
-      , "assimp-vc143-mt.lib"
-      , "draco.lib"
-      , "kubazip.lib"
-      , "minizip.lib"
-      , "poly2tri.lib"
-      , "pugixml.lib"
-      , "zlib.lib"
-
-      , "gdi32.lib"
-      , "user32.lib"
-      , "Shell32.lib"
-      , "Advapi32.lib"
+      -- Engine specific
+      -- , "DropEngine" -- Do it your selfs for live coding
    }
 
 
