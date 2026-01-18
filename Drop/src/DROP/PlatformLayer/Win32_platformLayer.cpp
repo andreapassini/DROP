@@ -26,12 +26,6 @@ struct DropFileTime
     FILETIME fileTime;
 };
 
-inline void GetLastTimeFileWrite(
-    DropFileTime* OutFileTime
-    , char* Filename
-) {
-    OutFileTime->fileTime = Win32_GetLastWriteTime(Filename);
-}
 inline FILETIME Win32_GetLastWriteTime(
     char* Filename
 ) {
@@ -127,19 +121,6 @@ void Win32_UnloadGameCode(
     InGameFunctions.UpdateGame = UpdateGameStub;
 }
 
-void CleanDLLPath(
-    size_t OutSourceGameCodeDLLFullPathSize, char* OutSourceGameCodeDLLFullPath
-    , size_t OutTempGameCodeDLLFullPathSize, char* OutTempGameCodeDLLFullPath
-    , size_t InDLLNameSize, char* InDLLName
-    , size_t InDLLTempNameSize, char* InDLLTempName
-) {
-    Win32_CleanDLLPath(
-        OutSourceGameCodeDLLFullPathSize, OutSourceGameCodeDLLFullPath
-        , OutTempGameCodeDLLFullPathSize, OutTempGameCodeDLLFullPath
-        , InDLLNameSize, InDLLName
-        , InDLLTempNameSize, InDLLTempName
-    );
-}
 void Win32_CleanDLLPath(
     size_t OutSourceGameCodeDLLFullPathSize, char* OutSourceGameCodeDLLFullPath
     , size_t OutTempGameCodeDLLFullPathSize, char* OutTempGameCodeDLLFullPath

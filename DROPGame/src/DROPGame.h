@@ -39,9 +39,15 @@ void DLLEXPORT StartGame();
 void StartGameStub() {};
 
 
-void DLLEXPORT UpdateGame(const float deltaTime, DropEngineCalls* EngineCalls);
+void DLLEXPORT UpdateGame(
+	const float deltaTime
+	, DropEngineCalls* EngineCalls
+);
 // Stub
-void UpdateGameStub(const float deltaTime, DropEngineCalls* EngineCalls) {};
+void UpdateGameStub(
+	const float deltaTime
+	, DropEngineCalls* EngineCalls
+) {};
 
 
 
