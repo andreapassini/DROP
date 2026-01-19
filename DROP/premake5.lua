@@ -31,6 +31,7 @@ project "Drop"
    {
       "src"
       , "%{wks.location}/DropEngine/src"
+      , "%{wks.location}/DropGame/src"
    }
 
    libdirs 

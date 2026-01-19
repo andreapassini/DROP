@@ -1,33 +1,40 @@
-#include "DROPGame.h"
-
+#include "DropEngine.h"
 
 #include <iostream>
-#include <vector>
+
+#include "Utils/Log.h"
+#include "Window/Window.h"
+
+using namespace Drop;
 
 static bool bFirstExe = true;
 
-void PrintNumber(const int InNumber)
+void StartEngine()
 {
-	std::cout << "PrintNumber " << InNumber << std::endl;
+	Drop::Log::Init();
+	LOG_CORE_WARN("Initialized Log!");
+
+	LOG_CORE_INFO("Drop Engine starting");
+
+	// to be removed
+	Window* m_WindowHandle = Window::Create();
+	//Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
+
+
 }
 
-void StartGame()
-{
-	std::cout << "<<< StartGame" << std::endl;
+void  UpdateEngine(
+	const float deltaTime
+	, PlatformCalls* platformCalls
+) {
+	// Call the the Game Update
 
-    bFirstExe = true;
 }
 
-void UpdateGame(
-    const float deltaTime
-    , DropEngineCalls* EngineCalls
-) {	
-	if (bFirstExe) {
-        
-        bFirstExe = false;
-	}
+void  UpdatedGameDLL(
+) {
+	// Update the DLL
 
-    EngineCalls->engineCall();
 }
 
 #ifdef DROP_PLATFORM_WINDOWS
