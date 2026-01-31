@@ -18,7 +18,7 @@
 #include "PlatformLayer/platformLayer.h"
 #include "Types/Types.h"
 #include "platformLayer.h"
-
+#include "GameEngine.h"
 
 namespace Drop {
 
@@ -56,7 +56,7 @@ void Win32_LoadLibrary(
 
     InGameFunctions.bIsValid = false;
 
-    InGameFunctions.DLLLastWriteTime = Win32_GetLastWriteTime(SourceDLLName);
+    InGameFunctions.DLLastWriteTime = Win32_GetLastWriteTime(SourceDLLName);
     //CopyFile(T_GAME_DLL_NAME, T_GAME_DLL_TEMP_NAME, FALSE);
     CopyFileA(SourceDLLName, TempDLLName, FALSE);
 
@@ -244,7 +244,7 @@ void Win32_CheckAndUpdateDLL(
     , char* InTempGameCodeDLLFullPath
 ) {
     FILETIME NewDLLWriteTime = Win32_GetLastWriteTime(InSourceGameCodeDLLFullPath);
-    if (CompareFileTime(&NewDLLWriteTime, &gameFunctions.DLLLastWriteTime) != 0)
+    if (CompareFileTime(&NewDLLWriteTime, &gameFunctions.DLLastWriteTime) != 0)
     {
         // Something is wrong with this, i cannot, without bp, update the DLL
         // https://hero.handmade.network/forums/code-discussion/t/3266-weird_bug_with_live_code_editing
