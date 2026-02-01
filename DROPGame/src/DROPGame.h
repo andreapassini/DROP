@@ -48,7 +48,8 @@ extern "C" {
 #endif
 
 
-
+// API between engine and game
+// Game will call this engine functions
 struct DLLEXPORT DropEngineCalls
 {
 	EngineCall engineCall = {};

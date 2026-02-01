@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 // Engine includes
-#include "DROP/Types/Types.h"
+#include "Types/Types.h"
 
 namespace Drop
 {

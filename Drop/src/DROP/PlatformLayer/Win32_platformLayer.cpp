@@ -10,17 +10,15 @@
 // Platform includes
 #include "Win32_platformLayer.h"
 
+#include "DropEngine.h"
 #include "GameEngine.h"
-#include "DROPGame.h"
+#include "DropGame.h"
 #include "Memory/memoryAllocator.h"
 #include "Strings/stringUtils.h"
 
 #include "PlatformLayer/platformLayer.h"
 #include "Types/Types.h"
 #include "platformLayer.h"
-#include "GameEngine.h"
-
-namespace Drop {
 
 struct DropFileTime
 {
@@ -48,7 +46,7 @@ inline FILETIME Win32_GetLastWriteTime(
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
 void Win32_LoadLibrary(
     HINSTANCE& inHinstLib
-    , GameDLLProcAdresses& InGameFunctions
+    , GameDLL& InGameFunctions
     , char* SourceDLLName
     , char* TempDLLName
 ) {
@@ -68,25 +66,25 @@ void Win32_LoadLibrary(
 
     if (NULL != inHinstLib)
     {
-        InGameFunctions.PrintNumber = (PRINT_NUMBER)GetProcAddress(inHinstLib, InGameFunctions.PrintNumberName);
-        InGameFunctions.StartGame = (START_GAME)GetProcAddress(inHinstLib, InGameFunctions.StartGameName);
-        InGameFunctions.UpdateGame = (UPDATE_GAME)GetProcAddress(inHinstLib, InGameFunctions.UpdateGameName);
+        InGameFunctions.procAdresses.PrintNumber = (PRINT_NUMBER)GetProcAddress(inHinstLib, InGameFunctions.procAdresses.PrintNumberName);
+        InGameFunctions.procAdresses.StartGame = (START_GAME)GetProcAddress(inHinstLib, InGameFunctions.procAdresses.StartGameName);
+        InGameFunctions.procAdresses.UpdateGame = (UPDATE_GAME)GetProcAddress(inHinstLib, InGameFunctions.procAdresses.UpdateGameName);
 
         // If the function address is valid, call the function.
         fRunTimeLinkSuccess = TRUE;
-        if (NULL == InGameFunctions.PrintNumber)
+        if (NULL == InGameFunctions.procAdresses.PrintNumber)
         {
             fRunTimeLinkSuccess = FALSE;
         }
         // Check error
 
-        if (NULL == InGameFunctions.StartGame)
+        if (NULL == InGameFunctions.procAdresses.StartGame)
         {
             fRunTimeLinkSuccess = FALSE;
         }
         // Check error
 
-        if (NULL == InGameFunctions.UpdateGame)
+        if (NULL == InGameFunctions.procAdresses.UpdateGame)
         {
             fRunTimeLinkSuccess = FALSE;
         }
@@ -107,7 +105,7 @@ void Win32_LoadLibrary(
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
 void Win32_LoadLibrary(
     HINSTANCE& inHinstLib
-    , EngineDLLProcAdresses& InEngineFunctions
+    , EngineDLL& InEngineFunctions
     , char* SourceDLLName
     , char* TempDLLName
 ) {
@@ -115,7 +113,7 @@ void Win32_LoadLibrary(
 
     InEngineFunctions.bIsValid = false;
 
-    InEngineFunctions.DLLLastWriteTime = Win32_GetLastWriteTime(SourceDLLName);
+    InEngineFunctions.DLLastWriteTime = Win32_GetLastWriteTime(SourceDLLName);
     //CopyFile(T_ENGINE_DLL_NAME, T_ENGINE_DLL_TEMP_NAME, FALSE);
     CopyFileA(SourceDLLName, TempDLLName, FALSE);
 
@@ -127,25 +125,18 @@ void Win32_LoadLibrary(
 
     if (NULL != inHinstLib)
     {
-        InEngineFunctions.PrintNumber = (PRINT_NUMBER)GetProcAddress(inHinstLib, InEngineFunctions.PrintNumberName);
-        InEngineFunctions.StartEngine = (START_ENGINE)GetProcAddress(inHinstLib, InEngineFunctions.StartEngineName);
-        InEngineFunctions.UpdateEngine = (UPDATE_ENGINE)GetProcAddress(inHinstLib, InEngineFunctions.UpdateEngineName);
+        InEngineFunctions.procAdresses.StartEngine = (START_ENGINE)GetProcAddress(inHinstLib, InEngineFunctions.procAdresses.StartEngineName);
+        InEngineFunctions.procAdresses.UpdateEngine = (UPDATE_ENGINE)GetProcAddress(inHinstLib, InEngineFunctions.procAdresses.UpdateEngineName);
 
         // If the function address is valid, call the function.
-        fRunTimeLinkSuccess = TRUE;
-        if (NULL == InEngineFunctions.PrintNumber)
+
+        if (NULL == InEngineFunctions.procAdresses.StartEngine)
         {
             fRunTimeLinkSuccess = FALSE;
         }
         // Check error
 
-        if (NULL == InEngineFunctions.StartEngine)
-        {
-            fRunTimeLinkSuccess = FALSE;
-        }
-        // Check error
-
-        if (NULL == InEngineFunctions.UpdateEngine)
+        if (NULL == InEngineFunctions.procAdresses.UpdateEngine)
         {
             fRunTimeLinkSuccess = FALSE;
         }
@@ -165,7 +156,7 @@ void Win32_LoadLibrary(
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
 void Win32_UnloadCode(
     HINSTANCE& inHinstLib
-    , GameDLLProcAdresses& InGameFunctions
+    , GameDLL& InGameFunctions
 ) {
     BOOL fFreeResult;
 
@@ -176,15 +167,15 @@ void Win32_UnloadCode(
     }
 
     InGameFunctions.bIsValid = false;
-    InGameFunctions.PrintNumber = PrintNumberStub;
-    InGameFunctions.StartGame = StartGameStub;
-    InGameFunctions.UpdateGame = UpdateGameStub;
+    InGameFunctions.procAdresses.PrintNumber = PrintNumberStub;
+    InGameFunctions.procAdresses.StartGame = StartGameStub;
+    InGameFunctions.procAdresses.UpdateGame = UpdateGameStub;
 }
 
 // https://learn.microsoft.com/it-it/windows/win32/dlls/using-run-time-dynamic-linking
 void Win32_UnloadCode(
     HINSTANCE& inHinstLib
-    , EngineDLLProcAdresses& InEngineFunctions
+    , EngineDLL& InEngineFunctions
 ) {
     BOOL fFreeResult;
 
@@ -195,9 +186,8 @@ void Win32_UnloadCode(
     }
 
     InEngineFunctions.bIsValid = false;
-    InEngineFunctions.PrintNumber = PrintNumberStub;
-    InEngineFunctions.StartEngine = StartEngineStub;
-    InEngineFunctions.UpdateEngine = UpdateEngineStub;
+    InEngineFunctions.procAdresses.StartEngine = StartEngineStub;
+    InEngineFunctions.procAdresses.UpdateEngine = UpdateEngineStub;
 }
 
 void Win32_CleanDLLPath(
@@ -238,46 +228,50 @@ void Win32_CleanDLLPath(
 
 void Win32_CheckAndUpdateDLL(
     HINSTANCE& hinstLib
-    , GameDLLProcAdresses& gameFunctions
+    , GameDLL& gameDLL
     , uint32 LoadCounter
     , char* InSourceGameCodeDLLFullPath
     , char* InTempGameCodeDLLFullPath
 ) {
     FILETIME NewDLLWriteTime = Win32_GetLastWriteTime(InSourceGameCodeDLLFullPath);
-    if (CompareFileTime(&NewDLLWriteTime, &gameFunctions.DLLastWriteTime) != 0)
+    if (CompareFileTime(&NewDLLWriteTime, &gameDLL.DLLastWriteTime) != 0)
     {
         // Something is wrong with this, i cannot, without bp, update the DLL
         // https://hero.handmade.network/forums/code-discussion/t/3266-weird_bug_with_live_code_editing
         // Fix for now - look at episode 39, the blog quoted a fix
         Sleep(30);
-        Win32_UnloadGameCode(hinstLib, gameFunctions);
+        Win32_UnloadCode(
+            hinstLib
+            , gameDLL
+        );
         Win32_LoadLibrary(
             hinstLib
-            , gameFunctions
+            , gameDLL
             , InSourceGameCodeDLLFullPath
             , InTempGameCodeDLLFullPath
         );
         LoadCounter = 0;
-
-        std::cout << "Time: " << (float)glfwGetTime() << std::endl;
     }
 }
 
 void Win32_CheckAndUpdateDLL(
     HINSTANCE& hinstLib
-    , EngineDLLProcAdresses& EngineFunctions
+    , EngineDLL& EngineFunctions
     , uint32 LoadCounter
     , char* InSourceEngineCodeDLLFullPath
     , char* InTempEngineCodeDLLFullPath
 ) {
     FILETIME NewDLLWriteTime = Win32_GetLastWriteTime(InSourceEngineCodeDLLFullPath);
-    if (CompareFileTime(&NewDLLWriteTime, &EngineFunctions.DLLLastWriteTime) != 0)
+    if (CompareFileTime(&NewDLLWriteTime, &EngineFunctions.DLLastWriteTime) != 0)
     {
         // Something is wrong with this, i cannot, without bp, update the DLL
         // https://hero.handmade.network/forums/code-discussion/t/3266-weird_bug_with_live_code_editing
         // Fix for now - look at episode 39, the blog quoted a fix
         Sleep(30);
-        Win32_UnloadCode(hinstLib, EngineFunctions);
+        Win32_UnloadCode(
+            hinstLib
+            , EngineFunctions
+        );
         Win32_LoadLibrary(
             hinstLib
             , EngineFunctions
@@ -285,42 +279,46 @@ void Win32_CheckAndUpdateDLL(
             , InTempEngineCodeDLLFullPath
         );
         LoadCounter = 0;
-
-        std::cout << "Time: " << (float)glfwGetTime() << std::endl;
     }
 }
+ 
+// ------------------------------------------------------------
 
-void GetTime()
+// Platform API to engine 
+
+void TestPlatformCall()
 {
-    std::cout << "Time: " << (float)glfwGetTime() << std::endl;
+    std::cout << "Call from: " << __func__ << std::endl;
 }
 
- 
 // ------------------------------------------------------------
 
 bool bUpdatedEngineDLLCheck = false;
 bool bUpdatedGameDLLCheck = false;
+
+namespace Drop 
+{
 
 int Main(int argc, char** argv)
 {
     // Engine DLL
     char SourceEngineCodeDLLFullPath[MAX_PATH];
     char TempEngineCodeDLLFullPath[MAX_PATH];
-    char DLLName[] = ENGINE_DLL_NAME;
-    char DLLTempName[] = ENGINE_DLL_TEMP_NAME;
+    char engineDLLName[] = ENGINE_DLL_NAME;
+    char engineDLLTempName[] = ENGINE_DLL_TEMP_NAME;
     Win32_CleanDLLPath(
         sizeof(SourceEngineCodeDLLFullPath), SourceEngineCodeDLLFullPath
         , sizeof(TempEngineCodeDLLFullPath), TempEngineCodeDLLFullPath
-        , sizeof(DLLName) - 1, DLLName
-        , sizeof(DLLTempName) - 1, DLLTempName
+        , sizeof(engineDLLName) - 1, engineDLLName
+        , sizeof(engineDLLTempName) - 1, engineDLLTempName
     );
 
-    uint32_t LoadCounter = 0;
-    EngineDLLProcAdresses EngineFunctions;
-    HINSTANCE hinstLib;
+    uint32_t engineLoadCounter = 0;
+    EngineDLL engineDLL;
+    HINSTANCE engineHinstLib;
     Win32_LoadLibrary(
-        hinstLib
-        , EngineFunctions
+        engineHinstLib
+        , engineDLL
         , SourceEngineCodeDLLFullPath
         , TempEngineCodeDLLFullPath
     );
@@ -329,58 +327,65 @@ int Main(int argc, char** argv)
     // Game DLL
     char SourceGameCodeDLLFullPath[MAX_PATH];
     char TempGameCodeDLLFullPath[MAX_PATH];
-    char DLLName[] = GAME_DLL_NAME;
-    char DLLTempName[] = GAME_DLL_TEMP_NAME;
+    char gameDLLName[] = GAME_DLL_NAME;
+    char gameDLLTempName[] = GAME_DLL_TEMP_NAME;
     Win32_CleanDLLPath(
         sizeof(SourceGameCodeDLLFullPath), SourceGameCodeDLLFullPath
         , sizeof(TempGameCodeDLLFullPath), TempGameCodeDLLFullPath
-        , sizeof(DLLName) - 1, DLLName
-        , sizeof(DLLTempName) - 1, DLLTempName
+        , sizeof(gameDLLName) - 1, gameDLLName
+        , sizeof(gameDLLTempName) - 1, gameDLLTempName
     );
 
-    uint32_t LoadCounter = 0;
-    GameDLLProcAdresses gameFunctions;
-    HINSTANCE hinstLib;
+    uint32_t gameLoadCounter = 0;
+    GameDLL gameDLL;
+    HINSTANCE gameHinstLib;
     Win32_LoadLibrary(
-        hinstLib
-        , gameFunctions
+        gameHinstLib
+        , gameDLL
         , SourceGameCodeDLLFullPath
         , TempGameCodeDLLFullPath
     );
 
-    DropEngineCalls EngineCalls;
-    EngineCalls.engineCall = GetTime;
+    DropPlatformCalls platformCalls;
+    platformCalls.platformCall = TestPlatformCall;
 
-    // Setup Engine
-    GameEngine::StartEngine();
+    engineDLL.procAdresses.StartEngine();
 
-    gameFunctions.StartGame();
+    gameDLL.procAdresses.StartGame();
 
     // MainLoop
     while (g_GameEngineRunning)
     {
-        Win32_CheckAndUpdateDLL(
-            hinstLib
-            , gameFunctions
-            , LoadCounter
-            , SourceGameCodeDLLFullPath
-            , TempGameCodeDLLFullPath
-        );
-
         // Call it also for the Engine DLL via an Engine side call
         Win32_CheckAndUpdateDLL(
-            hinstLib
-            , EngineFunctions
-            , LoadCounter
+            engineHinstLib
+            , engineDLL
+            , engineLoadCounter
             , SourceEngineCodeDLLFullPath
             , TempEngineCodeDLLFullPath
         );
 
-        if(gameFunctions.UpdateGame)
-            gameFunctions.UpdateGame(0.0166f, &EngineCalls);
+        Win32_CheckAndUpdateDLL(
+            gameHinstLib
+            , gameDLL
+            , gameLoadCounter
+            , SourceGameCodeDLLFullPath
+            , TempGameCodeDLLFullPath
+        );
+
+        if (engineDLL.procAdresses.UpdateEngine)
+        {
+            engineDLL.procAdresses.UpdateEngine(
+                &platformCalls
+                , &gameDLL.procAdresses
+            );
+        }
+        //if(gameDLL.UpdateGame)
+        //    gameDLL.UpdateGame(0.0166f, &EngineCalls);
     }
 
     return 0;
 }
 
+}
 #endif // DROP_PLATFORM_WINDOWS

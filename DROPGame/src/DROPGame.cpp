@@ -27,7 +27,10 @@ void UpdateGame(
         bFirstExe = false;
 	}
 
-    EngineCalls->engineCall();
+    if (EngineCalls->engineCall)
+    {
+        EngineCalls->engineCall();
+    }
 }
 
 #ifdef DROP_PLATFORM_WINDOWS

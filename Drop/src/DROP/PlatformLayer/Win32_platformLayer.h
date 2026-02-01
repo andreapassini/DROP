@@ -2,13 +2,23 @@
 
 #include <windows.h> 
 
-#include "DROPGame.h"
+#include "DropEngine.h"
+#include "DropGame.h"
 
-struct GameDLLProcAdresses
+struct EngineDLL
 {
 	FILETIME DLLastWriteTime;
 
-	GameProcAdresses gameProcAdresses;
+	EngineProcAdresses procAdresses;
+
+	bool bIsValid = false;
+};
+
+struct GameDLL
+{
+	FILETIME DLLastWriteTime;
+
+	GameProcAdresses procAdresses;
 
 	bool bIsValid = false;
 };

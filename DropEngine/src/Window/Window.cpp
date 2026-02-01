@@ -1,11 +1,12 @@
-#include "Drop/Utils/Log.h"
 #include "Window.h"
+
+#include "Utils/Log.h"
+#include "Types/Types.h"
 
 //#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <GL/GL.h>
-#include <DROP/Types/Types.h>
 
 using namespace Drop;
 

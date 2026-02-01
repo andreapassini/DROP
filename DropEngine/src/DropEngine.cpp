@@ -5,36 +5,47 @@
 #include "Utils/Log.h"
 #include "Window/Window.h"
 
+#include "GameEngine.h"
+#include "DROPGame.h"
+
+#include "glfw/glfw3.h"
+
 using namespace Drop;
 
-static bool bFirstExe = true;
+static DropEngineCalls gDropEngineCalls;
+void TestEngineCall(){}
 
 void StartEngine()
 {
-	Drop::Log::Init();
-	LOG_CORE_WARN("Initialized Log!");
+    Drop::Log::Init();
+    LOG_CORE_WARN("Initialized Log!");
 
-	LOG_CORE_INFO("Drop Engine starting");
+    LOG_CORE_INFO("Drop Engine starting");
 
-	// to be removed
-	Window* m_WindowHandle = Window::Create();
-	//Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
-
-
+    // to be removed
+    Window* m_WindowHandle = Window::Create();
+    //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
 }
 
-void  UpdateEngine(
-	const float deltaTime
-	, PlatformCalls* platformCalls
+void UpdateEngine(
+    DropPlatformCalls* platformCalls
+    , GameProcAdresses* gameCalls
 ) {
-	// Call the the Game Update
+    // Get the updated engine calls (this could be conditional, only if DLL updated)
+    gDropEngineCalls.engineCall = TestEngineCall;
 
-}
+    // Get time from glfwGetTime
+    const float deltaTime = (float)glfwGetTime();
+    std::cout << "Time: " << deltaTime << std::endl;
 
-void  UpdatedGameDLL(
-) {
-	// Update the DLL
-
+    if (gameCalls->UpdateGame)
+    {
+        // call UpdateGame
+        gameCalls->UpdateGame(
+            deltaTime
+            , &gDropEngineCalls
+        );
+    }
 }
 
 #ifdef DROP_PLATFORM_WINDOWS
@@ -52,7 +63,6 @@ BOOL WINAPI DllMain(
     case DLL_PROCESS_ATTACH:
         // Initialize once for each new process.
         // Return FALSE to fail DLL load.
-        bFirstExe = true;
         std::cout << "DLL_PROCESS_ATTACH" << std::endl;
         break;
 

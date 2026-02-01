@@ -1,11 +1,8 @@
 #pragma once
 
-//#define GLFW_INCLUDE_NONE
-#include <glfw/glfw3.h>
+#define DROP_ENGINE_API
 
-#define DROP_API
-
-#ifdef  DROP_API 
+#ifdef  DROP_ENGINE_API 
 /*Enabled as "export" while compiling the dll project*/
 #define DLLEXPORT __declspec(dllexport)  
 #else
@@ -13,9 +10,36 @@
 #define DLLEXPORT __declspec(dllimport)  
 #endif
 
-// Engine side Functions Declarations
+#pragma region EngineSideFunctionsDef
+// =================== GAME SIDE ===================
+#define ENGINE_DLL_NAME "DropEngine.dll"
+#define ENGINE_DLL_TEMP_NAME "DropEngine_temp.dll"
+#define T_ENGINE_DLL_NAME TEXT("DropEngine.dll")
+#define T_ENGINE_DLL_TEMP_NAME TEXT("DropEngine_temp.dll")
+
+#define DLLFUN __cdecl
+
+struct GameProcAdresses;
+struct DropPlatformCalls;
+
+typedef void(DLLFUN* PRINT_NUMBER)(int);
+typedef void(DLLFUN* START_ENGINE)(void);
+typedef void(DLLFUN* UPDATE_ENGINE)(DropPlatformCalls*, GameProcAdresses*);
+
+struct EngineProcAdresses
+{
+	START_ENGINE StartEngine = {};
+	char* StartEngineName = "StartEngine";
+
+	UPDATE_ENGINE UpdateEngine = {};
+	char* UpdateEngineName = "UpdateEngine";
+};
+#pragma endregion
+
+// Platform side Functions Declarations
 #define PLATFORM_CALL(name) void(*name)(void)
 typedef PLATFORM_CALL(PlatformCall);
+
 
 static bool g_GameEngineRunning = true;
 
@@ -23,36 +47,35 @@ static bool g_GameEngineRunning = true;
 extern "C" {
 #endif
 
+	struct DLLEXPORT DropPlatformCalls
+	{
+		PlatformCall platformCall = {};
+	};
 
+	struct GameEngineCode
+	{
+		// Data
+		bool bGameEngineRunning = true;
 
-struct DLLEXPORT PlatformCalls
-{
-	PlatformCall platformCall = {};
-};
+		// Func Pointers for API
 
+	};
 
-void DLLEXPORT StartEngine();
-// Stub
-void StartEngine() {};
+	void DLLEXPORT StartEngine();
+	// Stub
+	void StartEngineStub() {};
 
-
-void DLLEXPORT UpdateEngine(
-	const float deltaTime
-	, PlatformCalls* platformCalls
-);
-// Stub
-void UpdateEngineStub(
-	const float deltaTime
-	, PlatformCalls* platformCalls
-) {};
-
-
-void DLLEXPORT UpdatedGameDLL(
-);
-// Stub
-void UpdatedGameDLLStub(
-) {};
-
+	void DLLEXPORT UpdateEngine( // Get the DeltaTime from glfwGetTime
+		DropPlatformCalls* platformCalls
+		, GameProcAdresses* gameCalls
+	);
+	// Stub
+	void UpdateEngineStub(
+		DropPlatformCalls* platformCalls
+		, GameProcAdresses* gameCalls
+	)
+	{
+	};
 
 
 #ifdef __cplusplus
