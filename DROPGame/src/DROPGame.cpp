@@ -1,6 +1,5 @@
 #include "DROPGame.h"
 
-
 #include <iostream>
 #include <vector>
 
@@ -23,7 +22,6 @@ void UpdateGame(
     , DropEngineCalls* EngineCalls
 ) {	
 	if (bFirstExe) {
-        
         bFirstExe = false;
 	}
 

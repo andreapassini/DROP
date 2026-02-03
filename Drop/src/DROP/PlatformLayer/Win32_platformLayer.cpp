@@ -9,16 +9,14 @@
 
 // Platform includes
 #include "Win32_platformLayer.h"
+#include "platformLayer.h"
 
 #include "DropEngine.h"
 #include "GameEngine.h"
 #include "DropGame.h"
 #include "Memory/memoryAllocator.h"
 #include "Strings/stringUtils.h"
-
-#include "PlatformLayer/platformLayer.h"
 #include "Types/Types.h"
-#include "platformLayer.h"
 
 struct DropFileTime
 {

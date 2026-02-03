@@ -22,7 +22,7 @@ namespace Drop
 
 	Window* Window::Create(const WindowProps& props)
 	{
-		return new Window(props);
+		return new Window(props); // Dont use NEW, get mem from Platform Layer
 	}
 
 	Window::Window(const WindowProps& props)

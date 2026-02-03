@@ -13,7 +13,9 @@
 using namespace Drop;
 
 static DropEngineCalls gDropEngineCalls;
-void TestEngineCall(){}
+
+void TestEngineCall(){
+}
 
 void StartEngine()
 {
@@ -23,7 +25,8 @@ void StartEngine()
     LOG_CORE_INFO("Drop Engine starting");
 
     // to be removed
-    Window* m_WindowHandle = Window::Create();
+    // We need to allocate memory on the .exe (Platform Layer)
+    Window* m_WindowHandle = Window::Create(); 
     //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
 }
 

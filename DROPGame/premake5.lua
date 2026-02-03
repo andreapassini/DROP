@@ -37,19 +37,21 @@ project "DropGame"
       -- , "%{wks.location}/Drop/src"
       -- , "%{wks.location}/Drop/dependencies"
 
-      "%{IncludeDir.glad}"
-      , "%{IncludeDir.GLFW}"
-      , "%{IncludeDir.ImGui}"
-      , "%{IncludeDir.glm}"
-      , "%{IncludeDir.stb_image}"
-      , "%{IncludeDir.assimp}"
-      , "%{IncludeDir.yaml_cpp}"
+      -- "%{IncludeDir.glad}"
+      -- , "%{IncludeDir.GLFW}"
+      -- , "%{IncludeDir.ImGui}"
+      -- , "%{IncludeDir.glm}"
+      -- , "%{IncludeDir.stb_image}"
+      -- , "%{IncludeDir.assimp}"
+      -- , "%{IncludeDir.yaml_cpp}"
    }
 
-   -- links
-   -- {
-   --    "Drop"
-   -- }
+   links
+   {
+      -- Windows specific
+      "shlwapi.lib"
+   }
+
 
    filter "system:windows"
       systemversion "latest"

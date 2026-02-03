@@ -157,3 +157,11 @@ Vector:
 # Enhanced Project Structure: Engine with Live Coding
 
 ![image](https://github.com/user-attachments/assets/8f8bf45f-4e4a-4739-94ff-022e97789bd3)
+
+# ToDo Today
+
+
+- [x] .bat for Engine
+- [x] Test linking of static external libs at game level
+        Epic fail, if you re-compile everythig goes wrong
+ 

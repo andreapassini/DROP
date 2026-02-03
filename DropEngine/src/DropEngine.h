@@ -74,8 +74,7 @@ extern "C" {
 		DropPlatformCalls* platformCalls
 		, GameProcAdresses* gameCalls
 	)
-	{
-	};
+	{};
 
 
 #ifdef __cplusplus
