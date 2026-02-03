@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Types/Types.h"
+
 #define DROP_ENGINE_API
 
 #ifdef  DROP_ENGINE_API 
@@ -22,8 +24,7 @@
 struct GameProcAdresses;
 struct DropPlatformCalls;
 
-typedef void(DLLFUN* PRINT_NUMBER)(int);
-typedef void(DLLFUN* START_ENGINE)(void);
+typedef void(DLLFUN* START_ENGINE)(DropPlatformCalls*);
 typedef void(DLLFUN* UPDATE_ENGINE)(DropPlatformCalls*, GameProcAdresses*);
 
 struct EngineProcAdresses
@@ -39,7 +40,15 @@ struct EngineProcAdresses
 // Platform side Functions Declarations
 #define PLATFORM_CALL(name) void(*name)(void)
 typedef PLATFORM_CALL(PlatformCall);
+#define PLATFORM_ALLOC_CALL(name) void*(*name)(size_t, void*)
+typedef PLATFORM_ALLOC_CALL(AllocateMemory);
 
+#define Kilobytes(Value) ((Value)*1024LL)
+#define Megabytes(Value) (Kilobytes(Value)*1024LL)
+#define Gigabytes(Value) (Megabytes(Value)*1024LL)
+#define Terabytes(Value) (Gigabytes(Value)*1024LL)
+
+#define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 
 static bool g_GameEngineRunning = true;
 
@@ -50,6 +59,13 @@ extern "C" {
 	struct DLLEXPORT DropPlatformCalls
 	{
 		PlatformCall platformCall = {};
+		AllocateMemory allocateMemory = {};
+	};
+
+	struct EngineMemory
+	{
+		void* memory = nullptr;
+		int64 sizeInBytes = 0LL;
 	};
 
 	struct GameEngineCode
@@ -61,9 +77,9 @@ extern "C" {
 
 	};
 
-	void DLLEXPORT StartEngine();
+	void DLLEXPORT StartEngine(DropPlatformCalls* platformCalls);
 	// Stub
-	void StartEngineStub() {};
+	void StartEngineStub(DropPlatformCalls* platformCalls) {};
 
 	void DLLEXPORT UpdateEngine( // Get the DeltaTime from glfwGetTime
 		DropPlatformCalls* platformCalls

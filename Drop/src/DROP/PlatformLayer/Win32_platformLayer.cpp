@@ -346,8 +346,9 @@ int Main(int argc, char** argv)
 
     DropPlatformCalls platformCalls;
     platformCalls.platformCall = TestPlatformCall;
+    platformCalls.allocateMemory = AllocateMemory;
 
-    engineDLL.procAdresses.StartEngine();
+    engineDLL.procAdresses.StartEngine(&platformCalls);
 
     gameDLL.procAdresses.StartGame();
 
@@ -383,6 +384,18 @@ int Main(int argc, char** argv)
     }
 
     return 0;
+}
+
+void* AllocateMemory(
+    size_t sizeInBytes
+    , void* startingAddress /*= nullptr*/
+){
+    return VirtualAlloc(
+        startingAddress
+        , sizeInBytes
+        , MEM_RESERVE | MEM_COMMIT
+        , PAGE_READWRITE
+    );
 }
 
 }

@@ -13,16 +13,23 @@
 using namespace Drop;
 
 static DropEngineCalls gDropEngineCalls;
+static EngineMemory gEngineMemory;
 
 void TestEngineCall(){
 }
 
-void StartEngine()
+void StartEngine(DropPlatformCalls* platformCalls)
 {
     Drop::Log::Init();
     LOG_CORE_WARN("Initialized Log!");
 
     LOG_CORE_INFO("Drop Engine starting");
+
+    gEngineMemory.sizeInBytes = Gigabytes(2);
+    gEngineMemory.memory = platformCalls->allocateMemory(
+        gEngineMemory.sizeInBytes
+        , 0
+    );
 
     // to be removed
     // We need to allocate memory on the .exe (Platform Layer)
