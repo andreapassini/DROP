@@ -64,8 +64,17 @@ extern "C" {
 
 	struct EngineMemory
 	{
-		void* memory = nullptr;
 		int64 sizeInBytes = 0LL;
+
+		// PersistentMemory
+		void* persistentMemory = nullptr;
+		int64 persistentMemorysizeInBytes = 0LL;
+
+		// Transient Memory
+		void* sceneMemory = nullptr;
+		int64 sceneMemorysizeInBytes = 0LL;
+		void* frameMemory = nullptr;
+		int64 frameMemorySizeInBytes = 0LL;
 	};
 
 	struct GameEngineCode
@@ -89,8 +98,7 @@ extern "C" {
 	void UpdateEngineStub(
 		DropPlatformCalls* platformCalls
 		, GameProcAdresses* gameCalls
-	)
-	{};
+	) {};
 
 
 #ifdef __cplusplus

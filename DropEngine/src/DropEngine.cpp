@@ -26,7 +26,7 @@ void StartEngine(DropPlatformCalls* platformCalls)
     LOG_CORE_INFO("Drop Engine starting");
 
     gEngineMemory.sizeInBytes = Gigabytes(2);
-    gEngineMemory.memory = platformCalls->allocateMemory(
+    gEngineMemory.persistentMemory = platformCalls->allocateMemory(
         gEngineMemory.sizeInBytes
         , 0
     );
