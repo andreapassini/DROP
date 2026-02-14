@@ -11,11 +11,15 @@
 typedef int8_t int8;
 typedef int16_t int16;
 typedef int32_t int32;
+#define INT32_ERROR_VALUE _I32_MAX
 typedef int64_t int64;
+#define INT64_ERROR_VALUE _I64_MAX
 typedef int8 i8;
 typedef int16 i16;
 typedef int32 i32;
+#define I32_ERROR_VALUE INT32_ERROR_VALUE
 typedef int64 i64;
+#define I64_ERROR_VALUE INT64_ERROR_VALUE
 
 //typedef unsigned char      uint8_t;
 //typedef unsigned short     uint16_t;
