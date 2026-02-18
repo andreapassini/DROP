@@ -13,29 +13,6 @@
 #endif
 
 #pragma region EngineSideFunctionsDef
-// =================== GAME SIDE ===================
-#define ENGINE_DLL_NAME "DropEngine.dll"
-#define ENGINE_DLL_TEMP_NAME "DropEngine_temp.dll"
-#define T_ENGINE_DLL_NAME TEXT("DropEngine.dll")
-#define T_ENGINE_DLL_TEMP_NAME TEXT("DropEngine_temp.dll")
-
-#define DLLFUN __cdecl
-
-struct GameProcAdresses;
-struct DropPlatformCalls;
-
-typedef void(DLLFUN* START_ENGINE)(DropPlatformCalls*);
-typedef void(DLLFUN* UPDATE_ENGINE)(DropPlatformCalls*, GameProcAdresses*);
-
-struct EngineProcAdresses
-{
-	START_ENGINE StartEngine = {};
-	char* StartEngineName = "StartEngine";
-
-	UPDATE_ENGINE UpdateEngine = {};
-	char* UpdateEngineName = "UpdateEngine";
-};
-#pragma endregion
 
 // Platform side Functions Declarations
 #define PLATFORM_CALL(name) void(*name)(void)
@@ -52,39 +29,64 @@ typedef PLATFORM_ALLOC_CALL(AllocateMemory);
 
 static bool g_GameEngineRunning = true;
 
+// =================== GAME SIDE ===================
+#define ENGINE_DLL_NAME "DropEngine.dll"
+#define ENGINE_DLL_TEMP_NAME "DropEngine_temp.dll"
+#define T_ENGINE_DLL_NAME TEXT("DropEngine.dll")
+#define T_ENGINE_DLL_TEMP_NAME TEXT("DropEngine_temp.dll")
+
+#define DLLFUN __cdecl
+
+struct GameProcAdresses;
+struct DropPlatformCalls;
+
+typedef void(DLLFUN* START_ENGINE)(DropPlatformCalls*);
+typedef void(DLLFUN* UPDATE_ENGINE)(DropPlatformCalls*, GameProcAdresses*);
+
+struct DropPlatformCalls
+{
+	PlatformCall platformCall = {};
+	AllocateMemory allocateMemory = {};
+};
+
+struct EngineProcAdresses
+{
+	START_ENGINE StartEngine = {};
+	char* StartEngineName = "StartEngine";
+
+	UPDATE_ENGINE UpdateEngine = {};
+	char* UpdateEngineName = "UpdateEngine";
+};
+
+
+struct EngineMemory
+{
+	size_t sizeInBytes = 0LL;
+
+	// PersistentMemory
+	void* persistentMemory = nullptr;
+	size_t persistentMemorysizeInBytes = 0LL;
+
+	// Transient Memory 
+	void* sceneMemory = nullptr;
+	size_t sceneMemorysizeInBytes = 0LL;
+	void* frameMemory = nullptr;
+	size_t frameMemorySizeInBytes = 0LL;
+};
+
+struct GameEngineCode
+{
+	// Data
+	bool bGameEngineRunning = true;
+
+	// Func Pointers for API
+
+};
+#pragma endregion
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-	struct DLLEXPORT DropPlatformCalls
-	{
-		PlatformCall platformCall = {};
-		AllocateMemory allocateMemory = {};
-	};
-
-	struct EngineMemory
-	{
-		int64 sizeInBytes = 0LL;
-
-		// PersistentMemory
-		void* persistentMemory = nullptr;
-		int64 persistentMemorysizeInBytes = 0LL;
-
-		// Transient Memory
-		void* sceneMemory = nullptr;
-		int64 sceneMemorysizeInBytes = 0LL;
-		void* frameMemory = nullptr;
-		int64 frameMemorySizeInBytes = 0LL;
-	};
-
-	struct GameEngineCode
-	{
-		// Data
-		bool bGameEngineRunning = true;
-
-		// Func Pointers for API
-
-	};
 
 	void DLLEXPORT StartEngine(DropPlatformCalls* platformCalls);
 	// Stub

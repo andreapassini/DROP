@@ -82,6 +82,57 @@ namespace Drop
 		SetVSync(true);
 	}
 
+	//void glfwInitAllocator(const GLFWallocator* allocator);
+	void Window::Init(
+		const WindowProps& props
+		, const GLFWallocator* glfwAllocator
+	) {
+		m_Data.Title = props.Title;
+		m_Data.Width = props.Width;
+		m_Data.Height = props.Height;
+
+		LOG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+
+		if (!s_GLFWInitialized)
+		{
+			// TODO: glfwTerminate on system shutdown
+			glfwInitAllocator(glfwAllocator);
+			int success = glfwInit();
+			assert(success /*, "Could not intialize GLFW!"*/);
+			glfwSetErrorCallback(GLFWErrorCallback);
+			s_GLFWInitialized = true;
+		}
+
+		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+		//// we set if the window is resizable
+		//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
+
+		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+
+		// Consider making Context Graphics Lib independent
+		if (!m_Window)
+		{
+			assert(false/*, "Failed to create GLFW window"*/);
+			glfwTerminate();
+			return;
+		}
+
+		glfwMakeContextCurrent(m_Window);
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		assert(status/*, "Failed to initialize Glad!"*/);
+
+		LOG_CORE_INFO("OpenGL Info:");
+		LOG_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
+		LOG_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
+		LOG_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
+
+		glfwSetWindowUserPointer(m_Window, &m_Data);
+		SetVSync(true);
+	}
+
 	void Window::Shutdown()
 	{
 		glfwDestroyWindow(m_Window);

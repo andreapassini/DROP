@@ -10,7 +10,7 @@
 
 
 void ArenaInit(
-	Arena* arena
+	ArenaAllocator* arena
 	, void* backingBuffer
 	, size_t backingBufferLength
 ) {
@@ -21,7 +21,7 @@ void ArenaInit(
 }
 
 void* ArenaAlloc(
-	Arena* arena
+	ArenaAllocator* arena
 	, size_t size
 	, size_t align /*= DEFAULT_ALIGNMENT*/
 ) {
@@ -38,7 +38,7 @@ void* ArenaAlloc(
 		arena->currentOffset = offset + size;
 
 		// Zero new memory by default
-		memset(ptr, 0, size);
+		memset(ptr, 0, size); // this will override the fucking arena values GODDAMIT if not assigned in the right way
 		return ptr;
 	}
 	// Return NULL if the arena is out of memory (or handle differently)
@@ -46,7 +46,7 @@ void* ArenaAlloc(
 }
 
 void ArenaFree(
-	Arena* arena
+	ArenaAllocator* arena
 	, void* ptr
 ) {
 	// Do nothing
@@ -54,7 +54,7 @@ void ArenaFree(
 
 // useful for resize, avoid reallocating if the resize is on the last chuck
 void* ArenaResize(
-	Arena* arena
+	ArenaAllocator* arena
 	, void* old_memory
 	, size_t old_size
 	, size_t new_size

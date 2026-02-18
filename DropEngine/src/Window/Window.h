@@ -50,10 +50,14 @@ namespace Drop
 		inline void* GetNativeWindow() const { return m_Window; }
 
 		static Window* Create(const WindowProps& props = WindowProps());
+		void Init(const WindowProps& props);
+		void Init(
+			const WindowProps& props
+			, const GLFWallocator* glfwAllocator
+		);
 
-	private:
-		virtual void Init(const WindowProps& props);
-		virtual void Shutdown();
+		void Shutdown();
+
 	private:
 		GLFWwindow* m_Window;
 

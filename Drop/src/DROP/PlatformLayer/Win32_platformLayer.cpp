@@ -388,7 +388,7 @@ int Main(int argc, char** argv)
 
 void* AllocateMemory(
     size_t sizeInBytes
-    , void* startingAddress /*= nullptr*/
+    , void* startingAddress /*= nullptr*/ // dont start from 0, not a good idea since (nullptr if checked)
 ){
     return VirtualAlloc(
         startingAddress

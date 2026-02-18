@@ -6,7 +6,9 @@
 #include "Window/Window.h"
 
 #include "GameEngine.h"
+#include "EngineState.h"
 #include "DROPGame.h"
+#include "Memory/arenaAllocator.h"
 
 #include "glfw/glfw3.h"
 
@@ -17,6 +19,52 @@ static EngineMemory gEngineMemory;
 
 void TestEngineCall(){
 }
+ 
+
+// For GLFW compatibility
+//typedef void* (*GLFWallocatefun)(size_t size, void* user);
+void* TempGLFWAllocate(
+    size_t size
+    , void* user
+) {
+    ArenaAllocator* arenaAllocator = (ArenaAllocator*)(user);
+    assert(arenaAllocator);
+
+    return ArenaAlloc(
+        arenaAllocator
+        , size
+    );
+}
+//typedef void* (*GLFWreallocatefun)(void* block, size_t size, void* user);
+void* TempGLFWReallocate(
+    void* block
+    , size_t size
+    , void* user
+) {
+    ArenaAllocator* arenaAllocator = (ArenaAllocator*)(user);
+    assert(arenaAllocator);
+
+    return ArenaResize(
+        arenaAllocator
+        , block
+        , 0L // this will call an ArenaAlloc right away, not a big deal for now
+        , size
+    );
+}
+//typedef void (*GLFWdeallocatefun)(void* block, void* user);
+void TempGLFWDeallocate(
+    void* block
+    , void* user
+) {
+    ArenaAllocator* arenaAllocator = (ArenaAllocator*)(user);
+    assert(arenaAllocator);
+
+    return ArenaFree(
+        arenaAllocator
+        , block
+    );
+}
+
 
 void StartEngine(DropPlatformCalls* platformCalls)
 {
@@ -25,15 +73,83 @@ void StartEngine(DropPlatformCalls* platformCalls)
 
     LOG_CORE_INFO("Drop Engine starting");
 
-    gEngineMemory.sizeInBytes = Gigabytes(2);
+    // Memory initialization, consider doing this by reading config file
+    gEngineMemory.persistentMemorysizeInBytes = Megabytes(128);
+    gEngineMemory.sceneMemorysizeInBytes = Gigabytes(2);
+    gEngineMemory.frameMemorySizeInBytes = Megabytes(128);
+    gEngineMemory.sizeInBytes = gEngineMemory.persistentMemorysizeInBytes 
+        + gEngineMemory.sceneMemorysizeInBytes 
+        + gEngineMemory.frameMemorySizeInBytes;
+
     gEngineMemory.persistentMemory = platformCalls->allocateMemory(
         gEngineMemory.sizeInBytes
         , 0
     );
+    gEngineMemory.sceneMemory = (void*)(
+        (uintptr_t)gEngineMemory.persistentMemory 
+        + gEngineMemory.persistentMemorysizeInBytes
+    );
+    gEngineMemory.frameMemory = (void*)(
+        (uintptr_t)gEngineMemory.sceneMemory
+        + gEngineMemory.sceneMemorysizeInBytes
+    );
 
-    // to be removed
+    //  persistentMemory              sceneMemory                frameMemory
+    //  persistentMemorysizeInBytes   sceneMemorysizeInBytes     frameMemorySizeInBytes
+    // [-----------------------------|--------------------------|-----------------------]
+
+    assert(sizeof(EngineState) <= gEngineMemory.persistentMemorysizeInBytes);
+    EngineState* engineState = (EngineState*)(
+        (void*)(
+            (uintptr_t)gEngineMemory.persistentMemory 
+            + sizeof(EngineState)
+        )
+    );
+    assert(engineState);
+
+    ArenaInit(
+        &engineState->persistentArenaAllocator
+        , gEngineMemory.persistentMemory
+        , gEngineMemory.persistentMemorysizeInBytes
+    );
+    ArenaInit(
+        &engineState->sceneArenaAllocator
+        , gEngineMemory.sceneMemory
+        , gEngineMemory.sceneMemorysizeInBytes
+    );
+    ArenaInit(
+        &engineState->frameArenaAllocator
+        , gEngineMemory.frameMemory
+        , gEngineMemory.frameMemorySizeInBytes
+    );
+
     // We need to allocate memory on the .exe (Platform Layer)
-    Window* m_WindowHandle = Window::Create(); 
+    // Allocate on PermanentStorage
+    size_t WindowSize = sizeof(Drop::Window);
+    engineState->windowHandle = (Drop::Window*)ArenaAlloc(
+        &engineState->persistentArenaAllocator
+        , WindowSize
+    );
+    WindowProps windowProps;
+    // glfw allocator
+    //typedef struct GLFWallocator
+    //{
+    //    GLFWallocatefun allocate;
+    //    GLFWreallocatefun reallocate;
+    //    GLFWdeallocatefun deallocate;
+    //    void* user;
+    //};
+    GLFWallocator currentAllocator;
+    currentAllocator.allocate = TempGLFWAllocate;
+    currentAllocator.reallocate = TempGLFWReallocate;
+    currentAllocator.deallocate = TempGLFWDeallocate;
+    currentAllocator.user = (void*)(&engineState->persistentArenaAllocator);
+
+    engineState->windowHandle->Init(
+        windowProps
+        , &currentAllocator // struct copied inside GLFW call
+    );
+    //engineState->windowHandle = Window::Create();
     //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
 }
 

@@ -10,7 +10,7 @@
 #define DEFAULT_ALIGNMENT (2*sizeof(void *))
 #endif
 
-struct Arena
+struct ArenaAllocator
 {
 	unsigned char* buffer = nullptr;
 	size_t bufferLenght = 0LL;
@@ -19,24 +19,24 @@ struct Arena
 };
 
 void ArenaInit(
-	Arena* arena
+	ArenaAllocator* arena
 	, void* backingBuffer
 	, size_t backingBufferLength
 );
 
 void* ArenaAlloc(
-	Arena* arena
+	ArenaAllocator* arena
 	, size_t size
 	, size_t align = DEFAULT_ALIGNMENT
 );
 
 void ArenaFree(
-	Arena* arena
+	ArenaAllocator* arena
 	, void* ptr
 );
 
 void* ArenaResize(
-	Arena* arena
+	ArenaAllocator* arena
 	, void* old_memor
 	, size_t old_size
 	, size_t new_size
