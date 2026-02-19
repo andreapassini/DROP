@@ -5,9 +5,11 @@
 // and modified
 
 #include <cassert>
-#include <vcruntime_string.h>
+#include <cstring>
 #include "Types/Types.h"
+#include "Utils/Log.h"
 
+#define DEBUG_ARENA_ALLOCATOR 1
 
 void ArenaInit(
 	ArenaAllocator* arena
@@ -26,6 +28,14 @@ void* ArenaAlloc(
 	, size_t align /*= DEFAULT_ALIGNMENT*/
 ) {
 	// Align 'currentOffset' forward to the specified alignment
+
+#ifdef DEBUG_ARENA_ALLOCATOR
+	// To debug
+	uintptr_t currentBuffer = (uintptr_t)arena->buffer;
+	uintptr_t currentOffset = (uintptr_t)arena->currentOffset;
+	// 
+#endif // DEBUG_ARENA_ALLOCATOR
+
 	uintptr_t curr_ptr = (uintptr_t)arena->buffer + (uintptr_t)arena->currentOffset;
 	uintptr_t offset = AlignForward(curr_ptr, align);
 	offset -= (uintptr_t)arena->buffer; // Change to relative offset
@@ -34,14 +44,53 @@ void* ArenaAlloc(
 	if (offset + size <= arena->bufferLenght)
 	{
 		void* ptr = &arena->buffer[offset];
+
+#ifdef DEBUG_ARENA_ALLOCATOR
+		// To debug
+		uintptr_t ptrInUInt = (uintptr_t)ptr;
+		// 
+#endif // DEBUG_ARENA_ALLOCATOR
+
 		arena->previousOffset = offset;
 		arena->currentOffset = offset + size;
 
+		// Print before memset
+		//LOG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		LOG_CORE_INFO("Print before memset:\n \
+			arena->buffer={0}\n \
+			\tarena->bufferLenght = {1}\n \
+			\tarena->currentOffset = {2}\n \
+			\tsize = {3}\n \
+			\tptr = {4}\n \
+			\toffset = {5}\n \
+			\tptr + size= {6}\n \
+			\tcurr_ptr = {7}"
+			, (uintptr_t)arena->buffer, arena->bufferLenght, (uintptr_t)arena->currentOffset
+			, size, (uintptr_t)ptr, offset, (uintptr_t)((uintptr_t)ptr + (uintptr_t)size), (uintptr_t)curr_ptr
+		);
+
 		// Zero new memory by default
 		memset(ptr, 0, size); // this will override the fucking arena values GODDAMIT if not assigned in the right way
+		// something is wrong it is resetting also the buffer, are we in 32 bits?????? - no i added a check in main
+
+		LOG_CORE_INFO("Print AFTER memset:\n \
+			arena->buffer={0}\n \
+			\tarena->bufferLenght = {1}\n \
+			\tarena->currentOffset = {2}\n \
+			\tsize = {3}\n \
+			\tptr = {4}\n \
+			\toffset = {5}\n \
+			\tptr + size= {6}\n \
+			\tcurr_ptr = {7}\n ----------------------------------------"
+			, (uintptr_t)arena->buffer, arena->bufferLenght, (uintptr_t)arena->currentOffset
+			, size, (uintptr_t)ptr, offset, (uintptr_t)((uintptr_t)ptr + (uintptr_t)size), (uintptr_t)curr_ptr
+		);
+
 		return ptr;
 	}
 	// Return NULL if the arena is out of memory (or handle differently)
+
+	__debugbreak;
 	return nullptr;
 }
 
@@ -49,6 +98,8 @@ void ArenaFree(
 	ArenaAllocator* arena
 	, void* ptr
 ) {
+	LOG_CORE_INFO("{0} of ptr {1}", __FUNCTION__, (uintptr_t)ptr);
+
 	// Do nothing
 }
 
@@ -60,6 +111,8 @@ void* ArenaResize(
 	, size_t new_size
 	, size_t align /*= DEFAULT_ALIGNMENT*/
 ) {
+	LOG_CORE_INFO("{0} of size {1}", __FUNCTION__, new_size);
+
 	unsigned char* old_mem = (unsigned char*)old_memory;
 
 	assert(IsPowerOfTwo(align));

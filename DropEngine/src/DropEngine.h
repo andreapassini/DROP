@@ -25,6 +25,12 @@ typedef PLATFORM_ALLOC_CALL(AllocateMemory);
 #define Gigabytes(Value) (Megabytes(Value)*1024LL)
 #define Terabytes(Value) (Gigabytes(Value)*1024LL)
 
+// for rounded numbers easy to read in uintpr_t
+#define KilobytesWRONG(Value) ((Value)*1000LL)
+#define MegabytesWRONG(Value) (KilobytesWRONG(Value)*1000LL)
+#define GigabytesWRONG(Value) (MegabytesWRONG(Value)*1000LL)
+#define TerabytesWRONG(Value) (GigabytesWRONG(Value)*1000LL)
+
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 
 static bool g_GameEngineRunning = true;

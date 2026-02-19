@@ -83,16 +83,23 @@ void StartEngine(DropPlatformCalls* platformCalls)
 
     gEngineMemory.persistentMemory = platformCalls->allocateMemory(
         gEngineMemory.sizeInBytes
-        , 0
+        , (LPVOID)TerabytesWRONG(5)
     );
+    assert(gEngineMemory.persistentMemory);
+
+    uintptr_t persistentMemoryUIntptr = (uintptr_t)gEngineMemory.persistentMemory;
+
     gEngineMemory.sceneMemory = (void*)(
-        (uintptr_t)gEngineMemory.persistentMemory 
-        + gEngineMemory.persistentMemorysizeInBytes
+        (uintptr_t)gEngineMemory.persistentMemory + gEngineMemory.persistentMemorysizeInBytes
     );
+
+    uintptr_t sceneMemoryUIntptr = (uintptr_t)gEngineMemory.sceneMemory;
+
     gEngineMemory.frameMemory = (void*)(
-        (uintptr_t)gEngineMemory.sceneMemory
-        + gEngineMemory.sceneMemorysizeInBytes
+        (uintptr_t)gEngineMemory.sceneMemory + gEngineMemory.sceneMemorysizeInBytes
     );
+
+    uintptr_t frameMemoryUIntptr = (uintptr_t)gEngineMemory.frameMemory;
 
     //  persistentMemory              sceneMemory                frameMemory
     //  persistentMemorysizeInBytes   sceneMemorysizeInBytes     frameMemorySizeInBytes
@@ -102,14 +109,17 @@ void StartEngine(DropPlatformCalls* platformCalls)
     EngineState* engineState = (EngineState*)(
         (void*)(
             (uintptr_t)gEngineMemory.persistentMemory 
-            + sizeof(EngineState)
+            /*+ sizeof(EngineState)*/ // IDIOT THIS IS NOT AHEAD. THE BUFFER MUST BE MOVED AHEAD FUCKING DUMASS
         )
     );
     assert(engineState);
+    uintptr_t engineStateUIntptr = (uintptr_t)((void*)(engineState));
+
+    uintptr_t persistentMemoryAfterGameState = engineStateUIntptr + sizeof(EngineState);
 
     ArenaInit(
         &engineState->persistentArenaAllocator
-        , gEngineMemory.persistentMemory
+        , (void*)persistentMemoryAfterGameState
         , gEngineMemory.persistentMemorysizeInBytes
     );
     ArenaInit(

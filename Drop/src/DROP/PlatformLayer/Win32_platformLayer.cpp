@@ -294,11 +294,38 @@ void TestPlatformCall()
 bool bUpdatedEngineDLLCheck = false;
 bool bUpdatedGameDLLCheck = false;
 
+// Check windows
+#if _WIN32 || _WIN64
+#if _WIN64
+#define ENVIRONMENT64
+#else
+#define ENVIRONMENT32
+#endif
+#endif
+
 namespace Drop 
 {
 
 int Main(int argc, char** argv)
 {
+#if defined(ENVIRONMENT64)
+    if (sizeof(void*) != 8)
+    {
+        wprintf(L"ENV64BIT: Error: pointer should be 8 bytes. Exiting.");
+        exit(0);
+    }
+    wprintf(L"Diagnostics: we are running in 64-bit mode.\n");
+#elif defined (ENVIRONMENT32)
+    if (sizeof(void*) != 4)
+    {
+        wprintf(L"ENV32BIT: Error: pointer should be 4 bytes. Exiting.");
+        exit(0);
+    }
+    wprintf(L"Diagnostics: we are running in 32-bit mode.\n");
+#else
+#error "Must define either ENV32BIT or ENV64BIT".
+#endif
+
     // Engine DLL
     char SourceEngineCodeDLLFullPath[MAX_PATH];
     char TempEngineCodeDLLFullPath[MAX_PATH];
@@ -388,12 +415,14 @@ int Main(int argc, char** argv)
 
 void* AllocateMemory(
     size_t sizeInBytes
-    , void* startingAddress /*= nullptr*/ // dont start from 0, not a good idea since (nullptr if checked)
+    , void* startingAddress /*= nullptr*/
 ){
+    wprintf(L"%s of sizeInBytes = %lu.\n", __func__, sizeInBytes);
+
     return VirtualAlloc(
         startingAddress
         , sizeInBytes
-        , MEM_RESERVE | MEM_COMMIT
+        , MEM_COMMIT | MEM_RESERVE
         , PAGE_READWRITE
     );
 }
