@@ -145,8 +145,8 @@ void _glfwDestroyWindowNull(_GLFWwindow* window)
     if (window->monitor)
         releaseMonitor(window);
 
-    if (_glfw.null.focusedWindow == window)
-        _glfw.null.focusedWindow = NULL;
+    if (_glfw->null.focusedWindow == window)
+        _glfw->null.focusedWindow = NULL;
 
     if (window->context.destroy)
         window->context.destroy(window);
@@ -302,9 +302,9 @@ void _glfwGetWindowContentScaleNull(_GLFWwindow* window, float* xscale, float* y
 
 void _glfwIconifyWindowNull(_GLFWwindow* window)
 {
-    if (_glfw.null.focusedWindow == window)
+    if (_glfw->null.focusedWindow == window)
     {
-        _glfw.null.focusedWindow = NULL;
+        _glfw->null.focusedWindow = NULL;
         _glfwInputWindowFocus(window, GLFW_FALSE);
     }
 
@@ -351,10 +351,10 @@ int _glfwWindowMaximizedNull(_GLFWwindow* window)
 
 int _glfwWindowHoveredNull(_GLFWwindow* window)
 {
-    return _glfw.null.xcursor >= window->null.xpos &&
-           _glfw.null.ycursor >= window->null.ypos &&
-           _glfw.null.xcursor <= window->null.xpos + window->null.width - 1 &&
-           _glfw.null.ycursor <= window->null.ypos + window->null.height - 1;
+    return _glfw->null.xcursor >= window->null.xpos &&
+           _glfw->null.ycursor >= window->null.ypos &&
+           _glfw->null.xcursor <= window->null.xpos + window->null.width - 1 &&
+           _glfw->null.ycursor <= window->null.ypos + window->null.height - 1;
 }
 
 int _glfwFramebufferTransparentNull(_GLFWwindow* window)
@@ -416,9 +416,9 @@ void _glfwRequestWindowAttentionNull(_GLFWwindow* window)
 
 void _glfwHideWindowNull(_GLFWwindow* window)
 {
-    if (_glfw.null.focusedWindow == window)
+    if (_glfw->null.focusedWindow == window)
     {
-        _glfw.null.focusedWindow = NULL;
+        _glfw->null.focusedWindow = NULL;
         _glfwInputWindowFocus(window, GLFW_FALSE);
     }
 
@@ -429,14 +429,14 @@ void _glfwFocusWindowNull(_GLFWwindow* window)
 {
     _GLFWwindow* previous;
 
-    if (_glfw.null.focusedWindow == window)
+    if (_glfw->null.focusedWindow == window)
         return;
 
     if (!window->null.visible)
         return;
 
-    previous = _glfw.null.focusedWindow;
-    _glfw.null.focusedWindow = window;
+    previous = _glfw->null.focusedWindow;
+    _glfw->null.focusedWindow = window;
 
     if (previous)
     {
@@ -450,7 +450,7 @@ void _glfwFocusWindowNull(_GLFWwindow* window)
 
 int _glfwWindowFocusedNull(_GLFWwindow* window)
 {
-    return _glfw.null.focusedWindow == window;
+    return _glfw->null.focusedWindow == window;
 }
 
 int _glfwWindowIconifiedNull(_GLFWwindow* window)
@@ -482,15 +482,15 @@ void _glfwPostEmptyEventNull(void)
 void _glfwGetCursorPosNull(_GLFWwindow* window, double* xpos, double* ypos)
 {
     if (xpos)
-        *xpos = _glfw.null.xcursor - window->null.xpos;
+        *xpos = _glfw->null.xcursor - window->null.xpos;
     if (ypos)
-        *ypos = _glfw.null.ycursor - window->null.ypos;
+        *ypos = _glfw->null.ycursor - window->null.ypos;
 }
 
 void _glfwSetCursorPosNull(_GLFWwindow* window, double x, double y)
 {
-    _glfw.null.xcursor = window->null.xpos + (int) x;
-    _glfw.null.ycursor = window->null.ypos + (int) y;
+    _glfw->null.xcursor = window->null.xpos + (int) x;
+    _glfw->null.ycursor = window->null.ypos + (int) y;
 }
 
 void _glfwSetCursorModeNull(_GLFWwindow* window, int mode)
@@ -520,13 +520,13 @@ void _glfwSetCursorNull(_GLFWwindow* window, _GLFWcursor* cursor)
 void _glfwSetClipboardStringNull(const char* string)
 {
     char* copy = _glfw_strdup(string);
-    _glfw_free(_glfw.null.clipboardString);
-    _glfw.null.clipboardString = copy;
+    _glfw_free(_glfw->null.clipboardString);
+    _glfw->null.clipboardString = copy;
 }
 
 const char* _glfwGetClipboardStringNull(void)
 {
-    return _glfw.null.clipboardString;
+    return _glfw->null.clipboardString;
 }
 
 EGLenum _glfwGetEGLPlatformNull(EGLint** attribs)

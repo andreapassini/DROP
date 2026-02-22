@@ -71,32 +71,32 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
 //
 static GLFWbool loadLibraries(void)
 {
-    _glfw.win32.user32.instance = _glfwPlatformLoadModule("user32.dll");
-    if (!_glfw.win32.user32.instance)
+    _glfw->win32.user32.instance = _glfwPlatformLoadModule("user32.dll");
+    if (!_glfw->win32.user32.instance)
     {
         _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                              "Win32: Failed to load user32.dll");
         return GLFW_FALSE;
     }
 
-    _glfw.win32.user32.SetProcessDPIAware_ = (PFN_SetProcessDPIAware)
-        _glfwPlatformGetModuleSymbol(_glfw.win32.user32.instance, "SetProcessDPIAware");
-    _glfw.win32.user32.ChangeWindowMessageFilterEx_ = (PFN_ChangeWindowMessageFilterEx)
-        _glfwPlatformGetModuleSymbol(_glfw.win32.user32.instance, "ChangeWindowMessageFilterEx");
-    _glfw.win32.user32.EnableNonClientDpiScaling_ = (PFN_EnableNonClientDpiScaling)
-        _glfwPlatformGetModuleSymbol(_glfw.win32.user32.instance, "EnableNonClientDpiScaling");
-    _glfw.win32.user32.SetProcessDpiAwarenessContext_ = (PFN_SetProcessDpiAwarenessContext)
-        _glfwPlatformGetModuleSymbol(_glfw.win32.user32.instance, "SetProcessDpiAwarenessContext");
-    _glfw.win32.user32.GetDpiForWindow_ = (PFN_GetDpiForWindow)
-        _glfwPlatformGetModuleSymbol(_glfw.win32.user32.instance, "GetDpiForWindow");
-    _glfw.win32.user32.AdjustWindowRectExForDpi_ = (PFN_AdjustWindowRectExForDpi)
-        _glfwPlatformGetModuleSymbol(_glfw.win32.user32.instance, "AdjustWindowRectExForDpi");
+    _glfw->win32.user32.SetProcessDPIAware_ = (PFN_SetProcessDPIAware)
+        _glfwPlatformGetModuleSymbol(_glfw->win32.user32.instance, "SetProcessDPIAware");
+    _glfw->win32.user32.ChangeWindowMessageFilterEx_ = (PFN_ChangeWindowMessageFilterEx)
+        _glfwPlatformGetModuleSymbol(_glfw->win32.user32.instance, "ChangeWindowMessageFilterEx");
+    _glfw->win32.user32.EnableNonClientDpiScaling_ = (PFN_EnableNonClientDpiScaling)
+        _glfwPlatformGetModuleSymbol(_glfw->win32.user32.instance, "EnableNonClientDpiScaling");
+    _glfw->win32.user32.SetProcessDpiAwarenessContext_ = (PFN_SetProcessDpiAwarenessContext)
+        _glfwPlatformGetModuleSymbol(_glfw->win32.user32.instance, "SetProcessDpiAwarenessContext");
+    _glfw->win32.user32.GetDpiForWindow_ = (PFN_GetDpiForWindow)
+        _glfwPlatformGetModuleSymbol(_glfw->win32.user32.instance, "GetDpiForWindow");
+    _glfw->win32.user32.AdjustWindowRectExForDpi_ = (PFN_AdjustWindowRectExForDpi)
+        _glfwPlatformGetModuleSymbol(_glfw->win32.user32.instance, "AdjustWindowRectExForDpi");
 
-    _glfw.win32.dinput8.instance = _glfwPlatformLoadModule("dinput8.dll");
-    if (_glfw.win32.dinput8.instance)
+    _glfw->win32.dinput8.instance = _glfwPlatformLoadModule("dinput8.dll");
+    if (_glfw->win32.dinput8.instance)
     {
-        _glfw.win32.dinput8.Create = (PFN_DirectInput8Create)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.dinput8.instance, "DirectInput8Create");
+        _glfw->win32.dinput8.Create = (PFN_DirectInput8Create)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.dinput8.instance, "DirectInput8Create");
     }
 
     {
@@ -113,46 +113,46 @@ static GLFWbool loadLibraries(void)
 
         for (i = 0;  names[i];  i++)
         {
-            _glfw.win32.xinput.instance = _glfwPlatformLoadModule(names[i]);
-            if (_glfw.win32.xinput.instance)
+            _glfw->win32.xinput.instance = _glfwPlatformLoadModule(names[i]);
+            if (_glfw->win32.xinput.instance)
             {
-                _glfw.win32.xinput.GetCapabilities = (PFN_XInputGetCapabilities)
-                    _glfwPlatformGetModuleSymbol(_glfw.win32.xinput.instance, "XInputGetCapabilities");
-                _glfw.win32.xinput.GetState = (PFN_XInputGetState)
-                    _glfwPlatformGetModuleSymbol(_glfw.win32.xinput.instance, "XInputGetState");
+                _glfw->win32.xinput.GetCapabilities = (PFN_XInputGetCapabilities)
+                    _glfwPlatformGetModuleSymbol(_glfw->win32.xinput.instance, "XInputGetCapabilities");
+                _glfw->win32.xinput.GetState = (PFN_XInputGetState)
+                    _glfwPlatformGetModuleSymbol(_glfw->win32.xinput.instance, "XInputGetState");
 
                 break;
             }
         }
     }
 
-    _glfw.win32.dwmapi.instance = _glfwPlatformLoadModule("dwmapi.dll");
-    if (_glfw.win32.dwmapi.instance)
+    _glfw->win32.dwmapi.instance = _glfwPlatformLoadModule("dwmapi.dll");
+    if (_glfw->win32.dwmapi.instance)
     {
-        _glfw.win32.dwmapi.IsCompositionEnabled = (PFN_DwmIsCompositionEnabled)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.dwmapi.instance, "DwmIsCompositionEnabled");
-        _glfw.win32.dwmapi.Flush = (PFN_DwmFlush)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.dwmapi.instance, "DwmFlush");
-        _glfw.win32.dwmapi.EnableBlurBehindWindow = (PFN_DwmEnableBlurBehindWindow)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.dwmapi.instance, "DwmEnableBlurBehindWindow");
-        _glfw.win32.dwmapi.GetColorizationColor = (PFN_DwmGetColorizationColor)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.dwmapi.instance, "DwmGetColorizationColor");
+        _glfw->win32.dwmapi.IsCompositionEnabled = (PFN_DwmIsCompositionEnabled)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.dwmapi.instance, "DwmIsCompositionEnabled");
+        _glfw->win32.dwmapi.Flush = (PFN_DwmFlush)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.dwmapi.instance, "DwmFlush");
+        _glfw->win32.dwmapi.EnableBlurBehindWindow = (PFN_DwmEnableBlurBehindWindow)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.dwmapi.instance, "DwmEnableBlurBehindWindow");
+        _glfw->win32.dwmapi.GetColorizationColor = (PFN_DwmGetColorizationColor)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.dwmapi.instance, "DwmGetColorizationColor");
     }
 
-    _glfw.win32.shcore.instance = _glfwPlatformLoadModule("shcore.dll");
-    if (_glfw.win32.shcore.instance)
+    _glfw->win32.shcore.instance = _glfwPlatformLoadModule("shcore.dll");
+    if (_glfw->win32.shcore.instance)
     {
-        _glfw.win32.shcore.SetProcessDpiAwareness_ = (PFN_SetProcessDpiAwareness)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.shcore.instance, "SetProcessDpiAwareness");
-        _glfw.win32.shcore.GetDpiForMonitor_ = (PFN_GetDpiForMonitor)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.shcore.instance, "GetDpiForMonitor");
+        _glfw->win32.shcore.SetProcessDpiAwareness_ = (PFN_SetProcessDpiAwareness)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.shcore.instance, "SetProcessDpiAwareness");
+        _glfw->win32.shcore.GetDpiForMonitor_ = (PFN_GetDpiForMonitor)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.shcore.instance, "GetDpiForMonitor");
     }
 
-    _glfw.win32.ntdll.instance = _glfwPlatformLoadModule("ntdll.dll");
-    if (_glfw.win32.ntdll.instance)
+    _glfw->win32.ntdll.instance = _glfwPlatformLoadModule("ntdll.dll");
+    if (_glfw->win32.ntdll.instance)
     {
-        _glfw.win32.ntdll.RtlVerifyVersionInfo_ = (PFN_RtlVerifyVersionInfo)
-            _glfwPlatformGetModuleSymbol(_glfw.win32.ntdll.instance, "RtlVerifyVersionInfo");
+        _glfw->win32.ntdll.RtlVerifyVersionInfo_ = (PFN_RtlVerifyVersionInfo)
+            _glfwPlatformGetModuleSymbol(_glfw->win32.ntdll.instance, "RtlVerifyVersionInfo");
     }
 
     return GLFW_TRUE;
@@ -162,23 +162,23 @@ static GLFWbool loadLibraries(void)
 //
 static void freeLibraries(void)
 {
-    if (_glfw.win32.xinput.instance)
-        _glfwPlatformFreeModule(_glfw.win32.xinput.instance);
+    if (_glfw->win32.xinput.instance)
+        _glfwPlatformFreeModule(_glfw->win32.xinput.instance);
 
-    if (_glfw.win32.dinput8.instance)
-        _glfwPlatformFreeModule(_glfw.win32.dinput8.instance);
+    if (_glfw->win32.dinput8.instance)
+        _glfwPlatformFreeModule(_glfw->win32.dinput8.instance);
 
-    if (_glfw.win32.user32.instance)
-        _glfwPlatformFreeModule(_glfw.win32.user32.instance);
+    if (_glfw->win32.user32.instance)
+        _glfwPlatformFreeModule(_glfw->win32.user32.instance);
 
-    if (_glfw.win32.dwmapi.instance)
-        _glfwPlatformFreeModule(_glfw.win32.dwmapi.instance);
+    if (_glfw->win32.dwmapi.instance)
+        _glfwPlatformFreeModule(_glfw->win32.dwmapi.instance);
 
-    if (_glfw.win32.shcore.instance)
-        _glfwPlatformFreeModule(_glfw.win32.shcore.instance);
+    if (_glfw->win32.shcore.instance)
+        _glfwPlatformFreeModule(_glfw->win32.shcore.instance);
 
-    if (_glfw.win32.ntdll.instance)
-        _glfwPlatformFreeModule(_glfw.win32.ntdll.instance);
+    if (_glfw->win32.ntdll.instance)
+        _glfwPlatformFreeModule(_glfw->win32.ntdll.instance);
 }
 
 // Create key code translation tables
@@ -187,136 +187,136 @@ static void createKeyTables(void)
 {
     int scancode;
 
-    memset(_glfw.win32.keycodes, -1, sizeof(_glfw.win32.keycodes));
-    memset(_glfw.win32.scancodes, -1, sizeof(_glfw.win32.scancodes));
+    memset(_glfw->win32.keycodes, -1, sizeof(_glfw->win32.keycodes));
+    memset(_glfw->win32.scancodes, -1, sizeof(_glfw->win32.scancodes));
 
-    _glfw.win32.keycodes[0x00B] = GLFW_KEY_0;
-    _glfw.win32.keycodes[0x002] = GLFW_KEY_1;
-    _glfw.win32.keycodes[0x003] = GLFW_KEY_2;
-    _glfw.win32.keycodes[0x004] = GLFW_KEY_3;
-    _glfw.win32.keycodes[0x005] = GLFW_KEY_4;
-    _glfw.win32.keycodes[0x006] = GLFW_KEY_5;
-    _glfw.win32.keycodes[0x007] = GLFW_KEY_6;
-    _glfw.win32.keycodes[0x008] = GLFW_KEY_7;
-    _glfw.win32.keycodes[0x009] = GLFW_KEY_8;
-    _glfw.win32.keycodes[0x00A] = GLFW_KEY_9;
-    _glfw.win32.keycodes[0x01E] = GLFW_KEY_A;
-    _glfw.win32.keycodes[0x030] = GLFW_KEY_B;
-    _glfw.win32.keycodes[0x02E] = GLFW_KEY_C;
-    _glfw.win32.keycodes[0x020] = GLFW_KEY_D;
-    _glfw.win32.keycodes[0x012] = GLFW_KEY_E;
-    _glfw.win32.keycodes[0x021] = GLFW_KEY_F;
-    _glfw.win32.keycodes[0x022] = GLFW_KEY_G;
-    _glfw.win32.keycodes[0x023] = GLFW_KEY_H;
-    _glfw.win32.keycodes[0x017] = GLFW_KEY_I;
-    _glfw.win32.keycodes[0x024] = GLFW_KEY_J;
-    _glfw.win32.keycodes[0x025] = GLFW_KEY_K;
-    _glfw.win32.keycodes[0x026] = GLFW_KEY_L;
-    _glfw.win32.keycodes[0x032] = GLFW_KEY_M;
-    _glfw.win32.keycodes[0x031] = GLFW_KEY_N;
-    _glfw.win32.keycodes[0x018] = GLFW_KEY_O;
-    _glfw.win32.keycodes[0x019] = GLFW_KEY_P;
-    _glfw.win32.keycodes[0x010] = GLFW_KEY_Q;
-    _glfw.win32.keycodes[0x013] = GLFW_KEY_R;
-    _glfw.win32.keycodes[0x01F] = GLFW_KEY_S;
-    _glfw.win32.keycodes[0x014] = GLFW_KEY_T;
-    _glfw.win32.keycodes[0x016] = GLFW_KEY_U;
-    _glfw.win32.keycodes[0x02F] = GLFW_KEY_V;
-    _glfw.win32.keycodes[0x011] = GLFW_KEY_W;
-    _glfw.win32.keycodes[0x02D] = GLFW_KEY_X;
-    _glfw.win32.keycodes[0x015] = GLFW_KEY_Y;
-    _glfw.win32.keycodes[0x02C] = GLFW_KEY_Z;
+    _glfw->win32.keycodes[0x00B] = GLFW_KEY_0;
+    _glfw->win32.keycodes[0x002] = GLFW_KEY_1;
+    _glfw->win32.keycodes[0x003] = GLFW_KEY_2;
+    _glfw->win32.keycodes[0x004] = GLFW_KEY_3;
+    _glfw->win32.keycodes[0x005] = GLFW_KEY_4;
+    _glfw->win32.keycodes[0x006] = GLFW_KEY_5;
+    _glfw->win32.keycodes[0x007] = GLFW_KEY_6;
+    _glfw->win32.keycodes[0x008] = GLFW_KEY_7;
+    _glfw->win32.keycodes[0x009] = GLFW_KEY_8;
+    _glfw->win32.keycodes[0x00A] = GLFW_KEY_9;
+    _glfw->win32.keycodes[0x01E] = GLFW_KEY_A;
+    _glfw->win32.keycodes[0x030] = GLFW_KEY_B;
+    _glfw->win32.keycodes[0x02E] = GLFW_KEY_C;
+    _glfw->win32.keycodes[0x020] = GLFW_KEY_D;
+    _glfw->win32.keycodes[0x012] = GLFW_KEY_E;
+    _glfw->win32.keycodes[0x021] = GLFW_KEY_F;
+    _glfw->win32.keycodes[0x022] = GLFW_KEY_G;
+    _glfw->win32.keycodes[0x023] = GLFW_KEY_H;
+    _glfw->win32.keycodes[0x017] = GLFW_KEY_I;
+    _glfw->win32.keycodes[0x024] = GLFW_KEY_J;
+    _glfw->win32.keycodes[0x025] = GLFW_KEY_K;
+    _glfw->win32.keycodes[0x026] = GLFW_KEY_L;
+    _glfw->win32.keycodes[0x032] = GLFW_KEY_M;
+    _glfw->win32.keycodes[0x031] = GLFW_KEY_N;
+    _glfw->win32.keycodes[0x018] = GLFW_KEY_O;
+    _glfw->win32.keycodes[0x019] = GLFW_KEY_P;
+    _glfw->win32.keycodes[0x010] = GLFW_KEY_Q;
+    _glfw->win32.keycodes[0x013] = GLFW_KEY_R;
+    _glfw->win32.keycodes[0x01F] = GLFW_KEY_S;
+    _glfw->win32.keycodes[0x014] = GLFW_KEY_T;
+    _glfw->win32.keycodes[0x016] = GLFW_KEY_U;
+    _glfw->win32.keycodes[0x02F] = GLFW_KEY_V;
+    _glfw->win32.keycodes[0x011] = GLFW_KEY_W;
+    _glfw->win32.keycodes[0x02D] = GLFW_KEY_X;
+    _glfw->win32.keycodes[0x015] = GLFW_KEY_Y;
+    _glfw->win32.keycodes[0x02C] = GLFW_KEY_Z;
 
-    _glfw.win32.keycodes[0x028] = GLFW_KEY_APOSTROPHE;
-    _glfw.win32.keycodes[0x02B] = GLFW_KEY_BACKSLASH;
-    _glfw.win32.keycodes[0x033] = GLFW_KEY_COMMA;
-    _glfw.win32.keycodes[0x00D] = GLFW_KEY_EQUAL;
-    _glfw.win32.keycodes[0x029] = GLFW_KEY_GRAVE_ACCENT;
-    _glfw.win32.keycodes[0x01A] = GLFW_KEY_LEFT_BRACKET;
-    _glfw.win32.keycodes[0x00C] = GLFW_KEY_MINUS;
-    _glfw.win32.keycodes[0x034] = GLFW_KEY_PERIOD;
-    _glfw.win32.keycodes[0x01B] = GLFW_KEY_RIGHT_BRACKET;
-    _glfw.win32.keycodes[0x027] = GLFW_KEY_SEMICOLON;
-    _glfw.win32.keycodes[0x035] = GLFW_KEY_SLASH;
-    _glfw.win32.keycodes[0x056] = GLFW_KEY_WORLD_2;
+    _glfw->win32.keycodes[0x028] = GLFW_KEY_APOSTROPHE;
+    _glfw->win32.keycodes[0x02B] = GLFW_KEY_BACKSLASH;
+    _glfw->win32.keycodes[0x033] = GLFW_KEY_COMMA;
+    _glfw->win32.keycodes[0x00D] = GLFW_KEY_EQUAL;
+    _glfw->win32.keycodes[0x029] = GLFW_KEY_GRAVE_ACCENT;
+    _glfw->win32.keycodes[0x01A] = GLFW_KEY_LEFT_BRACKET;
+    _glfw->win32.keycodes[0x00C] = GLFW_KEY_MINUS;
+    _glfw->win32.keycodes[0x034] = GLFW_KEY_PERIOD;
+    _glfw->win32.keycodes[0x01B] = GLFW_KEY_RIGHT_BRACKET;
+    _glfw->win32.keycodes[0x027] = GLFW_KEY_SEMICOLON;
+    _glfw->win32.keycodes[0x035] = GLFW_KEY_SLASH;
+    _glfw->win32.keycodes[0x056] = GLFW_KEY_WORLD_2;
 
-    _glfw.win32.keycodes[0x00E] = GLFW_KEY_BACKSPACE;
-    _glfw.win32.keycodes[0x153] = GLFW_KEY_DELETE;
-    _glfw.win32.keycodes[0x14F] = GLFW_KEY_END;
-    _glfw.win32.keycodes[0x01C] = GLFW_KEY_ENTER;
-    _glfw.win32.keycodes[0x001] = GLFW_KEY_ESCAPE;
-    _glfw.win32.keycodes[0x147] = GLFW_KEY_HOME;
-    _glfw.win32.keycodes[0x152] = GLFW_KEY_INSERT;
-    _glfw.win32.keycodes[0x15D] = GLFW_KEY_MENU;
-    _glfw.win32.keycodes[0x151] = GLFW_KEY_PAGE_DOWN;
-    _glfw.win32.keycodes[0x149] = GLFW_KEY_PAGE_UP;
-    _glfw.win32.keycodes[0x045] = GLFW_KEY_PAUSE;
-    _glfw.win32.keycodes[0x146] = GLFW_KEY_PAUSE;
-    _glfw.win32.keycodes[0x039] = GLFW_KEY_SPACE;
-    _glfw.win32.keycodes[0x00F] = GLFW_KEY_TAB;
-    _glfw.win32.keycodes[0x03A] = GLFW_KEY_CAPS_LOCK;
-    _glfw.win32.keycodes[0x145] = GLFW_KEY_NUM_LOCK;
-    _glfw.win32.keycodes[0x046] = GLFW_KEY_SCROLL_LOCK;
-    _glfw.win32.keycodes[0x03B] = GLFW_KEY_F1;
-    _glfw.win32.keycodes[0x03C] = GLFW_KEY_F2;
-    _glfw.win32.keycodes[0x03D] = GLFW_KEY_F3;
-    _glfw.win32.keycodes[0x03E] = GLFW_KEY_F4;
-    _glfw.win32.keycodes[0x03F] = GLFW_KEY_F5;
-    _glfw.win32.keycodes[0x040] = GLFW_KEY_F6;
-    _glfw.win32.keycodes[0x041] = GLFW_KEY_F7;
-    _glfw.win32.keycodes[0x042] = GLFW_KEY_F8;
-    _glfw.win32.keycodes[0x043] = GLFW_KEY_F9;
-    _glfw.win32.keycodes[0x044] = GLFW_KEY_F10;
-    _glfw.win32.keycodes[0x057] = GLFW_KEY_F11;
-    _glfw.win32.keycodes[0x058] = GLFW_KEY_F12;
-    _glfw.win32.keycodes[0x064] = GLFW_KEY_F13;
-    _glfw.win32.keycodes[0x065] = GLFW_KEY_F14;
-    _glfw.win32.keycodes[0x066] = GLFW_KEY_F15;
-    _glfw.win32.keycodes[0x067] = GLFW_KEY_F16;
-    _glfw.win32.keycodes[0x068] = GLFW_KEY_F17;
-    _glfw.win32.keycodes[0x069] = GLFW_KEY_F18;
-    _glfw.win32.keycodes[0x06A] = GLFW_KEY_F19;
-    _glfw.win32.keycodes[0x06B] = GLFW_KEY_F20;
-    _glfw.win32.keycodes[0x06C] = GLFW_KEY_F21;
-    _glfw.win32.keycodes[0x06D] = GLFW_KEY_F22;
-    _glfw.win32.keycodes[0x06E] = GLFW_KEY_F23;
-    _glfw.win32.keycodes[0x076] = GLFW_KEY_F24;
-    _glfw.win32.keycodes[0x038] = GLFW_KEY_LEFT_ALT;
-    _glfw.win32.keycodes[0x01D] = GLFW_KEY_LEFT_CONTROL;
-    _glfw.win32.keycodes[0x02A] = GLFW_KEY_LEFT_SHIFT;
-    _glfw.win32.keycodes[0x15B] = GLFW_KEY_LEFT_SUPER;
-    _glfw.win32.keycodes[0x137] = GLFW_KEY_PRINT_SCREEN;
-    _glfw.win32.keycodes[0x138] = GLFW_KEY_RIGHT_ALT;
-    _glfw.win32.keycodes[0x11D] = GLFW_KEY_RIGHT_CONTROL;
-    _glfw.win32.keycodes[0x036] = GLFW_KEY_RIGHT_SHIFT;
-    _glfw.win32.keycodes[0x15C] = GLFW_KEY_RIGHT_SUPER;
-    _glfw.win32.keycodes[0x150] = GLFW_KEY_DOWN;
-    _glfw.win32.keycodes[0x14B] = GLFW_KEY_LEFT;
-    _glfw.win32.keycodes[0x14D] = GLFW_KEY_RIGHT;
-    _glfw.win32.keycodes[0x148] = GLFW_KEY_UP;
+    _glfw->win32.keycodes[0x00E] = GLFW_KEY_BACKSPACE;
+    _glfw->win32.keycodes[0x153] = GLFW_KEY_DELETE;
+    _glfw->win32.keycodes[0x14F] = GLFW_KEY_END;
+    _glfw->win32.keycodes[0x01C] = GLFW_KEY_ENTER;
+    _glfw->win32.keycodes[0x001] = GLFW_KEY_ESCAPE;
+    _glfw->win32.keycodes[0x147] = GLFW_KEY_HOME;
+    _glfw->win32.keycodes[0x152] = GLFW_KEY_INSERT;
+    _glfw->win32.keycodes[0x15D] = GLFW_KEY_MENU;
+    _glfw->win32.keycodes[0x151] = GLFW_KEY_PAGE_DOWN;
+    _glfw->win32.keycodes[0x149] = GLFW_KEY_PAGE_UP;
+    _glfw->win32.keycodes[0x045] = GLFW_KEY_PAUSE;
+    _glfw->win32.keycodes[0x146] = GLFW_KEY_PAUSE;
+    _glfw->win32.keycodes[0x039] = GLFW_KEY_SPACE;
+    _glfw->win32.keycodes[0x00F] = GLFW_KEY_TAB;
+    _glfw->win32.keycodes[0x03A] = GLFW_KEY_CAPS_LOCK;
+    _glfw->win32.keycodes[0x145] = GLFW_KEY_NUM_LOCK;
+    _glfw->win32.keycodes[0x046] = GLFW_KEY_SCROLL_LOCK;
+    _glfw->win32.keycodes[0x03B] = GLFW_KEY_F1;
+    _glfw->win32.keycodes[0x03C] = GLFW_KEY_F2;
+    _glfw->win32.keycodes[0x03D] = GLFW_KEY_F3;
+    _glfw->win32.keycodes[0x03E] = GLFW_KEY_F4;
+    _glfw->win32.keycodes[0x03F] = GLFW_KEY_F5;
+    _glfw->win32.keycodes[0x040] = GLFW_KEY_F6;
+    _glfw->win32.keycodes[0x041] = GLFW_KEY_F7;
+    _glfw->win32.keycodes[0x042] = GLFW_KEY_F8;
+    _glfw->win32.keycodes[0x043] = GLFW_KEY_F9;
+    _glfw->win32.keycodes[0x044] = GLFW_KEY_F10;
+    _glfw->win32.keycodes[0x057] = GLFW_KEY_F11;
+    _glfw->win32.keycodes[0x058] = GLFW_KEY_F12;
+    _glfw->win32.keycodes[0x064] = GLFW_KEY_F13;
+    _glfw->win32.keycodes[0x065] = GLFW_KEY_F14;
+    _glfw->win32.keycodes[0x066] = GLFW_KEY_F15;
+    _glfw->win32.keycodes[0x067] = GLFW_KEY_F16;
+    _glfw->win32.keycodes[0x068] = GLFW_KEY_F17;
+    _glfw->win32.keycodes[0x069] = GLFW_KEY_F18;
+    _glfw->win32.keycodes[0x06A] = GLFW_KEY_F19;
+    _glfw->win32.keycodes[0x06B] = GLFW_KEY_F20;
+    _glfw->win32.keycodes[0x06C] = GLFW_KEY_F21;
+    _glfw->win32.keycodes[0x06D] = GLFW_KEY_F22;
+    _glfw->win32.keycodes[0x06E] = GLFW_KEY_F23;
+    _glfw->win32.keycodes[0x076] = GLFW_KEY_F24;
+    _glfw->win32.keycodes[0x038] = GLFW_KEY_LEFT_ALT;
+    _glfw->win32.keycodes[0x01D] = GLFW_KEY_LEFT_CONTROL;
+    _glfw->win32.keycodes[0x02A] = GLFW_KEY_LEFT_SHIFT;
+    _glfw->win32.keycodes[0x15B] = GLFW_KEY_LEFT_SUPER;
+    _glfw->win32.keycodes[0x137] = GLFW_KEY_PRINT_SCREEN;
+    _glfw->win32.keycodes[0x138] = GLFW_KEY_RIGHT_ALT;
+    _glfw->win32.keycodes[0x11D] = GLFW_KEY_RIGHT_CONTROL;
+    _glfw->win32.keycodes[0x036] = GLFW_KEY_RIGHT_SHIFT;
+    _glfw->win32.keycodes[0x15C] = GLFW_KEY_RIGHT_SUPER;
+    _glfw->win32.keycodes[0x150] = GLFW_KEY_DOWN;
+    _glfw->win32.keycodes[0x14B] = GLFW_KEY_LEFT;
+    _glfw->win32.keycodes[0x14D] = GLFW_KEY_RIGHT;
+    _glfw->win32.keycodes[0x148] = GLFW_KEY_UP;
 
-    _glfw.win32.keycodes[0x052] = GLFW_KEY_KP_0;
-    _glfw.win32.keycodes[0x04F] = GLFW_KEY_KP_1;
-    _glfw.win32.keycodes[0x050] = GLFW_KEY_KP_2;
-    _glfw.win32.keycodes[0x051] = GLFW_KEY_KP_3;
-    _glfw.win32.keycodes[0x04B] = GLFW_KEY_KP_4;
-    _glfw.win32.keycodes[0x04C] = GLFW_KEY_KP_5;
-    _glfw.win32.keycodes[0x04D] = GLFW_KEY_KP_6;
-    _glfw.win32.keycodes[0x047] = GLFW_KEY_KP_7;
-    _glfw.win32.keycodes[0x048] = GLFW_KEY_KP_8;
-    _glfw.win32.keycodes[0x049] = GLFW_KEY_KP_9;
-    _glfw.win32.keycodes[0x04E] = GLFW_KEY_KP_ADD;
-    _glfw.win32.keycodes[0x053] = GLFW_KEY_KP_DECIMAL;
-    _glfw.win32.keycodes[0x135] = GLFW_KEY_KP_DIVIDE;
-    _glfw.win32.keycodes[0x11C] = GLFW_KEY_KP_ENTER;
-    _glfw.win32.keycodes[0x059] = GLFW_KEY_KP_EQUAL;
-    _glfw.win32.keycodes[0x037] = GLFW_KEY_KP_MULTIPLY;
-    _glfw.win32.keycodes[0x04A] = GLFW_KEY_KP_SUBTRACT;
+    _glfw->win32.keycodes[0x052] = GLFW_KEY_KP_0;
+    _glfw->win32.keycodes[0x04F] = GLFW_KEY_KP_1;
+    _glfw->win32.keycodes[0x050] = GLFW_KEY_KP_2;
+    _glfw->win32.keycodes[0x051] = GLFW_KEY_KP_3;
+    _glfw->win32.keycodes[0x04B] = GLFW_KEY_KP_4;
+    _glfw->win32.keycodes[0x04C] = GLFW_KEY_KP_5;
+    _glfw->win32.keycodes[0x04D] = GLFW_KEY_KP_6;
+    _glfw->win32.keycodes[0x047] = GLFW_KEY_KP_7;
+    _glfw->win32.keycodes[0x048] = GLFW_KEY_KP_8;
+    _glfw->win32.keycodes[0x049] = GLFW_KEY_KP_9;
+    _glfw->win32.keycodes[0x04E] = GLFW_KEY_KP_ADD;
+    _glfw->win32.keycodes[0x053] = GLFW_KEY_KP_DECIMAL;
+    _glfw->win32.keycodes[0x135] = GLFW_KEY_KP_DIVIDE;
+    _glfw->win32.keycodes[0x11C] = GLFW_KEY_KP_ENTER;
+    _glfw->win32.keycodes[0x059] = GLFW_KEY_KP_EQUAL;
+    _glfw->win32.keycodes[0x037] = GLFW_KEY_KP_MULTIPLY;
+    _glfw->win32.keycodes[0x04A] = GLFW_KEY_KP_SUBTRACT;
 
     for (scancode = 0;  scancode < 512;  scancode++)
     {
-        if (_glfw.win32.keycodes[scancode] > 0)
-            _glfw.win32.scancodes[_glfw.win32.keycodes[scancode]] = scancode;
+        if (_glfw->win32.keycodes[scancode] > 0)
+            _glfw->win32.scancodes[_glfw->win32.keycodes[scancode]] = scancode;
     }
 }
 
@@ -326,7 +326,7 @@ static GLFWbool createHelperWindow(void)
 {
     MSG msg;
 
-    _glfw.win32.helperWindowHandle =
+    _glfw->win32.helperWindowHandle =
         CreateWindowExW(WS_EX_OVERLAPPEDWINDOW,
                         _GLFW_WNDCLASSNAME,
                         L"GLFW message window",
@@ -336,7 +336,7 @@ static GLFWbool createHelperWindow(void)
                         GetModuleHandleW(NULL),
                         NULL);
 
-    if (!_glfw.win32.helperWindowHandle)
+    if (!_glfw->win32.helperWindowHandle)
     {
         _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                              "Win32: Failed to create helper window");
@@ -345,7 +345,7 @@ static GLFWbool createHelperWindow(void)
 
     // HACK: The command to the first ShowWindow call is ignored if the parent
     //       process passed along a STARTUPINFO, so clear that with a no-op call
-    ShowWindow(_glfw.win32.helperWindowHandle, SW_HIDE);
+    ShowWindow(_glfw->win32.helperWindowHandle, SW_HIDE);
 
     // Register for HID device notifications
     {
@@ -355,13 +355,13 @@ static GLFWbool createHelperWindow(void)
         dbi.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
         dbi.dbcc_classguid = GUID_DEVINTERFACE_HID;
 
-        _glfw.win32.deviceNotificationHandle =
-            RegisterDeviceNotificationW(_glfw.win32.helperWindowHandle,
+        _glfw->win32.deviceNotificationHandle =
+            RegisterDeviceNotificationW(_glfw->win32.helperWindowHandle,
                                         (DEV_BROADCAST_HDR*) &dbi,
                                         DEVICE_NOTIFY_WINDOW_HANDLE);
     }
 
-    while (PeekMessageW(&msg, _glfw.win32.helperWindowHandle, 0, 0, PM_REMOVE))
+    while (PeekMessageW(&msg, _glfw->win32.helperWindowHandle, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
@@ -459,7 +459,7 @@ void _glfwUpdateKeyNamesWin32(void)
     int key;
     BYTE state[256] = {0};
 
-    memset(_glfw.win32.keynames, 0, sizeof(_glfw.win32.keynames));
+    memset(_glfw->win32.keynames, 0, sizeof(_glfw->win32.keynames));
 
     for (key = GLFW_KEY_SPACE;  key <= GLFW_KEY_LAST;  key++)
     {
@@ -467,7 +467,7 @@ void _glfwUpdateKeyNamesWin32(void)
         int scancode, length;
         WCHAR chars[16];
 
-        scancode = _glfw.win32.scancodes[key];
+        scancode = _glfw->win32.scancodes[key];
         if (scancode == -1)
             continue;
 
@@ -500,8 +500,8 @@ void _glfwUpdateKeyNamesWin32(void)
             continue;
 
         WideCharToMultiByte(CP_UTF8, 0, chars, 1,
-                            _glfw.win32.keynames[key],
-                            sizeof(_glfw.win32.keynames[key]),
+                            _glfw->win32.keynames[key],
+                            sizeof(_glfw->win32.keynames[key]),
                             NULL, NULL);
     }
 }
@@ -646,16 +646,16 @@ int _glfwInitWin32(void)
 
 void _glfwTerminateWin32(void)
 {
-    if (_glfw.win32.deviceNotificationHandle)
-        UnregisterDeviceNotification(_glfw.win32.deviceNotificationHandle);
+    if (_glfw->win32.deviceNotificationHandle)
+        UnregisterDeviceNotification(_glfw->win32.deviceNotificationHandle);
 
-    if (_glfw.win32.helperWindowHandle)
-        DestroyWindow(_glfw.win32.helperWindowHandle);
+    if (_glfw->win32.helperWindowHandle)
+        DestroyWindow(_glfw->win32.helperWindowHandle);
 
     _glfwUnregisterWindowClassWin32();
 
-    _glfw_free(_glfw.win32.clipboardString);
-    _glfw_free(_glfw.win32.rawInput);
+    _glfw_free(_glfw->win32.clipboardString);
+    _glfw_free(_glfw->win32.rawInput);
 
     _glfwTerminateWGL();
     _glfwTerminateEGL();

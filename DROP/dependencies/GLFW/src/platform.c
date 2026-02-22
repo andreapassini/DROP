@@ -114,7 +114,7 @@ GLFWbool _glfwSelectPlatform(int desiredID, _GLFWplatform* platform)
 GLFWAPI int glfwGetPlatform(void)
 {
     _GLFW_REQUIRE_INIT_OR_RETURN(0);
-    return _glfw.platform.platformID;
+    return _glfw->platform.platformID;
 }
 
 GLFWAPI int glfwPlatformSupported(int platformID)

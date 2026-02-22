@@ -216,27 +216,27 @@ typedef EGLBoolean (EGLAPIENTRY * PFN_eglSwapBuffers)(EGLDisplay,EGLSurface);
 typedef EGLBoolean (EGLAPIENTRY * PFN_eglSwapInterval)(EGLDisplay,EGLint);
 typedef const char* (EGLAPIENTRY * PFN_eglQueryString)(EGLDisplay,EGLint);
 typedef GLFWglproc (EGLAPIENTRY * PFN_eglGetProcAddress)(const char*);
-#define eglGetConfigAttrib _glfw.egl.GetConfigAttrib
-#define eglGetConfigs _glfw.egl.GetConfigs
-#define eglGetDisplay _glfw.egl.GetDisplay
-#define eglGetError _glfw.egl.GetError
-#define eglInitialize _glfw.egl.Initialize
-#define eglTerminate _glfw.egl.Terminate
-#define eglBindAPI _glfw.egl.BindAPI
-#define eglCreateContext _glfw.egl.CreateContext
-#define eglDestroySurface _glfw.egl.DestroySurface
-#define eglDestroyContext _glfw.egl.DestroyContext
-#define eglCreateWindowSurface _glfw.egl.CreateWindowSurface
-#define eglMakeCurrent _glfw.egl.MakeCurrent
-#define eglSwapBuffers _glfw.egl.SwapBuffers
-#define eglSwapInterval _glfw.egl.SwapInterval
-#define eglQueryString _glfw.egl.QueryString
-#define eglGetProcAddress _glfw.egl.GetProcAddress
+#define eglGetConfigAttrib _glfw->egl.GetConfigAttrib
+#define eglGetConfigs _glfw->egl.GetConfigs
+#define eglGetDisplay _glfw->egl.GetDisplay
+#define eglGetError _glfw->egl.GetError
+#define eglInitialize _glfw->egl.Initialize
+#define eglTerminate _glfw->egl.Terminate
+#define eglBindAPI _glfw->egl.BindAPI
+#define eglCreateContext _glfw->egl.CreateContext
+#define eglDestroySurface _glfw->egl.DestroySurface
+#define eglDestroyContext _glfw->egl.DestroyContext
+#define eglCreateWindowSurface _glfw->egl.CreateWindowSurface
+#define eglMakeCurrent _glfw->egl.MakeCurrent
+#define eglSwapBuffers _glfw->egl.SwapBuffers
+#define eglSwapInterval _glfw->egl.SwapInterval
+#define eglQueryString _glfw->egl.QueryString
+#define eglGetProcAddress _glfw->egl.GetProcAddress
 
 typedef EGLDisplay (EGLAPIENTRY * PFNEGLGETPLATFORMDISPLAYEXTPROC)(EGLenum,void*,const EGLint*);
 typedef EGLSurface (EGLAPIENTRY * PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)(EGLDisplay,EGLConfig,void*,const EGLint*);
-#define eglGetPlatformDisplayEXT _glfw.egl.GetPlatformDisplayEXT
-#define eglCreatePlatformWindowSurfaceEXT _glfw.egl.CreatePlatformWindowSurfaceEXT
+#define eglGetPlatformDisplayEXT _glfw->egl.GetPlatformDisplayEXT
+#define eglCreatePlatformWindowSurfaceEXT _glfw->egl.CreatePlatformWindowSurfaceEXT
 
 #define OSMESA_RGBA 0x1908
 #define OSMESA_FORMAT 0x22
@@ -259,13 +259,13 @@ typedef int (GLAPIENTRY * PFN_OSMesaMakeCurrent)(OSMesaContext,void*,int,int,int
 typedef int (GLAPIENTRY * PFN_OSMesaGetColorBuffer)(OSMesaContext,int*,int*,int*,void**);
 typedef int (GLAPIENTRY * PFN_OSMesaGetDepthBuffer)(OSMesaContext,int*,int*,int*,void**);
 typedef GLFWglproc (GLAPIENTRY * PFN_OSMesaGetProcAddress)(const char*);
-#define OSMesaCreateContextExt _glfw.osmesa.CreateContextExt
-#define OSMesaCreateContextAttribs _glfw.osmesa.CreateContextAttribs
-#define OSMesaDestroyContext _glfw.osmesa.DestroyContext
-#define OSMesaMakeCurrent _glfw.osmesa.MakeCurrent
-#define OSMesaGetColorBuffer _glfw.osmesa.GetColorBuffer
-#define OSMesaGetDepthBuffer _glfw.osmesa.GetDepthBuffer
-#define OSMesaGetProcAddress _glfw.osmesa.GetProcAddress
+#define OSMesaCreateContextExt _glfw->osmesa.CreateContextExt
+#define OSMesaCreateContextAttribs _glfw->osmesa.CreateContextAttribs
+#define OSMesaDestroyContext _glfw->osmesa.DestroyContext
+#define OSMesaMakeCurrent _glfw->osmesa.MakeCurrent
+#define OSMesaGetColorBuffer _glfw->osmesa.GetColorBuffer
+#define OSMesaGetDepthBuffer _glfw->osmesa.GetDepthBuffer
+#define OSMesaGetProcAddress _glfw->osmesa.GetProcAddress
 
 #define VK_NULL_HANDLE 0
 
@@ -326,7 +326,7 @@ typedef void (APIENTRY * PFN_vkVoidFunction)(void);
 
 typedef PFN_vkVoidFunction (APIENTRY * PFN_vkGetInstanceProcAddr)(VkInstance,const char*);
 typedef VkResult (APIENTRY * PFN_vkEnumerateInstanceExtensionProperties)(const char*,uint32_t*,VkExtensionProperties*);
-#define vkGetInstanceProcAddr _glfw.vk.GetInstanceProcAddr
+#define vkGetInstanceProcAddr _glfw->vk.GetInstanceProcAddr
 
 #include "platform.h"
 
@@ -339,13 +339,13 @@ typedef VkResult (APIENTRY * PFN_vkEnumerateInstanceExtensionProperties)(const c
 
 // Checks for whether the library has been initialized
 #define _GLFW_REQUIRE_INIT()                         \
-    if (!_glfw.initialized)                          \
+    if (!_glfw->initialized)                          \
     {                                                \
         _glfwInputError(GLFW_NOT_INITIALIZED, NULL); \
         return;                                      \
     }
 #define _GLFW_REQUIRE_INIT_OR_RETURN(x)              \
-    if (!_glfw.initialized)                          \
+    if (!_glfw->initialized)                          \
     {                                                \
         _glfwInputError(GLFW_NOT_INITIALIZED, NULL); \
         return x;                                    \
@@ -880,7 +880,7 @@ struct _GLFWlibrary
 
 // Global state shared between compilation units of GLFW
 //
-extern _GLFWlibrary _glfw;
+extern _GLFWlibrary* _glfw;
 
 
 //////////////////////////////////////////////////////////////////////////

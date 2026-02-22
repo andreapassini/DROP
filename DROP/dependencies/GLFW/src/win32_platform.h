@@ -269,12 +269,12 @@ typedef enum
 // xinput.dll function pointer typedefs
 typedef DWORD (WINAPI * PFN_XInputGetCapabilities)(DWORD,DWORD,XINPUT_CAPABILITIES*);
 typedef DWORD (WINAPI * PFN_XInputGetState)(DWORD,XINPUT_STATE*);
-#define XInputGetCapabilities _glfw.win32.xinput.GetCapabilities
-#define XInputGetState _glfw.win32.xinput.GetState
+#define XInputGetCapabilities _glfw->win32.xinput.GetCapabilities
+#define XInputGetState _glfw->win32.xinput.GetState
 
 // dinput8.dll function pointer typedefs
 typedef HRESULT (WINAPI * PFN_DirectInput8Create)(HINSTANCE,DWORD,REFIID,LPVOID*,LPUNKNOWN);
-#define DirectInput8Create _glfw.win32.dinput8.Create
+#define DirectInput8Create _glfw->win32.dinput8.Create
 
 // user32.dll function pointer typedefs
 typedef BOOL (WINAPI * PFN_SetProcessDPIAware)(void);
@@ -283,32 +283,32 @@ typedef BOOL (WINAPI * PFN_EnableNonClientDpiScaling)(HWND);
 typedef BOOL (WINAPI * PFN_SetProcessDpiAwarenessContext)(HANDLE);
 typedef UINT (WINAPI * PFN_GetDpiForWindow)(HWND);
 typedef BOOL (WINAPI * PFN_AdjustWindowRectExForDpi)(LPRECT,DWORD,BOOL,DWORD,UINT);
-#define SetProcessDPIAware _glfw.win32.user32.SetProcessDPIAware_
-#define ChangeWindowMessageFilterEx _glfw.win32.user32.ChangeWindowMessageFilterEx_
-#define EnableNonClientDpiScaling _glfw.win32.user32.EnableNonClientDpiScaling_
-#define SetProcessDpiAwarenessContext _glfw.win32.user32.SetProcessDpiAwarenessContext_
-#define GetDpiForWindow _glfw.win32.user32.GetDpiForWindow_
-#define AdjustWindowRectExForDpi _glfw.win32.user32.AdjustWindowRectExForDpi_
+#define SetProcessDPIAware _glfw->win32.user32.SetProcessDPIAware_
+#define ChangeWindowMessageFilterEx _glfw->win32.user32.ChangeWindowMessageFilterEx_
+#define EnableNonClientDpiScaling _glfw->win32.user32.EnableNonClientDpiScaling_
+#define SetProcessDpiAwarenessContext _glfw->win32.user32.SetProcessDpiAwarenessContext_
+#define GetDpiForWindow _glfw->win32.user32.GetDpiForWindow_
+#define AdjustWindowRectExForDpi _glfw->win32.user32.AdjustWindowRectExForDpi_
 
 // dwmapi.dll function pointer typedefs
 typedef HRESULT (WINAPI * PFN_DwmIsCompositionEnabled)(BOOL*);
 typedef HRESULT (WINAPI * PFN_DwmFlush)(VOID);
 typedef HRESULT(WINAPI * PFN_DwmEnableBlurBehindWindow)(HWND,const DWM_BLURBEHIND*);
 typedef HRESULT (WINAPI * PFN_DwmGetColorizationColor)(DWORD*,BOOL*);
-#define DwmIsCompositionEnabled _glfw.win32.dwmapi.IsCompositionEnabled
-#define DwmFlush _glfw.win32.dwmapi.Flush
-#define DwmEnableBlurBehindWindow _glfw.win32.dwmapi.EnableBlurBehindWindow
-#define DwmGetColorizationColor _glfw.win32.dwmapi.GetColorizationColor
+#define DwmIsCompositionEnabled _glfw->win32.dwmapi.IsCompositionEnabled
+#define DwmFlush _glfw->win32.dwmapi.Flush
+#define DwmEnableBlurBehindWindow _glfw->win32.dwmapi.EnableBlurBehindWindow
+#define DwmGetColorizationColor _glfw->win32.dwmapi.GetColorizationColor
 
 // shcore.dll function pointer typedefs
 typedef HRESULT (WINAPI * PFN_SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS);
 typedef HRESULT (WINAPI * PFN_GetDpiForMonitor)(HMONITOR,MONITOR_DPI_TYPE,UINT*,UINT*);
-#define SetProcessDpiAwareness _glfw.win32.shcore.SetProcessDpiAwareness_
-#define GetDpiForMonitor _glfw.win32.shcore.GetDpiForMonitor_
+#define SetProcessDpiAwareness _glfw->win32.shcore.SetProcessDpiAwareness_
+#define GetDpiForMonitor _glfw->win32.shcore.GetDpiForMonitor_
 
 // ntdll.dll function pointer typedefs
 typedef LONG (WINAPI * PFN_RtlVerifyVersionInfo)(OSVERSIONINFOEXW*,ULONG,ULONGLONG);
-#define RtlVerifyVersionInfo _glfw.win32.ntdll.RtlVerifyVersionInfo_
+#define RtlVerifyVersionInfo _glfw->win32.ntdll.RtlVerifyVersionInfo_
 
 // WGL extension pointer typedefs
 typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC)(int);
@@ -316,11 +316,11 @@ typedef BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBIVARBPROC)(HDC,int,int,UINT,con
 typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC)(void);
 typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC)(HDC);
 typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC,HGLRC,const int*);
-#define wglSwapIntervalEXT _glfw.wgl.SwapIntervalEXT
-#define wglGetPixelFormatAttribivARB _glfw.wgl.GetPixelFormatAttribivARB
-#define wglGetExtensionsStringEXT _glfw.wgl.GetExtensionsStringEXT
-#define wglGetExtensionsStringARB _glfw.wgl.GetExtensionsStringARB
-#define wglCreateContextAttribsARB _glfw.wgl.CreateContextAttribsARB
+#define wglSwapIntervalEXT _glfw->wgl.SwapIntervalEXT
+#define wglGetPixelFormatAttribivARB _glfw->wgl.GetPixelFormatAttribivARB
+#define wglGetExtensionsStringEXT _glfw->wgl.GetExtensionsStringEXT
+#define wglGetExtensionsStringARB _glfw->wgl.GetExtensionsStringARB
+#define wglCreateContextAttribsARB _glfw->wgl.CreateContextAttribsARB
 
 // opengl32.dll function pointer typedefs
 typedef HGLRC (WINAPI * PFN_wglCreateContext)(HDC);
@@ -330,13 +330,13 @@ typedef HDC (WINAPI * PFN_wglGetCurrentDC)(void);
 typedef HGLRC (WINAPI * PFN_wglGetCurrentContext)(void);
 typedef BOOL (WINAPI * PFN_wglMakeCurrent)(HDC,HGLRC);
 typedef BOOL (WINAPI * PFN_wglShareLists)(HGLRC,HGLRC);
-#define wglCreateContext _glfw.wgl.CreateContext
-#define wglDeleteContext _glfw.wgl.DeleteContext
-#define wglGetProcAddress _glfw.wgl.GetProcAddress
-#define wglGetCurrentDC _glfw.wgl.GetCurrentDC
-#define wglGetCurrentContext _glfw.wgl.GetCurrentContext
-#define wglMakeCurrent _glfw.wgl.MakeCurrent
-#define wglShareLists _glfw.wgl.ShareLists
+#define wglCreateContext _glfw->wgl.CreateContext
+#define wglDeleteContext _glfw->wgl.DeleteContext
+#define wglGetProcAddress _glfw->wgl.GetProcAddress
+#define wglGetCurrentDC _glfw->wgl.GetCurrentDC
+#define wglGetCurrentContext _glfw->wgl.GetCurrentContext
+#define wglMakeCurrent _glfw->wgl.MakeCurrent
+#define wglShareLists _glfw->wgl.ShareLists
 
 typedef VkFlags VkWin32SurfaceCreateFlagsKHR;
 

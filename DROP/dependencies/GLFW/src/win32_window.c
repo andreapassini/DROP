@@ -297,10 +297,10 @@ static void disableRawMouseMotion(_GLFWwindow* window)
 //
 static void disableCursor(_GLFWwindow* window)
 {
-    _glfw.win32.disabledCursorWindow = window;
+    _glfw->win32.disabledCursorWindow = window;
     _glfwGetCursorPosWin32(window,
-                           &_glfw.win32.restoreCursorPosX,
-                           &_glfw.win32.restoreCursorPosY);
+                           &_glfw->win32.restoreCursorPosX,
+                           &_glfw->win32.restoreCursorPosY);
     updateCursorImage(window);
     _glfwCenterCursorInContentArea(window);
     updateClipRect(window);
@@ -316,11 +316,11 @@ static void enableCursor(_GLFWwindow* window)
     if (window->rawMouseMotion)
         disableRawMouseMotion(window);
 
-    _glfw.win32.disabledCursorWindow = NULL;
+    _glfw->win32.disabledCursorWindow = NULL;
     updateClipRect(NULL);
     _glfwSetCursorPosWin32(window,
-                           _glfw.win32.restoreCursorPosX,
-                           _glfw.win32.restoreCursorPosY);
+                           _glfw->win32.restoreCursorPosX,
+                           _glfw->win32.restoreCursorPosY);
     updateCursorImage(window);
 }
 
@@ -448,18 +448,18 @@ static void fitToMonitor(_GLFWwindow* window)
 //
 static void acquireMonitor(_GLFWwindow* window)
 {
-    if (!_glfw.win32.acquiredMonitorCount)
+    if (!_glfw->win32.acquiredMonitorCount)
     {
         SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED);
 
         // HACK: When mouse trails are enabled the cursor becomes invisible when
         //       the OpenGL ICD switches to page flipping
-        SystemParametersInfo(SPI_GETMOUSETRAILS, 0, &_glfw.win32.mouseTrailSize, 0);
+        SystemParametersInfo(SPI_GETMOUSETRAILS, 0, &_glfw->win32.mouseTrailSize, 0);
         SystemParametersInfo(SPI_SETMOUSETRAILS, 0, 0, 0);
     }
 
     if (!window->monitor->window)
-        _glfw.win32.acquiredMonitorCount++;
+        _glfw->win32.acquiredMonitorCount++;
 
     _glfwSetVideoModeWin32(window->monitor, &window->videoMode);
     _glfwInputMonitorWindow(window->monitor, window);
@@ -472,13 +472,13 @@ static void releaseMonitor(_GLFWwindow* window)
     if (window->monitor->window != window)
         return;
 
-    _glfw.win32.acquiredMonitorCount--;
-    if (!_glfw.win32.acquiredMonitorCount)
+    _glfw->win32.acquiredMonitorCount--;
+    if (!_glfw->win32.acquiredMonitorCount)
     {
         SetThreadExecutionState(ES_CONTINUOUS);
 
         // HACK: Restore mouse trail length saved in acquireMonitor
-        SystemParametersInfo(SPI_SETMOUSETRAILS, _glfw.win32.mouseTrailSize, 0, 0);
+        SystemParametersInfo(SPI_SETMOUSETRAILS, _glfw->win32.mouseTrailSize, 0, 0);
     }
 
     _glfwInputMonitorWindow(window->monitor, NULL);
@@ -525,7 +525,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
             case WM_DEVICECHANGE:
             {
-                if (!_glfw.joysticksInitialized)
+                if (!_glfw->joysticksInitialized)
                     break;
 
                 if (wParam == DBT_DEVICEARRIVAL)
@@ -546,7 +546,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
             case WM_CREATE:
             {
-                if (_glfw.hints.window.titlebar)
+                if (_glfw->hints.window.titlebar)
                     break;
 
                 if (hasThickFrame)
@@ -570,7 +570,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
             case WM_ACTIVATE:
             {
-                if (_glfw.hints.window.titlebar)
+                if (_glfw->hints.window.titlebar)
                     break;
 
 				RECT title_bar_rect = {0};
@@ -742,7 +742,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 scancode = MapVirtualKeyW((UINT) wParam, MAPVK_VK_TO_VSC);
             }
 
-            key = _glfw.win32.keycodes[scancode];
+            key = _glfw->win32.keycodes[scancode];
 
             // The Ctrl keys require special handling
             if (wParam == VK_CONTROL)
@@ -888,7 +888,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 const int dx = x - window->win32.lastCursorPosX;
                 const int dy = y - window->win32.lastCursorPosY;
 
-                if (_glfw.win32.disabledCursorWindow != window)
+                if (_glfw->win32.disabledCursorWindow != window)
                     break;
                 if (window->rawMouseMotion)
                     break;
@@ -913,22 +913,22 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             RAWINPUT* data = NULL;
             int dx, dy;
 
-            if (_glfw.win32.disabledCursorWindow != window)
+            if (_glfw->win32.disabledCursorWindow != window)
                 break;
             if (!window->rawMouseMotion)
                 break;
 
             GetRawInputData(ri, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
-            if (size > (UINT) _glfw.win32.rawInputSize)
+            if (size > (UINT) _glfw->win32.rawInputSize)
             {
-                _glfw_free(_glfw.win32.rawInput);
-                _glfw.win32.rawInput = _glfw_calloc(size, 1);
-                _glfw.win32.rawInputSize = size;
+                _glfw_free(_glfw->win32.rawInput);
+                _glfw->win32.rawInput = _glfw_calloc(size, 1);
+                _glfw->win32.rawInputSize = size;
             }
 
-            size = _glfw.win32.rawInputSize;
+            size = _glfw->win32.rawInputSize;
             if (GetRawInputData(ri, RID_INPUT,
-                                _glfw.win32.rawInput, &size,
+                                _glfw->win32.rawInput, &size,
                                 sizeof(RAWINPUTHEADER)) == (UINT) -1)
             {
                 _glfwInputError(GLFW_PLATFORM_ERROR,
@@ -936,7 +936,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 break;
             }
 
-            data = _glfw.win32.rawInput;
+            data = _glfw->win32.rawInput;
             if (data->data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
             {
                 dx = data->data.mouse.lLastX - window->win32.lastCursorPosX;
@@ -1008,7 +1008,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
 		case WM_NCCALCSIZE:
 		{
-			if (_glfw.hints.window.titlebar || !hasThickFrame || !wParam)
+			if (_glfw->hints.window.titlebar || !hasThickFrame || !wParam)
 				break;
 
             // For custom frames
@@ -1057,7 +1057,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                                        (window->win32.maximized &&
                                         wParam != SIZE_RESTORED);
 
-            if (_glfw.win32.disabledCursorWindow == window)
+            if (_glfw->win32.disabledCursorWindow == window)
                 updateClipRect(window);
 
             if (window->win32.iconified != iconified)
@@ -1105,7 +1105,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
         case WM_MOVE:
         {
-            if (_glfw.win32.disabledCursorWindow == window)
+            if (_glfw->win32.disabledCursorWindow == window)
                 updateClipRect(window);
 
             // NOTE: This cannot use LOWORD/HIWORD recommended by MSDN, as
@@ -1305,7 +1305,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
         case WM_ACTIVATE:
         {
-            if (_glfw.hints.window.titlebar)
+            if (_glfw->hints.window.titlebar)
                 break;
 
 			RECT title_bar_rect = { 0 };
@@ -1313,7 +1313,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
         }
         case WM_NCHITTEST:
         {
-            if (_glfw.hints.window.titlebar || !hasThickFrame)
+            if (_glfw->hints.window.titlebar || !hasThickFrame)
                 break;
 
             //
@@ -1588,8 +1588,8 @@ void _glfwDestroyWindowWin32(_GLFWwindow* window)
     if (window->context.destroy)
         window->context.destroy(window);
 
-    if (_glfw.win32.disabledCursorWindow == window)
-        _glfw.win32.disabledCursorWindow = NULL;
+    if (_glfw->win32.disabledCursorWindow == window)
+        _glfw->win32.disabledCursorWindow = NULL;
 
     if (window->win32.handle)
     {
@@ -2095,7 +2095,7 @@ void _glfwSetWindowOpacityWin32(_GLFWwindow* window, float opacity)
 
 void _glfwSetRawMouseMotionWin32(_GLFWwindow *window, GLFWbool enabled)
 {
-    if (_glfw.win32.disabledCursorWindow != window)
+    if (_glfw->win32.disabledCursorWindow != window)
         return;
 
     if (enabled)
@@ -2123,7 +2123,7 @@ void _glfwPollEventsWin32(void)
             //       may post it to this one, for example Task Manager
             // HACK: Treat WM_QUIT as a close on all windows
 
-            window = _glfw.windowListHead;
+            window = _glfw->windowListHead;
             while (window)
             {
                 _glfwInputWindowCloseRequest(window);
@@ -2163,7 +2163,7 @@ void _glfwPollEventsWin32(void)
             {
                 const int vk = keys[i][0];
                 const int key = keys[i][1];
-                const int scancode = _glfw.win32.scancodes[key];
+                const int scancode = _glfw->win32.scancodes[key];
 
                 if ((GetKeyState(vk) & 0x8000))
                     continue;
@@ -2175,7 +2175,7 @@ void _glfwPollEventsWin32(void)
         }
     }
 
-    window = _glfw.win32.disabledCursorWindow;
+    window = _glfw->win32.disabledCursorWindow;
     if (window)
     {
         int width, height;
@@ -2207,7 +2207,7 @@ void _glfwWaitEventsTimeoutWin32(double timeout)
 
 void _glfwPostEmptyEventWin32(void)
 {
-    PostMessage(_glfw.win32.helperWindowHandle, WM_NULL, 0, 0);
+    PostMessage(_glfw->win32.helperWindowHandle, WM_NULL, 0, 0);
 }
 
 void _glfwGetCursorPosWin32(_GLFWwindow* window, double* xpos, double* ypos)
@@ -2244,7 +2244,7 @@ void _glfwSetCursorModeWin32(_GLFWwindow* window, int mode)
         if (_glfwWindowFocusedWin32(window))
             disableCursor(window);
     }
-    else if (_glfw.win32.disabledCursorWindow == window)
+    else if (_glfw->win32.disabledCursorWindow == window)
         enableCursor(window);
     else if (cursorInContentArea(window))
         updateCursorImage(window);
@@ -2253,18 +2253,18 @@ void _glfwSetCursorModeWin32(_GLFWwindow* window, int mode)
 const char* _glfwGetScancodeNameWin32(int scancode)
 {
     if (scancode < 0 || scancode > (KF_EXTENDED | 0xff) ||
-        _glfw.win32.keycodes[scancode] == GLFW_KEY_UNKNOWN)
+        _glfw->win32.keycodes[scancode] == GLFW_KEY_UNKNOWN)
     {
         _glfwInputError(GLFW_INVALID_VALUE, "Invalid scancode %i", scancode);
         return NULL;
     }
 
-    return _glfw.win32.keynames[_glfw.win32.keycodes[scancode]];
+    return _glfw->win32.keynames[_glfw->win32.keycodes[scancode]];
 }
 
 int _glfwGetKeyScancodeWin32(int key)
 {
-    return _glfw.win32.scancodes[key];
+    return _glfw->win32.scancodes[key];
 }
 
 int _glfwCreateCursorWin32(_GLFWcursor* cursor,
@@ -2374,7 +2374,7 @@ void _glfwSetClipboardStringWin32(const char* string)
     MultiByteToWideChar(CP_UTF8, 0, string, -1, buffer, characterCount);
     GlobalUnlock(object);
 
-    if (!OpenClipboard(_glfw.win32.helperWindowHandle))
+    if (!OpenClipboard(_glfw->win32.helperWindowHandle))
     {
         _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                              "Win32: Failed to open clipboard");
@@ -2392,7 +2392,7 @@ const char* _glfwGetClipboardStringWin32(void)
     HANDLE object;
     WCHAR* buffer;
 
-    if (!OpenClipboard(_glfw.win32.helperWindowHandle))
+    if (!OpenClipboard(_glfw->win32.helperWindowHandle))
     {
         _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                              "Win32: Failed to open clipboard");
@@ -2417,40 +2417,40 @@ const char* _glfwGetClipboardStringWin32(void)
         return NULL;
     }
 
-    _glfw_free(_glfw.win32.clipboardString);
-    _glfw.win32.clipboardString = _glfwCreateUTF8FromWideStringWin32(buffer);
+    _glfw_free(_glfw->win32.clipboardString);
+    _glfw->win32.clipboardString = _glfwCreateUTF8FromWideStringWin32(buffer);
 
     GlobalUnlock(object);
     CloseClipboard();
 
-    return _glfw.win32.clipboardString;
+    return _glfw->win32.clipboardString;
 }
 
 EGLenum _glfwGetEGLPlatformWin32(EGLint** attribs)
 {
-    if (_glfw.egl.ANGLE_platform_angle)
+    if (_glfw->egl.ANGLE_platform_angle)
     {
         int type = 0;
 
-        if (_glfw.egl.ANGLE_platform_angle_opengl)
+        if (_glfw->egl.ANGLE_platform_angle_opengl)
         {
-            if (_glfw.hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_OPENGL)
+            if (_glfw->hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_OPENGL)
                 type = EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE;
-            else if (_glfw.hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_OPENGLES)
+            else if (_glfw->hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_OPENGLES)
                 type = EGL_PLATFORM_ANGLE_TYPE_OPENGLES_ANGLE;
         }
 
-        if (_glfw.egl.ANGLE_platform_angle_d3d)
+        if (_glfw->egl.ANGLE_platform_angle_d3d)
         {
-            if (_glfw.hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_D3D9)
+            if (_glfw->hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_D3D9)
                 type = EGL_PLATFORM_ANGLE_TYPE_D3D9_ANGLE;
-            else if (_glfw.hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_D3D11)
+            else if (_glfw->hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_D3D11)
                 type = EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE;
         }
 
-        if (_glfw.egl.ANGLE_platform_angle_vulkan)
+        if (_glfw->egl.ANGLE_platform_angle_vulkan)
         {
-            if (_glfw.hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_VULKAN)
+            if (_glfw->hints.init.angleType == GLFW_ANGLE_PLATFORM_TYPE_VULKAN)
                 type = EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE;
         }
 
@@ -2469,7 +2469,7 @@ EGLenum _glfwGetEGLPlatformWin32(EGLint** attribs)
 
 EGLNativeDisplayType _glfwGetEGLNativeDisplayWin32(void)
 {
-    return GetDC(_glfw.win32.helperWindowHandle);
+    return GetDC(_glfw->win32.helperWindowHandle);
 }
 
 EGLNativeWindowType _glfwGetEGLNativeWindowWin32(_GLFWwindow* window)
@@ -2479,7 +2479,7 @@ EGLNativeWindowType _glfwGetEGLNativeWindowWin32(_GLFWwindow* window)
 
 void _glfwGetRequiredInstanceExtensionsWin32(char** extensions)
 {
-    if (!_glfw.vk.KHR_surface || !_glfw.vk.KHR_win32_surface)
+    if (!_glfw->vk.KHR_surface || !_glfw->vk.KHR_win32_surface)
         return;
 
     extensions[0] = "VK_KHR_surface";
@@ -2543,7 +2543,7 @@ GLFWAPI HWND glfwGetWin32Window(GLFWwindow* handle)
     _GLFWwindow* window = (_GLFWwindow*) handle;
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
 
-    if (_glfw.platform.platformID != GLFW_PLATFORM_WIN32)
+    if (_glfw->platform.platformID != GLFW_PLATFORM_WIN32)
     {
         _glfwInputError(GLFW_PLATFORM_UNAVAILABLE,
                         "Win32: Platform not initialized");

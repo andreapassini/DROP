@@ -39,7 +39,7 @@ static void makeContextCurrentOSMesa(_GLFWwindow* window)
     if (window)
     {
         int width, height;
-        _glfw.platform.getFramebufferSize(window, &width, &height);
+        _glfw->platform.getFramebufferSize(window, &width, &height);
 
         // Check to see if we need to allocate a new buffer
         if ((window->context.osmesa.buffer == NULL) ||
@@ -65,7 +65,7 @@ static void makeContextCurrentOSMesa(_GLFWwindow* window)
         }
     }
 
-    _glfwPlatformSetTls(&_glfw.contextSlot, window);
+    _glfwPlatformSetTls(&_glfw->contextSlot, window);
 }
 
 static GLFWglproc getProcAddressOSMesa(const char* procname)
@@ -133,43 +133,43 @@ GLFWbool _glfwInitOSMesa(void)
         NULL
     };
 
-    if (_glfw.osmesa.handle)
+    if (_glfw->osmesa.handle)
         return GLFW_TRUE;
 
     for (i = 0;  sonames[i];  i++)
     {
-        _glfw.osmesa.handle = _glfwPlatformLoadModule(sonames[i]);
-        if (_glfw.osmesa.handle)
+        _glfw->osmesa.handle = _glfwPlatformLoadModule(sonames[i]);
+        if (_glfw->osmesa.handle)
             break;
     }
 
-    if (!_glfw.osmesa.handle)
+    if (!_glfw->osmesa.handle)
     {
         _glfwInputError(GLFW_API_UNAVAILABLE, "OSMesa: Library not found");
         return GLFW_FALSE;
     }
 
-    _glfw.osmesa.CreateContextExt = (PFN_OSMesaCreateContextExt)
-        _glfwPlatformGetModuleSymbol(_glfw.osmesa.handle, "OSMesaCreateContextExt");
-    _glfw.osmesa.CreateContextAttribs = (PFN_OSMesaCreateContextAttribs)
-        _glfwPlatformGetModuleSymbol(_glfw.osmesa.handle, "OSMesaCreateContextAttribs");
-    _glfw.osmesa.DestroyContext = (PFN_OSMesaDestroyContext)
-        _glfwPlatformGetModuleSymbol(_glfw.osmesa.handle, "OSMesaDestroyContext");
-    _glfw.osmesa.MakeCurrent = (PFN_OSMesaMakeCurrent)
-        _glfwPlatformGetModuleSymbol(_glfw.osmesa.handle, "OSMesaMakeCurrent");
-    _glfw.osmesa.GetColorBuffer = (PFN_OSMesaGetColorBuffer)
-        _glfwPlatformGetModuleSymbol(_glfw.osmesa.handle, "OSMesaGetColorBuffer");
-    _glfw.osmesa.GetDepthBuffer = (PFN_OSMesaGetDepthBuffer)
-        _glfwPlatformGetModuleSymbol(_glfw.osmesa.handle, "OSMesaGetDepthBuffer");
-    _glfw.osmesa.GetProcAddress = (PFN_OSMesaGetProcAddress)
-        _glfwPlatformGetModuleSymbol(_glfw.osmesa.handle, "OSMesaGetProcAddress");
+    _glfw->osmesa.CreateContextExt = (PFN_OSMesaCreateContextExt)
+        _glfwPlatformGetModuleSymbol(_glfw->osmesa.handle, "OSMesaCreateContextExt");
+    _glfw->osmesa.CreateContextAttribs = (PFN_OSMesaCreateContextAttribs)
+        _glfwPlatformGetModuleSymbol(_glfw->osmesa.handle, "OSMesaCreateContextAttribs");
+    _glfw->osmesa.DestroyContext = (PFN_OSMesaDestroyContext)
+        _glfwPlatformGetModuleSymbol(_glfw->osmesa.handle, "OSMesaDestroyContext");
+    _glfw->osmesa.MakeCurrent = (PFN_OSMesaMakeCurrent)
+        _glfwPlatformGetModuleSymbol(_glfw->osmesa.handle, "OSMesaMakeCurrent");
+    _glfw->osmesa.GetColorBuffer = (PFN_OSMesaGetColorBuffer)
+        _glfwPlatformGetModuleSymbol(_glfw->osmesa.handle, "OSMesaGetColorBuffer");
+    _glfw->osmesa.GetDepthBuffer = (PFN_OSMesaGetDepthBuffer)
+        _glfwPlatformGetModuleSymbol(_glfw->osmesa.handle, "OSMesaGetDepthBuffer");
+    _glfw->osmesa.GetProcAddress = (PFN_OSMesaGetProcAddress)
+        _glfwPlatformGetModuleSymbol(_glfw->osmesa.handle, "OSMesaGetProcAddress");
 
-    if (!_glfw.osmesa.CreateContextExt ||
-        !_glfw.osmesa.DestroyContext ||
-        !_glfw.osmesa.MakeCurrent ||
-        !_glfw.osmesa.GetColorBuffer ||
-        !_glfw.osmesa.GetDepthBuffer ||
-        !_glfw.osmesa.GetProcAddress)
+    if (!_glfw->osmesa.CreateContextExt ||
+        !_glfw->osmesa.DestroyContext ||
+        !_glfw->osmesa.MakeCurrent ||
+        !_glfw->osmesa.GetColorBuffer ||
+        !_glfw->osmesa.GetDepthBuffer ||
+        !_glfw->osmesa.GetProcAddress)
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
                         "OSMesa: Failed to load required entry points");
@@ -183,10 +183,10 @@ GLFWbool _glfwInitOSMesa(void)
 
 void _glfwTerminateOSMesa(void)
 {
-    if (_glfw.osmesa.handle)
+    if (_glfw->osmesa.handle)
     {
-        _glfwPlatformFreeModule(_glfw.osmesa.handle);
-        _glfw.osmesa.handle = NULL;
+        _glfwPlatformFreeModule(_glfw->osmesa.handle);
+        _glfw->osmesa.handle = NULL;
     }
 }
 

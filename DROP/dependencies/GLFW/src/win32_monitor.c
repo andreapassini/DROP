@@ -141,13 +141,13 @@ void _glfwPollMonitorsWin32(void)
     DISPLAY_DEVICEW adapter, display;
     _GLFWmonitor* monitor;
 
-    disconnectedCount = _glfw.monitorCount;
+    disconnectedCount = _glfw->monitorCount;
     if (disconnectedCount)
     {
-        disconnected = _glfw_calloc(_glfw.monitorCount, sizeof(_GLFWmonitor*));
+        disconnected = _glfw_calloc(_glfw->monitorCount, sizeof(_GLFWmonitor*));
         memcpy(disconnected,
-               _glfw.monitors,
-               _glfw.monitorCount * sizeof(_GLFWmonitor*));
+               _glfw->monitors,
+               _glfw->monitorCount * sizeof(_GLFWmonitor*));
     }
 
     for (adapterIndex = 0;  ;  adapterIndex++)
@@ -185,7 +185,7 @@ void _glfwPollMonitorsWin32(void)
                 {
                     disconnected[i] = NULL;
                     // handle may have changed, update
-                    EnumDisplayMonitors(NULL, NULL, monitorCallback, (LPARAM) _glfw.monitors[i]);
+                    EnumDisplayMonitors(NULL, NULL, monitorCallback, (LPARAM) _glfw->monitors[i]);
                     break;
                 }
             }
