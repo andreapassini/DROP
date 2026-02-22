@@ -47,22 +47,22 @@ BOOL WINAPI DllMain(
         // Initialize once for each new process.
         // Return FALSE to fail DLL load.
         bFirstExe = true;
-        std::cout << "DLL_PROCESS_ATTACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " "DLL_PROCESS_ATTACH" << std::endl;
         break;
 
     case DLL_THREAD_ATTACH:
         // Do thread-specific initialization.
-        std::cout << "DLL_THREAD_ATTACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " "DLL_THREAD_ATTACH" << std::endl;
         break;
 
     case DLL_THREAD_DETACH:
         // Do thread-specific cleanup.
-        std::cout << "DLL_THREAD_DETACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " "DLL_THREAD_DETACH" << std::endl;
         break;
 
     case DLL_PROCESS_DETACH:
         // Perform any necessary cleanup.
-        std::cout << "DLL_PROCESS_DETACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " << "DLL_PROCESS_DETACH" << std::endl;
         break;
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.

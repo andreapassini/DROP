@@ -435,6 +435,29 @@ GLFWAPI void glfwInitAllocator(const GLFWallocator* allocator)
         memset(&_glfwInitAllocator, 0, sizeof(GLFWallocator));
 }
 
+GLFWAPI GLFWlibrary* glfwGetLib()
+{
+    return &_glfw;
+}
+
+GLFWAPI size_t glfwGetLibSize()
+{
+    return sizeof(GLFWlibrary);
+}
+
+GLFWAPI void glfwSetLib(GLFWlibrary* inGlfwLib)
+{
+    if (!inGlfwLib) {
+        return;
+    }
+    _glfw = *inGlfwLib;
+}
+
+GLFWAPI GLFWlibrary* glfwAllocateLib(const GLFWallocator* allocator)
+{
+    return allocator->allocate(sizeof(GLFWlibrary), allocator->user);
+}
+
 GLFWAPI void glfwInitVulkanLoader(PFN_vkGetInstanceProcAddr loader)
 {
     _glfwInitHints.vulkanLoader = loader;

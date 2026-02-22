@@ -45,9 +45,10 @@ static bool g_GameEngineRunning = true;
 
 struct GameProcAdresses;
 struct DropPlatformCalls;
+struct EngineMemory;
 
-typedef void(DLLFUN* START_ENGINE)(DropPlatformCalls*);
-typedef void(DLLFUN* UPDATE_ENGINE)(DropPlatformCalls*, GameProcAdresses*);
+typedef void(DLLFUN* START_ENGINE)(DropPlatformCalls*, EngineMemory*);
+typedef void(DLLFUN* UPDATE_ENGINE)(DropPlatformCalls*, EngineMemory*, GameProcAdresses*);
 
 struct DropPlatformCalls
 {
@@ -73,9 +74,11 @@ struct EngineMemory
 	void* persistentMemory = nullptr;
 	size_t persistentMemorysizeInBytes = 0LL;
 
-	// Transient Memory 
+	// Transient Memory, it will be cleared in specific moments
+	// Scene Memory 
 	void* sceneMemory = nullptr;
 	size_t sceneMemorysizeInBytes = 0LL;
+	// Frame Memory
 	void* frameMemory = nullptr;
 	size_t frameMemorySizeInBytes = 0LL;
 };
@@ -94,17 +97,25 @@ struct GameEngineCode
 extern "C" {
 #endif
 
-	void DLLEXPORT StartEngine(DropPlatformCalls* platformCalls);
+	void DLLEXPORT StartEngine(
+		DropPlatformCalls* platformCalls
+		, EngineMemory* engineMemory
+	);
 	// Stub
-	void StartEngineStub(DropPlatformCalls* platformCalls) {};
+	void StartEngineStub(
+		DropPlatformCalls* platformCalls
+		, EngineMemory* engineMemory
+	) {};
 
 	void DLLEXPORT UpdateEngine( // Get the DeltaTime from glfwGetTime
 		DropPlatformCalls* platformCalls
+		, EngineMemory* engineMemory
 		, GameProcAdresses* gameCalls
 	);
 	// Stub
 	void UpdateEngineStub(
 		DropPlatformCalls* platformCalls
+		, EngineMemory* engineMemory
 		, GameProcAdresses* gameCalls
 	) {};
 

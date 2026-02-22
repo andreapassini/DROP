@@ -375,7 +375,12 @@ int Main(int argc, char** argv)
     platformCalls.platformCall = TestPlatformCall;
     platformCalls.allocateMemory = AllocateMemory;
 
-    engineDLL.procAdresses.StartEngine(&platformCalls);
+    EngineMemory engineMemory;
+
+    engineDLL.procAdresses.StartEngine(
+        &platformCalls
+        , &engineMemory // this will be initialized by the Engine
+    );
 
     gameDLL.procAdresses.StartGame();
 
@@ -403,6 +408,7 @@ int Main(int argc, char** argv)
         {
             engineDLL.procAdresses.UpdateEngine(
                 &platformCalls
+                , &engineMemory // this will was initialized by the Engine in EngineStart()
                 , &gameDLL.procAdresses
             );
         }

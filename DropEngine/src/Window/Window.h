@@ -58,7 +58,7 @@ namespace Drop
 
 		void Shutdown();
 
-	private:
+		GLFWlibrary* glfwLibrary;
 		GLFWwindow* m_Window;
 
 		struct WindowData

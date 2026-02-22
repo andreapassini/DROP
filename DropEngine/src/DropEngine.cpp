@@ -15,7 +15,6 @@
 using namespace Drop;
 
 static DropEngineCalls gDropEngineCalls;
-static EngineMemory gEngineMemory;
 
 void TestEngineCall(){
 }
@@ -66,49 +65,51 @@ void TempGLFWDeallocate(
 }
 
 
-void StartEngine(DropPlatformCalls* platformCalls)
-{
+void StartEngine(
+    DropPlatformCalls* platformCalls
+    , EngineMemory* engineMemory
+) {
     Drop::Log::Init();
     LOG_CORE_WARN("Initialized Log!");
 
     LOG_CORE_INFO("Drop Engine starting");
 
     // Memory initialization, consider doing this by reading config file
-    gEngineMemory.persistentMemorysizeInBytes = Megabytes(128);
-    gEngineMemory.sceneMemorysizeInBytes = Gigabytes(2);
-    gEngineMemory.frameMemorySizeInBytes = Megabytes(128);
-    gEngineMemory.sizeInBytes = gEngineMemory.persistentMemorysizeInBytes 
-        + gEngineMemory.sceneMemorysizeInBytes 
-        + gEngineMemory.frameMemorySizeInBytes;
+    engineMemory->persistentMemorysizeInBytes = Megabytes(128);
+    engineMemory->sceneMemorysizeInBytes = Gigabytes(2);
+    engineMemory->frameMemorySizeInBytes = Megabytes(128);
+    engineMemory->sizeInBytes = engineMemory->persistentMemorysizeInBytes
+        + engineMemory->sceneMemorysizeInBytes 
+        + engineMemory->frameMemorySizeInBytes;
 
-    gEngineMemory.persistentMemory = platformCalls->allocateMemory(
-        gEngineMemory.sizeInBytes
+    engineMemory->persistentMemory = platformCalls->allocateMemory(
+        engineMemory->sizeInBytes
         , (LPVOID)TerabytesWRONG(5)
     );
-    assert(gEngineMemory.persistentMemory);
+    assert(engineMemory->persistentMemory);
 
-    uintptr_t persistentMemoryUIntptr = (uintptr_t)gEngineMemory.persistentMemory;
+    uintptr_t persistentMemoryUIntptr = (uintptr_t)engineMemory->persistentMemory;
 
-    gEngineMemory.sceneMemory = (void*)(
-        (uintptr_t)gEngineMemory.persistentMemory + gEngineMemory.persistentMemorysizeInBytes
+    engineMemory->sceneMemory = (void*)(
+        (uintptr_t)engineMemory->persistentMemory + engineMemory->persistentMemorysizeInBytes
     );
 
-    uintptr_t sceneMemoryUIntptr = (uintptr_t)gEngineMemory.sceneMemory;
+    uintptr_t sceneMemoryUIntptr = (uintptr_t)engineMemory->sceneMemory;
 
-    gEngineMemory.frameMemory = (void*)(
-        (uintptr_t)gEngineMemory.sceneMemory + gEngineMemory.sceneMemorysizeInBytes
+    engineMemory->frameMemory = (void*)(
+        (uintptr_t)engineMemory->sceneMemory + engineMemory->sceneMemorysizeInBytes
     );
 
-    uintptr_t frameMemoryUIntptr = (uintptr_t)gEngineMemory.frameMemory;
+    uintptr_t frameMemoryUIntptr = (uintptr_t)engineMemory->frameMemory;
 
     //  persistentMemory              sceneMemory                frameMemory
     //  persistentMemorysizeInBytes   sceneMemorysizeInBytes     frameMemorySizeInBytes
     // [-----------------------------|--------------------------|-----------------------]
 
-    assert(sizeof(EngineState) <= gEngineMemory.persistentMemorysizeInBytes);
+    assert(sizeof(EngineState) <= engineMemory->persistentMemorysizeInBytes);
     EngineState* engineState = (EngineState*)(
         (void*)(
-            (uintptr_t)gEngineMemory.persistentMemory 
+            (uintptr_t)engineMemory->persistentMemory 
             /*+ sizeof(EngineState)*/ // IDIOT THIS IS NOT AHEAD. THE BUFFER MUST BE MOVED AHEAD FUCKING DUMASS
         )
     );
@@ -120,17 +121,17 @@ void StartEngine(DropPlatformCalls* platformCalls)
     ArenaInit(
         &engineState->persistentArenaAllocator
         , (void*)persistentMemoryAfterGameState
-        , gEngineMemory.persistentMemorysizeInBytes
+        , engineMemory->persistentMemorysizeInBytes
     );
     ArenaInit(
         &engineState->sceneArenaAllocator
-        , gEngineMemory.sceneMemory
-        , gEngineMemory.sceneMemorysizeInBytes
+        , engineMemory->sceneMemory
+        , engineMemory->sceneMemorysizeInBytes
     );
     ArenaInit(
         &engineState->frameArenaAllocator
-        , gEngineMemory.frameMemory
-        , gEngineMemory.frameMemorySizeInBytes
+        , engineMemory->frameMemory
+        , engineMemory->frameMemorySizeInBytes
     );
 
     // We need to allocate memory on the .exe (Platform Layer)
@@ -140,6 +141,7 @@ void StartEngine(DropPlatformCalls* platformCalls)
         &engineState->persistentArenaAllocator
         , WindowSize
     );
+
     WindowProps windowProps;
     // glfw allocator
     //typedef struct GLFWallocator
@@ -165,10 +167,23 @@ void StartEngine(DropPlatformCalls* platformCalls)
 
 void UpdateEngine(
     DropPlatformCalls* platformCalls
+    , EngineMemory* engineMemory
     , GameProcAdresses* gameCalls
 ) {
     // Get the updated engine calls (this could be conditional, only if DLL updated)
     gDropEngineCalls.engineCall = TestEngineCall;
+
+    EngineState* engineState = (EngineState*)(engineMemory->persistentMemory);
+    assert(engineState);
+
+    // THIS SHOULD BE DONE ON REATTACH
+    glfwSetLib(engineState->windowHandle->glfwLibrary);
+    std::cout << "engineState->windowHandle->glfwLibrary = " 
+        << (uintptr_t)engineState->windowHandle->glfwLibrary << std::endl;
+    glfwSetWindowUserPointer(
+        (GLFWwindow*)engineState->windowHandle->GetNativeWindow()
+        , &engineState->windowHandle->m_Data
+    );
 
     // Get time from glfwGetTime
     const float deltaTime = (float)glfwGetTime();
@@ -182,6 +197,7 @@ void UpdateEngine(
             , &gDropEngineCalls
         );
     }
+    memcpy(engineState->windowHandle->glfwLibrary, glfwGetLib(), glfwGetLibSize());
 }
 
 #ifdef DROP_PLATFORM_WINDOWS
@@ -199,22 +215,22 @@ BOOL WINAPI DllMain(
     case DLL_PROCESS_ATTACH:
         // Initialize once for each new process.
         // Return FALSE to fail DLL load.
-        std::cout << "DLL_PROCESS_ATTACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " << "DLL_PROCESS_ATTACH" << std::endl;
         break;
 
     case DLL_THREAD_ATTACH:
         // Do thread-specific initialization.
-        std::cout << "DLL_THREAD_ATTACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " "DLL_THREAD_ATTACH" << std::endl;
         break;
 
     case DLL_THREAD_DETACH:
         // Do thread-specific cleanup.
-        std::cout << "DLL_THREAD_DETACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " "DLL_THREAD_DETACH" << std::endl;
         break;
 
     case DLL_PROCESS_DETACH:
         // Perform any necessary cleanup.
-        std::cout << "DLL_PROCESS_DETACH" << std::endl;
+        std::cout << "[" << __FILE__ << "] " "DLL_PROCESS_DETACH" << std::endl;
         break;
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.

@@ -2102,6 +2102,8 @@ typedef struct GLFWallocator
     void* user;
 } GLFWallocator;
 
+typedef struct _GLFWlibrary GLFWlibrary;
+
 
 /*************************************************************************
  * GLFW API functions
@@ -2252,6 +2254,11 @@ GLFWAPI void glfwInitHint(int hint, int value);
  *  @ingroup init
  */
 GLFWAPI void glfwInitAllocator(const GLFWallocator* allocator);
+
+GLFWAPI GLFWlibrary* glfwGetLib();
+GLFWAPI size_t glfwGetLibSize();
+GLFWAPI void glfwSetLib(GLFWlibrary* inGlfwLib);
+GLFWAPI GLFWlibrary* glfwAllocateLib(const GLFWallocator* allocator);
 
 #if defined(VK_VERSION_1_0)
 

@@ -96,11 +96,17 @@ namespace Drop
 		if (!s_GLFWInitialized)
 		{
 			// TODO: glfwTerminate on system shutdown
+			glfwLibrary = glfwAllocateLib(glfwAllocator);
+			glfwSetLib(glfwLibrary);
 			glfwInitAllocator(glfwAllocator);
+			// glfwLib is being copied, we need to take every fucking time the copy
+			// otherwise at dll reload all the data will we wiped
+			// this lib is so bad
 			int success = glfwInit();
 			assert(success /*, "Could not intialize GLFW!"*/);
 			glfwSetErrorCallback(GLFWErrorCallback);
 			s_GLFWInitialized = true;
+			memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 		}
 
 		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -110,13 +116,20 @@ namespace Drop
 		//// we set if the window is resizable
 		//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
 
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		m_Window = glfwCreateWindow(
+			(int)props.Width
+			, (int)props.Height
+			, m_Data.Title.c_str()
+			, nullptr
+			, nullptr
+		);
 
 		// Consider making Context Graphics Lib independent
 		if (!m_Window)
 		{
 			assert(false/*, "Failed to create GLFW window"*/);
 			glfwTerminate();
+			memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 			return;
 		}
 
@@ -131,12 +144,14 @@ namespace Drop
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
+		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	void Window::Shutdown()
 	{
 		glfwDestroyWindow(m_Window);
 		glfwTerminate();
+		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	void Window::OnUpdate()
@@ -151,11 +166,13 @@ namespace Drop
 			m_Data.Width = width;
 			m_Data.Height = height;
 		}
+		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	void Window::OnEndFrame()
 	{
 		glfwSwapBuffers(m_Window);
+		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	bool Window::IsShouldClose()
@@ -176,6 +193,7 @@ namespace Drop
 			glfwSwapInterval(0);
 
 		m_Data.VSync = enabled;
+		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	bool Window::IsVSync() const

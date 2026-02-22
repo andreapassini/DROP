@@ -6,8 +6,9 @@ class Drop::Window;
 
 struct EngineState
 {
+	Drop::Window* windowHandle;
+
 	ArenaAllocator persistentArenaAllocator;
 	ArenaAllocator sceneArenaAllocator;
 	ArenaAllocator frameArenaAllocator;
-	Drop::Window* windowHandle;
 };
