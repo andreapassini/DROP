@@ -18,7 +18,7 @@ static DropEngineCalls gDropEngineCalls;
 
 void TestEngineCall(){
 }
- 
+
 
 // For GLFW compatibility
 //typedef void* (*GLFWallocatefun)(size_t size, void* user);

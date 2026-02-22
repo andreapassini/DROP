@@ -423,7 +423,7 @@ void* AllocateMemory(
     size_t sizeInBytes
     , void* startingAddress /*= nullptr*/
 ){
-    wprintf(L"%s of sizeInBytes = %lu.\n", __func__, sizeInBytes);
+    wprintf(L"%s of sizeInBytes = %zu.\n", __func__, sizeInBytes);
 
     return VirtualAlloc(
         startingAddress
