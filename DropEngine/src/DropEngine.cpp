@@ -197,7 +197,6 @@ void UpdateEngine(
             , &gDropEngineCalls
         );
     }
-    memcpy(engineState->windowHandle->glfwLibrary, glfwGetLib(), glfwGetLibSize());
 }
 
 #ifdef DROP_PLATFORM_WINDOWS

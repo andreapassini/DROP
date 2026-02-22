@@ -98,7 +98,7 @@ namespace Drop
 			// TODO: glfwTerminate on system shutdown
 			glfwLibrary = glfwAllocateLib(glfwAllocator);
 			glfwSetLib(glfwLibrary);
-			glfwInitAllocator(glfwAllocator);
+			glfwInitAllocator(glfwAllocator); // THIS IS STILL USING A STRUCT and not a PTR
 			// glfwLib is being copied, we need to take every fucking time the copy
 			// otherwise at dll reload all the data will we wiped
 			// this lib is so bad
@@ -106,7 +106,6 @@ namespace Drop
 			assert(success /*, "Could not intialize GLFW!"*/);
 			glfwSetErrorCallback(GLFWErrorCallback);
 			s_GLFWInitialized = true;
-			memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 		}
 
 		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -129,7 +128,6 @@ namespace Drop
 		{
 			assert(false/*, "Failed to create GLFW window"*/);
 			glfwTerminate();
-			memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 			return;
 		}
 
@@ -144,14 +142,12 @@ namespace Drop
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
-		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	void Window::Shutdown()
 	{
 		glfwDestroyWindow(m_Window);
 		glfwTerminate();
-		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	void Window::OnUpdate()
@@ -166,13 +162,11 @@ namespace Drop
 			m_Data.Width = width;
 			m_Data.Height = height;
 		}
-		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	void Window::OnEndFrame()
 	{
 		glfwSwapBuffers(m_Window);
-		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	bool Window::IsShouldClose()
@@ -193,7 +187,6 @@ namespace Drop
 			glfwSwapInterval(0);
 
 		m_Data.VSync = enabled;
-		memcpy(glfwLibrary, glfwGetLib(), glfwGetLibSize());
 	}
 
 	bool Window::IsVSync() const
