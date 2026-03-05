@@ -27,6 +27,9 @@ namespace Drop
 
 		//EventCallbackFn EventCallback;
 
+		// For now this is glfw specific
+		// we could just make it void ptr
+		// and make a macro to cast it to the specific ptr
 		GLFWlibrary* glfwLibrary = nullptr;
 		GLFWwindow* glfwWindow = nullptr;
 	};
