@@ -54,7 +54,6 @@ namespace Drop
 		LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	//void glfwInitAllocator(const GLFWallocator* allocator);
 	void InitWindow(
 		const WindowProps& props
 		, Window* window
