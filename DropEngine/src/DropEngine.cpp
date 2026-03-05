@@ -157,10 +157,12 @@ void StartEngine(
     currentAllocator.deallocate = TempGLFWDeallocate;
     currentAllocator.user = (void*)(&engineState->persistentArenaAllocator);
 
-    engineState->windowHandle->Init(
+    InitWindow(
         windowProps
-        , &currentAllocator // struct copied inside GLFW call
+        , engineState->windowHandle
+        , &currentAllocator
     );
+
     //engineState->windowHandle = Window::Create();
     //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
 }
@@ -181,8 +183,8 @@ void UpdateEngine(
     std::cout << "engineState->windowHandle->glfwLibrary = " 
         << (uintptr_t)engineState->windowHandle->glfwLibrary << std::endl;
     glfwSetWindowUserPointer(
-        (GLFWwindow*)engineState->windowHandle->GetNativeWindow()
-        , &engineState->windowHandle->m_Data
+        engineState->windowHandle->glfwWindow
+        , &engineState->windowHandle
     );
 
     // Get time from glfwGetTime
@@ -197,6 +199,9 @@ void UpdateEngine(
             , &gDropEngineCalls
         );
     }
+
+    // Swap buffers
+    OnEndFrame(engineState->windowHandle);
 }
 
 #ifdef DROP_PLATFORM_WINDOWS

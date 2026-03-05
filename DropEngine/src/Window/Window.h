@@ -13,64 +13,44 @@ namespace Drop
 {
 	struct WindowProps
 	{
-		std::string Title;
-		unsigned int Width;
-		unsigned int Height;
-
-		WindowProps(const std::string& title = "Drop Engine",
-			unsigned int width = 1600,
-			unsigned int height = 900)
-			: Title(title), Width(width), Height(height)
-		{
-		}
+		std::string title = "Drop Engine";
+		int32 width = 1600;
+		int32 height = 900;
 	};
 
-	// Interface representing a desktop system based Window
-	class Window
+	struct Window
 	{
-	public:
-		//using EventCallbackFn = std::function<void(Event&)>;
+		std::string title;
+		int32 width = 1600;
+		int32 height = 900; // cannot use uint32 cause of glfw API Problem
+		bool VSync = true;
 
-		Window(const WindowProps& props);
-		~Window();
+		//EventCallbackFn EventCallback;
 
-		void OnUpdate();
-		void OnEndFrame();
-		bool IsShouldClose();
-		void SetShouldClose(bool shouldClose);
-
-		inline uint32_t GetWidth() const { return m_Data.Width; }
-		inline uint32_t GetHeight() const { return m_Data.Height; }
-
-		// Window attributes
-		//virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
-		void SetVSync(bool enabled);
-		bool IsVSync() const;
-
-		inline void* GetNativeWindow() const { return m_Window; }
-
-		static Window* Create(const WindowProps& props = WindowProps());
-		void Init(const WindowProps& props);
-		void Init(
-			const WindowProps& props
-			, const GLFWallocator* glfwAllocator
-		);
-
-		void Shutdown();
-
-		GLFWlibrary* glfwLibrary;
-		GLFWwindow* m_Window;
-
-		struct WindowData
-		{
-			std::string Title;
-			int32 Width, Height; // cannot use uint32 cause of glfw API Problem
-			bool VSync;
-
-			//EventCallbackFn EventCallback;
-		};
-
-		WindowData m_Data;
-
+		GLFWlibrary* glfwLibrary = nullptr;
+		GLFWwindow* glfwWindow = nullptr;
 	};
+
+	void InitWindow(
+		const WindowProps& props
+		, Window* window
+		, const GLFWallocator* glfwAllocator
+	);
+
+	void SetVSync(
+		const bool enabled
+		, Window* window
+	);
+
+	void OnUpdate(
+		Window* window
+	);
+
+	void OnEndFrame(
+		Window* window
+	);
+
+	bool IsShouldClose(
+		Window* window
+	);
 }

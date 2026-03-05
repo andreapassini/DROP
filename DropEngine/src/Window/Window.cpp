@@ -8,6 +8,40 @@
 #include <glad/glad.h>
 #include <GL/GL.h>
 
+#define CHECK_AND_RETURN_WINDOW(window) \
+	if(!window) \
+	{	\
+		LOG_CORE_ERROR("Window Error: ({0})", "!window"); \
+		return; \
+	} \
+	if(!window->glfwWindow) \
+	{ \
+		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwWindow"); \
+		return; \
+	} \
+	if(!window->glfwLibrary) \
+	{ \
+		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwLibrary"); \
+		return; \
+	} \
+
+#define CHECK_AND_RETURN_WINDOW(window, returnValue) \
+	if(!window) \
+	{	\
+		LOG_CORE_ERROR("Window Error: ({0})", "!window"); \
+		return returnValue; \
+	} \
+	if(!window->glfwWindow) \
+	{ \
+		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwWindow"); \
+		return returnValue; \
+	} \
+	if(!window->glfwLibrary) \
+	{ \
+		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwLibrary"); \
+		return returnValue; \
+	} \
+
 using namespace Drop;
 
 namespace Drop
@@ -15,124 +49,70 @@ namespace Drop
 
 	static bool s_GLFWInitialized = false;
 
-	static void GLFWErrorCallback(int error, const char* description)
+	static void GLFWErrorCallback(int32 error, const char* description)
 	{
 		LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
-	{
-		return new Window(props); // Dont use NEW, get mem from Platform Layer
-	}
-
-	Window::Window(const WindowProps& props)
-	{
-		Init(props);
-	}
-
-	Window::~Window()
-	{
-		Shutdown();
-	}
-
-	void Window::Init(const WindowProps& props)
-	{
-		m_Data.Title = props.Title;
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
-
-		LOG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
-
-		if (!s_GLFWInitialized)
+	//void glfwInitAllocator(const GLFWallocator* allocator);
+	void InitWindow(
+		const WindowProps& props
+		, Window* window
+		, const GLFWallocator* glfwAllocator
+	) {
+		if (!window)
 		{
-			// TODO: glfwTerminate on system shutdown
-			int success = glfwInit();
-			assert(success /*, "Could not intialize GLFW!"*/);
-			glfwSetErrorCallback(GLFWErrorCallback);
-			s_GLFWInitialized = true;
+			return;
 		}
-
-		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-		//// we set if the window is resizable
-		//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
-
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-
-		// Consider making Context Graphics Lib independent
-		if (!m_Window)
+		if (!glfwAllocator)
 		{
-			assert(false/*, "Failed to create GLFW window"*/);
-			glfwTerminate();
 			return;
 		}
 
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		assert(status/*, "Failed to initialize Glad!"*/);
+		window->width = props.width;
+		window->height = props.height;
+		window->title = props.title; // Fix String allocation
 
-		LOG_CORE_INFO("OpenGL Info:");
-		LOG_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
-		LOG_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
-		LOG_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
+		LOG_CORE_INFO("Creating window {0} ({1}, {2})", window->title, window->width, window->height);
 
-		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true);
-	}
+		// Assuming 
+		// !window->glfwLibrary 
+		// and !window->glfwWindow
 
-	//void glfwInitAllocator(const GLFWallocator* allocator);
-	void Window::Init(
-		const WindowProps& props
-		, const GLFWallocator* glfwAllocator
-	) {
-		m_Data.Title = props.Title;
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
+		// TODO: glfwTerminate on system shutdown
+		glfwInitAllocator(glfwAllocator); // THIS IS STILL USING A STRUCT and not a PTR
+		window->glfwLibrary = glfwAllocateLib(glfwAllocator);
+		glfwSetLib(window->glfwLibrary);
+		
+		int32 success = glfwInit();
+		assert(success /*, "Could not intialize GLFW!"*/);
+		glfwSetErrorCallback(GLFWErrorCallback);
 
-		LOG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+		// we set if the window is resizable
+		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
 
-		if (!s_GLFWInitialized)
-		{
-			// TODO: glfwTerminate on system shutdown
-			glfwLibrary = glfwAllocateLib(glfwAllocator);
-			glfwSetLib(glfwLibrary);
-			glfwInitAllocator(glfwAllocator); // THIS IS STILL USING A STRUCT and not a PTR
-			// glfwLib is being copied, we need to take every fucking time the copy
-			// otherwise at dll reload all the data will we wiped
-			// this lib is so bad
-			int success = glfwInit();
-			assert(success /*, "Could not intialize GLFW!"*/);
-			glfwSetErrorCallback(GLFWErrorCallback);
-			s_GLFWInitialized = true;
-		}
-
-		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-		//// we set if the window is resizable
-		//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
-
-		m_Window = glfwCreateWindow(
-			(int)props.Width
-			, (int)props.Height
-			, m_Data.Title.c_str()
+		window->glfwWindow = glfwCreateWindow(
+			window->width
+			, window->height
+			, window->title.c_str()
 			, nullptr
 			, nullptr
 		);
 
 		// Consider making Context Graphics Lib independent
-		if (!m_Window)
+		if (!window->glfwWindow)
 		{
 			assert(false/*, "Failed to create GLFW window"*/);
 			glfwTerminate();
 			return;
 		}
 
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		glfwMakeContextCurrent(window->glfwWindow);
+		int32 status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		assert(status/*, "Failed to initialize Glad!"*/);
 
 		LOG_CORE_INFO("OpenGL Info:");
@@ -140,58 +120,80 @@ namespace Drop
 		LOG_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
 		LOG_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
 
-		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true);
+		glfwSetWindowUserPointer(
+			window->glfwWindow
+			, window
+		);
+		SetVSync(
+			true
+			, window
+		);
 	}
 
-	void Window::Shutdown()
-	{
-		glfwDestroyWindow(m_Window);
+	void Shutdown(
+		Window* window
+	) {
+		CHECK_AND_RETURN_WINDOW(window);
+
+		glfwDestroyWindow(window->glfwWindow);
 		glfwTerminate();
 	}
 
-	void Window::OnUpdate()
-	{
+	void OnUpdate(
+		Window* window
+	) {
+		CHECK_AND_RETURN_WINDOW(window);
+
 		glfwPollEvents();
 
 		// Handle Resize
-		int32 width, height;
-		glfwGetFramebufferSize((GLFWwindow*)GetNativeWindow(), &width, &height);
-		if (width != m_Data.Width || height != m_Data.Height)
-		{
-			m_Data.Width = width;
-			m_Data.Height = height;
+		int32 width = 0;
+		int32 height = 0;
+		glfwGetFramebufferSize(window->glfwWindow, &width, &height);
+		if (width != window->width
+			|| height != window->height
+		) {
+			window->width = width;
+			window->height = height;
 		}
 	}
 
-	void Window::OnEndFrame()
-	{
-		glfwSwapBuffers(m_Window);
+	void OnEndFrame(
+		Window* window
+	) {
+		CHECK_AND_RETURN_WINDOW(window);
+
+		glfwSwapBuffers(window->glfwWindow);
 	}
 
-	bool Window::IsShouldClose()
-	{
-		return glfwWindowShouldClose(m_Window);
+	bool IsShouldClose(
+		Window* window
+	) {
+		CHECK_AND_RETURN_WINDOW(window, false);
+
+		return glfwWindowShouldClose(window->glfwWindow);
 	}
 
-	void Window::SetShouldClose(bool shouldClose)
-	{
-		glfwSetWindowShouldClose(m_Window, shouldClose);
+	void SetShouldClose(
+		bool shouldClose
+		, Window* window
+	) {
+		CHECK_AND_RETURN_WINDOW(window);
+
+		glfwSetWindowShouldClose(
+			window->glfwWindow
+			, shouldClose
+		);
 	}
 
-	void Window::SetVSync(bool enabled)
-	{
-		if (enabled)
-			glfwSwapInterval(1);
-		else
-			glfwSwapInterval(0);
+	void SetVSync(
+		const bool enabled
+		, Window* window
+	) {
+		CHECK_AND_RETURN_WINDOW(window);
 
-		m_Data.VSync = enabled;
+		enabled ? glfwSwapInterval(1) : glfwSwapInterval(0);
+
+		window->VSync = enabled;
 	}
-
-	bool Window::IsVSync() const
-	{
-		return m_Data.VSync;
-	}
-
 }
