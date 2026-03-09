@@ -40,8 +40,8 @@ project "DropEngine"
       , "%{IncludeDir.yaml_cpp}"
    }
 
-   includedirs
-   {
+   -- includedirs
+   -- {
       -- "%{wks.location}/Drop/dependencies/spdlog/include"
       -- , "%{wks.location}/Drop/src"
       -- , "%{wks.location}/Drop/dependencies"
@@ -53,7 +53,7 @@ project "DropEngine"
       -- , "%{IncludeDir.stb_image}"
       -- , "%{IncludeDir.assimp}"
       -- , "%{IncludeDir.yaml_cpp}"
-   }
+   -- }
 
    libdirs 
    { 
@@ -99,18 +99,18 @@ project "DropEngine"
       runtime "Debug"
       optimize "Off"
       symbols "On"
-      buildoptions "/MTd /LD"
+      buildoptions "/MTd /LD /MP"
 
    filter "configurations:Release"
       defines { "DROP_RELEASE" }
       runtime "Release"
       optimize "On"
       symbols "On"
-      buildoptions "/MT /LD"
+      buildoptions "/MT /LD /MP"
 
    filter "configurations:Dist"
       defines { "DROP_DIST" }
       runtime "Release"
       optimize "On"
       symbols "Off"
-      buildoptions "/MT /LD"
+      buildoptions "/MT /LD /MP"

@@ -12,7 +12,11 @@ GOTO Done
 dependencies\premake-5.0.0-beta2-windows\premake5.exe cleanPdb
 REM Use Solution folders and dont use back slashes in path
 REM https://learn.microsoft.com/it-it/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170
-msbuild Drop.sln /t:Tools\DropGame
+REM https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-build-specific-targets-in-solutions-by-using-msbuild-exe?view=visualstudio&viewFallbackFrom=vs-2019
+REM https://learn.microsoft.com/en-us/visualstudio/ide/configure-build-run-options?view=visualstudio
+REM -consoleLoggerParameters:PerformanceSummary;NoSummary
+REM /consoleLoggerParameters:ErrorsOnly;PerformanceSummary;NoSummary
+msbuild Drop.sln /t:Tools\DropGame /p:BuildProjectReferences=false /verbosity:quiet /consoleLoggerParameters:PerformanceSummary;NoSummary
 REM for dll error, copy the dll code into temp_dll file
 REM Add msbuild to env var PATH (%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin) 
 REM and RESTART
