@@ -49,3 +49,19 @@ typedef double float64;
 
 #define PRINT_FLOAT32_4 %.4f
 #define PRINT_FLOAT_4 PRINT_FLOAT32_4
+
+#if DROP_PLATFORM_WINDOWS
+//#include "debugapi.h" // this cause compile errors
+// __debugBreak is not working 
+// https://learn.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-debugbreak
+#include "Windows.h"
+#define ensure(a) \
+	if(!a) \
+	{ \
+		DebugBreak(); \
+	} 
+
+#else
+#define ensure 
+#endif
+

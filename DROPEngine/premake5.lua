@@ -1,5 +1,6 @@
 project "DropEngine"
    kind "SharedLib"
+   architecture "x86_64"
    language "C++"
    cppdialect "C++17"
    staticruntime "off"

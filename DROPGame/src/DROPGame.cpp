@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include "Types/Types.h"
 
 static bool bFirstExe = true;
 

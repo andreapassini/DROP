@@ -1,5 +1,6 @@
 project "DropGame"
    kind "SharedLib"
+   architecture "x86_64"
    language "C++"
    cppdialect "C++17"
    staticruntime "off"
@@ -19,7 +20,7 @@ project "DropGame"
    }
 
    defines
-   {
+   { 
 		"GLM_ENABLE_EXPERIMENTAL"
       , "_CRT_SECURE_NO_WARNINGS"
       , "_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH"
@@ -29,6 +30,7 @@ project "DropGame"
    includedirs
    {
       "src"
+      , "%{wks.location}/DROPEngine/src"
    }
 
    includedirs
