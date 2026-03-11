@@ -28,8 +28,6 @@ void* ArenaAlloc(
 	, size_t align /*= DEFAULT_ALIGNMENT*/
 ) {
 	// Align 'currentOffset' forward to the specified alignment
-
-
 	uintptr_t curr_ptr = (uintptr_t)arena->buffer + (uintptr_t)arena->currentOffset;
 	uintptr_t offset = AlignForward(curr_ptr, align);
 	offset -= (uintptr_t)arena->buffer; // Change to relative offset
