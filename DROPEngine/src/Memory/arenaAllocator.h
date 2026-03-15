@@ -34,7 +34,7 @@ template <typename T>
 T* ArenaAlloc(
 	ArenaAllocator* arena
 	, size_t size
-	, size_t align /*= DEFAULT_ALIGNMENT*/
+	, size_t align = DEFAULT_ALIGNMENT
 ) {
 	// Align 'currentOffset' forward to the specified alignment
 	uintptr_t curr_ptr = (uintptr_t)arena->buffer + (uintptr_t)arena->currentOffset;

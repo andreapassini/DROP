@@ -137,7 +137,7 @@ void StartEngine(
     // We need to allocate memory on the .exe (Platform Layer)
     // Allocate on PermanentStorage
     size_t WindowSize = sizeof(Drop::Window);
-    engineState->windowHandle = (Drop::Window*)ArenaAlloc(
+    engineState->windowHandle = ArenaAlloc<Drop::Window>(
         &engineState->persistentArenaAllocator
         , WindowSize
     );
