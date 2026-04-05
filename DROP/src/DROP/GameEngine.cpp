@@ -167,6 +167,7 @@ namespace Drop
 		sceneContext.materials = &m_Materials;
 		sceneContext.textuers = &m_TextureIds;
 		sceneContext.wireframe = m_Game->m_Wireframe;
+		sceneContext.time = 0.0f;
 	
 		RendererContext& renderContext = g_activeScene->ecs.GetSingletonComponent<RendererContext>();
 
@@ -184,12 +185,21 @@ namespace Drop
 			// pooling events
 			m_ActiveWindowHandle->OnUpdate();
 
+			if (Input::IsKeyPressed(KeyCode::R)) {
+				// Recompile Shaders
+				Renderer::RecompileAllShadersInMaterials(
+					sceneContext
+					, renderContext
+				);
+			}
+
 			m_Game->m_Camera.OnUpdate(m_DeltaTime);
 			m_Game->m_Camera.OnResize(m_ActiveWindowHandle->GetWidth(), m_ActiveWindowHandle->GetHeight());
 
 			sceneContext.height = m_ActiveWindowHandle->GetHeight();
 			sceneContext.width = m_ActiveWindowHandle->GetWidth();
 			sceneContext.wireframe = m_Game->m_Wireframe;
+			sceneContext.time = m_CurrentTime;
 
 			// Update
 			m_Game->OnUpdate(m_DeltaTime);

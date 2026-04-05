@@ -193,5 +193,14 @@ namespace Drop
             , SceneContext& sceneContext
             , RendererContext& rendererContext
         );
+
+        void RecompileAllShaders(
+            SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
+        void RecompileAllShadersInMaterials(
+            SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
     };
 }

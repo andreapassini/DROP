@@ -27,48 +27,65 @@ public:
 
 #pragma region ShaderSetup
         //FULL_COLOR_SHADER
+        std::string path_00_basic_vert =     GetFullPath("/DROP/src/Drop/shaders/00_basic.vert");
+        std::string path_01_fullcolor_frag = GetFullPath("/DROP/src/Drop/shaders/01_fullcolor.frag");
         gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            GetFullPath("\\DROP\\src\\Drop\\shaders\\00_basic.vert").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\01_fullcolor.frag").c_str()
+            path_00_basic_vert.c_str(), path_00_basic_vert.size() + 1
+            , path_01_fullcolor_frag.c_str(), path_01_fullcolor_frag.size() + 1
         );
 
         // ILLUMINATION_GGX_SHADER
+        std::string path_21_ggx_tex_shadow =    GetFullPath("/DROP/src/Drop/shaders/21_ggx_tex_shadow.vert");
+        std::string path_ggx_tex_shadow_noSub = GetFullPath("/DROP/src/Drop/shaders/ggx_tex_shadow_noSub.frag");
         gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            GetFullPath("\\DROP\\src\\Drop\\shaders\\21_ggx_tex_shadow.vert").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\ggx_tex_shadow_noSub.frag").c_str()
+            path_21_ggx_tex_shadow.c_str(), path_21_ggx_tex_shadow.size() + 1
+            , path_ggx_tex_shadow_noSub.c_str(), path_ggx_tex_shadow_noSub.size() + 1
         );
 
         // SHADOW_SHADER
+        std::string path_19_shadowmap = GetFullPath("/DROP/src/Drop/shaders/19_shadowmap.vert");
+        std::string path_20_shadowmap = GetFullPath("/DROP/src/Drop/shaders/20_shadowmap.frag");
         gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            GetFullPath("\\DROP\\src\\Drop\\shaders\\19_shadowmap.vert").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\20_shadowmap.frag").c_str()
+            path_19_shadowmap.c_str(), path_19_shadowmap.size() + 1
+            , path_20_shadowmap.c_str(), path_20_shadowmap.size() + 1
         );
 
         // EMPTY_QUAD_SHADER
+        std::string path_quadFrustum_vert = GetFullPath("/DROP/src/Drop/shaders/quadFrustum.vert");
+        std::string path_quadFrustum_geom = GetFullPath("/DROP/src/Drop/shaders/quadFrustum.geom");
+        std::string path_quadFrustum_frag = GetFullPath("/DROP/src/Drop/shaders/quadFrustum.frag");
         gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.vert").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.geom").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\quadFrustum.frag").c_str()
+            path_quadFrustum_vert.c_str(), path_quadFrustum_vert.size() + 1
+            , path_quadFrustum_geom.c_str(), path_quadFrustum_geom.size() + 1
+            , path_quadFrustum_frag.c_str(), path_quadFrustum_frag.size() + 1
         );
 
         // EMPTY_BOX_SHADER
+        std::string path_boxFrustum_vert = GetFullPath("/DROP/src/Drop/shaders/boxFrustum.vert");
+        std::string path_boxFrustum_geom = GetFullPath("/DROP/src/Drop/shaders/boxFrustum.geom");
+        std::string path_boxFrustum_frag = GetFullPath("/DROP/src/Drop/shaders/boxFrustum.frag");
         gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.vert").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.geom").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\boxFrustum.frag").c_str()
+            path_boxFrustum_vert.c_str(), path_boxFrustum_vert.size() + 1
+            , path_boxFrustum_geom.c_str(), path_boxFrustum_geom.size() + 1
+            , path_boxFrustum_frag.c_str(), path_boxFrustum_frag.size() + 1
         );
 
         // BILLBOARD_SHADER
+        std::string path_billboard_vert = GetFullPath("/DROP/src/Drop/shaders/billboard.vert");
+        std::string path_billboard_geom = GetFullPath("/DROP/src/Drop/shaders/billboard.geom");
+        std::string path_billboard_frag = GetFullPath("/DROP/src/Drop/shaders/billboard.frag");
         gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.vert").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.geom").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.frag").c_str()
+            path_billboard_vert.c_str(), path_billboard_vert.size() + 1
+            , path_billboard_geom.c_str(), path_billboard_geom.size() + 1
+            , path_billboard_frag.c_str(), path_billboard_frag.size() + 1
         );
 
         // TERRAIN_SHADER
+        std::string path_terrain_vert = GetFullPath("/DROP/src/Drop/shaders/terrain.vert");
+        std::string path_terrain_frag = GetFullPath("/DROP/src/Drop/shaders/terrain.frag");
         gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
-            GetFullPath("\\DROP\\src\\Drop\\shaders\\terrain.vert").c_str()
-            , GetFullPath("\\DROP\\src\\Drop\\shaders\\terrain.frag").c_str()
+            path_terrain_vert.c_str(), path_terrain_vert.size() + 1
+            , path_terrain_frag.c_str(), path_terrain_frag.size() + 1
         );
 #pragma endregion
 

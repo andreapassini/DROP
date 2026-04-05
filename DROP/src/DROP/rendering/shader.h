@@ -25,6 +25,8 @@ using namespace std;
 #include <filesystem>
 #include <DROP/utils/Log.h>
 
+#define MAX_SHADER_PATH 256
+#define NULL_SHADER UINT32_MAX
 
 class Shader
 {
@@ -34,10 +36,55 @@ public:
 
     //constructor
     Shader(
-        const GLchar* const vertexPath
-        , const GLchar* const fragmentPath
+        const GLchar* const vertexPath, const GLuint vertexPathSize
+        , const GLchar* const fragmentPath, const GLuint fragmentPathSize
     )
     {
+        CompileShaders(
+            vertexPath, vertexPathSize
+            , fragmentPath, fragmentPathSize
+        );
+    }
+
+    Shader(
+        const GLchar* const vertexPath, const GLuint vertexPathSize
+        , const GLchar* const geometryPath, const GLuint geometryPathSize
+        , const GLchar* const fragmentPath, const GLuint fragmentPathSize
+    )
+    {
+        CompileShaders(
+            vertexPath, vertexPathSize
+            , geometryPath, geometryPathSize
+            , fragmentPath, fragmentPathSize
+        );     
+    }
+
+    Shader(
+        const GLchar* const computePath, const GLuint computePathSize
+    )
+    {
+        CompileShaders(
+            computePath, computePathSize
+        );
+    }
+
+    void CompileShaders(
+        const GLchar* const vertexPath, const GLuint vertexPathSize
+        , const GLchar* const fragmentPath, const GLuint fragmentPathSize
+    ) {
+        if (vertexPathSize > MAX_SHADER_PATH
+            || fragmentPathSize > MAX_SHADER_PATH
+        ) {
+            assert(0);
+            return;
+        }
+
+        vertexShaderFilePathSize = vertexPathSize;
+        fragmentShaderFilePathSize = fragmentPathSize;
+
+        memcpy(vertexShaderFilePath, vertexPath, vertexPathSize);
+        memcpy(fragmentShaderFilePath, fragmentPath, fragmentPathSize);
+
         LOG_CORE_TRACE(
             "Vertex: {0}, \nFragment: {1}"
             , vertexPath
@@ -51,10 +98,9 @@ public:
         ifstream fShaderFile;
 
         // ensure ifstream objects can throw exceptions:
-        vShaderFile.exceptions (ifstream::failbit | ifstream::badbit);
-        fShaderFile.exceptions (ifstream::failbit | ifstream::badbit);
-        try
-        {
+        vShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+        fShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+        try {
             // Open files
             vShaderFile.open(vertexPath);
             fShaderFile.open(fragmentPath);
@@ -69,8 +115,7 @@ public:
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
         }
-        catch (ifstream::failure e)
-        {
+        catch (ifstream::failure e) {
             cout << e.what() << ", " << e.code().message() << e.code().value() << endl;
             cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
         }
@@ -80,7 +125,6 @@ public:
         const GLchar* fShaderCode = fragmentCode.c_str();
 
         // Step 2: we compile the shaders
-        GLuint vertex, fragment;
 
         // Vertex Shader
         vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -109,12 +153,26 @@ public:
         glDeleteShader(fragment);
     }
 
-    Shader(
-        const GLchar* const vertexPath
-        , const GLchar* const geometryPath
-        , const GLchar* const fragmentPath
-    )
-    {
+    void CompileShaders(
+        const GLchar* const vertexPath, const GLuint vertexPathSize
+        , const GLchar* const geometryPath, const GLuint geometryPathSize
+        , const GLchar* const fragmentPath, const GLuint fragmentPathSize
+    ) {
+        if (vertexPathSize > MAX_SHADER_PATH
+            || geometryPathSize > MAX_SHADER_PATH
+            || fragmentPathSize > MAX_SHADER_PATH
+        ) {
+            return;
+        }
+
+        memcpy(vertexShaderFilePath, vertexPath, vertexPathSize);
+        memcpy(geometryShaderFilePath, geometryPath, geometryPathSize);
+        memcpy(fragmentShaderFilePath, fragmentPath, fragmentPathSize);
+
+        vertexShaderFilePathSize = vertexPathSize;
+        geometryShaderFilePathSize = geometryPathSize;
+        fragmentShaderFilePathSize = fragmentPathSize;
+
         LOG_CORE_TRACE(
             "Vertex: {0}, \nGeometry: {1}, \nFragment: {2}"
             , vertexPath
@@ -135,8 +193,7 @@ public:
         vShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
         gShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
         fShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
-        try
-        {
+        try {
             // Open files
             vShaderFile.open(vertexPath);
             gShaderFile.open(geometryPath);
@@ -155,8 +212,7 @@ public:
             geometryCode = gShaderStream.str();
             fragmentCode = fShaderStream.str();
         }
-        catch (ifstream::failure e)
-        {
+        catch (ifstream::failure e) {
             cout << e.what() << ", " << e.code().message() << e.code().value() << endl;
             cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
         }
@@ -168,7 +224,7 @@ public:
 
 
         // Step 2: we compile the shaders
-        GLuint vertex, geometry, fragment;
+        //GLuint vertex, geometry, fragment;
 
         // Vertex Shader
         vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -207,15 +263,21 @@ public:
         glDeleteShader(fragment);
     }
 
-    Shader(
-        const GLchar* const computePath
-    )
-    {
+    void CompileShaders(
+        const GLchar* const computePath, const GLuint computePathSize
+    ) {
+        if (computePathSize > MAX_SHADER_PATH) 
+        {
+            return;
+        }
+
         LOG_CORE_TRACE(
             "Compute: {0}"
             , computePath
         );
 
+        memcpy(vertexShaderFilePath, computePath, sizeof(GLchar) * computePathSize);
+        computeShaderFilePathSize = computePathSize;
 
         // Step 1: we retrieve shaders source code from provided filepaths
         string computeCode;
@@ -223,8 +285,7 @@ public:
 
         // ensure ifstream objects can throw exceptions:
         cShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
-        try
-        {
+        try {
             // Open files
             cShaderFile.open(computePath);
             stringstream cShaderStream;
@@ -235,8 +296,7 @@ public:
             // Convert stream into string
             computeCode = cShaderStream.str();
         }
-        catch (ifstream::failure e)
-        {
+        catch (ifstream::failure e) {
             cout << e.what() << ", " << e.code().message() << e.code().value() << endl;
             cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
         }
@@ -245,7 +305,7 @@ public:
         const GLchar* cShaderCode = computeCode.c_str();
 
         // Step 2: we compile the shaders
-        GLuint compute;
+        //GLuint compute;
 
         // Compute Shader
         compute = glCreateShader(GL_COMPUTE_SHADER);
@@ -264,12 +324,125 @@ public:
         // Step 4: we delete the shaders because they are linked to the Shader Program, and we do not need them anymore
         glDeleteShader(compute);
     }
+
+    void DeleteShadersAndPrograms(){
+
+        if (vertex != NULL_SHADER)
+            glDetachShader(Program, vertex);
+        if (geometry != NULL_SHADER)
+            glDetachShader(Program, geometry);
+        if (fragment != NULL_SHADER)
+            glDetachShader(Program, fragment);
+        if (compute != NULL_SHADER)
+            glDetachShader(Program, compute);
+
+        glDeleteProgram(Program);
+
+        if (vertex != NULL_SHADER)
+            glDeleteShader(vertex);
+        if (geometry != NULL_SHADER)
+            glDeleteShader(geometry);
+        if (fragment != NULL_SHADER)
+            glDeleteShader(fragment);
+        if (compute != NULL_SHADER)
+            glDeleteShader(compute);
+
+        vertex = NULL_SHADER;
+        geometry = NULL_SHADER;
+        fragment = NULL_SHADER;
+        compute = NULL_SHADER;
+    }
     
+    // it will Delete and recompile the shaders
+    void ReCompileShader() 
+    {
+        if (vertex != NULL_SHADER
+            && fragment != NULL_SHADER
+            && geometry == NULL_SHADER
+        ) {
+            ReCompileShader(
+                vertexShaderFilePath
+                , fragmentShaderFilePath
+            );
+        }
+        else if (vertex != NULL_SHADER
+            && fragment != NULL_SHADER
+            && geometry != NULL_SHADER
+        ) {
+            ReCompileShader(
+                vertexShaderFilePath
+                , geometryShaderFilePath
+                , fragmentShaderFilePath
+            );
+        }
+        else if (compute != NULL_SHADER) 
+        {
+            ReCompileShader(
+                computeShaderFilePath
+            );
+        }
+    }
+
+    // it will Delete and recompile the shaders
+    void ReCompileShader(
+        const GLchar* const vertexPath
+        , const GLchar* const fragmentPath
+    ) {
+        DeleteShadersAndPrograms();
+
+        CompileShaders(
+            vertexPath, vertexShaderFilePathSize
+            , fragmentPath, fragmentShaderFilePathSize
+        );
+    }
+
+    // it will Delete and recompile the shaders
+    void ReCompileShader(
+        const GLchar* const vertexPath
+        , const GLchar* const geometryPath
+        , const GLchar* const fragmentPath
+    ) {
+        DeleteShadersAndPrograms();
+
+        CompileShaders(
+            vertexPath, vertexShaderFilePathSize
+            , geometryPath, geometryShaderFilePathSize
+            , fragmentPath, fragmentShaderFilePathSize
+        );
+    }
+
+    // it will Delete and recompile the shaders
+    void ReCompileShader(
+        const GLchar* const computePath
+    ) {
+        DeleteShadersAndPrograms();
+
+        CompileShaders(
+            computePath, computeShaderFilePathSize
+        );
+    }
+
     // We activate the Shader Program as part of the current rendering process
     void Use() { glUseProgram(this->Program); }
 
     // We delete the Shader Program when application closes
     void Delete() { glDeleteProgram(this->Program); }
+
+    GLuint vertex = NULL_SHADER;
+    GLuint geometry = NULL_SHADER;
+    GLuint fragment = NULL_SHADER;
+    GLuint compute = NULL_SHADER;
+    
+    // For these we need a mem compy and buffer size at function call
+    GLchar vertexShaderFilePath[MAX_SHADER_PATH];
+    GLchar geometryShaderFilePath[MAX_SHADER_PATH];
+    GLchar fragmentShaderFilePath[MAX_SHADER_PATH];
+    GLchar computeShaderFilePath[MAX_SHADER_PATH];
+
+    GLuint vertexShaderFilePathSize;
+    GLuint geometryShaderFilePathSize;
+    GLuint fragmentShaderFilePathSize;
+    GLuint computeShaderFilePathSize;
 
 private:
 
