@@ -4,6 +4,7 @@
 #include "DROP/rendering/renderer.h"
 #include "DROP/sceneGraph/sceneGraph.h"
 #include "DROP/particles/physicsBasedParticle.h"
+#include "DROP/rendering/terrainComponent.h"
 
 using namespace Drop;
 
@@ -13,6 +14,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	RendererContext& rendererContext = ecs.GetSingletonComponent<RendererContext>();
 
 	std::vector<StaticMeshComponent>& denseMeshComponents = ecs.GetComponentPool<StaticMeshComponent>().Data();
+	std::vector<TerrainComponent>& denseTerrainComponents = ecs.GetComponentPool<TerrainComponent>().Data();
 
 	// enable depth -- done in renderer init
 	
@@ -54,6 +56,22 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 
 		Renderer::DrawMesh(
 			meshComponent
+			, worldTransform
+			, sceneContext
+			, rendererContext
+		);
+	}
+
+	// draw all the terrains
+	for (size_t i = 0; i < denseTerrainComponents.size(); i++)
+	{
+		TerrainComponent& terrainComponent = denseTerrainComponents[i];
+
+		TransformComponent& transformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(i);
+		Transform& worldTransform = transformComp.cumulatedTransform;
+
+		Renderer::DrawTerrain(
+			terrainComponent
 			, worldTransform
 			, sceneContext
 			, rendererContext

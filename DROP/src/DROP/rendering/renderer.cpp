@@ -33,6 +33,7 @@
 #include "colors.h"
 #include "DROP/sceneGraph/sceneGraph.h"
 #include "DROP/utils/Log.h"
+#include "terrainComponent.h"
 
 #define UNLOCK_FRAMERTE
 
@@ -827,6 +828,150 @@ namespace Drop
             , 1
             , GL_FALSE
             , glm::value_ptr(sceneContext.lightSpaceMatrix)
+        );
+
+        // we determine the position in the Shader Program of the uniform variables
+        GLint lightDirLocation = glGetUniformLocation(shader.Program, "lightVector");
+
+        // we assign the value to the uniform variables
+        glUniform3fv(lightDirLocation, 1, glm::value_ptr(sceneContext.lightDir));
+        glCheckError();
+
+        std::vector<TextureID>& textuers = *sceneContext.textuers;
+
+        {   // without this scope there is an error for the variable "**location" not used
+            GLint kdLocation = glGetUniformLocation(shader.Program, "Kd");
+            GLint alphaLocation = glGetUniformLocation(shader.Program, "Alpha");
+            GLint f0Location = glGetUniformLocation(shader.Program, "F0");
+
+            glUniform1f(kdLocation, material.kd);
+            glCheckError();
+
+            glUniform1f(alphaLocation, material.alpha);
+            glCheckError();
+
+            glUniform1f(f0Location, material.f0);
+            glCheckError();
+
+            //glActiveTexture(GL_TEXTURE2); // old, now we set the system textures from 20th index
+            glActiveTexture(SHADOW_MAP_ACTIVE);
+            glCheckError();
+
+            glBindTexture(GL_TEXTURE_2D, rendererContext.depthMap);
+            glCheckError();
+
+            GLint shadowLocation = glGetUniformLocation(shader.Program, "shadowMap");
+            glCheckError();
+
+            glUniform1i(shadowLocation, SHADOW_MAP_1i);
+            glCheckError();
+        }
+
+        for (uint32_t  i = 0; i < MAX_USER_TEXTURES; i++)
+        {
+            TextureSpecification& currTexture = material.textures[i];
+            std::string textureName = "";
+            std::string repeatName = "";
+            if (currTexture.textureId != TEXTURE_NOT_USED)
+            {
+                // we dont want to override systems textures (from index 20 to 31)
+                assert(currTexture.textureId <= MAX_USER_TEXTURES - 1);
+
+                // we pass the needed uniforms
+                textureName = "tex_" + std::to_string(i);
+                GLint textureLocation = glGetUniformLocation(shader.Program, textureName.c_str());
+                glCheckError();
+
+                repeatName = "repeat_" + std::to_string(i);
+                GLint repeatLocation = glGetUniformLocation(shader.Program, repeatName.c_str());
+                glCheckError();
+
+                // we activate the texture of the plane
+
+                glActiveTexture(GL_TEXTURE0 + i);
+                glCheckError();
+
+                glBindTexture(GL_TEXTURE_2D, (textuers).at(currTexture.textureId));
+                glCheckError();
+
+                glUniform1i(textureLocation, i);
+                glCheckError();
+
+                glUniform1f(repeatLocation, currTexture.UVRepeat);
+                glCheckError();
+            }
+        }
+
+
+        VgMath::Transform& transform = worldTransform;
+        glm::mat4 modelMatrix(1.0f);
+        SceneGraph::TransformToMatrix(transform, modelMatrix);
+
+        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(sceneContext.camera->GetViewMatrix() * modelMatrix));
+        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glCheckError();
+
+        glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
+        glCheckError();
+
+        model.Draw();
+    }
+
+    void Renderer::DrawTerrain(
+        const TerrainComponent& meshComponent
+        , VgMath::Transform& worldTransform
+        , SceneContext& sceneContext
+        , RendererContext& rendererContext
+    ) {
+        std::vector<Model>& models = *sceneContext.models;
+        assert(models.size() > meshComponent.modelId);
+        Model& model = models[meshComponent.modelId];
+
+        std::vector<Material>& materials = *sceneContext.materials;
+        assert(materials.size() > meshComponent.materialId);
+        Material& material = materials[meshComponent.materialId];
+
+        std::vector<Shader>& shaders = rendererContext.shaders;
+        assert(shaders.size() > meshComponent.materialId);
+        Shader& shader = shaders[material.shaderID];
+
+        // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
+        shader.Use();
+
+        // we pass projection and view matrices to the Shader Program
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shader.Program
+                , "projectionMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.camera->GetProjectionMatrix())
+        );
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shader.Program
+                , "viewMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.camera->GetViewMatrix())
+        );
+        glUniformMatrix4fv(
+            glGetUniformLocation(
+                shader.Program
+                , "lightSpaceMatrix"
+            )
+            , 1
+            , GL_FALSE
+            , glm::value_ptr(sceneContext.lightSpaceMatrix)
+        );
+        glUniform1f(
+            glGetUniformLocation(
+                shader.Program
+                , "time"
+            )
+            , sceneContext.time
         );
 
         // we determine the position in the Shader Program of the uniform variables

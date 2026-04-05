@@ -7,13 +7,13 @@ Entities:
       LocalTransform:
         Translate: [0, -1, 0]
         Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
-        Scale: 10
+        Scale: 1
       Parent: 18446744073709551615
       CumulativeTransform:
         Translate: [0, -1, 0]
         Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
-        Scale: 10
-    StaticMeshComponent:
+        Scale: 1
+    TerrainComponent:
       modelId: 3
       materialId: 0
       bCastShadow: true

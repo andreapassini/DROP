@@ -64,6 +64,12 @@ public:
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.geom").c_str()
             , GetFullPath("\\DROP\\src\\Drop\\shaders\\billboard.frag").c_str()
         );
+
+        // TERRAIN_SHADER
+        gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().shaders.emplace_back(
+            GetFullPath("\\DROP\\src\\Drop\\shaders\\terrain.vert").c_str()
+            , GetFullPath("\\DROP\\src\\Drop\\shaders\\terrain.frag").c_str()
+        );
 #pragma endregion
 
         LOG_TRACE("GetExecutableDir: " + GetExecutableDir());
@@ -95,7 +101,7 @@ public:
             material.f0 = 0.9f;
             material.textures[0].textureId = CRACKED_SOIL_DIFFUSE_MAP;
             material.textures[0].UVRepeat = 80.0f;
-            material.shaderID = ILLUMINATION_GGX_SHADER;
+            material.shaderID = TERRAIN_SHADER;
             gameEngine->m_Materials.push_back(material);
         }
         {
@@ -140,6 +146,7 @@ public:
         //gameEngine->g_activeScene->ecs.RegisterComponent<Camera, Transform>();
 
         gameEngine->g_activeScene->ecs.RegisterComponent<StaticMeshComponent, TransformComponent>();
+        gameEngine->g_activeScene->ecs.RegisterComponent<TerrainComponent, TransformComponent>();
 
         gameEngine->g_activeScene->ecs.RegisterComponent<ParticleEmitter, TransformComponent>();
         gameEngine->g_activeScene->ecs.RegisterComponent<PBParticleEmitter, TransformComponent>();

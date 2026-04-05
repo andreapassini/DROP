@@ -42,6 +42,7 @@
 #include "DROP/rendering/material.h"
 #include "DROP/particles/particle.h"
 #include "DROP/particles/physicsBasedParticle.h"
+#include "terrainComponent.h"
 
 #define FULL_COLOR_SHADER 0
 #define ILLUMINATION_GGX_SHADER 1
@@ -49,6 +50,7 @@
 #define EMPTY_QUAD_SHADER 3
 #define EMPTY_BOX_SHADER 4
 #define BILLBOARD_SHADER 5
+#define TERRAIN_SHADER 6
 
 namespace Drop
 {
@@ -74,6 +76,8 @@ namespace Drop
 
         bool wireframe;
         bool vSync = false;
+
+        float time = 0.0f;
     };
 
     struct RendererContext {
@@ -93,6 +97,9 @@ namespace Drop
         EClockWise clockWiseOrder = EClockWise::COUNTER_CLOCKWISE;
 
         bool drawDebug = false;
+
+        // All the shader paths
+
 
         std::vector<Shader> shaders{};
     };
@@ -175,6 +182,13 @@ namespace Drop
         );
         void DrawMesh(
             const StaticMeshComponent& model
+            , VgMath::Transform& worldTransform
+            , SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
+
+        void DrawTerrain(
+            const TerrainComponent& meshComponent
             , VgMath::Transform& worldTransform
             , SceneContext& sceneContext
             , RendererContext& rendererContext

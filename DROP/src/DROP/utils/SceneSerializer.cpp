@@ -15,6 +15,7 @@
 #include "DROP/utils/Log.h"
 #include "ExecPath.h"
 #include "Drop/particles/physicsBasedParticle.h"
+#include "DROP/rendering/terrainComponent.h"
 
 using namespace VgMath;
 
@@ -221,6 +222,16 @@ namespace SceneSerializer
 			out << YAML::Key << "bCastShadow" << YAML::Value << s.bCastShadow;
 			out << YAML::EndMap;
 		}
+		if (ecs.Has<TerrainComponent>(entityId))
+		{
+			out << YAML::Key << "TerrainComponent";
+			out << YAML::BeginMap;
+			TerrainComponent& s = ecs.Get<TerrainComponent>(entityId);
+			out << YAML::Key << "modelId" << YAML::Value << s.modelId;
+			out << YAML::Key << "materialId" << YAML::Value << s.materialId;
+			out << YAML::Key << "bCastShadow" << YAML::Value << s.bCastShadow;
+			out << YAML::EndMap;
+		}
 		if (ecs.Has<ParticleEmitter>(entityId))
 		{
 			out << YAML::Key << "ParticleEmitter";
@@ -351,6 +362,12 @@ namespace SceneSerializer
 				staticMeshComp.modelId = staticMeshCompNode["modelId"].as<ModelID>();
 				staticMeshComp.materialId = staticMeshCompNode["materialId"].as<MaterialID>();
 				staticMeshComp.bCastShadow = staticMeshCompNode["bCastShadow"].as<bool>();
+			}
+			if (auto terrainCompNode = entity["TerrainComponent"]) {
+				TerrainComponent& terrainComp = scene->ecs.Add<TerrainComponent, TransformComponent>(deserializedEntity);
+				terrainComp.modelId = terrainCompNode["modelId"].as<ModelID>();
+				terrainComp.materialId = terrainCompNode["materialId"].as<MaterialID>();
+				terrainComp.bCastShadow = terrainCompNode["bCastShadow"].as<bool>();
 			}
 			if (auto particleEmitterNode = entity["ParticleEmitter"]) {
 				ParticleEmitter& particleEmitter = scene->ecs.Add<ParticleEmitter, TransformComponent>(deserializedEntity);
