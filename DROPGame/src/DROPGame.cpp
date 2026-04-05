@@ -392,6 +392,14 @@ public:
 
         ImGui::Separator();
         ImGui::Checkbox("Draw Debug Lines", &m_DrawDebug);
+
+        ImGui::Separator();
+        if (ImGui::Button("Recompile all shaders \nin materials (R as shortcut)")) {
+            Renderer::RecompileAllShadersInMaterials(
+                gameEngine->g_activeScene->ecs.GetSingletonComponent<SceneContext>()
+                , gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>()
+            );
+        }
         
         ImGui::Begin("Drop Scene");
         ImGui::Separator();
