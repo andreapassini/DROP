@@ -1,14 +1,11 @@
 #pragma once
 
 #include "Types/Types.h"
+#include "Memory/memoryAllocatorUtils.h"
 
 // From Ginger Bill
 // https://www.gingerbill.org/article/2019/02/08/memory-allocation-strategies-002/
 // and modified
-
-#ifndef DEFAULT_ALIGNMENT
-#define DEFAULT_ALIGNMENT (2*sizeof(void *))
-#endif
 
 struct ArenaAllocator
 {
@@ -49,26 +46,6 @@ T* ArenaAlloc(
 		arena->previousOffset = offset;
 		arena->currentOffset = offset + size;
 
-#ifdef DEBUG_ARENA_ALLOCATOR
-		uintptr_t currentBuffer = (uintptr_t)arena->buffer;
-		uintptr_t currentOffset = (uintptr_t)arena->currentOffset;
-		uintptr_t ptrInUInt = (uintptr_t)ptr;
-
-		//LOG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
-		LOG_CORE_INFO("Print before memset:\n \
-			arena->buffer={0}\n \
-			\tarena->bufferLenght = {1}\n \
-			\tarena->currentOffset = {2}\n \
-			\tsize = {3}\n \
-			\tptr = {4}\n \
-			\toffset = {5}\n \
-			\tptr + size= {6}\n \
-			\tcurr_ptr = {7}"
-			, (uintptr_t)arena->buffer, arena->bufferLenght, (uintptr_t)arena->currentOffset
-			, size, (uintptr_t)ptr, offset, (uintptr_t)((uintptr_t)ptr + (uintptr_t)size), (uintptr_t)curr_ptr
-		);
-#endif // DEBUG_ARENA_ALLOCATOR
-
 		// Zero new memory by default
 		memset(ptr, 0, size);
 
@@ -94,16 +71,6 @@ void* ArenaResize(
 	, size_t align = DEFAULT_ALIGNMENT
 );
 
-void ArenaReset(
+void ArenaFreeAll(
 	ArenaAllocator* arena
-);
-
-
-// Utils
-bool IsPowerOfTwo(
-	uintptr_t x
-);
-uintptr_t AlignForward(
-	uintptr_t ptr
-	, size_t align
 );
