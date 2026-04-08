@@ -94,6 +94,10 @@ void* ArenaResize(
 	, size_t align = DEFAULT_ALIGNMENT
 );
 
+void ArenaReset(
+	ArenaAllocator* arena
+);
+
 
 // Utils
 bool IsPowerOfTwo(

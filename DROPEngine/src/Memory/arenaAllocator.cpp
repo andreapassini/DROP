@@ -8,6 +8,7 @@
 #include <cstring>
 #include "Types/Types.h"
 #include "Utils/Log.h"
+#include "Utils/assert.h"
 
 #define DEBUG_ARENA_ALLOCATOR 1
 
@@ -37,38 +38,17 @@ void* ArenaAlloc(
 	{
 		void* ptr = &arena->buffer[offset];
 
-
 		arena->previousOffset = offset;
 		arena->currentOffset = offset + size;
-
-#ifdef DEBUG_ARENA_ALLOCATOR
-		uintptr_t currentBuffer = (uintptr_t)arena->buffer;
-		uintptr_t currentOffset = (uintptr_t)arena->currentOffset;
-		uintptr_t ptrInUInt = (uintptr_t)ptr;
-
-		//LOG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
-		LOG_CORE_INFO("Print before memset:\n \
-			arena->buffer={0}\n \
-			\tarena->bufferLenght = {1}\n \
-			\tarena->currentOffset = {2}\n \
-			\tsize = {3}\n \
-			\tptr = {4}\n \
-			\toffset = {5}\n \
-			\tptr + size= {6}\n \
-			\tcurr_ptr = {7}"
-			, (uintptr_t)arena->buffer, arena->bufferLenght, (uintptr_t)arena->currentOffset
-			, size, (uintptr_t)ptr, offset, (uintptr_t)((uintptr_t)ptr + (uintptr_t)size), (uintptr_t)curr_ptr
-		);
-#endif // DEBUG_ARENA_ALLOCATOR
 
 		// Zero new memory by default
 		memset(ptr, 0, size);
 
 		return ptr;
 	}
-	// Return NULL if the arena is out of memory (or handle differently)
 
-	__debugbreak;
+	// Return NULL if the arena is out of memory (or handle differently)
+	DEBUG_BREAK; // Maybe add another buffer at this point
 	return nullptr;
 }
 
@@ -134,7 +114,13 @@ void* ArenaResize(
 
 }
 
-
+// We could avoid using this by scoping better the Arena Allocator
+void ArenaReset(
+	ArenaAllocator* arena
+) {
+	arena->currentOffset = 0;
+	arena->previousOffset = 0;
+}
 
 // UTILS ----------------------
 
