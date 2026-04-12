@@ -42,7 +42,6 @@
 #include "DROP/rendering/material.h"
 #include "DROP/particles/particle.h"
 #include "DROP/particles/physicsBasedParticle.h"
-#include "terrainComponent.h"
 
 #define FULL_COLOR_SHADER 0
 #define ILLUMINATION_GGX_SHADER 1
@@ -51,6 +50,8 @@
 #define EMPTY_BOX_SHADER 4
 #define BILLBOARD_SHADER 5
 #define TERRAIN_SHADER 6
+
+struct TerrainComponent;
 
 namespace Drop
 {

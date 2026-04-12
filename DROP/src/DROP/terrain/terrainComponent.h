@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdint>
 
 // attach this comp to entity
@@ -20,4 +21,6 @@ struct TerrainComponent {
 	// how much data regarding rendering specifics
 	// has to be stored in this component?
 	bool bCastShadow = false;
+
+	uint32_t numOfTerrains = 10 * 10;
 };

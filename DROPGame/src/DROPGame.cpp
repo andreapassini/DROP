@@ -10,6 +10,7 @@
 #include "DROP/utils/Log.h"
 #include "Drop/particles/particle.h"
 #include "Drop/particles/physicsBasedParticle.h"
+#include "DROP/terrain/terrainComponent.h"
 
 #define UV_GRID_SIM_DIFFUSE_MAP 0
 #define CRACKED_SOIL_DIFFUSE_MAP 1

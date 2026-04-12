@@ -15,7 +15,7 @@
 #include "DROP/utils/Log.h"
 #include "ExecPath.h"
 #include "Drop/particles/physicsBasedParticle.h"
-#include "DROP/rendering/terrainComponent.h"
+#include "DROP/terrain/terrainComponent.h"
 
 using namespace VgMath;
 
@@ -230,6 +230,7 @@ namespace SceneSerializer
 			out << YAML::Key << "modelId" << YAML::Value << s.modelId;
 			out << YAML::Key << "materialId" << YAML::Value << s.materialId;
 			out << YAML::Key << "bCastShadow" << YAML::Value << s.bCastShadow;
+			out << YAML::Key << "numOfTerrains" << YAML::Value << s.numOfTerrains;
 			out << YAML::EndMap;
 		}
 		if (ecs.Has<ParticleEmitter>(entityId))
@@ -368,6 +369,7 @@ namespace SceneSerializer
 				terrainComp.modelId = terrainCompNode["modelId"].as<ModelID>();
 				terrainComp.materialId = terrainCompNode["materialId"].as<MaterialID>();
 				terrainComp.bCastShadow = terrainCompNode["bCastShadow"].as<bool>();
+				terrainComp.numOfTerrains = terrainCompNode["numOfTerrains"].as<uint32_t>();
 			}
 			if (auto particleEmitterNode = entity["ParticleEmitter"]) {
 				ParticleEmitter& particleEmitter = scene->ecs.Add<ParticleEmitter, TransformComponent>(deserializedEntity);

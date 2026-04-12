@@ -33,7 +33,7 @@
 #include "colors.h"
 #include "DROP/sceneGraph/sceneGraph.h"
 #include "DROP/utils/Log.h"
-#include "terrainComponent.h"
+#include "DROP/terrain/terrainComponent.h"
 
 #define UNLOCK_FRAMERTE
 

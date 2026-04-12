@@ -4,7 +4,7 @@
 #include "DROP/rendering/renderer.h"
 #include "DROP/sceneGraph/sceneGraph.h"
 #include "DROP/particles/physicsBasedParticle.h"
-#include "DROP/rendering/terrainComponent.h"
+#include "DROP/terrain/terrainComponent.h"
 
 using namespace Drop;
 
@@ -70,12 +70,32 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		TransformComponent& transformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(i);
 		Transform& worldTransform = transformComp.cumulatedTransform;
 
-		Renderer::DrawTerrain(
-			terrainComponent
-			, worldTransform
-			, sceneContext
-			, rendererContext
-		);
+		// Consider the entity as the center of all terrains
+		// 3 should be num row and num col
+		int32_t numRowOrCol = (int32_t)sqrt(terrainComponent.numOfTerrains); // since it's a square
+		float rowCenter = 0.0;
+		rowCenter = (float)numRowOrCol / 2.0f;
+		float colCenter = 0.0f;
+		colCenter = (float)numRowOrCol / 2.0f;
+		float debugDisplacement = 0.1f;
+		float displacement = 10.0f + debugDisplacement;
+
+		for (uint32_t j = 0; j < terrainComponent.numOfTerrains; j++) {
+			float row = (float)(j / numRowOrCol) - rowCenter;
+			float col = (float)(j % numRowOrCol) - colCenter;
+			VgMath::Vector3 extraDisplacement;
+			extraDisplacement.x = (float)(row) * displacement;
+			extraDisplacement.z = (float)(col) * displacement;
+			Transform movedTransform = worldTransform;
+			movedTransform.translate += extraDisplacement;
+
+			Renderer::DrawTerrain(
+				terrainComponent
+				, movedTransform
+				, sceneContext
+				, rendererContext
+			);
+		}
 	}
 
 	std::vector<ParticleEmitter>& denseParticleEmitters = ecs.GetComponentPool<ParticleEmitter>().Data();

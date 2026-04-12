@@ -59,14 +59,13 @@ out vec4 posLightSpace;
 void main(){
 
   // vertex position in world coordinates
-//  float sinPosY = position.y + (UV.y * sin(time)); // + (sin( time));
   float cosUVx = cos((UV.x + time) * 2);
   float sinUVy = sin((UV.y + time) * 2.5);
-  float sinUVy2 = sin((UV.y + time) * 2 * 2.35);
-  float sinPosY = position.y + cosUVx + sinUVy + sinUVy2;
-//  float sinPosY = 0.0;
+  // float sinUVy2 = sin((UV.y + time) * 2 * 2.35);
+  // float sinPosY = position.y + cosUVx + sinUVy + sinUVy2;
+  float sinPosY = 0.0;
   vec4 mPosition = modelMatrix * vec4( position.x, sinPosY, position.z, 1.0 );
-//  vec4 mPosition = modelMatrix * vec4( position.x, position.y + time, position.z, 1.0 );
+  //  vec4 mPosition = modelMatrix * vec4( position.x, position.y + time, position.z, 1.0 );
   // vertex position in camera coordinates
   vec4 mvPosition = viewMatrix * mPosition;
 

@@ -17,17 +17,18 @@ Entities:
       modelId: 3
       materialId: 0
       bCastShadow: true
+      numOfTerrains: 36
   - Entity: 1
     Tag:
       Tag name: Sphere
     TransformComponent:
       LocalTransform:
-        Translate: [-3, 1, 0]
+        Translate: [0, 1, 0]
         Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 1
       Parent: 18446744073709551615
       CumulativeTransform:
-        Translate: [-3, 1, 0]
+        Translate: [0, 1, 0]
         Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 1
     StaticMeshComponent:
