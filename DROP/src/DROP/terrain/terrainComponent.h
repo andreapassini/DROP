@@ -9,6 +9,14 @@
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;
 
+#define MAX_NUM_TERRAINS 100
+
+struct TerrainDisplacementMap {
+	size_t displacementMapSize = 81;
+	float maxDisplacement = 2.5f;
+	float displacementMap[81] = { 0.0f };
+};
+
 struct TerrainComponent {
 	ModelID modelId = 0;
 
@@ -22,5 +30,6 @@ struct TerrainComponent {
 	// has to be stored in this component?
 	bool bCastShadow = false;
 
-	uint32_t numOfTerrains = 10 * 10;
+	uint32_t numOfTerrains = MAX_NUM_TERRAINS;
+	TerrainDisplacementMap displacementMaps[MAX_NUM_TERRAINS];
 };

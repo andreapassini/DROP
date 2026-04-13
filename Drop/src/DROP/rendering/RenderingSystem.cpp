@@ -91,6 +91,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 
 			Renderer::DrawTerrain(
 				terrainComponent
+				, j
 				, movedTransform
 				, sceneContext
 				, rendererContext

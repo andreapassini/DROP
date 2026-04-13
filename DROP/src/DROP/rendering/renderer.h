@@ -190,6 +190,7 @@ namespace Drop
 
         void DrawTerrain(
             const TerrainComponent& meshComponent
+            , size_t terrainIndex
             , VgMath::Transform& worldTransform
             , SceneContext& sceneContext
             , RendererContext& rendererContext

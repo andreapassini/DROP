@@ -36,6 +36,7 @@ in flat vec2 flat_UV;
 
 in flat int flat_vertexID;  
 in flat int flat_maxVertexID;
+in float vertexDisplacement;
 
 // for the correct rendering of the shadows, we need to calculate the vertex coordinates also in "light coordinates" (= using light as a camera)
 in vec4 posLightSpace;
@@ -191,5 +192,6 @@ void main()
     // float maxVertexIDFloat = float(flat_maxVertexID);
     // float vertexIDFloat = float(flat_vertexID) / maxVertexIDFloat;
 
-    colorFrag = vec4(flat_UV.x, flat_UV.y, 0.0, 1.0);
+    colorFrag = vec4(flat_UV.x * vertexDisplacement, flat_UV.y * vertexDisplacement, 0.0, 1.0);
+    // colorFrag = vec4(vertexDisplacement, vertexDisplacement, 0.0, 1.0);
 }

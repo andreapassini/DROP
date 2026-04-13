@@ -918,21 +918,22 @@ namespace Drop
     }
 
     void Renderer::DrawTerrain(
-        const TerrainComponent& meshComponent
+        const TerrainComponent& terrainComponent
+        , size_t terrainIndex
         , VgMath::Transform& worldTransform
         , SceneContext& sceneContext
         , RendererContext& rendererContext
     ) {
         std::vector<Model>& models = *sceneContext.models;
-        assert(models.size() > meshComponent.modelId);
-        Model& model = models[meshComponent.modelId];
+        assert(models.size() > terrainComponent.modelId);
+        Model& model = models[terrainComponent.modelId];
 
         std::vector<Material>& materials = *sceneContext.materials;
-        assert(materials.size() > meshComponent.materialId);
-        Material& material = materials[meshComponent.materialId];
+        assert(materials.size() > terrainComponent.materialId);
+        Material& material = materials[terrainComponent.materialId];
 
         std::vector<Shader>& shaders = rendererContext.shaders;
-        assert(shaders.size() > meshComponent.materialId);
+        assert(shaders.size() > terrainComponent.materialId);
         Shader& shader = shaders[material.shaderID];
 
         // We "install" the selected Shader Program as part of the current rendering process. We pass to the shader the light transformation matrix, and the depth map rendered in the first rendering step
@@ -1046,6 +1047,24 @@ namespace Drop
             }
         }
 
+        GLint numVertices = model.GetNumVertices();
+        glUniform1i(glGetUniformLocation(shader.Program, "maxVertexID"), numVertices);
+        glCheckError();
+
+        glUniform1f(glGetUniformLocation(shader.Program, "maxDisplacement"), 1.0f);
+        glCheckError();
+
+        // the size of the map 
+        GLint displacementMapSize = numVertices;
+        glUniform1fv(\
+            glGetUniformLocation(\
+                shader.Program \
+                , "displacementMap" \
+            ) \
+            , numVertices \
+            , &terrainComponent.displacementMaps[terrainIndex].displacementMap[0] \
+        );
+        glCheckError();
 
         VgMath::Transform& transform = worldTransform;
         glm::mat4 modelMatrix(1.0f);
@@ -1056,9 +1075,6 @@ namespace Drop
         glCheckError();
 
         glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
-        glCheckError();
-
-        glUniform1i(glGetUniformLocation(shader.Program, "maxVertexID"), model.GetNumVertices());
         glCheckError();
 
         model.Draw();
