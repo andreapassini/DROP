@@ -84,7 +84,13 @@ public:
             this->meshes[i].Draw();
     }
 
-    //////////////////////////////////////////
+    GLint GetNumVertices() {
+        GLint outSize = 0;
+        for (GLuint i = 0; i < this->meshes.size(); i++)
+            outSize += this->meshes[i].vertices.size();
+
+        return outSize;
+    }
 
 
 private:

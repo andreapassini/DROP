@@ -458,7 +458,8 @@ private:
 			{
 				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 cout << "| ERROR::::SHADER-COMPILATION-ERROR of type: " << type << "|\n" << infoLog << "\n| -- --------------------------------------------------- -- |" << endl;
-			}
+                DebugBreak();
+            }
 		}
 		else
 		{
@@ -467,7 +468,8 @@ private:
 			{
 				glGetProgramInfoLog(shader, 1024, NULL, infoLog);
                 cout << "| ERROR::::PROGRAM-LINKING-ERROR of type: " << type << "|\n" << infoLog << "\n| -- --------------------------------------------------- -- |" << endl;
-			}
+                DebugBreak();
+            }
 		}
 	}
 };

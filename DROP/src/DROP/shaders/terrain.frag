@@ -32,6 +32,10 @@ in vec3 vViewPosition;
 
 // interpolated texture coordinates
 in vec2 interp_UV;
+in flat vec2 flat_UV;
+
+in flat int flat_vertexID;  
+in flat int flat_maxVertexID;
 
 // for the correct rendering of the shadows, we need to calculate the vertex coordinates also in "light coordinates" (= using light as a camera)
 in vec4 posLightSpace;
@@ -182,7 +186,10 @@ void main()
     //        shadow value = 0 -> fragment is in light
     // Therefore, we use (1-shadow) as weight to apply to the illumination model
     vec3 finalColor = (1.0 - shadow)*(lambert + specular)*NdotL;
+    // colorFrag = vec4(finalColor, 1.0);
+   
+    // float maxVertexIDFloat = float(flat_maxVertexID);
+    // float vertexIDFloat = float(flat_vertexID) / maxVertexIDFloat;
 
-
-    colorFrag = vec4(finalColor, 1.0);
+    colorFrag = vec4(flat_UV.x, flat_UV.y, 0.0, 1.0);
 }

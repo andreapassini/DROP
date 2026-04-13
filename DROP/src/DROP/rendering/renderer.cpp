@@ -1058,6 +1058,9 @@ namespace Drop
         glUniformMatrix3fv(glGetUniformLocation(shader.Program, "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
         glCheckError();
 
+        glUniform1i(glGetUniformLocation(shader.Program, "maxVertexID"), model.GetNumVertices());
+        glCheckError();
+
         model.Draw();
     }
 

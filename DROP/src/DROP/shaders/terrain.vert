@@ -40,6 +40,8 @@ uniform vec3 lightVector;
 
 uniform float time;
 
+uniform flat int maxVertexID;
+
 // direction of incoming light in view coordinates
 out vec3 lightDir;
 // normals in view coordinates
@@ -51,6 +53,10 @@ out vec3 vViewPosition;
 
 // the output variable for UV coordinates
 out vec2 interp_UV;
+out flat vec2 flat_UV;
+
+out flat int flat_vertexID;
+out flat int flat_maxVertexID;
 
 // for the correct rendering of the shadows, we need to calculate the vertex coordinates also in "light coordinates" (= using light as a camera)
 out vec4 posLightSpace;
@@ -83,6 +89,11 @@ void main(){
 
   // I assign the values to a variable with "out" qualifier so to use the per-fragment interpolated values in the Fragment shader
   interp_UV = UV;
+  flat_UV = UV;
+
+  // I assign the values to a variable with "out" qualifier so to use the per-fragment interpolated values in the Fragment shader
+  flat_vertexID = gl_VertexID;
+  flat_maxVertexID = maxVertexID;
 
   // vertex position in "light coordinates"
   posLightSpace = lightSpaceMatrix * mPosition;
