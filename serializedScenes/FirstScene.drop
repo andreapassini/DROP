@@ -17,7 +17,6 @@ Entities:
       modelId: 3
       materialId: 0
       bCastShadow: true
-      numOfTerrains: 36
   - Entity: 1
     Tag:
       Tag name: Sphere

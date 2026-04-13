@@ -9,7 +9,7 @@
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;
 
-#define MAX_NUM_TERRAINS 100
+#define MAX_NUM_TERRAINS 144
 
 struct TerrainDisplacementMap {
 	size_t displacementMapSize = 81;

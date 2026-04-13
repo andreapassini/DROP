@@ -45,7 +45,7 @@ private:
 private:
     float m_VerticalFOV = 45.0f;
     float m_NearClip = 0.1f;
-    float m_FarClip = 100.0f;
+    float m_FarClip = 1000.0f;
 
     glm::mat4 m_ProjectionMatrix{ 1.0f };
     glm::mat4 m_ViewMatrix{ 1.0f };
