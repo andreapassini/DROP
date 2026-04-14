@@ -1054,8 +1054,11 @@ namespace Drop
         glUniform1f(glGetUniformLocation(shader.Program, "maxDisplacement"), 1.0f);
         glCheckError();
 
+
         // the size of the map 
         GLint displacementMapSize = numVertices;
+        // Not so fast now, we have to check first if the displacement map is loaded
+        
         glUniform1fv(\
             glGetUniformLocation(\
                 shader.Program \

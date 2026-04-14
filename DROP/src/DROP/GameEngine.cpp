@@ -30,6 +30,9 @@
 #include "particles/particleSystem.h"
 #include "sceneGraph/scene.h"
 
+#include "terrain/terrainComponent.h"
+#include "terrain/terrainSystem.h"
+
 extern bool g_GameEngineRunning;
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
@@ -123,6 +126,9 @@ namespace Drop
 		g_activeScene->ecs.RegisterSingletonComponent<SceneContext>(arena);
 		g_activeScene->ecs.RegisterSingletonComponent<RendererContext>(arena);
 
+		g_activeScene->ecs.RegisterSingletonComponent<TerrainsContext>(arena);
+		g_activeScene->ecs.RegisterSingletonComponent<TerrainsAssetsContext>(arena);
+
 		//g_activeScene->ecs.RegisterSingletonComponent<SceneContext>(arena);
 		//g_activeScene->ecs.RegisterSingletonComponent<RendererContext>(arena);
 
@@ -137,6 +143,10 @@ namespace Drop
 		Renderer::Init(
 			(GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow()
 			, *renderContext
+		);
+
+		InitTerrains(
+			g_activeScene->ecs
 		);
 
 		//Scene currScene;
@@ -238,6 +248,8 @@ namespace Drop
 
 			SceneGraph::CalculateWorldTransforms(g_activeScene->ecs);
 
+
+
 			RenderingSystem::Update(g_activeScene->ecs, m_DeltaTime);
 
 			// render your GUI
@@ -290,7 +302,13 @@ namespace Drop
 		unsigned char* image;
 		//image = stbi_load(path, &w, &h, &channels, STBI_rgb);
 		//image = stbi_load(path, &w, &h, &channels, STBI_rgb_alpha);
-		image = stbi_load(path, &w, &h, &channels, STBI_default); //    STBI_default = 0, // only used for desired_channels
+		image = stbi_load(
+			path
+			, &w
+			, &h
+			, &channels
+			, STBI_default
+		); //    STBI_default = 0, // only used for desired_channels
 
 		if (image == nullptr)
 			LOG_CORE_ERROR("Failed to load texture: {0}", path);

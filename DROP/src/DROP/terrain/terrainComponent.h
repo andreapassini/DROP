@@ -2,20 +2,48 @@
 
 #include <cstdint>
 
-// attach this comp to entity
-// maybe rename it to Static Model
-// since it is not holding a mesh directly
-
-typedef uint32_t ModelID;
-typedef uint32_t MaterialID;
 
 #define MAX_NUM_TERRAINS 144
 
+#define TERRAIN_INDEX_NULL UINT32_MAX
+#define LOADED_MAPS 9
+
+typedef uint32_t ModelID;
+typedef uint32_t MaterialID;
+typedef uint32_t TerrainID;
+
 struct TerrainDisplacementMap {
-	size_t displacementMapSize = 81;
+	TerrainID terrainIndex = TERRAIN_INDEX_NULL;
+	uint32_t displacementMapSize = 81;
 	float maxDisplacement = 2.5f;
-	float displacementMap[81] = { 0.0f };
+	// #TODO use a texture and a 2DSampler
+	float displacementMap[81]; // this depends on num of vertices of the mesh
 };
+
+// Use a mutex to access TerrainDisplacementMaps
+struct TerrainsAssetsContext {
+	TerrainID numOfLoadedTerrainDisplacementMaps = LOADED_MAPS;
+	// useful for fast lookup
+	TerrainID requiredMaps[LOADED_MAPS];
+	TerrainDisplacementMap terrainDisplacementMaps[LOADED_MAPS];
+};
+
+struct TerrainsContext {
+	TerrainID numOfLoadedTerrainDisplacementMaps = LOADED_MAPS;
+	bool bNeedsDisplacementMapsUpdate = false;
+
+	// like a sparse set
+	TerrainID terrainToDisplacementMappings[MAX_NUM_TERRAINS];
+	
+	// useful for fast lookup
+	TerrainID requiredMaps[LOADED_MAPS] = { 0 };
+
+	TerrainDisplacementMap terrainDisplacementMaps[LOADED_MAPS];
+
+	// stub displacement map
+	TerrainDisplacementMap stubTerrainDisplacementMap;
+};
+
 
 struct TerrainComponent {
 	ModelID modelId = 0;
@@ -30,6 +58,5 @@ struct TerrainComponent {
 	// has to be stored in this component?
 	bool bCastShadow = false;
 
-	uint32_t numOfTerrains = MAX_NUM_TERRAINS;
-	TerrainDisplacementMap displacementMaps[MAX_NUM_TERRAINS];
+	TerrainID numOfTerrains = MAX_NUM_TERRAINS;
 };
