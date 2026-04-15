@@ -8,12 +8,15 @@ struct TerrainsContext;
 namespace TerrainSystem {
 
 void InitTerrains(bseecs::ECS& ecs);
-void UpdateTerrains(bseecs::ECS& ecs);
+void UpdateTerrains(
+	bseecs::ECS& ecs
+	, const float deltaTime
+);
 
 void InitTerrainsDisplacementMaps(TerrainsContext& inTerrainContext);
 
 bool IsTerrainMapLoaded(
-	bseecs::ECS& ecs
+	TerrainsContext& terrainContext
 	, TerrainID terrainID
 );
 

@@ -145,7 +145,7 @@ namespace Drop
 			, *renderContext
 		);
 
-		InitTerrains(
+		TerrainSystem::InitTerrains(
 			g_activeScene->ecs
 		);
 
@@ -248,7 +248,7 @@ namespace Drop
 
 			SceneGraph::CalculateWorldTransforms(g_activeScene->ecs);
 
-
+			TerrainSystem::UpdateTerrains(g_activeScene->ecs, m_DeltaTime);
 
 			RenderingSystem::Update(g_activeScene->ecs, m_DeltaTime);
 

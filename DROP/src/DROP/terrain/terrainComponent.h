@@ -25,6 +25,7 @@ struct TerrainsAssetsContext {
 	TerrainID numOfLoadedTerrainDisplacementMaps = LOADED_MAPS;
 	// useful for fast lookup
 	TerrainID requiredMaps[LOADED_MAPS];
+	TerrainID loadedMaps[LOADED_MAPS];
 	TerrainDisplacementMap terrainDisplacementMaps[LOADED_MAPS];
 };
 
@@ -36,7 +37,7 @@ struct TerrainsContext {
 	TerrainID terrainToDisplacementMappings[MAX_NUM_TERRAINS];
 	
 	// useful for fast lookup
-	TerrainID requiredMaps[LOADED_MAPS] = { 0 };
+	TerrainID requiredMaps[LOADED_MAPS];
 
 	TerrainDisplacementMap terrainDisplacementMaps[LOADED_MAPS];
 
