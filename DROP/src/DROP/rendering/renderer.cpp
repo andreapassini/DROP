@@ -923,6 +923,7 @@ namespace Drop
         , VgMath::Transform& worldTransform
         , SceneContext& sceneContext
         , RendererContext& rendererContext
+        , TerrainsContext& terrainsContext
     ) {
         std::vector<Model>& models = *sceneContext.models;
         assert(models.size() > terrainComponent.modelId);
@@ -1054,20 +1055,39 @@ namespace Drop
         glUniform1f(glGetUniformLocation(shader.Program, "maxDisplacement"), 1.0f);
         glCheckError();
 
-
-        // the size of the map 
         GLint displacementMapSize = numVertices;
-        // Not so fast now, we have to check first if the displacement map is loaded
-        
-        glUniform1fv(\
-            glGetUniformLocation(\
-                shader.Program \
-                , "displacementMap" \
-            ) \
-            , numVertices \
-            , &terrainComponent.displacementMaps[terrainIndex].displacementMap[0] \
-        );
-        glCheckError();
+        assert(displacementMapSize == terrainsContext.terrainDisplacementMaps[0].displacementMapSize);
+        if (
+            (terrainIndex >= 9 * 3 + 3 
+                && terrainIndex <= 9 * 3 + 5) 
+            || (terrainIndex >= 9 * 4 + 3 
+                && terrainIndex <= 9 * 4 + 5)
+            || (terrainIndex >= 9 * 5 + 3 
+                && terrainIndex <= 9 * 5 + 5)
+        ) {
+            // the size of the map 
+            // Not so fast now, we have to check first if the displacement map is loaded
+            glUniform1fv(\
+                glGetUniformLocation(\
+                    shader.Program \
+                    , "displacementMap" \
+                ) \
+                , displacementMapSize \
+                , &terrainsContext.terrainDisplacementMaps[terrainIndex].displacementMap[0] \
+            );
+            glCheckError();
+        }
+        else {
+            glUniform1fv(\
+                glGetUniformLocation(\
+                    shader.Program \
+                    , "displacementMap" \
+                ) \
+                , displacementMapSize \
+                , &terrainsContext.stubTerrainDisplacementMap.displacementMap[0] \
+            );
+            glCheckError();
+        }
 
         VgMath::Transform& transform = worldTransform;
         glm::mat4 modelMatrix(1.0f);

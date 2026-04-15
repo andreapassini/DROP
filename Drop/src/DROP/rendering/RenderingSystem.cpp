@@ -12,6 +12,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 	
 	SceneContext& sceneContext = ecs.GetSingletonComponent<SceneContext>();
 	RendererContext& rendererContext = ecs.GetSingletonComponent<RendererContext>();
+	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
 
 	std::vector<StaticMeshComponent>& denseMeshComponents = ecs.GetComponentPool<StaticMeshComponent>().Data();
 	std::vector<TerrainComponent>& denseTerrainComponents = ecs.GetComponentPool<TerrainComponent>().Data();
@@ -95,6 +96,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 				, movedTransform
 				, sceneContext
 				, rendererContext
+				, terrainsContext
 			);
 		}
 	}

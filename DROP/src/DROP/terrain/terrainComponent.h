@@ -7,6 +7,7 @@
 
 #define TERRAIN_INDEX_NULL UINT32_MAX
 #define LOADED_MAPS 9
+#define TERRAIN_MAP_SIZE 81
 
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;
@@ -14,10 +15,10 @@ typedef uint32_t TerrainID;
 
 struct TerrainDisplacementMap {
 	TerrainID terrainIndex = TERRAIN_INDEX_NULL;
-	uint32_t displacementMapSize = 81;
+	uint32_t displacementMapSize = TERRAIN_MAP_SIZE;
 	float maxDisplacement = 2.5f;
 	// #TODO use a texture and a 2DSampler
-	float displacementMap[81]; // this depends on num of vertices of the mesh
+	float displacementMap[TERRAIN_MAP_SIZE]; // this depends on num of vertices of the mesh
 };
 
 // Use a mutex to access TerrainDisplacementMaps
@@ -38,6 +39,7 @@ struct TerrainsContext {
 	
 	// useful for fast lookup
 	TerrainID requiredMaps[LOADED_MAPS];
+	TerrainID loadedMaps[LOADED_MAPS];
 
 	TerrainDisplacementMap terrainDisplacementMaps[LOADED_MAPS];
 

@@ -52,6 +52,7 @@
 #define TERRAIN_SHADER 6
 
 struct TerrainComponent;
+struct TerrainsContext;
 
 namespace Drop
 {
@@ -194,6 +195,7 @@ namespace Drop
             , VgMath::Transform& worldTransform
             , SceneContext& sceneContext
             , RendererContext& rendererContext
+            , TerrainsContext& terrainsContext
         );
 
         void RecompileAllShaders(

@@ -345,9 +345,6 @@ public:
 
         SceneGraph::CalculateWorldTransforms(gameEngine->g_activeScene->ecs);
 
-        // Initialize Terrains
-        InitTerrains(gameEngine->g_activeScene->ecs);
-
 //      // #TODO Add line component
 //      {
 //          // when emplace_back at back, it will call destructor
