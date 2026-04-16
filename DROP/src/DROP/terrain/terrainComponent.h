@@ -8,6 +8,7 @@
 #define TERRAIN_INDEX_NULL UINT32_MAX
 #define LOADED_MAPS 9
 #define TERRAIN_MAP_SIZE 81
+#define TERRAIN_MAX_PATH_SIZE 256
 
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;
@@ -19,6 +20,11 @@ struct TerrainDisplacementMap {
 	float maxDisplacement = 2.5f;
 	// #TODO use a texture and a 2DSampler
 	float displacementMap[TERRAIN_MAP_SIZE]; // this depends on num of vertices of the mesh
+};
+
+struct TerrainDisplacementPath {
+	char filePath[TERRAIN_MAX_PATH_SIZE];
+	size_t maxFilePathSize = TERRAIN_MAX_PATH_SIZE;
 };
 
 // Use a mutex to access TerrainDisplacementMaps
@@ -37,6 +43,7 @@ struct TerrainsContext {
 	// like a sparse set
 	TerrainID terrainToDisplacementMappings[MAX_NUM_TERRAINS];
 	TerrainID maxNumTerrains = MAX_NUM_TERRAINS;
+	TerrainDisplacementPath terrainDisplacementPath[MAX_NUM_TERRAINS];
 
 	// useful for fast lookup
 	TerrainID requiredMaps[LOADED_MAPS];

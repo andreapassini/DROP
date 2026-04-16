@@ -14,6 +14,10 @@ void UpdateTerrains(
 	, const float deltaTime
 );
 
+void GenerateSaveAndSetPathForTerrainsDisplacementMaps(
+	TerrainsContext& inTerrainContext
+);
+
 void InitTerrainsDisplacementMaps(TerrainsContext& inTerrainContext);
 
 bool IsTerrainMapLoaded(

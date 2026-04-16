@@ -13,6 +13,7 @@
 #include "DROP/terrain/terrainComponent.h"
 #include "DROP/math/mat3.h"
 #include "DROP/utils/ExecPath.h"
+#include "DROP/core/file.h"
 
 
 void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
@@ -34,6 +35,13 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 		memset(&terrainContext.terrainDisplacementMaps[i].displacementMap[0], 0
 			, sizeof(terrainContext.terrainDisplacementMaps[i].displacementMap[0]) 
 			* terrainContext.terrainDisplacementMaps[i].displacementMapSize);
+
+	}
+
+	for (uint32_t i = 0; i < terrainContext.maxNumTerrains; i++) {
+		memset(&terrainContext.terrainDisplacementPath[i].filePath[0], 0
+			, sizeof(terrainContext.terrainDisplacementPath[i].filePath[0])
+			* terrainContext.terrainDisplacementPath[i].maxFilePathSize);
 	}
 
 
@@ -62,7 +70,7 @@ void TerrainSystem::UpdateTerrains(
 	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
 
 	// Copy the assets terrain buffer into the game terrain buffer
-	if (terrainContext.bNeedsDisplacementMapsUpdate) {
+	if (terrainContext.bNeedsDisplacementMapsUpdate && false) {
 
 		// LOCK MUTEX
 		assert(terrainContext.numOfLoadedTerrainDisplacementMaps == terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps);
@@ -124,75 +132,70 @@ void TerrainSystem::UpdateTerrains(
 	
 }
 
-void TerrainSystem::InitTerrainsDisplacementMaps(TerrainsContext& inTerrainContext) {
-	// Initialize terrains displacement maps
-	//  #TODO this should generate a map for each terrain id and not only 9 maps
+// #TODO Divide the path creation from map generation
+void TerrainSystem::GenerateSaveAndSetPathForTerrainsDisplacementMaps(
+	TerrainsContext& inTerrainContext
+) {
 	//  #TODO make it parallel
-	for (uint32_t i = 0; i < inTerrainContext.numOfLoadedTerrainDisplacementMaps; i++) {
-		for (uint32_t j = 0; j < inTerrainContext.terrainDisplacementMaps[i].displacementMapSize; j++) {
-			inTerrainContext.terrainDisplacementMaps[i].displacementMap[j] =
+	float displacementMap[TERRAIN_MAP_SIZE]; // this depends on num of vertices of the mesh
+	for (uint32_t i = 0; i < inTerrainContext.maxNumTerrains; i++)
+	{
+		// Fill the temp buffer and save it
+		for (uint32_t j = 0; j < inTerrainContext.terrainDisplacementMaps[0].displacementMapSize; j++)
+		{
+			displacementMap[j] =
 				VgMath::RandomBetween0and1()
-				* inTerrainContext.terrainDisplacementMaps[i].maxDisplacement;
+				* inTerrainContext.terrainDisplacementMaps[0].maxDisplacement;
 		}
-		// #TODO save in a file			
+		std::string relPath = "/terrains/terrainDisplacement_"
+			+ std::to_string(i)
+			+ ".drop";
+
+		std::string absProjPath = GetRelativeProjectPathWithMarker();
+		std::string filePath = absProjPath + relPath;
+		File::WriteFile(
+			filePath.c_str(), filePath.size() + 1 // for the null terminator
+			, &displacementMap[0]
+			, sizeof(displacementMap[0])
+			, inTerrainContext.terrainDisplacementMaps[0].displacementMapSize
+		);
+
+		assert(TERRAIN_MAX_PATH_SIZE >= filePath.size() + 1); // safety check
+		memcpy(
+			&inTerrainContext.terrainDisplacementPath[i].filePath[0]
+			, filePath.c_str()
+			, filePath.size() + 1
+		);
+		inTerrainContext.terrainDisplacementPath[i].maxFilePathSize = filePath.size() + 1;
 	}
+}
 
-	TerrainID rowDim = sqrt(inTerrainContext.maxNumTerrains);
-	TerrainID centerId = (rowDim / 2 * rowDim) + rowDim / 2;
+// SYNC INIT
+void TerrainSystem::InitTerrainsDisplacementMaps(
+	TerrainsContext& inTerrainContext
+) {
 
-	// update the loaded map
-	inTerrainContext.loadedMaps[0] = centerId + 0;
-	inTerrainContext.loadedMaps[1] = centerId + 1;
-	inTerrainContext.loadedMaps[2] = centerId + 2;
+#if 1 // not only for maps re-generation but also for paths
+	// #TODO Divide the path creation from map generation
+	GenerateSaveAndSetPathForTerrainsDisplacementMaps(inTerrainContext);
+#endif
 
-	inTerrainContext.loadedMaps[3] = centerId + 0 + rowDim * 1;
-	inTerrainContext.loadedMaps[4] = centerId + 1 + rowDim * 1;
-	inTerrainContext.loadedMaps[5] = centerId + 2 + rowDim * 1;
+	TerrainID numCol = sqrt(inTerrainContext.maxNumTerrains);
+	TerrainID numRow = sqrt(inTerrainContext.maxNumTerrains);
+	TerrainID centerId = numCol / 2 + (numRow / 2 * numRow);
 
-	inTerrainContext.loadedMaps[6] = centerId + 0 + rowDim * 2;
-	inTerrainContext.loadedMaps[7] = centerId + 1 + rowDim * 2;
-	inTerrainContext.loadedMaps[8] = centerId + 2 + rowDim * 2;
-
-	// update the mapping
-	inTerrainContext.terrainToDisplacementMappings[centerId + 0] = 0;
-	inTerrainContext.terrainToDisplacementMappings[centerId + 1] = 1;
-	inTerrainContext.terrainToDisplacementMappings[centerId + 2] = 2;
-
-	inTerrainContext.terrainToDisplacementMappings[centerId + 0 + rowDim * 1] = 3;
-	inTerrainContext.terrainToDisplacementMappings[centerId + 1 + rowDim * 1] = 4;
-	inTerrainContext.terrainToDisplacementMappings[centerId + 2 + rowDim * 1] = 5;
-
-	inTerrainContext.terrainToDisplacementMappings[centerId + 0 + rowDim * 2] = 6;
-	inTerrainContext.terrainToDisplacementMappings[centerId + 1 + rowDim * 2] = 7;
-	inTerrainContext.terrainToDisplacementMappings[centerId + 2 + rowDim * 2] = 8;
-
-	// save in a file
-	// Resolve file path
-	std::string filePath = GetFullPath("/terrains/SomeTerrain.drop").c_str();
-	float fileContent[TERRAIN_MAP_SIZE];
-
-	// #TODO use the engine side specific function for file reading
-	FILE* f;
-	f = fopen(filePath.c_str(), "w");
-	if (!f) {
-		fclose(f);
-		DebugBreak();
-		return;
+	for (TerrainID row = centerId - 1; row < numRow && row <= centerId + 1; row++) {
+		for (TerrainID col = centerId - 1; col < numCol && col <= centerId + 1; col++) {
+			TerrainID currentIndex = col + row * numCol;
+			LoadTerrainDisplacementMap(
+				&inTerrainContext.terrainDisplacementMaps[currentIndex - centerId - 1].displacementMap[0]
+				, inTerrainContext.terrainDisplacementMaps[currentIndex - centerId - 1].displacementMapSize
+				, &inTerrainContext.loadedMaps[currentIndex - centerId - 1]
+				, currentIndex
+			);
+			inTerrainContext.terrainToDisplacementMappings[currentIndex] = currentIndex - centerId - 1;
+		}
 	}
-
-	size_t sizeTest = sizeof(inTerrainContext.terrainDisplacementMaps[0].displacementMap[0]);
-	size_t writtenBytes = fwrite(
-		&inTerrainContext.terrainDisplacementMaps[0].displacementMap[0]
-		, sizeof(inTerrainContext.terrainDisplacementMaps[0].displacementMap[0])
-		, inTerrainContext.terrainDisplacementMaps[0].displacementMapSize
-		, f
-	);
-
-	if (writtenBytes == 0) {
-		DebugBreak();
-	}
-	
-	fclose(f);
 }
 
 bool TerrainSystem::IsTerrainMapLoaded(
