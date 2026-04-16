@@ -3,7 +3,7 @@
 #include <cstdint>
 
 
-#define MAX_NUM_TERRAINS 144
+#define MAX_NUM_TERRAINS 121
 
 #define TERRAIN_INDEX_NULL UINT32_MAX
 #define LOADED_MAPS 9
@@ -36,7 +36,8 @@ struct TerrainsContext {
 
 	// like a sparse set
 	TerrainID terrainToDisplacementMappings[MAX_NUM_TERRAINS];
-	
+	TerrainID maxNumTerrains = MAX_NUM_TERRAINS;
+
 	// useful for fast lookup
 	TerrainID requiredMaps[LOADED_MAPS];
 	TerrainID loadedMaps[LOADED_MAPS];

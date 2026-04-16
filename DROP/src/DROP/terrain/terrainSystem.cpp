@@ -126,14 +126,45 @@ void TerrainSystem::UpdateTerrains(
 
 void TerrainSystem::InitTerrainsDisplacementMaps(TerrainsContext& inTerrainContext) {
 	// Initialize terrains displacement maps
+	//  #TODO this should generate a map for each terrain id and not only 9 maps
+	//  #TODO make it parallel
 	for (uint32_t i = 0; i < inTerrainContext.numOfLoadedTerrainDisplacementMaps; i++) {
 		for (uint32_t j = 0; j < inTerrainContext.terrainDisplacementMaps[i].displacementMapSize; j++) {
 			inTerrainContext.terrainDisplacementMaps[i].displacementMap[j] =
 				VgMath::RandomBetween0and1()
 				* inTerrainContext.terrainDisplacementMaps[i].maxDisplacement;
 		}
-		// save in a file
+		// #TODO save in a file			
 	}
+
+	TerrainID rowDim = sqrt(inTerrainContext.maxNumTerrains);
+	TerrainID centerId = (rowDim / 2 * rowDim) + rowDim / 2;
+
+	// update the loaded map
+	inTerrainContext.loadedMaps[0] = centerId + 0;
+	inTerrainContext.loadedMaps[1] = centerId + 1;
+	inTerrainContext.loadedMaps[2] = centerId + 2;
+
+	inTerrainContext.loadedMaps[3] = centerId + 0 + rowDim * 1;
+	inTerrainContext.loadedMaps[4] = centerId + 1 + rowDim * 1;
+	inTerrainContext.loadedMaps[5] = centerId + 2 + rowDim * 1;
+
+	inTerrainContext.loadedMaps[6] = centerId + 0 + rowDim * 2;
+	inTerrainContext.loadedMaps[7] = centerId + 1 + rowDim * 2;
+	inTerrainContext.loadedMaps[8] = centerId + 2 + rowDim * 2;
+
+	// update the mapping
+	inTerrainContext.terrainToDisplacementMappings[centerId + 0] = 0;
+	inTerrainContext.terrainToDisplacementMappings[centerId + 1] = 1;
+	inTerrainContext.terrainToDisplacementMappings[centerId + 2] = 2;
+
+	inTerrainContext.terrainToDisplacementMappings[centerId + 0 + rowDim * 1] = 3;
+	inTerrainContext.terrainToDisplacementMappings[centerId + 1 + rowDim * 1] = 4;
+	inTerrainContext.terrainToDisplacementMappings[centerId + 2 + rowDim * 1] = 5;
+
+	inTerrainContext.terrainToDisplacementMappings[centerId + 0 + rowDim * 2] = 6;
+	inTerrainContext.terrainToDisplacementMappings[centerId + 1 + rowDim * 2] = 7;
+	inTerrainContext.terrainToDisplacementMappings[centerId + 2 + rowDim * 2] = 8;
 
 	// save in a file
 	// Resolve file path
@@ -236,12 +267,6 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 		DebugBreak();
 	}
 	fclose(f);
-
-	//ifstream fStream;
-	//fStream.open(filePath);
-	//std::stringstream stringtream;
-	//stringtream << fStream.rdbuf();
-	//fStream.close();
 
 	// #TODO LOCK
 	memcpy(

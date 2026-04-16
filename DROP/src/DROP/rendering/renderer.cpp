@@ -1057,14 +1057,7 @@ namespace Drop
 
         GLint displacementMapSize = numVertices;
         assert(displacementMapSize == terrainsContext.terrainDisplacementMaps[0].displacementMapSize);
-        if (
-            (terrainIndex >= 9 * 3 + 3 
-                && terrainIndex <= 9 * 3 + 5) 
-            || (terrainIndex >= 9 * 4 + 3 
-                && terrainIndex <= 9 * 4 + 5)
-            || (terrainIndex >= 9 * 5 + 3 
-                && terrainIndex <= 9 * 5 + 5)
-        ) {
+        if (terrainsContext.terrainToDisplacementMappings[terrainIndex] != TERRAIN_INDEX_NULL) {
             // the size of the map 
             // Not so fast now, we have to check first if the displacement map is loaded
             glUniform1fv(\
