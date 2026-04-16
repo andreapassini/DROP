@@ -15,7 +15,7 @@ typedef uint32_t MaterialID;
 typedef uint32_t TerrainID;
 
 struct TerrainDisplacementMap {
-	TerrainID terrainIndex = TERRAIN_INDEX_NULL;
+	//TerrainID terrainIndex = TERRAIN_INDEX_NULL;
 	uint32_t displacementMapSize = TERRAIN_MAP_SIZE;
 	float maxDisplacement = 2.5f;
 	// #TODO use a texture and a 2DSampler
@@ -43,7 +43,6 @@ struct TerrainsContext {
 	// like a sparse set
 	TerrainID terrainToDisplacementMappings[MAX_NUM_TERRAINS];
 	TerrainID maxNumTerrains = MAX_NUM_TERRAINS;
-	TerrainDisplacementPath terrainDisplacementPath[MAX_NUM_TERRAINS];
 
 	// useful for fast lookup
 	TerrainID requiredMaps[LOADED_MAPS];
@@ -53,6 +52,7 @@ struct TerrainsContext {
 
 	// stub displacement map
 	TerrainDisplacementMap stubTerrainDisplacementMap;
+	TerrainDisplacementPath terrainDisplacementPath[MAX_NUM_TERRAINS];
 };
 
 

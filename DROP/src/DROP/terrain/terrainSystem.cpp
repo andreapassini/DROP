@@ -18,24 +18,27 @@
 
 void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 	TerrainsContext& terrainContext = ecs.GetSingletonComponent<TerrainsContext>();
-	size_t testSizeOf = sizeof(terrainContext.terrainToDisplacementMappings[0]);
+
+	size_t sizeOfTerrainsContext = sizeof(terrainContext);
+
 	// Reset buffers
 	memset(&terrainContext.terrainToDisplacementMappings[0], TERRAIN_INDEX_NULL
 		, sizeof(terrainContext.terrainToDisplacementMappings[0]) * MAX_NUM_TERRAINS);
 
 	memset(&terrainContext.requiredMaps, TERRAIN_INDEX_NULL
 		, sizeof(terrainContext.requiredMaps[0]) * LOADED_MAPS);
+
 	memset(&terrainContext.loadedMaps[0], TERRAIN_INDEX_NULL
 		, sizeof(terrainContext.loadedMaps[0]) * LOADED_MAPS);
+
 	memset(&terrainContext.stubTerrainDisplacementMap.displacementMap[0], 0.0
 		, sizeof(terrainContext.stubTerrainDisplacementMap.displacementMap[0]) 
 		* terrainContext.stubTerrainDisplacementMap.displacementMapSize);
 
 	for (uint32_t i = 0; i < terrainContext.numOfLoadedTerrainDisplacementMaps; i++) {
-		memset(&terrainContext.terrainDisplacementMaps[i].displacementMap[0], 0
+		memset(&terrainContext.terrainDisplacementMaps[i].displacementMap[0], 0.0
 			, sizeof(terrainContext.terrainDisplacementMaps[i].displacementMap[0]) 
 			* terrainContext.terrainDisplacementMaps[i].displacementMapSize);
-
 	}
 
 	for (uint32_t i = 0; i < terrainContext.maxNumTerrains; i++) {
@@ -45,18 +48,19 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 	}
 
 
-	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
-	// Reset assets buffers
-	memset(&terrainsAssetsContext.requiredMaps[0], TERRAIN_INDEX_NULL
-		, sizeof(terrainsAssetsContext.requiredMaps[0]) * LOADED_MAPS);
-	memset(&terrainsAssetsContext.loadedMaps[0], TERRAIN_INDEX_NULL
-		, sizeof(terrainsAssetsContext.loadedMaps[0]) * LOADED_MAPS);
+	//TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
+	//// Reset assets buffers
+	//memset(&terrainsAssetsContext.requiredMaps[0], TERRAIN_INDEX_NULL
+	//	, sizeof(terrainsAssetsContext.requiredMaps[0]) * LOADED_MAPS);
 
-	for (uint32_t i = 0; i < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps; i++) {
-		memset(&terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0], 0
-			, sizeof(terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0])
-			* terrainsAssetsContext.terrainDisplacementMaps[i].displacementMapSize);
-	}
+	//memset(&terrainsAssetsContext.loadedMaps[0], TERRAIN_INDEX_NULL
+	//	, sizeof(terrainsAssetsContext.loadedMaps[0]) * LOADED_MAPS);
+
+	//for (uint32_t i = 0; i < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps; i++) {
+	//	memset(&terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0], 0.0
+	//		, sizeof(terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0])
+	//		* terrainsAssetsContext.terrainDisplacementMaps[i].displacementMapSize);
+	//}
 
 
 	TerrainSystem::InitTerrainsDisplacementMaps(terrainContext);
@@ -66,6 +70,8 @@ void TerrainSystem::UpdateTerrains(
 	bseecs::ECS& ecs
 	, const float deltaTime
 ) {
+	return;
+
 	TerrainsContext& terrainContext = ecs.GetSingletonComponent<TerrainsContext>();
 	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
 
@@ -113,20 +119,21 @@ void TerrainSystem::UpdateTerrains(
 	// From the LOADED MAPS, find those that could be removed
 
 	// Update the required maps
-	TerrainID mapPosition = 0;
-	TerrainID terrainPosition = 0;
-	terrainsAssetsContext.loadedMaps[mapPosition] = TERRAIN_INDEX_NULL;
-	TerrainDisplacementMap& currentTerrainDisplacementMap = terrainsAssetsContext.terrainDisplacementMaps[mapPosition];
-	currentTerrainDisplacementMap.terrainIndex = terrainPosition;
-	static int numLoads = 0;
-	if (numLoads++ > 1)
-		return;
-	TerrainSystem::LoadTerrainDisplacementMap(
-		&terrainsAssetsContext.terrainDisplacementMaps[mapPosition].displacementMap[0]
-		, currentTerrainDisplacementMap.displacementMapSize
-		, &terrainsAssetsContext.loadedMaps[mapPosition]
-		, terrainPosition
-	);
+	//TerrainID mapPosition = 0;
+	//TerrainID terrainPosition = 0;
+	//terrainsAssetsContext.loadedMaps[mapPosition] = TERRAIN_INDEX_NULL;
+	//TerrainDisplacementMap& currentTerrainDisplacementMap = terrainsAssetsContext.terrainDisplacementMaps[mapPosition];
+	//currentTerrainDisplacementMap.terrainIndex = terrainPosition;
+	//static int numLoads = 0;
+	//if (numLoads++ > 1)
+	//	return;
+	//TerrainSystem::LoadTerrainDisplacementMap(
+	//	&terrainsAssetsContext.terrainDisplacementMaps[mapPosition].displacementMap[0]
+	//	, currentTerrainDisplacementMap.displacementMapSize
+	//	, &terrainsAssetsContext.loadedMaps[mapPosition]
+	//	, terrainPosition
+	//	, terrainContext
+	//);
 
 	// launch threads with the specific maps and a copy of the context
 	
@@ -182,18 +189,25 @@ void TerrainSystem::InitTerrainsDisplacementMaps(
 
 	TerrainID numCol = sqrt(inTerrainContext.maxNumTerrains);
 	TerrainID numRow = sqrt(inTerrainContext.maxNumTerrains);
+	TerrainID centerRow = numRow / 2;
+	TerrainID centerCol = numCol / 2;
 	TerrainID centerId = numCol / 2 + (numRow / 2 * numRow);
 
-	for (TerrainID row = centerId - 1; row < numRow && row <= centerId + 1; row++) {
-		for (TerrainID col = centerId - 1; col < numCol && col <= centerId + 1; col++) {
-			TerrainID currentIndex = col + row * numCol;
+	TerrainID currentIndex = 0;
+	uint32_t iteration = 0;
+	for (TerrainID row = centerRow - 1; row <= centerRow + 1; row++) {
+		for (TerrainID col = centerCol - 1; col <= centerCol + 1; col++) {
+			currentIndex = col + row * numCol;
 			LoadTerrainDisplacementMap(
-				&inTerrainContext.terrainDisplacementMaps[currentIndex - centerId - 1].displacementMap[0]
-				, inTerrainContext.terrainDisplacementMaps[currentIndex - centerId - 1].displacementMapSize
-				, &inTerrainContext.loadedMaps[currentIndex - centerId - 1]
+				&inTerrainContext.terrainDisplacementMaps[iteration].displacementMap[0]
+				, inTerrainContext.terrainDisplacementMaps[iteration].displacementMapSize
+				, &inTerrainContext.loadedMaps[iteration]
 				, currentIndex
+				, &inTerrainContext.terrainDisplacementPath[currentIndex].filePath[0]
+				, inTerrainContext.terrainDisplacementPath[currentIndex].maxFilePathSize
 			);
-			inTerrainContext.terrainToDisplacementMappings[currentIndex] = currentIndex - centerId - 1;
+			inTerrainContext.terrainToDisplacementMappings[currentIndex] = iteration;
+			iteration++;
 		}
 	}
 }
@@ -219,6 +233,8 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 	, uint32_t mapBufferSize
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition
+	, const char* filePath
+	, size_t filePathSize
 ) {
 	if (terrainPosition == TERRAIN_INDEX_NULL) {
 		DebugBreak();
@@ -231,12 +247,19 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 	}
 
 	// Resolve file path
-	std::string filePath = GetFullPath("/terrains/SomeTerrain.drop").c_str();
+	//std::string relPath = "/terrains/terrainDisplacement_"
+	//	+ std::to_string(terrainPosition)
+	//	+ ".drop";
+	//std::string absProjPath = GetRelativeProjectPathWithMarker();
+	//std::string filePath = absProjPath + relPath;
+
 	float fileContent[TERRAIN_MAP_SIZE];
+
+	std::cout << "reading file: " << filePath << std::endl;
 
 	// #TODO use the engine side specific function for file reading
 	FILE* f;
-	f = fopen(filePath.c_str(), "rb");
+	f = fopen(filePath, "rb");
 	if (!f) {
 		DebugBreak();
 		return;
