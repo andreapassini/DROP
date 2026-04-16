@@ -40,7 +40,7 @@ uniform vec3 lightVector;
 
 uniform float time;
 
-uniform flat int maxVertexID;
+uniform int maxVertexID;
 
 uniform float maxDisplacement;
 uniform float displacementMap[81];
