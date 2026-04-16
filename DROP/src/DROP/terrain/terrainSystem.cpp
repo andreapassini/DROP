@@ -213,6 +213,7 @@ bool TerrainSystem::IsTerrainMapLoaded(
 	return outLoaded;
 }
 
+// #TODO for file, use platform specific functions
 void TerrainSystem::LoadTerrainDisplacementMap(
 	float* mapBuffer
 	, uint32_t mapBufferSize
