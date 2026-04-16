@@ -13,7 +13,7 @@ void File::ReadFile() {
 };
 
 void File::WriteFile(
-	char* inFilePath, size_t filePathSize
+	const char* inFilePath, size_t filePathSize
 	, void* inBuffer, size_t elementSize, size_t elementCount
 ) {
 	FILE* f;
