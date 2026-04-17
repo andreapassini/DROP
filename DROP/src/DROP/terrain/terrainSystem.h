@@ -30,8 +30,7 @@ void LoadTerrainDisplacementMap(
 	, uint32_t mapBufferSize
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition
-	, const char* filePath
-	, size_t filePathSize
+	//, std::string filePath
 );
 
 }

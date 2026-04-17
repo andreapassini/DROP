@@ -52,7 +52,7 @@ struct TerrainsContext {
 
 	// stub displacement map
 	TerrainDisplacementMap stubTerrainDisplacementMap;
-	TerrainDisplacementPath terrainDisplacementPath[MAX_NUM_TERRAINS];
+	std::string terrainDisplacementPath[MAX_NUM_TERRAINS];
 };
 
 

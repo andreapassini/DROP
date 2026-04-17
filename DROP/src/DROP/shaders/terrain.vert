@@ -41,6 +41,8 @@ uniform vec3 lightVector;
 uniform float time;
 
 uniform int maxVertexID;
+//uniform int edge;
+uniform int terrainIndex;
 
 uniform float maxDisplacement;
 uniform float displacementMap[81];
@@ -59,9 +61,12 @@ out vec3 vViewPosition;
 // the output variable for UV coordinates
 out vec2 interp_UV;
 out flat vec2 flat_UV;
+out flat int flat_terrainIndex;
 
 out flat int flat_vertexID;
 out flat int flat_maxVertexID;
+out flat float flat_maxDisplacement;
+out flat int flat_linearizedIndex;
 
 // for the correct rendering of the shadows, we need to calculate the vertex coordinates also in "light coordinates" (= using light as a camera)
 out vec4 posLightSpace;
@@ -70,7 +75,9 @@ out vec4 posLightSpace;
 void main(){
   // I assign the values to a variable with "out" qualifier so to use the per-fragment interpolated values in the Fragment shader
   flat_vertexID = gl_VertexID;
+  flat_terrainIndex = terrainIndex;
   flat_maxVertexID = maxVertexID;
+  flat_maxDisplacement = maxDisplacement;
 
   // vertex position in world coordinates
   // float cosUVx = cos((UV.x + time) * 2);
@@ -80,11 +87,15 @@ void main(){
   float sinPosY = 0.0;
   float edge = float(sqrt(maxVertexID)); // beware of x < 0
   int edgeInt = int(edge);
-  int raw = int(UV.x * edge);  
-  int col = int(UV.y * edge);
+  float edgeFloat = float(edge);
+  int raw = int(UV.x * edgeFloat);  
+  int col = int(UV.y * edgeFloat);
+  raw = int(sqrt(raw * raw));
+  col = int(sqrt(col * col));
   int linearizedIndex = (raw * edgeInt) + col;
-  sinPosY = displacementMap[linearizedIndex] * maxDisplacement;
+  sinPosY = displacementMap[linearizedIndex];
   vertexDisplacement = sinPosY;
+  sinPosY = 0.0;
   vec4 mPosition = modelMatrix * vec4( position.x, sinPosY, position.z, 1.0 );
   //  vec4 mPosition = modelMatrix * vec4( position.x, position.y + time, position.z, 1.0 );
   // vertex position in camera coordinates
@@ -105,6 +116,7 @@ void main(){
   // I assign the values to a variable with "out" qualifier so to use the per-fragment interpolated values in the Fragment shader
   interp_UV = UV;
   flat_UV = UV;
+  flat_linearizedIndex = linearizedIndex;
 
   // vertex position in "light coordinates"
   posLightSpace = lightSpaceMatrix * mPosition;

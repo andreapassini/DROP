@@ -36,6 +36,9 @@ in flat vec2 flat_UV;
 
 in flat int flat_vertexID;  
 in flat int flat_maxVertexID;
+in flat int flat_terrainIndex;
+in flat int flat_linearizedIndex;
+in flat float flat_maxDisplacement;
 in float vertexDisplacement;
 
 // for the correct rendering of the shadows, we need to calculate the vertex coordinates also in "light coordinates" (= using light as a camera)
@@ -193,5 +196,27 @@ void main()
     // float vertexIDFloat = float(flat_vertexID) / maxVertexIDFloat;
 
     colorFrag = vec4(flat_UV.x * vertexDisplacement, flat_UV.y * vertexDisplacement, 0.0, 1.0);
-    // colorFrag = vec4(vertexDisplacement, vertexDisplacement, 0.0, 1.0);
+    float float_flat_terrainIndex = float(flat_terrainIndex);
+    float float_flat_maxVertexID = float(flat_maxVertexID);
+//    float debugVal = 100.0;
+//    colorFrag = vec4(
+//        (float_flat_terrainIndex * float_flat_terrainIndex)/ (float_flat_maxVertexID * float_flat_maxVertexID)
+//        , 1.0 - ((float_flat_terrainIndex * float_flat_terrainIndex) / (float_flat_maxVertexID * float_flat_maxVertexID))
+//        , 0.0
+//        , 1.0
+//    );
+    float float_flat_linearizedIndex = float(flat_linearizedIndex);
+//    colorFrag = vec4(
+//        float_flat_linearizedIndex / 81.0
+//        , 0.33
+//        , 0.0
+//        , 1.0
+//    );
+//    colorFrag = vec4(
+//        vertexDisplacement / flat_maxDisplacement
+//        , 0.33
+//        , 0.0
+//        , 1.0
+//    );
+//    // colorFrag = vec4(vertexDisplacement, vertexDisplacement, 0.0, 1.0);
 }

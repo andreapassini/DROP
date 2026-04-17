@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "DROP/core/file.h"
+#include <string>
 
 void File::ReadFile() {
 	assert(0);
@@ -18,6 +19,34 @@ void File::WriteFile(
 ) {
 	FILE* f;
 	f = fopen(inFilePath, "w");
+	if (!f)
+	{
+		// no need to close file if error while opening
+		DebugBreak();
+		return;
+	}
+
+	size_t writtenBytes = fwrite(
+		inBuffer
+		, elementSize
+		, elementCount
+		, f
+	);
+
+	if (writtenBytes == 0)
+	{
+	DebugBreak();
+	}
+
+	fclose(f);
+}
+
+void File::WriteFile(
+	std::string inFilePath
+	, void* inBuffer, size_t elementSize, size_t elementCount
+) {
+	FILE* f;
+	f = fopen(inFilePath.c_str(), "w");
 	if (!f)
 	{
 		// no need to close file if error while opening

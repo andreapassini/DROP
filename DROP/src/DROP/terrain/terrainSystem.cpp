@@ -41,11 +41,11 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 			* terrainContext.terrainDisplacementMaps[i].displacementMapSize);
 	}
 
-	for (uint32_t i = 0; i < terrainContext.maxNumTerrains; i++) {
-		memset(&terrainContext.terrainDisplacementPath[i].filePath[0], 0
-			, sizeof(terrainContext.terrainDisplacementPath[i].filePath[0])
-			* terrainContext.terrainDisplacementPath[i].maxFilePathSize);
-	}
+	//for (uint32_t i = 0; i < terrainContext.maxNumTerrains; i++) {
+	//	memset(&terrainContext.terrainDisplacementPath[i].filePath[0], 0
+	//		, sizeof(terrainContext.terrainDisplacementPath[i].filePath[0])
+	//		* terrainContext.terrainDisplacementPath[i].maxFilePathSize);
+	//}
 
 
 	//TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
@@ -167,13 +167,15 @@ void TerrainSystem::GenerateSaveAndSetPathForTerrainsDisplacementMaps(
 			, inTerrainContext.terrainDisplacementMaps[0].displacementMapSize
 		);
 
-		assert(TERRAIN_MAX_PATH_SIZE >= filePath.size() + 1); // safety check
-		memcpy(
-			&inTerrainContext.terrainDisplacementPath[i].filePath[0]
-			, filePath.c_str()
-			, filePath.size() + 1
-		);
-		inTerrainContext.terrainDisplacementPath[i].maxFilePathSize = filePath.size() + 1;
+		//inTerrainContext.terrainDisplacementPath[i] = std::move(filePath);
+
+		//assert(TERRAIN_MAX_PATH_SIZE >= filePath.size() + 1); // safety check
+		//memcpy(
+		//	&inTerrainContext.terrainDisplacementPath[i].filePath[0]
+		//	, filePath.c_str()
+		//	, filePath.size() + 1
+		//);
+		//inTerrainContext.terrainDisplacementPath[i].maxFilePathSize = filePath.size() + 1;
 	}
 }
 
@@ -203,8 +205,9 @@ void TerrainSystem::InitTerrainsDisplacementMaps(
 				, inTerrainContext.terrainDisplacementMaps[iteration].displacementMapSize
 				, &inTerrainContext.loadedMaps[iteration]
 				, currentIndex
-				, &inTerrainContext.terrainDisplacementPath[currentIndex].filePath[0]
-				, inTerrainContext.terrainDisplacementPath[currentIndex].maxFilePathSize
+				//, inTerrainContext.terrainDisplacementPath[currentIndex]
+				//, &inTerrainContext.terrainDisplacementPath[currentIndex].filePath[0]
+				//, inTerrainContext.terrainDisplacementPath[currentIndex].maxFilePathSize
 			);
 			inTerrainContext.terrainToDisplacementMappings[currentIndex] = iteration;
 			iteration++;
@@ -233,8 +236,7 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 	, uint32_t mapBufferSize
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition
-	, const char* filePath
-	, size_t filePathSize
+	//, std::string filePath
 ) {
 	if (terrainPosition == TERRAIN_INDEX_NULL) {
 		DebugBreak();
@@ -255,11 +257,17 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 
 	float fileContent[TERRAIN_MAP_SIZE];
 
+	std::string relPath = "/terrains/terrainDisplacement_"
+		+ std::to_string(terrainPosition)
+		+ ".drop";
+	std::string absProjPath = GetRelativeProjectPathWithMarker();
+	std::string filePath = absProjPath + relPath;
+
 	std::cout << "reading file: " << filePath << std::endl;
 
 	// #TODO use the engine side specific function for file reading
 	FILE* f;
-	f = fopen(filePath, "rb");
+	f = fopen(filePath.c_str(), "rb");
 	if (!f) {
 		DebugBreak();
 		return;

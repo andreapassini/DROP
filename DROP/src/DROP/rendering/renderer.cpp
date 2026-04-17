@@ -1052,12 +1052,21 @@ namespace Drop
         glUniform1i(glGetUniformLocation(shader.Program, "maxVertexID"), numVertices);
         glCheckError();
 
+        GLint edge = (GLint)sqrt(numVertices);
+        glUniform1i(glGetUniformLocation(shader.Program, "edge"), edge);
+        glCheckError();
+        glUniform1i(glGetUniformLocation(shader.Program, "terrainIndex"), (GLint)terrainIndex);
+        glCheckError();
+
         glUniform1f(glGetUniformLocation(shader.Program, "maxDisplacement"), 1.0f);
         glCheckError();
 
-        GLint displacementMapSize = numVertices;
-        assert(displacementMapSize == terrainsContext.terrainDisplacementMaps[0].displacementMapSize);
+        GLsizei displacementMapSize = terrainsContext.terrainDisplacementMaps[0].displacementMapSize;
+        assert(numVertices == terrainsContext.terrainDisplacementMaps[0].displacementMapSize);
         if (terrainsContext.terrainToDisplacementMappings[terrainIndex] != TERRAIN_INDEX_NULL) {
+            TerrainID mapID = terrainsContext.terrainToDisplacementMappings[terrainIndex];
+            TerrainID loadedMapID = terrainsContext.loadedMaps[mapID];
+            assert(loadedMapID == terrainIndex);
             // the size of the map 
             // Not so fast now, we have to check first if the displacement map is loaded
             glUniform1fv(\
@@ -1066,11 +1075,11 @@ namespace Drop
                     , "displacementMap" \
                 ) \
                 , displacementMapSize \
-                , &terrainsContext.terrainDisplacementMaps[terrainIndex].displacementMap[0] \
+                , &terrainsContext.terrainDisplacementMaps[mapID].displacementMap[0] \
             );
             glCheckError();
         }
-        else {
+        else { 
             glUniform1fv(\
                 glGetUniformLocation(\
                     shader.Program \

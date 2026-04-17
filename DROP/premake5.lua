@@ -11,7 +11,11 @@ project "Drop"
    { 
       "src/**.h"
       , "src/**.cpp"
-   
+
+      , "src/**.frag"
+      , "src/**.vert"
+      , "src/**.geom"
+
       , "dependencies/stb_image/**.h"
 		, "dependencies/stb_image/**.cpp"
 		, "dependencies/glm/glm/**.hpp"
