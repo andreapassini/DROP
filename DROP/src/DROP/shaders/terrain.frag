@@ -211,14 +211,16 @@ void main()
     float float_mod_linearizedIndex = mod(
         float_flat_linearizedIndex,float_flat_maxVertexID);
     // if > 1.0, something is wrong
+    float errorAmplifier = 10.0;
     float float_error_linearizedIndex 
-        = clamp(float_flat_linearizedIndex/float_flat_maxVertexID-1.0, 0.0, 1.0);
+        = clamp(float_flat_linearizedIndex/float_flat_maxVertexID-1.0, 0.0, 1.0)
+        * errorAmplifier;
     vec3 whiteIndex = white * float_mod_linearizedIndex;
     colorFrag = vec4(
 //        float_mod_linearizedIndex / float_flat_maxVertexID
-        0.0
+        float_error_linearizedIndex
         , 0.0
-        , float_error_linearizedIndex
+        , 0.0
         , 1.0
     );
 //    colorFrag = vec4(
