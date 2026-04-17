@@ -92,7 +92,8 @@ void main(){
 //  int col = int(UV.y * edgeFloat);
   int raw = int(clamp(UV.x * edgeFloat, 0.0, edge));  
   int col = int(clamp(UV.y * edgeFloat, 0.0, edge));
-  int linearizedIndex = clamp(((raw * edgeInt) + col), 0, maxVertexID);
+//  int linearizedIndex = clamp(((raw * edgeInt) + col), 0, maxVertexID);
+  int linearizedIndex = (raw * edgeInt) + col;
   sinPosY = displacementMap[linearizedIndex];
   vertexDisplacement = sinPosY;
   sinPosY = 0.0;
