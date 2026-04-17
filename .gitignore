@@ -13,3 +13,4 @@
 **/bin/
 bin-int/
 DROP/dependencies/assimp/libs/assimp-vc143-mt.lib
+/enc_temp_folder
