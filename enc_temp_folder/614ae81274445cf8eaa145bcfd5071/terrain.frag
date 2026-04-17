@@ -206,17 +206,13 @@ void main()
 //        , 0.0
 //        , 1.0
 //    );
-    vec3 white = vec3(1.0, 1.0, 1.0);
     float float_flat_linearizedIndex = float(flat_linearizedIndex);
-    float float_mod_linearizedIndex = mod(float_flat_linearizedIndex,81.0);
-    float float_error_linearizedIndex = float_flat_linearizedIndex/81.0;
-    vec3 whiteIndex = white * float_mod_linearizedIndex;
-    colorFrag = vec4(
-        float_mod_linearizedIndex
-        , float_flat_linearizedIndex
-        , 0.0
-        , 1.0
-    );
+//    colorFrag = vec4(
+//        float_flat_linearizedIndex / 81.0
+//        , 0.33
+//        , 0.0
+//        , 1.0
+//    );
 //    colorFrag = vec4(
 //        vertexDisplacement / flat_maxDisplacement
 //        , 0.33
