@@ -161,7 +161,7 @@ void TerrainSystem::GenerateSaveAndSetPathForTerrainsDisplacementMaps(
 
 		std::string absProjPath = GetRelativeProjectPathWithMarker();
 		std::string filePath = absProjPath + relPath;
-		File::WriteFile(
+		File::WriteBinaryFile(
 			filePath
 			, (char*)&displacementMap[0]
 			, sizeof(displacementMap[0])
@@ -255,6 +255,8 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 		return;
 	}
 
+	// since this could go in another thread
+	// we dont want to lock the map buffer while reading file
 	float fileContent[TERRAIN_MAP_SIZE];
 
 	std::string relPath = "/terrains/terrainDisplacement_"
@@ -265,9 +267,8 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 
 	std::cout << "reading file: " << filePath << std::endl;
 
-	// #TODO use the engine side specific function for file reading
 	size_t bufferElementSize = sizeof(fileContent[0]);
-	File::ReadFile(
+	File::ReadBinaryFile(
 		filePath
 		, (char*)(&fileContent[0])
 		, bufferElementSize, mapBufferSize
@@ -279,7 +280,7 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 		, fileContent
 		, sizeof(float) * mapBufferSize
 	);
+	*loadedMapPosToFill = terrainPosition;
 	// #TODO UnLOCK
 
-	*loadedMapPosToFill = terrainPosition;
 }

@@ -195,8 +195,8 @@ void main()
     // float maxVertexIDFloat = float(flat_maxVertexID);
     // float vertexIDFloat = float(flat_vertexID) / maxVertexIDFloat;
 
-//    colorFrag = vec4(flat_UV.x * vertexDisplacement, flat_UV.y * vertexDisplacement, 0.0, 1.0);
-   colorFrag = vec4(flat_UV.x, flat_UV.y, 0.0, 1.0);
+   colorFrag = vec4(flat_UV.x * vertexDisplacement, flat_UV.y * vertexDisplacement, 0.0, 1.0);
+//    colorFrag = vec4(flat_UV.x, flat_UV.y, 0.0, 1.0);
 //     colorFrag = vec4( vertexDisplacement, vertexDisplacement, 0.0, 1.0);
 //     float float_flat_terrainIndex = float(flat_terrainIndex);
 //     float float_flat_maxVertexID = float(flat_maxVertexID);

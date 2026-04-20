@@ -9,11 +9,11 @@
 #include "DROP/core/file.h"
 #include <string>
 
-void File::ReadFile() {
+void File::ReadBinaryFile() {
 	assert(0);
 };
 
-void File::WriteFile(
+void File::WriteBinaryFile(
 	const char* inFilePath, size_t filePathSize
 	, void* inBuffer, size_t elementSize, size_t elementCount
 ) {
@@ -41,7 +41,7 @@ void File::WriteFile(
 	fclose(f);
 }
 
-void File::WriteFile(
+void File::WriteBinaryFile(
 	std::string inFilePath
 	, char* inBuffer, size_t elementSize, size_t elementCount
 ) {
@@ -69,7 +69,7 @@ void File::WriteFile(
 	fclose(f);
 }
 
-size_t File::ReadFile(
+size_t File::ReadBinaryFile(
 	std::string inFilePath
 	, void* outBuffer, size_t elementSize, size_t elementCount
 ) {
