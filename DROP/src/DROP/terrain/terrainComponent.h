@@ -52,7 +52,12 @@ struct TerrainsContext {
 
 	// stub displacement map
 	TerrainDisplacementMap stubTerrainDisplacementMap;
+	
+	// Used for grid calculation
+	float terrainDimension = 10.0f;
 	std::string terrainDisplacementPath[MAX_NUM_TERRAINS];
+
+
 };
 
 

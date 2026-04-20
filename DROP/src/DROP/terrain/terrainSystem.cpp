@@ -14,7 +14,7 @@
 #include "DROP/math/mat3.h"
 #include "DROP/utils/ExecPath.h"
 #include "DROP/core/file.h"
-
+#include "DROP/math/vector3.h"
 
 void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 	TerrainsContext& terrainContext = ecs.GetSingletonComponent<TerrainsContext>();
@@ -283,4 +283,32 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 	*loadedMapPosToFill = terrainPosition;
 	// #TODO UnLOCK
 
+}
+
+TerrainID TerrainSystem::PositionInIndex(
+	const TerrainsContext* const inTerrainContext
+	, const VgMath::Vector3* const inPosition
+) {
+	TerrainID outTerrainID = TERRAIN_INDEX_NULL;
+	if (!inTerrainContext)
+	{
+		DebugBreak();
+		return outTerrainID;
+	}
+	if (!inPosition)
+	{
+		DebugBreak();
+		return outTerrainID;
+	}
+
+	float terrainDimension = inTerrainContext->terrainDimension;
+
+	// Grid calculation
+	TerrainID col = (TerrainID)(inPosition->x / terrainDimension);
+	TerrainID row = (TerrainID)(inPosition->y / terrainDimension);
+	TerrainID numCol = (TerrainID)(sqrt(inTerrainContext->maxNumTerrains));
+
+	outTerrainID = col + (row * numCol);
+
+	return outTerrainID;
 }

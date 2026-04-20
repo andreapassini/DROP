@@ -6,6 +6,10 @@ typedef uint32_t TerrainID;
 struct TerrainsContext;
 struct TerrainsAssetsContext;
 
+namespace VgMath {
+	class Vector3;
+}
+
 namespace TerrainSystem {
 
 void InitTerrains(bseecs::ECS& ecs);
@@ -31,6 +35,11 @@ void LoadTerrainDisplacementMap(
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition
 	//, std::string filePath
+);
+
+TerrainID PositionInIndex(
+	const TerrainsContext* const inTerrainContext
+	, const VgMath::Vector3* const inPosition
 );
 
 }
