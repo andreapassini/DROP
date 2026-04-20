@@ -196,33 +196,34 @@ void main()
     // float vertexIDFloat = float(flat_vertexID) / maxVertexIDFloat;
 
 //    colorFrag = vec4(flat_UV.x * vertexDisplacement, flat_UV.y * vertexDisplacement, 0.0, 1.0);
-    colorFrag = vec4( vertexDisplacement, vertexDisplacement, 0.0, 1.0);
-    float float_flat_terrainIndex = float(flat_terrainIndex);
-    float float_flat_maxVertexID = float(flat_maxVertexID);
-//    float debugVal = 100.0;
-//    colorFrag = vec4(
-//        (float_flat_terrainIndex * float_flat_terrainIndex)/ (float_flat_maxVertexID * float_flat_maxVertexID)
-//        , 1.0 - ((float_flat_terrainIndex * float_flat_terrainIndex) / (float_flat_maxVertexID * float_flat_maxVertexID))
-//        , 0.0
-//        , 1.0
-//    );
-    vec3 white = vec3(1.0, 1.0, 1.0);
-    float float_flat_linearizedIndex = float(flat_linearizedIndex);
-    float float_mod_linearizedIndex = mod(
-        float_flat_linearizedIndex,float_flat_maxVertexID);
-    // if > 1.0, something is wrong
-    float errorAmplifier = 10.0;
-    float float_error_linearizedIndex 
-        = clamp(float_flat_linearizedIndex/float_flat_maxVertexID-1.0, 0.0, 1.0)
-        * errorAmplifier;
-    vec3 whiteIndex = white * float_mod_linearizedIndex;
-    colorFrag = vec4(
-//        float_mod_linearizedIndex / float_flat_maxVertexID
-        float_error_linearizedIndex
-        , 0.0
-        , 0.0
-        , 1.0
-    );
+   colorFrag = vec4(flat_UV.x, flat_UV.y, 0.0, 1.0);
+//     colorFrag = vec4( vertexDisplacement, vertexDisplacement, 0.0, 1.0);
+//     float float_flat_terrainIndex = float(flat_terrainIndex);
+//     float float_flat_maxVertexID = float(flat_maxVertexID);
+// //    float debugVal = 100.0;
+// //    colorFrag = vec4(
+// //        (float_flat_terrainIndex * float_flat_terrainIndex)/ (float_flat_maxVertexID * float_flat_maxVertexID)
+// //        , 1.0 - ((float_flat_terrainIndex * float_flat_terrainIndex) / (float_flat_maxVertexID * float_flat_maxVertexID))
+// //        , 0.0
+// //        , 1.0
+// //    );
+//     vec3 white = vec3(1.0, 1.0, 1.0);
+//     float float_flat_linearizedIndex = float(flat_linearizedIndex);
+//     float float_mod_linearizedIndex = mod(
+//         float_flat_linearizedIndex,float_flat_maxVertexID);
+//     // if > 1.0, something is wrong
+//     float errorAmplifier = 10.0;
+//     float float_error_linearizedIndex 
+//         = clamp(float_flat_linearizedIndex/float_flat_maxVertexID-1.0, 0.0, 1.0)
+//         * errorAmplifier;
+//     vec3 whiteIndex = white * float_mod_linearizedIndex;
+//     colorFrag = vec4(
+// //        float_mod_linearizedIndex / float_flat_maxVertexID
+//         float_error_linearizedIndex
+//         , 0.0
+//         , 0.0
+//         , 1.0
+//     );
 //    colorFrag = vec4(
 //        vertexDisplacement / flat_maxDisplacement
 //        , 0.33

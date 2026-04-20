@@ -33,12 +33,12 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 
 	memset(&terrainContext.stubTerrainDisplacementMap.displacementMap[0], 0.0
 		, sizeof(terrainContext.stubTerrainDisplacementMap.displacementMap[0]) 
-		* terrainContext.stubTerrainDisplacementMap.displacementMapSize);
+			* terrainContext.stubTerrainDisplacementMap.displacementMapSize);
 
 	for (uint32_t i = 0; i < terrainContext.numOfLoadedTerrainDisplacementMaps; i++) {
 		memset(&terrainContext.terrainDisplacementMaps[i].displacementMap[0], 0.0
 			, sizeof(terrainContext.terrainDisplacementMaps[i].displacementMap[0]) 
-			* terrainContext.terrainDisplacementMaps[i].displacementMapSize);
+				* terrainContext.terrainDisplacementMaps[i].displacementMapSize);
 	}
 
 	//for (uint32_t i = 0; i < terrainContext.maxNumTerrains; i++) {
@@ -152,7 +152,8 @@ void TerrainSystem::GenerateSaveAndSetPathForTerrainsDisplacementMaps(
 		{
 			displacementMap[j] =
 				VgMath::RandomBetween0and1()
-				* inTerrainContext.terrainDisplacementMaps[0].maxDisplacement;
+				* 2.5f;
+			assert(displacementMap[j] >= 0.0 && displacementMap[j] <= 2.5);
 		}
 		std::string relPath = "/terrains/terrainDisplacement_"
 			+ std::to_string(i)
@@ -161,13 +162,20 @@ void TerrainSystem::GenerateSaveAndSetPathForTerrainsDisplacementMaps(
 		std::string absProjPath = GetRelativeProjectPathWithMarker();
 		std::string filePath = absProjPath + relPath;
 		File::WriteFile(
-			filePath.c_str(), filePath.size() + 1 // for the null terminator
-			, &displacementMap[0]
+			//filePath.c_str(), filePath.size() + 1 // for the null terminator
+			filePath
+			, (char*)&displacementMap[0]
 			, sizeof(displacementMap[0])
 			, inTerrainContext.terrainDisplacementMaps[0].displacementMapSize
 		);
 
-		//inTerrainContext.terrainDisplacementPath[i] = std::move(filePath);
+		inTerrainContext.terrainDisplacementPath[i] = std::move(filePath);
+
+		memset(
+			&displacementMap[0]
+			, 0.0
+			, sizeof(displacementMap[0]) * inTerrainContext.terrainDisplacementMaps[0].displacementMapSize
+		);
 
 		//assert(TERRAIN_MAX_PATH_SIZE >= filePath.size() + 1); // safety check
 		//memcpy(
@@ -201,8 +209,9 @@ void TerrainSystem::InitTerrainsDisplacementMaps(
 		for (TerrainID col = centerCol - 1; col <= centerCol + 1; col++) {
 			currentIndex = col + row * numCol;
 			LoadTerrainDisplacementMap(
-				&inTerrainContext.terrainDisplacementMaps[iteration].displacementMap[0]
-				, inTerrainContext.terrainDisplacementMaps[iteration].displacementMapSize
+				(char*)&inTerrainContext.terrainDisplacementMaps[iteration].displacementMap[0]
+				//, inTerrainContext.terrainDisplacementMaps[iteration].displacementMapSize
+				, sizeof(float)
 				, &inTerrainContext.loadedMaps[iteration]
 				, currentIndex
 				//, inTerrainContext.terrainDisplacementPath[currentIndex]
@@ -232,18 +241,21 @@ bool TerrainSystem::IsTerrainMapLoaded(
 
 // #TODO for file, use platform specific functions
 void TerrainSystem::LoadTerrainDisplacementMap(
-	float* mapBuffer
+	char* mapBuffer
 	, uint32_t mapBufferSize
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition
 	//, std::string filePath
-) {
-	if (terrainPosition == TERRAIN_INDEX_NULL) {
+)
+{
+	if (TERRAIN_INDEX_NULL == terrainPosition)
+	{
 		DebugBreak();
 		return;
 	}
 
-	if (!loadedMapPosToFill) {
+	if (!loadedMapPosToFill)
+	{
 		DebugBreak();
 		return;
 	}
@@ -255,7 +267,7 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 	//std::string absProjPath = GetRelativeProjectPathWithMarker();
 	//std::string filePath = absProjPath + relPath;
 
-	float fileContent[TERRAIN_MAP_SIZE];
+	char fileContent[TERRAIN_MAP_SIZE];
 
 	std::string relPath = "/terrains/terrainDisplacement_"
 		+ std::to_string(terrainPosition)
@@ -268,14 +280,16 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 	// #TODO use the engine side specific function for file reading
 	FILE* f;
 	f = fopen(filePath.c_str(), "rb");
-	if (!f) {
+	if (!f)
+	{
 		DebugBreak();
 		return;
 	}
 
 	fseek(f, 0, SEEK_END);
 	uint32_t len = (uint32_t)ftell(f); // in bytes
-	if (len < (sizeof(fileContent[0]) * mapBufferSize)) {
+	if (len < (sizeof(fileContent[0]) * mapBufferSize))
+	{
 		fclose(f);
 		DebugBreak();
 		return;
@@ -283,31 +297,43 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 
 	rewind(f); // we moved to the end with fseek SEEK_END
 	size_t bytesRead = fread(
-		(void*)fileContent
+		&fileContent[0]
 		, sizeof(fileContent[0])
 		, mapBufferSize
 		, f
 	);
-	if (ferror(f)) {
+	if (ferror(f))
+	{
 		char* error;
 		perror(error);
 		clearerr(f);
 		DebugBreak();
 	}
-	else if (feof(f)) {     /* possibility 2 */
+	else if (feof(f))
+	{     /* possibility 2 */
 		DebugBreak();
 	}
 
-	if (bytesRead == 0) {
+	if (bytesRead == 0)
+	{
 		DebugBreak();
 	}
+
+	//// Test with fscanf
+	//rewind(f); // we moved to the end with fseek SEEK_END
+	//for (size_t i = 0; i < mapBufferSize; i++)
+	//{
+	//	fscanf(f, "%lf", &fileContent[i]);
+	//	printf("%.3f ", fileContent[i]);
+	//}
+
 	fclose(f);
 
 	// #TODO LOCK
 	memcpy(
 		mapBuffer
 		, fileContent
-		, sizeof(fileContent[0]) * mapBufferSize
+		, sizeof(float) * mapBufferSize
 	);
 	// #TODO UnLOCK
 

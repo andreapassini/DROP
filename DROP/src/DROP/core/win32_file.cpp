@@ -43,7 +43,7 @@ void File::WriteFile(
 
 void File::WriteFile(
 	std::string inFilePath
-	, void* inBuffer, size_t elementSize, size_t elementCount
+	, char* inBuffer, size_t elementSize, size_t elementCount
 ) {
 	FILE* f;
 	f = fopen(inFilePath.c_str(), "w");
@@ -67,6 +67,59 @@ void File::WriteFile(
 	}
 
 	fclose(f);
+}
+
+size_t File::ReadFile(
+	std::string inFilePath
+	, void* inBuffer, size_t elementSize, size_t elementCount
+) {
+	size_t bytesRead = 0;
+	FILE* f;
+	f = fopen(inFilePath.c_str(), "rb");
+	if (!f)
+	{
+		DebugBreak();
+		return bytesRead;
+	}
+
+	fseek(f, 0, SEEK_END);
+
+	uint32_t len = (uint32_t)ftell(f); // in bytes
+	if (len < (elementSize * elementCount))
+	{
+		fclose(f);
+		DebugBreak();
+		return bytesRead;
+	}
+
+	rewind(f); // we moved to the end with fseek SEEK_END
+
+	bytesRead = fread(
+		inBuffer
+		, elementSize
+		, elementCount
+		, f
+	);
+
+	if (ferror(f))
+	{
+		char* error;
+		perror(error);
+		clearerr(f);
+		DebugBreak();
+	}
+	else if (feof(f))
+	{     /* possibility 2 */
+		DebugBreak();
+	}
+
+	if (bytesRead == 0)
+	{
+		DebugBreak();
+	}
+	fclose(f);
+
+	return bytesRead;
 }
 
 #endif // DROP_PLATFORM_WINDOWS

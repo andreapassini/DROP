@@ -96,7 +96,7 @@ void main(){
   int linearizedIndex = (raw * edgeInt) + col;
   sinPosY = displacementMap[linearizedIndex];
   vertexDisplacement = sinPosY;
-  sinPosY = 0.0;
+  // sinPosY = 0.0;
   vec4 mPosition = modelMatrix * vec4( position.x, sinPosY, position.z, 1.0 );
   //  vec4 mPosition = modelMatrix * vec4( position.x, position.y + time, position.z, 1.0 );
   // vertex position in camera coordinates
