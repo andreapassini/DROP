@@ -26,7 +26,7 @@ bool IsTerrainMapLoaded(
 );
 
 void LoadTerrainDisplacementMap(
-	char* mapBuffer
+	float* mapBuffer
 	, uint32_t mapBufferSize
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition

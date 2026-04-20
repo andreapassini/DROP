@@ -46,7 +46,7 @@ void File::WriteFile(
 	, char* inBuffer, size_t elementSize, size_t elementCount
 ) {
 	FILE* f;
-	f = fopen(inFilePath.c_str(), "w");
+	f = fopen(inFilePath.c_str(), "wb");
 	if (!f)
 	{
 		// no need to close file if error while opening
@@ -71,7 +71,7 @@ void File::WriteFile(
 
 size_t File::ReadFile(
 	std::string inFilePath
-	, void* inBuffer, size_t elementSize, size_t elementCount
+	, void* outBuffer, size_t elementSize, size_t elementCount
 ) {
 	size_t bytesRead = 0;
 	FILE* f;
@@ -95,7 +95,7 @@ size_t File::ReadFile(
 	rewind(f); // we moved to the end with fseek SEEK_END
 
 	bytesRead = fread(
-		inBuffer
+		outBuffer
 		, elementSize
 		, elementCount
 		, f

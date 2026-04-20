@@ -18,7 +18,7 @@ void WriteFile(
 
 size_t ReadFile(
 	std::string inFilePath
-	, void* inBuffer, size_t elementSize, size_t elementCount
+	, void* outBuffer, size_t elementSize, size_t elementCount
 );
 
 }
