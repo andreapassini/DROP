@@ -108,7 +108,19 @@ void TerrainSystem::UpdateTerrains(
 	);
 
 	// Find which new maps we need and sub them with the old ones
+	TerrainID numOfNewMapsRequired = 0;
+	for (TerrainID i = 0; i < LOADED_MAPS; i++) {
+		for (TerrainID j = 0; j < LOADED_MAPS && TERRAIN_INDEX_NULL != terrainsContext.requiredMaps[i]; j++) {
+			if (terrainsContext.loadedMaps[j] == terrainsContext.requiredMaps[i]) {
+				terrainsContext.requiredMaps[i] = TERRAIN_INDEX_NULL;
+				numOfNewMapsRequired++;
+			}
+		}
+	}
 
+	if (numOfNewMapsRequired == 0) {
+		return;
+	}
 }
 
 // assuming OutIndeciesBuffer.num == numberOfNearTargetIndecies
