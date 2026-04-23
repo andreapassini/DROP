@@ -2,7 +2,6 @@
 
 #include <cstdint>
 
-
 #define MAX_NUM_TERRAINS 121
 
 #define TERRAIN_INDEX_NULL UINT32_MAX
@@ -10,6 +9,8 @@
 #define TERRAIN_MAP_SIZE 81
 #define TERRAIN_MAX_PATH_SIZE 256
 #define TERRAIN_EDGE_SIZE 10.0f
+
+using EntityID = uint64_t;
 
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;

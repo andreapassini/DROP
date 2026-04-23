@@ -121,6 +121,8 @@ void TerrainSystem::UpdateTerrains(
 	if (numOfNewMapsRequired == 0) {
 		return;
 	}
+
+
 }
 
 // assuming OutIndeciesBuffer.num == numberOfNearTargetIndecies
