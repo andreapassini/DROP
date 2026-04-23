@@ -95,75 +95,56 @@ void TerrainSystem::UpdateTerrains(
 	bseecs::ECS& ecs
 	, const float deltaTime
 ) {
-	return;
+	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
 
-	TerrainsContext& terrainContext = ecs.GetSingletonComponent<TerrainsContext>();
-	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
+	// #TODO assuming a single TerrainTarget
+	VgMath::Vector3 targetPosition = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform.translate;
+	CalculateNearTargetIndecies(
+		&targetPosition
+		, terrainsContext.terrainDimension
+		, terrainsContext.maxNumTerrains
+		, LOADED_MAPS // must be bufferSize
+		, terrainsContext.requiredMaps
+	);
 
-	std::vector<TerrainTargetComponent>& denseTerrainTargetComponen = ecs.GetComponentPool<TerrainTargetComponent>().Data();
+	// Find which new maps we need and sub them with the old ones
 
-	// Copy the assets terrain buffer into the game terrain buffer
-	if (terrainContext.bNeedsDisplacementMapsUpdate && false) {
+}
 
-		// LOCK MUTEX
-		assert(terrainContext.numOfLoadedTerrainDisplacementMaps == terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps);
-		// Dest, Src, Size
-		memcpy(
-			&terrainContext.loadedMaps[0]
-			, &terrainsAssetsContext.loadedMaps[0]
-			, sizeof(terrainContext.loadedMaps[0]) * terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps
-		);
-		memcpy(
-			&terrainContext.terrainDisplacementMaps[0]
-			, &terrainsAssetsContext.terrainDisplacementMaps[0]
-			, sizeof(terrainContext.terrainDisplacementMaps[0]) * terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps
-		);
-		// UNLOCK MUTEX
+// assuming OutIndeciesBuffer.num == numberOfNearTargetIndecies
+void TerrainSystem::CalculateNearTargetIndecies(
+	const VgMath::Vector3* const inTargetPosition
+	, const float terrainDimension
+	, const TerrainID numberOfTerrains
+	, const TerrainID numberOfNearTargetIndecies
+	, TerrainID* const OutIndeciesBuffer
+) {
+	TerrainID targetLinearizedIndex = PositionToIndex(
+		numberOfTerrains
+		, terrainDimension
+		, inTargetPosition
+	);
+	TerrainID gridEdge = (TerrainID)(sqrt(numberOfTerrains));
+	TerrainID targetRow = targetLinearizedIndex / gridEdge;
+	TerrainID targetCol = targetLinearizedIndex % gridEdge;
 
-		//// this should be set false when all the displacement maps are loaded
-		//bool bFound = true; // to true cause of FOR condition
-		//for (uint32_t i = 0; 
-		//	i < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps
-		//		&& bFound;
-		//	i++
-		//) {
-		//	bFound = false;
-		//	for (uint32_t j = 0;
-		//		j < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps
-		//			&& !bFound;
-		//		j++
-		//	) {
+	// we are subtracting, use int
+	TerrainID iteration = 0;
+	for (int32_t row = (int32_t)(targetRow) - 1; row <= targetRow + 1; row++) {
+		if (row < 0 || row > gridEdge) {
+			continue;
+		}
 
-		//	}
-		//}
-		//terrainContext.bNeedsDisplacementMapsUpdate = bFound;
+		for (int32_t col = (int32_t)(targetCol) - 1; col <= targetCol + 1; col++) {
+			if (col < 0 || col > gridEdge) {
+				continue;
+			}
+
+			int32_t currentIndex = col + row * (int32_t)(gridEdge);
+			OutIndeciesBuffer[iteration] = currentIndex;
+			iteration++;
+		}
 	}
-
-	// Calculate next maps needed
-
-	// Find the next maps that should be needed
-
-	// From the LOADED MAPS, find those that could be removed
-
-	// Update the required maps
-	//TerrainID mapPosition = 0;
-	//TerrainID terrainPosition = 0;
-	//terrainsAssetsContext.loadedMaps[mapPosition] = TERRAIN_INDEX_NULL;
-	//TerrainDisplacementMap& currentTerrainDisplacementMap = terrainsAssetsContext.terrainDisplacementMaps[mapPosition];
-	//currentTerrainDisplacementMap.terrainIndex = terrainPosition;
-	//static int numLoads = 0;
-	//if (numLoads++ > 1)
-	//	return;
-	//TerrainSystem::LoadTerrainDisplacementMap(
-	//	&terrainsAssetsContext.terrainDisplacementMaps[mapPosition].displacementMap[0]
-	//	, currentTerrainDisplacementMap.displacementMapSize
-	//	, &terrainsAssetsContext.loadedMaps[mapPosition]
-	//	, terrainPosition
-	//	, terrainContext
-	//);
-
-	// launch threads with the specific maps and a copy of the context
-	
 }
 
 // #TODO Divide the path creation from map generation
@@ -312,32 +293,26 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 
 }
 
-TerrainID TerrainSystem::PositionInIndex(
-	const TerrainsContext* const inTerrainContext
+TerrainID TerrainSystem::PositionToIndex(
+	const float terrainDimension
+	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
 ) {
 	TerrainID outTerrainID = TERRAIN_INDEX_NULL;
-	if (!inTerrainContext)
-	{
-		DebugBreak();
-		return outTerrainID;
-	}
 	if (!inPosition)
 	{
 		DebugBreak();
 		return outTerrainID;
 	}
 
-	float terrainDimension = inTerrainContext->terrainDimension;
-
 	// Grid calculation
 	TerrainID col = (TerrainID)(inPosition->x / terrainDimension);
 	TerrainID row = (TerrainID)(inPosition->y / terrainDimension);
-	TerrainID numCol = (TerrainID)(sqrt(inTerrainContext->maxNumTerrains));
+	TerrainID numCol = (TerrainID)(sqrt(maxNumTerrains));
 
 	outTerrainID = col + (row * numCol);
 
-	if (outTerrainID >= inTerrainContext->maxNumTerrains)
+	if (outTerrainID >= maxNumTerrains)
 	{
 		outTerrainID = TERRAIN_INDEX_NULL;
 	}
@@ -345,31 +320,25 @@ TerrainID TerrainSystem::PositionInIndex(
 	return outTerrainID;
 }
 
-TerrainID TerrainSystem::PositionInIndexClamped(
-	const TerrainsContext* const inTerrainContext
+TerrainID TerrainSystem::PositionToIndexClamped(
+	const float terrainDimension
+	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
 ) {
 	TerrainID outTerrainID = TERRAIN_INDEX_NULL;
-	if (!inTerrainContext)
-	{
-		DebugBreak();
-		return outTerrainID;
-	}
 	if (!inPosition)
 	{
 		DebugBreak();
 		return outTerrainID;
 	}
 
-	float terrainDimension = inTerrainContext->terrainDimension;
-
 	// Grid calculation
 	TerrainID col = (TerrainID)(inPosition->x / terrainDimension);
 	TerrainID row = (TerrainID)(inPosition->y / terrainDimension);
-	TerrainID numCol = (TerrainID)(sqrt(inTerrainContext->maxNumTerrains));
+	TerrainID numCol = (TerrainID)(sqrt(maxNumTerrains));
 
 	outTerrainID = col + (row * numCol);
-	outTerrainID = clamp<TerrainID>(outTerrainID, 0, inTerrainContext->maxNumTerrains);
+	outTerrainID = clamp<TerrainID>(outTerrainID, 0, maxNumTerrains);
 
 	return outTerrainID;
 }

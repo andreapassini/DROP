@@ -58,7 +58,7 @@ struct TerrainsContext {
 	float terrainDimension = 10.0f;
 	std::string terrainDisplacementPath[MAX_NUM_TERRAINS];
 
-
+	EntityID targetID = 0;
 };
 
 

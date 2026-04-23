@@ -19,6 +19,14 @@ void UpdateTerrains(
 	, const float deltaTime
 );
 
+void CalculateNearTargetIndecies(
+	const VgMath::Vector3* const inTargetPosition
+	, const float terrainDimension
+	, const TerrainID numberOfTerrains
+	, const TerrainID numberOfNearTargetIndecies
+	, TerrainID* const OutIndeciesBuffer
+);
+
 void GenerateSaveAndSetPathForTerrainsDisplacementMaps(
 	TerrainsContext& inTerrainContext
 );
@@ -38,12 +46,14 @@ void LoadTerrainDisplacementMap(
 	//, std::string filePath
 );
 
-TerrainID PositionInIndex(
-	const TerrainsContext* const inTerrainContext
+TerrainID PositionToIndex(
+	const float terrainDimension
+	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
 );
-TerrainID PositionInIndexClamped(
-	const TerrainsContext* const inTerrainContext
+TerrainID PositionToIndexClamped(
+	const float terrainDimension
+	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
 );
 
