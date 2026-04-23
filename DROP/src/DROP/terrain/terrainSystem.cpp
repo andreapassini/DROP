@@ -11,10 +11,12 @@
 // Engine includes
 #include "DROP/ECS/beecs.h"
 #include "DROP/terrain/terrainComponent.h"
+#include "DROP/terrain/terrainTargetComponent.h"
 #include "DROP/math/mat3.h"
 #include "DROP/utils/ExecPath.h"
 #include "DROP/core/file.h"
 #include "DROP/math/vector3.h"
+#include "DROP/sceneGraph/sceneGraph.h"
 
 void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 	TerrainsContext& terrainContext = ecs.GetSingletonComponent<TerrainsContext>();
@@ -64,7 +66,30 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 
 
 	TerrainSystem::InitTerrainsDisplacementMaps(terrainContext);
+
 }
+
+void TerrainSystem::DiplaceTerrainComponent(
+	bseecs::ECS& ecs
+) {
+	// #TODO For now assume one terrain component
+	// Move the terrain component based on grid size
+	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
+	std::vector<TerrainComponent>& denseTerrainComponents = ecs.GetComponentPool<TerrainComponent>().Data();
+	EntityID DenseID = 0;
+	TerrainComponent& terrainComponent = denseTerrainComponents[DenseID];
+	TransformComponent& transformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(DenseID);
+
+	int32_t numRowOrCol = (int32_t)sqrt(terrainComponent.numOfTerrains); // since it's a square
+	float terrainEdgeSize = TERRAIN_EDGE_SIZE;
+	float gridCenter = (float)numRowOrCol / 2.0f;
+	float displacement = terrainEdgeSize * gridCenter;
+	 
+	VgMath::Vector3 extraDisplacement = VgMath::Vector3(displacement, 0.0f, 0.0f) + VgMath::Vector3(0.0f, 0.0f, displacement);
+	transformComp.localTransform.translate = transformComp.localTransform.translate - extraDisplacement; // minus since we are rendering them from bot left
+}
+
+
 
 void TerrainSystem::UpdateTerrains(
 	bseecs::ECS& ecs
@@ -74,6 +99,8 @@ void TerrainSystem::UpdateTerrains(
 
 	TerrainsContext& terrainContext = ecs.GetSingletonComponent<TerrainsContext>();
 	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
+
+	std::vector<TerrainTargetComponent>& denseTerrainTargetComponen = ecs.GetComponentPool<TerrainTargetComponent>().Data();
 
 	// Copy the assets terrain buffer into the game terrain buffer
 	if (terrainContext.bNeedsDisplacementMapsUpdate && false) {
@@ -309,6 +336,40 @@ TerrainID TerrainSystem::PositionInIndex(
 	TerrainID numCol = (TerrainID)(sqrt(inTerrainContext->maxNumTerrains));
 
 	outTerrainID = col + (row * numCol);
+
+	if (outTerrainID >= inTerrainContext->maxNumTerrains)
+	{
+		outTerrainID = TERRAIN_INDEX_NULL;
+	}
+
+	return outTerrainID;
+}
+
+TerrainID TerrainSystem::PositionInIndexClamped(
+	const TerrainsContext* const inTerrainContext
+	, const VgMath::Vector3* const inPosition
+) {
+	TerrainID outTerrainID = TERRAIN_INDEX_NULL;
+	if (!inTerrainContext)
+	{
+		DebugBreak();
+		return outTerrainID;
+	}
+	if (!inPosition)
+	{
+		DebugBreak();
+		return outTerrainID;
+	}
+
+	float terrainDimension = inTerrainContext->terrainDimension;
+
+	// Grid calculation
+	TerrainID col = (TerrainID)(inPosition->x / terrainDimension);
+	TerrainID row = (TerrainID)(inPosition->y / terrainDimension);
+	TerrainID numCol = (TerrainID)(sqrt(inTerrainContext->maxNumTerrains));
+
+	outTerrainID = col + (row * numCol);
+	outTerrainID = clamp<TerrainID>(outTerrainID, 0, inTerrainContext->maxNumTerrains);
 
 	return outTerrainID;
 }

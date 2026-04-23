@@ -9,6 +9,7 @@
 #define LOADED_MAPS 9
 #define TERRAIN_MAP_SIZE 81
 #define TERRAIN_MAX_PATH_SIZE 256
+#define TERRAIN_EDGE_SIZE 10.0f
 
 typedef uint32_t ModelID;
 typedef uint32_t MaterialID;

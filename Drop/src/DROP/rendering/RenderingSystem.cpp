@@ -74,16 +74,14 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		// Consider the entity as the center of all terrains
 		// 3 should be num row and num col
 		int32_t numRowOrCol = (int32_t)sqrt(terrainComponent.numOfTerrains); // since it's a square
-		float rowCenter = 0.0;
-		rowCenter = (float)numRowOrCol / 2.0f;
-		float colCenter = 0.0f;
-		colCenter = (float)numRowOrCol / 2.0f;
+
 		float debugDisplacement = 0.1f;
-		float displacement = 10.0f + debugDisplacement;
+		float displacement = TERRAIN_EDGE_SIZE + debugDisplacement;
 
 		for (uint32_t j = 0; j < terrainComponent.numOfTerrains; j++) {
-			float row = (float)(j / numRowOrCol) - rowCenter;
-			float col = (float)(j % numRowOrCol) - colCenter;
+			float row = (float)(j / numRowOrCol);
+			float col = (float)(j % numRowOrCol);
+
 			VgMath::Vector3 extraDisplacement;
 			extraDisplacement.x = (float)(row) * displacement;
 			extraDisplacement.z = (float)(col) * displacement;

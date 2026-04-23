@@ -183,6 +183,8 @@ namespace Drop
 
 		renderContext.window = Input::m_ActiveWindowHandle;
 
+		TerrainSystem::DiplaceTerrainComponent(g_activeScene->ecs);
+
 		// Main loop
 		while (!m_ActiveWindowHandle->IsShouldClose())
 		{

@@ -13,6 +13,7 @@ namespace VgMath {
 namespace TerrainSystem {
 
 void InitTerrains(bseecs::ECS& ecs);
+void DiplaceTerrainComponent(bseecs::ECS& ecs);
 void UpdateTerrains(
 	bseecs::ECS& ecs
 	, const float deltaTime
@@ -38,6 +39,10 @@ void LoadTerrainDisplacementMap(
 );
 
 TerrainID PositionInIndex(
+	const TerrainsContext* const inTerrainContext
+	, const VgMath::Vector3* const inPosition
+);
+TerrainID PositionInIndexClamped(
 	const TerrainsContext* const inTerrainContext
 	, const VgMath::Vector3* const inPosition
 );

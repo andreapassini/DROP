@@ -12,6 +12,7 @@
 #include "Drop/particles/physicsBasedParticle.h"
 #include "DROP/terrain/terrainComponent.h"
 #include "DROP/terrain/terrainSystem.h"
+#include "DROP/terrain/terrainTargetComponent.h"
 
 #define UV_GRID_SIM_DIFFUSE_MAP 0
 #define CRACKED_SOIL_DIFFUSE_MAP 1
@@ -169,6 +170,7 @@ public:
 
         gameEngine->g_activeScene->ecs.RegisterComponent<ParticleEmitter, TransformComponent>();
         gameEngine->g_activeScene->ecs.RegisterComponent<PBParticleEmitter, TransformComponent>();
+
         //gameEngine->g_activeScene->ecs.RegisterComponent<Billboard, Transform>();
         //gameEngine->g_activeScene->ecs.RegisterComponent<PhysicsObject>();
 
