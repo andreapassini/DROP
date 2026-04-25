@@ -96,3 +96,5 @@ The cumulated one for the scale, orientation and position of the object in world
 
 ![TerrainGridDisplacement](https://github.com/user-attachments/assets/f320c1d3-25e6-4a63-8aa1-07c8f2d6b83b)
 
+![GridCalculation](https://github.com/user-attachments/assets/b0d2b53a-fe8f-4d2a-aaa3-417033fce857)
+
