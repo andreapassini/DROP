@@ -1,12 +1,12 @@
 #include "DROP/terrain/terrainSystem.h"
 
 #define WIN32_LEAN_AND_MEAN      // Exclude rarely-used stuff from Windows headers
-#include <windows.h>
+#include <windows.h> // #TODO do not include win here, use the platform independent layer call
+#include <debugapi.h>
 
 // std lib includes
 #include <iostream>
 #include <fstream>
-#include <debugapi.h>
 
 // Engine includes
 #include "DROP/ECS/beecs.h"
