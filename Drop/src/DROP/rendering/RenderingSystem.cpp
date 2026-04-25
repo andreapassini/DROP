@@ -83,8 +83,8 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 			float col = (float)(j % numRowOrCol);
 
 			VgMath::Vector3 extraDisplacement;
-			extraDisplacement.x = (float)(row) * displacement;
-			extraDisplacement.z = (float)(col) * displacement;
+			extraDisplacement.x = (float)(col) * displacement;
+			extraDisplacement.z = (float)(row) * displacement;
 			Transform movedTransform = worldTransform;
 			movedTransform.translate += extraDisplacement;
 
