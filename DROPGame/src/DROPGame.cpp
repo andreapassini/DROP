@@ -407,7 +407,13 @@ public:
         
         ImGui::Begin("Drop Scene");
         ImGui::Separator();
+
         ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
+        // Sphere pos
+        TerrainsContext& terrainsContext = gameEngine->g_activeScene->ecs.GetSingletonComponent<TerrainsContext>();
+        VgMath::Vector3 targetPosition = gameEngine->g_activeScene->ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform.translate;
+
+        ImGui::Text("Sphere pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", targetPosition.x, targetPosition.y, targetPosition.z);
             
 		ImGui::End();
 

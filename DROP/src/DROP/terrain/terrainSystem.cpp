@@ -97,9 +97,36 @@ void TerrainSystem::UpdateTerrains(
 ) {
 	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
 
+	float xLeftLimit = -(121.0f / 2.0);
+	float xRightLimit = 121.0f / 2.0;
+	float speed = 15.0f;
+	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
+	// Bouncing on X
+	static bool bGoingRight = true;
+	if (currentTargetTransform.translate.x < xRightLimit && bGoingRight)
+	{
+		currentTargetTransform.translate.x += (speed * deltaTime);
+	}
+	else if(currentTargetTransform.translate.x >= xLeftLimit && !bGoingRight)
+	{
+		currentTargetTransform.translate.x -= (speed * deltaTime);
+	}
+	else
+	{
+		bGoingRight = !bGoingRight;
+	}
+
 	// #TODO assuming a single TerrainTarget
-	VgMath::Vector3 targetPosition = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform.translate;
-	CalculateNearTargetIndecies(
+	std::vector<TerrainComponent>& denseTerrainComponents = ecs.GetComponentPool<TerrainComponent>().Data();
+	EntityID DenseID = 0;
+	TerrainComponent& terrainComponent = denseTerrainComponents[DenseID];
+	TransformComponent& terrainTransformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(DenseID);
+	//
+
+	// Move it into terrainComp space/world
+	VgMath::Transform targetTransformInCompSpace = terrainTransformComp.localTransform * ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
+	VgMath::Vector3 targetPosition = -targetTransformInCompSpace.translate;
+	CalculateNearTargetIndexes(
 		&targetPosition
 		, terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
@@ -107,13 +134,14 @@ void TerrainSystem::UpdateTerrains(
 		, terrainsContext.requiredMaps
 	);
 
-	// Find which new maps we need and sub them with the old ones
+	// Do we need to update loaded maps?
 	TerrainID numOfNewMapsRequired = 0;
 	for (TerrainID i = 0; i < LOADED_MAPS; i++) {
+		numOfNewMapsRequired++;		
 		for (TerrainID j = 0; j < LOADED_MAPS && TERRAIN_INDEX_NULL != terrainsContext.requiredMaps[i]; j++) {
 			if (terrainsContext.loadedMaps[j] == terrainsContext.requiredMaps[i]) {
 				terrainsContext.requiredMaps[i] = TERRAIN_INDEX_NULL;
-				numOfNewMapsRequired++;
+				numOfNewMapsRequired--;
 			}
 		}
 	}
@@ -122,20 +150,68 @@ void TerrainSystem::UpdateTerrains(
 		return;
 	}
 
+	// Find which new maps we need and sub them with the old ones
+	TerrainID freeLoadedMapsIndexes[LOADED_MAPS];
+	for (TerrainID i = 0; i < LOADED_MAPS; i++)
+	{
+		bool bFound = false;
+		for (TerrainID j = 0; j < LOADED_MAPS && !bFound && TERRAIN_INDEX_NULL != terrainsContext.requiredMaps[j]; j++)
+		{
+			if (terrainsContext.loadedMaps[i] == terrainsContext.requiredMaps[j])
+			{
+				bFound = true;
+			}
+		}
 
+		if (!bFound)
+		{
+			freeLoadedMapsIndexes[i] = i;
+		}
+		else
+		{
+			freeLoadedMapsIndexes[i] = TERRAIN_INDEX_NULL;
+		}
+	}
+	
+	for (TerrainID i = 0; i < LOADED_MAPS; i++)
+	{
+		// Loop on Free Loaded Maps Indexes
+		if (TERRAIN_INDEX_NULL == freeLoadedMapsIndexes[i]) continue;
+		if (TERRAIN_INDEX_NULL == terrainsContext.requiredMaps[i]) continue;
+
+		TerrainID mapToBeLoaded = terrainsContext.requiredMaps[i];
+		TerrainID indexOfMapToBeLoaded = freeLoadedMapsIndexes[i];
+		TerrainID* mapPositionInLoaded = &terrainsContext.loadedMaps[indexOfMapToBeLoaded];
+
+		// Clear old mapping
+		terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = TERRAIN_INDEX_NULL;
+
+
+		// Load "mapToBeLoaded" in "mapPositionInLoaded" of "terrainsContext.loadedMaps"
+
+		LoadTerrainDisplacementMap(
+			&terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMap[0]
+			, terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMapSize
+			, mapPositionInLoaded
+			, mapToBeLoaded
+		);
+
+		// Update mapping
+		terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = indexOfMapToBeLoaded;
+	}
 }
 
-// assuming OutIndeciesBuffer.num == numberOfNearTargetIndecies
-void TerrainSystem::CalculateNearTargetIndecies(
+// assuming OutIndexesBuffer.num == numberOfNearTargetIndexes
+void TerrainSystem::CalculateNearTargetIndexes(
 	const VgMath::Vector3* const inTargetPosition
 	, const float terrainDimension
 	, const TerrainID numberOfTerrains
-	, const TerrainID numberOfNearTargetIndecies
-	, TerrainID* const OutIndeciesBuffer
+	, const TerrainID numberOfNearTargetIndexes
+	, TerrainID* const OutIndexesBuffer
 ) {
 	TerrainID targetLinearizedIndex = PositionToIndex(
-		numberOfTerrains
-		, terrainDimension
+		terrainDimension
+		, numberOfTerrains
 		, inTargetPosition
 	);
 	TerrainID gridEdge = (TerrainID)(sqrt(numberOfTerrains));
@@ -155,7 +231,7 @@ void TerrainSystem::CalculateNearTargetIndecies(
 			}
 
 			int32_t currentIndex = col + row * (int32_t)(gridEdge);
-			OutIndeciesBuffer[iteration] = currentIndex;
+			OutIndexesBuffer[iteration] = currentIndex;
 			iteration++;
 		}
 	}
@@ -320,9 +396,10 @@ TerrainID TerrainSystem::PositionToIndex(
 	}
 
 	// Grid calculation
-	TerrainID col = (TerrainID)(inPosition->x / terrainDimension);
-	TerrainID row = (TerrainID)(inPosition->y / terrainDimension);
-	TerrainID numCol = (TerrainID)(sqrt(maxNumTerrains));
+	TerrainID gridEdge = (TerrainID)(sqrt(maxNumTerrains));
+	TerrainID col = (TerrainID)(inPosition->x / gridEdge);
+	TerrainID row = (TerrainID)(inPosition->z / gridEdge);
+	TerrainID numCol = gridEdge;
 
 	outTerrainID = col + (row * numCol);
 
@@ -340,18 +417,13 @@ TerrainID TerrainSystem::PositionToIndexClamped(
 	, const VgMath::Vector3* const inPosition
 ) {
 	TerrainID outTerrainID = TERRAIN_INDEX_NULL;
-	if (!inPosition)
-	{
-		DebugBreak();
-		return outTerrainID;
-	}
 
-	// Grid calculation
-	TerrainID col = (TerrainID)(inPosition->x / terrainDimension);
-	TerrainID row = (TerrainID)(inPosition->y / terrainDimension);
-	TerrainID numCol = (TerrainID)(sqrt(maxNumTerrains));
+	outTerrainID = PositionToIndex(
+		terrainDimension
+		, maxNumTerrains
+		, inPosition
+	);
 
-	outTerrainID = col + (row * numCol);
 	outTerrainID = clamp<TerrainID>(outTerrainID, 0, maxNumTerrains);
 
 	return outTerrainID;

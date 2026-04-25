@@ -31,7 +31,7 @@ namespace Drop
 		virtual void OnUIRender() {}
 	public:
 		Camera m_Camera = Camera(
-			glm::vec3(0.0f, 0.0f, 6.0f),
+			glm::vec3(19.0f, 23.0f, 54.5f),
 			45.0f,
 			0.1f,
 			1000.0f,

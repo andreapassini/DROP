@@ -19,7 +19,7 @@ void UpdateTerrains(
 	, const float deltaTime
 );
 
-void CalculateNearTargetIndecies(
+void CalculateNearTargetIndexes(
 	const VgMath::Vector3* const inTargetPosition
 	, const float terrainDimension
 	, const TerrainID numberOfTerrains

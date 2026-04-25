@@ -59,7 +59,7 @@ struct TerrainsContext {
 	float terrainDimension = 10.0f;
 	std::string terrainDisplacementPath[MAX_NUM_TERRAINS];
 
-	EntityID targetID = 0;
+	EntityID targetID = 1; // 1 is the sphere
 };
 
 
