@@ -99,17 +99,17 @@ void TerrainSystem::UpdateTerrains(
 
 	float xLeftLimit = -(121.0f / 2.0);
 	float xRightLimit = 121.0f / 2.0;
-	float speed = 15.0f;
+	float speed = 0.050f;
 	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
 	// Bouncing on X
 	static bool bGoingRight = true;
 	if (currentTargetTransform.translate.x < xRightLimit && bGoingRight)
 	{
-		currentTargetTransform.translate.x += (speed * deltaTime);
+		currentTargetTransform.translate.x += (speed /** deltaTime*/);
 	}
 	else if(currentTargetTransform.translate.x >= xLeftLimit && !bGoingRight)
 	{
-		currentTargetTransform.translate.x -= (speed * deltaTime);
+		currentTargetTransform.translate.x -= (speed /** deltaTime*/);
 	}
 	else
 	{
@@ -140,7 +140,7 @@ void TerrainSystem::UpdateTerrains(
 		numOfNewMapsRequired++;		
 		for (TerrainID j = 0; j < LOADED_MAPS && TERRAIN_INDEX_NULL != terrainsContext.requiredMaps[i]; j++) {
 			if (terrainsContext.loadedMaps[j] == terrainsContext.requiredMaps[i]) {
-				terrainsContext.requiredMaps[i] = TERRAIN_INDEX_NULL;
+				//terrainsContext.requiredMaps[i] = TERRAIN_INDEX_NULL;
 				numOfNewMapsRequired--;
 			}
 		}
@@ -155,8 +155,13 @@ void TerrainSystem::UpdateTerrains(
 	for (TerrainID i = 0; i < LOADED_MAPS; i++)
 	{
 		bool bFound = false;
-		for (TerrainID j = 0; j < LOADED_MAPS && !bFound && TERRAIN_INDEX_NULL != terrainsContext.requiredMaps[j]; j++)
+		for (TerrainID j = 0; j < LOADED_MAPS && !bFound; j++)
 		{
+			if (TERRAIN_INDEX_NULL == terrainsContext.requiredMaps[j])
+			{
+				continue;
+			}
+
 			if (terrainsContext.loadedMaps[i] == terrainsContext.requiredMaps[j])
 			{
 				bFound = true;
@@ -172,33 +177,59 @@ void TerrainSystem::UpdateTerrains(
 			freeLoadedMapsIndexes[i] = TERRAIN_INDEX_NULL;
 		}
 	}
+
+	// Clear not needed maps
+	for (TerrainID i = 0; i < LOADED_MAPS; i++)
+	{
+		for (TerrainID j = 0; j < LOADED_MAPS && TERRAIN_INDEX_NULL != terrainsContext.requiredMaps[i]; j++)
+		{
+			if (terrainsContext.loadedMaps[j] == terrainsContext.requiredMaps[i])
+			{
+				terrainsContext.requiredMaps[i] = TERRAIN_INDEX_NULL;
+			}
+		}
+	}
 	
+	TerrainID lastFreeID = 0;
 	for (TerrainID i = 0; i < LOADED_MAPS; i++)
 	{
 		// Loop on Free Loaded Maps Indexes
-		if (TERRAIN_INDEX_NULL == freeLoadedMapsIndexes[i]) continue;
 		if (TERRAIN_INDEX_NULL == terrainsContext.requiredMaps[i]) continue;
 
-		TerrainID mapToBeLoaded = terrainsContext.requiredMaps[i];
-		TerrainID indexOfMapToBeLoaded = freeLoadedMapsIndexes[i];
-		TerrainID* mapPositionInLoaded = &terrainsContext.loadedMaps[indexOfMapToBeLoaded];
+		bool bLoaded = false;
+		for (TerrainID j = lastFreeID; j < LOADED_MAPS && !bLoaded; j++)
+		{
+			if (TERRAIN_INDEX_NULL == freeLoadedMapsIndexes[j]) continue;
 
-		// Clear old mapping
-		terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = TERRAIN_INDEX_NULL;
+			lastFreeID = j;
 
+			TerrainID mapToBeLoaded = terrainsContext.requiredMaps[i];
+			TerrainID indexOfMapToBeLoaded = freeLoadedMapsIndexes[j];
+			TerrainID* mapPositionInLoaded = &terrainsContext.loadedMaps[indexOfMapToBeLoaded];
 
-		// Load "mapToBeLoaded" in "mapPositionInLoaded" of "terrainsContext.loadedMaps"
+			// Clear old mapping
+			if (terrainsContext.loadedMaps[indexOfMapToBeLoaded] != TERRAIN_INDEX_NULL)
+			{
+				terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = TERRAIN_INDEX_NULL;
+			}
 
-		LoadTerrainDisplacementMap(
-			&terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMap[0]
-			, terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMapSize
-			, mapPositionInLoaded
-			, mapToBeLoaded
-		);
+			// Load "mapToBeLoaded" in "mapPositionInLoaded" of "terrainsContext.loadedMaps"
 
-		// Update mapping
-		terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = indexOfMapToBeLoaded;
+			LoadTerrainDisplacementMap(
+				&terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMap[0]
+				, terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMapSize
+				, mapPositionInLoaded
+				, mapToBeLoaded
+			);
+
+			// Update mapping
+			terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = indexOfMapToBeLoaded;
+			
+			bLoaded = true;
+		}
 	}
+
+	std::cout << "Terrain update" << std::endl;
 }
 
 // assuming OutIndexesBuffer.num == numberOfNearTargetIndexes
@@ -220,12 +251,13 @@ void TerrainSystem::CalculateNearTargetIndexes(
 
 	// we are subtracting, use int
 	TerrainID iteration = 0;
-	for (int32_t row = (int32_t)(targetRow) - 1; row <= targetRow + 1; row++) {
+	TerrainID dimSizeIncrease = (TerrainID)(sqrt(LOADED_MAPS))/2;
+	for (int32_t row = (int32_t)(targetRow) -dimSizeIncrease; row <= targetRow + dimSizeIncrease; row++) {
 		if (row < 0 || row > gridEdge) {
 			continue;
 		}
 
-		for (int32_t col = (int32_t)(targetCol) - 1; col <= targetCol + 1; col++) {
+		for (int32_t col = (int32_t)(targetCol) -dimSizeIncrease; col <= targetCol + dimSizeIncrease; col++) {
 			if (col < 0 || col > gridEdge) {
 				continue;
 			}
