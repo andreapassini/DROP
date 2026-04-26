@@ -89,25 +89,21 @@ void TerrainSystem::DiplaceTerrainComponent(
 	transformComp.localTransform.translate = transformComp.localTransform.translate - extraDisplacement; // minus since we are rendering them from bot left
 }
 
-
-
-void TerrainSystem::UpdateTerrains(
-	bseecs::ECS& ecs
-	, const float deltaTime
+void BounceTarget(
+	VgMath::Transform& currentTargetTransform
+	, TransformComponent& terrainTransformComp
+	, VgMath::Vector3& outTargetPosition
 ) {
-	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
-
 	float xLeftLimit = -(121.0f / 2.0);
 	float xRightLimit = 121.0f / 2.0;
 	float speed = 0.050f;
-	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
 	// Bouncing on X
 	static bool bGoingRight = true;
 	if (currentTargetTransform.translate.x < xRightLimit && bGoingRight)
 	{
 		currentTargetTransform.translate.x += (speed /** deltaTime*/);
 	}
-	else if(currentTargetTransform.translate.x >= xLeftLimit && !bGoingRight)
+	else if (currentTargetTransform.translate.x >= xLeftLimit && !bGoingRight)
 	{
 		currentTargetTransform.translate.x -= (speed /** deltaTime*/);
 	}
@@ -116,6 +112,19 @@ void TerrainSystem::UpdateTerrains(
 		bGoingRight = !bGoingRight;
 	}
 
+	// Move it into terrainComp space/world
+	VgMath::Transform targetTransformInCompSpace = terrainTransformComp.localTransform * currentTargetTransform;
+	outTargetPosition = -targetTransformInCompSpace.translate;
+}
+
+void TerrainSystem::UpdateTerrains(
+	bseecs::ECS& ecs
+	, const float deltaTime
+) {
+	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
+
+	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
+
 	// #TODO assuming a single TerrainTarget
 	std::vector<TerrainComponent>& denseTerrainComponents = ecs.GetComponentPool<TerrainComponent>().Data();
 	EntityID DenseID = 0;
@@ -123,9 +132,9 @@ void TerrainSystem::UpdateTerrains(
 	TransformComponent& terrainTransformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(DenseID);
 	//
 
-	// Move it into terrainComp space/world
-	VgMath::Transform targetTransformInCompSpace = terrainTransformComp.localTransform * ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
-	VgMath::Vector3 targetPosition = -targetTransformInCompSpace.translate;
+	VgMath::Vector3 targetPosition;
+	BounceTarget(currentTargetTransform, terrainTransformComp, targetPosition);
+
 	CalculateNearTargetIndexes(
 		&targetPosition
 		, terrainsContext.terrainDimension
@@ -365,7 +374,6 @@ bool TerrainSystem::IsTerrainMapLoaded(
 	return outLoaded;
 }
 
-// #TODO for file, use platform specific functions
 void TerrainSystem::LoadTerrainDisplacementMap(
 	float* mapBuffer
 	, uint32_t mapBufferSize
