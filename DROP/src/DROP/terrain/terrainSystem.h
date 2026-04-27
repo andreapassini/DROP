@@ -31,7 +31,10 @@ void GenerateSaveAndSetPathForTerrainsDisplacementMaps(
 	TerrainsContext& inTerrainContext
 );
 
-void InitTerrainsDisplacementMaps(TerrainsContext& inTerrainContext);
+void InitTerrainsDisplacementMaps(
+	TerrainsContext& inTerrainContext
+	, TerrainsAssetsContext& inTerrainsAssetsContext
+);
 
 bool IsTerrainMapLoaded(
 	TerrainsContext& terrainContext
@@ -43,6 +46,15 @@ void LoadTerrainDisplacementMap(
 	, uint32_t mapBufferSize
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition
+	//, std::string filePath
+);
+
+void AsyncLoadTerrainDisplacementMap(
+	float* mapBuffer
+	, uint32_t mapBufferSize
+	, TerrainID* loadedMapPosToFill
+	, TerrainID terrainPosition
+	, bool* bNewData
 	//, std::string filePath
 );
 

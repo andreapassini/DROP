@@ -36,6 +36,8 @@ struct TerrainsAssetsContext {
 	TerrainID requiredMaps[LOADED_MAPS];
 	TerrainID loadedMaps[LOADED_MAPS];
 	TerrainDisplacementMap terrainDisplacementMaps[LOADED_MAPS];
+
+	bool bNewData = false;
 };
 
 struct TerrainsContext {

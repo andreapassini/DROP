@@ -7,8 +7,11 @@
 // std lib includes
 #include <iostream>
 #include <fstream>
+#include <mutex>
+#include <thread>
 
 // Engine includes
+#include "DROP/core/thread.h"
 #include "DROP/ECS/beecs.h"
 #include "DROP/terrain/terrainComponent.h"
 #include "DROP/terrain/terrainTargetComponent.h"
@@ -17,6 +20,9 @@
 #include "DROP/core/file.h"
 #include "DROP/math/vector3.h"
 #include "DROP/sceneGraph/sceneGraph.h"
+
+
+std::mutex gMutex;
 
 void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 	TerrainsContext& terrainContext = ecs.GetSingletonComponent<TerrainsContext>();
@@ -43,30 +49,25 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 				* terrainContext.terrainDisplacementMaps[i].displacementMapSize);
 	}
 
-	//for (uint32_t i = 0; i < terrainContext.maxNumTerrains; i++) {
-	//	memset(&terrainContext.terrainDisplacementPath[i].filePath[0], 0
-	//		, sizeof(terrainContext.terrainDisplacementPath[i].filePath[0])
-	//		* terrainContext.terrainDisplacementPath[i].maxFilePathSize);
-	//}
+	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
+	// Reset assets buffers
+	memset(
+		&terrainsAssetsContext.requiredMaps[0], TERRAIN_INDEX_NULL
+		, sizeof(terrainsAssetsContext.requiredMaps[0]) * LOADED_MAPS);
 
+	memset(&terrainsAssetsContext.loadedMaps[0], TERRAIN_INDEX_NULL
+		, sizeof(terrainsAssetsContext.loadedMaps[0]) * LOADED_MAPS);
 
-	//TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
-	//// Reset assets buffers
-	//memset(&terrainsAssetsContext.requiredMaps[0], TERRAIN_INDEX_NULL
-	//	, sizeof(terrainsAssetsContext.requiredMaps[0]) * LOADED_MAPS);
+	for (uint32_t i = 0; i < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps; i++) {
+		memset(&terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0], 0.0
+			, sizeof(terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0])
+			* terrainsAssetsContext.terrainDisplacementMaps[i].displacementMapSize);
+	}
 
-	//memset(&terrainsAssetsContext.loadedMaps[0], TERRAIN_INDEX_NULL
-	//	, sizeof(terrainsAssetsContext.loadedMaps[0]) * LOADED_MAPS);
-
-	//for (uint32_t i = 0; i < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps; i++) {
-	//	memset(&terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0], 0.0
-	//		, sizeof(terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0])
-	//		* terrainsAssetsContext.terrainDisplacementMaps[i].displacementMapSize);
-	//}
-
-
-	TerrainSystem::InitTerrainsDisplacementMaps(terrainContext);
-
+	TerrainSystem::InitTerrainsDisplacementMaps(
+		terrainContext
+		, terrainsAssetsContext
+	);
 }
 
 void TerrainSystem::DiplaceTerrainComponent(
@@ -117,11 +118,75 @@ void BounceTarget(
 	outTargetPosition = -targetTransformInCompSpace.translate;
 }
 
+// Loaders threads -> inTerrainsAssetsContext
+// use inTerrainsAssetsContext as a double buffer not to lock every time the main thread operations
+void UpdateTerrainContextWithLoadedMaps(
+	TerrainsContext& inTerrainsContext
+	, TerrainsAssetsContext& inTerrainsAssetsContext
+) {
+	TerrainID mappingToClear[LOADED_MAPS];
+
+	gMutex.lock();
+
+	if (!inTerrainsAssetsContext.bNewData)
+	{
+		gMutex.unlock();
+		return;
+	}
+
+	// Copy for mapping
+	memcpy(
+		&mappingToClear[0]
+		, &inTerrainsContext.loadedMaps[0]
+		, sizeof(inTerrainsContext.loadedMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
+	);
+
+	// copy the loaded map buffers
+	assert(inTerrainsContext.numOfLoadedTerrainDisplacementMaps == inTerrainsAssetsContext.numOfLoadedTerrainDisplacementMaps);
+	memcpy(
+		&inTerrainsContext.terrainDisplacementMaps[0]
+		, &inTerrainsAssetsContext.terrainDisplacementMaps[0]
+		, sizeof(inTerrainsContext.terrainDisplacementMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
+	);
+
+	// copy also the loaded maps
+	memcpy(
+		&inTerrainsContext.loadedMaps[0]
+		, &inTerrainsAssetsContext.loadedMaps[0]
+		, sizeof(inTerrainsContext.loadedMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
+	);
+	
+	inTerrainsAssetsContext.bNewData = false;
+	gMutex.unlock();
+
+	// update mapping
+	for (TerrainID i = 0; i < LOADED_MAPS; i++)
+	{
+		if (mappingToClear[i] != TERRAIN_INDEX_NULL)
+		{
+			inTerrainsContext.terrainToDisplacementMappings[mappingToClear[i]] = TERRAIN_INDEX_NULL;
+		}
+	}
+	for (TerrainID i = 0; i < inTerrainsContext.numOfLoadedTerrainDisplacementMaps; i++)
+	{
+		if (inTerrainsContext.loadedMaps[i] != TERRAIN_INDEX_NULL)
+		{
+			inTerrainsContext.terrainToDisplacementMappings[inTerrainsContext.loadedMaps[i]] = i;
+		}
+	}
+}
+
 void TerrainSystem::UpdateTerrains(
 	bseecs::ECS& ecs
 	, const float deltaTime
 ) {
 	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
+	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
+	
+	UpdateTerrainContextWithLoadedMaps(
+		terrainsContext
+		, terrainsAssetsContext
+	);
 
 	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
 
@@ -206,33 +271,24 @@ void TerrainSystem::UpdateTerrains(
 		if (TERRAIN_INDEX_NULL == terrainsContext.requiredMaps[i]) continue;
 
 		bool bLoaded = false;
-		for (TerrainID j = lastFreeID; j < LOADED_MAPS && !bLoaded; j++)
+		for (TerrainID j = lastFreeID; j < LOADED_MAPS && bLoaded == false; j++)
 		{
 			if (TERRAIN_INDEX_NULL == freeLoadedMapsIndexes[j]) continue;
 
-			lastFreeID = j;
+			lastFreeID = j + 1;
 
+			// use TerrainsAssetContext for multi-threaded solution
 			TerrainID mapToBeLoaded = terrainsContext.requiredMaps[i];
 			TerrainID indexOfMapToBeLoaded = freeLoadedMapsIndexes[j];
-			TerrainID* mapPositionInLoaded = &terrainsContext.loadedMaps[indexOfMapToBeLoaded];
+			TerrainID* mapPositionInLoaded = &terrainsAssetsContext.loadedMaps[indexOfMapToBeLoaded];
 
-			// Clear old mapping
-			if (terrainsContext.loadedMaps[indexOfMapToBeLoaded] != TERRAIN_INDEX_NULL)
-			{
-				terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = TERRAIN_INDEX_NULL;
-			}
-
-			// Load "mapToBeLoaded" in "mapPositionInLoaded" of "terrainsContext.loadedMaps"
-
-			LoadTerrainDisplacementMap(
-				&terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMap[0]
+			AsyncLoadTerrainDisplacementMap(
+				&terrainsAssetsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMap[0]
 				, terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMapSize
 				, mapPositionInLoaded
 				, mapToBeLoaded
+				, &terrainsAssetsContext.bNewData
 			);
-
-			// Update mapping
-			terrainsContext.terrainToDisplacementMappings[terrainsContext.loadedMaps[indexOfMapToBeLoaded]] = indexOfMapToBeLoaded;
 			
 			bLoaded = true;
 		}
@@ -328,6 +384,7 @@ void TerrainSystem::GenerateSaveAndSetPathForTerrainsDisplacementMaps(
 // SYNC INIT
 void TerrainSystem::InitTerrainsDisplacementMaps(
 	TerrainsContext& inTerrainContext
+	, TerrainsAssetsContext& inTerrainsAssetsContext
 ) {
 
 #if 1 // not only for maps re-generation but also for paths
@@ -343,8 +400,9 @@ void TerrainSystem::InitTerrainsDisplacementMaps(
 
 	TerrainID currentIndex = 0;
 	uint32_t iteration = 0;
-	for (TerrainID row = centerRow - 1; row <= centerRow + 1; row++) {
-		for (TerrainID col = centerCol - 1; col <= centerCol + 1; col++) {
+	TerrainID dimSizeIncrease = (TerrainID)(sqrt(LOADED_MAPS)) / 2;
+	for (TerrainID row = centerRow - dimSizeIncrease; row <= centerRow + dimSizeIncrease; row++) {
+		for (TerrainID col = centerCol - dimSizeIncrease; col <= centerCol + dimSizeIncrease; col++) {
 			currentIndex = col + row * numCol;
 			LoadTerrainDisplacementMap(
 				&inTerrainContext.terrainDisplacementMaps[iteration].displacementMap[0]
@@ -357,6 +415,24 @@ void TerrainSystem::InitTerrainsDisplacementMaps(
 			iteration++;
 		}
 	}
+
+	// Copy the loaded in TerrainAssetContext
+	// Not using mutex since it's the start
+	memcpy(
+		&inTerrainsAssetsContext.loadedMaps[0]
+		, &inTerrainContext.loadedMaps[0]
+		, LOADED_MAPS * sizeof(inTerrainContext.loadedMaps[0])
+	);
+	memcpy(
+		&inTerrainsAssetsContext.requiredMaps[0]
+		, &inTerrainContext.requiredMaps[0]
+		, LOADED_MAPS * sizeof(inTerrainContext.requiredMaps[0])
+	);
+	memcpy(
+		&inTerrainsAssetsContext.terrainDisplacementMaps[0]
+		, &inTerrainContext.terrainDisplacementMaps[0]
+		, LOADED_MAPS * sizeof(inTerrainContext.terrainDisplacementMaps[0])
+	);
 }
 
 bool TerrainSystem::IsTerrainMapLoaded(
@@ -374,12 +450,12 @@ bool TerrainSystem::IsTerrainMapLoaded(
 	return outLoaded;
 }
 
+
 void TerrainSystem::LoadTerrainDisplacementMap(
 	float* mapBuffer
 	, uint32_t mapBufferSize
 	, TerrainID* loadedMapPosToFill
 	, TerrainID terrainPosition
-	//, std::string filePath
 ) {
 	if (TERRAIN_INDEX_NULL == terrainPosition)
 	{
@@ -412,15 +488,69 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 		, bufferElementSize, mapBufferSize
 	);
 
-	// #TODO LOCK
+	//// #TODO LOCK
+	//gMutex.lock();
 	memcpy(
 		mapBuffer
 		, fileContent
 		, sizeof(float) * mapBufferSize
 	);
 	*loadedMapPosToFill = terrainPosition;
+	//(*bNewData) = true;
+	//gMutex.unlock();
 	// #TODO UnLOCK
 
+}
+
+void TerrainSystem::AsyncLoadTerrainDisplacementMap(
+	float* mapBuffer
+	, uint32_t mapBufferSize
+	, TerrainID* loadedMapPosToFill
+	, TerrainID terrainPosition
+	, bool* bNewData
+) {
+	if (TERRAIN_INDEX_NULL == terrainPosition)
+	{
+		DebugBreak();
+		return;
+	}
+
+	if (!loadedMapPosToFill)
+	{
+		DebugBreak();
+		return;
+	}
+
+	//sleep_ms(1500);
+
+	// since this could go in another thread
+	// we dont want to lock the map buffer while reading file
+	float fileContent[TERRAIN_MAP_SIZE];
+
+	std::string relPath = "/terrains/terrainDisplacement_"
+		+ std::to_string(terrainPosition)
+		+ ".drop";
+	std::string absProjPath = GetRelativeProjectPathWithMarker();
+	std::string filePath = absProjPath + relPath;
+
+	std::cout << "reading file: " << filePath << std::endl;
+
+	size_t bufferElementSize = sizeof(fileContent[0]);
+	File::ReadBinaryFile(
+		filePath
+		, (char*)(&fileContent[0])
+		, bufferElementSize, mapBufferSize
+	);
+
+	gMutex.lock();
+	memcpy(
+		mapBuffer
+		, fileContent
+		, sizeof(float) * mapBufferSize
+	);
+	*loadedMapPosToFill = terrainPosition;
+	(*bNewData) = true;
+	gMutex.unlock();
 }
 
 TerrainID TerrainSystem::PositionToIndex(
