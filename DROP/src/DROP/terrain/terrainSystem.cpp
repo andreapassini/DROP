@@ -20,8 +20,10 @@
 #include "DROP/core/file.h"
 #include "DROP/math/vector3.h"
 #include "DROP/sceneGraph/sceneGraph.h"
+#include "DROP/assetManager/assetManager.h"
 
 
+// #TODO move this into the terrain contenxt
 std::mutex gMutex;
 
 void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
@@ -263,6 +265,8 @@ void TerrainSystem::UpdateTerrains(
 			}
 		}
 	}
+
+	AssetManagerContext& assetManagerContext = ecs.GetSingletonComponent<AssetManagerContext>();
 	
 	TerrainID lastFreeID = 0;
 	for (TerrainID i = 0; i < LOADED_MAPS; i++)
@@ -282,12 +286,27 @@ void TerrainSystem::UpdateTerrains(
 			TerrainID indexOfMapToBeLoaded = freeLoadedMapsIndexes[j];
 			TerrainID* mapPositionInLoaded = &terrainsAssetsContext.loadedMaps[indexOfMapToBeLoaded];
 
-			AsyncLoadTerrainDisplacementMap(
-				&terrainsAssetsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMap[0]
-				, terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMapSize
-				, mapPositionInLoaded
-				, mapToBeLoaded
-				, &terrainsAssetsContext.bNewData
+			float* mapBuffer = &terrainsAssetsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMap[0];
+			TerrainID mapSize = terrainsContext.terrainDisplacementMaps[indexOfMapToBeLoaded].displacementMapSize;
+			bool* bNewData = &terrainsAssetsContext.bNewData;
+
+			AssetManager::Enqueue(
+				&assetManagerContext
+				, [
+					mapBuffer
+					, mapSize
+					, mapPositionInLoaded
+					, mapToBeLoaded
+					, bNewData
+				] {
+					AsyncLoadTerrainDisplacementMap(
+						mapBuffer
+						, mapSize
+						, mapPositionInLoaded
+						, mapToBeLoaded
+						, bNewData
+					);
+				}
 			);
 			
 			bLoaded = true;
@@ -521,7 +540,7 @@ void TerrainSystem::AsyncLoadTerrainDisplacementMap(
 		return;
 	}
 
-	//sleep_ms(1500);
+	//sleep_ms(500);
 
 	// since this could go in another thread
 	// we dont want to lock the map buffer while reading file

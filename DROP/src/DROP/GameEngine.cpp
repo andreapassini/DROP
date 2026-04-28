@@ -32,6 +32,7 @@
 
 #include "terrain/terrainComponent.h"
 #include "terrain/terrainSystem.h"
+#include "assetManager/assetManager.h"
 
 extern bool g_GameEngineRunning;
 
@@ -128,6 +129,7 @@ namespace Drop
 
 		g_activeScene->ecs.RegisterSingletonComponent<TerrainsContext>(arena);
 		g_activeScene->ecs.RegisterSingletonComponent<TerrainsAssetsContext>(arena);
+		g_activeScene->ecs.RegisterSingletonComponent<AssetManagerContext>(arena);
 
 		//g_activeScene->ecs.RegisterSingletonComponent<SceneContext>(arena);
 		//g_activeScene->ecs.RegisterSingletonComponent<RendererContext>(arena);
@@ -144,6 +146,10 @@ namespace Drop
 			(GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow()
 			, *renderContext
 		);
+
+		AssetManagerContext* assetManagerContext = &g_activeScene->ecs.GetSingletonComponent<AssetManagerContext>();
+		AssetManager::InitAssetManager(assetManagerContext);
+
 
 		TerrainSystem::InitTerrains(
 			g_activeScene->ecs
