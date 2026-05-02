@@ -60,8 +60,9 @@ struct TerrainsContext {
 	// Used for grid calculation
 	float terrainDimension = 10.0f;
 	std::string terrainDisplacementPath[MAX_NUM_TERRAINS];
+	TerrainID oldTargetLinearizedIndex = TERRAIN_INDEX_NULL;
 
-	EntityID targetID = 1; // 1 is the sphere
+	EntityID targetID = 1; // 1 is the 
 };
 
 

@@ -1,4 +1,5 @@
 #include "assetManager.h"
+#include <iostream>
 
 void AssetManager::InitAssetManager(
 	AssetManagerContext* assetManager
@@ -27,6 +28,7 @@ void AssetManager::AssetLoop(
 ) {
 	if (!assetManager) return;
 
+	int32_t i = 0;
 	// we cannot use stop without locking
 	while (true) {
 		std::function<void()> task;
@@ -55,6 +57,8 @@ void AssetManager::AssetLoop(
 			// Get the next task from the queue
 			task = std::move(assetManager->tasks.front());
 			assetManager->tasks.pop();
+			i++;
+			std::cout << "task num: " << i << ", queue size: " << assetManager->tasks.size() << std::endl;
 		}
 
 		task();

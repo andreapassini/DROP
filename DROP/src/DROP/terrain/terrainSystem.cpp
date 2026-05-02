@@ -96,24 +96,39 @@ void BounceTarget(
 	VgMath::Transform& currentTargetTransform
 	, TransformComponent& terrainTransformComp
 	, VgMath::Vector3& outTargetPosition
+	, const float deltaTime
 ) {
 	float xLeftLimit = -(121.0f / 2.0);
 	float xRightLimit = 121.0f / 2.0;
-	float speed = 0.050f;
+	float speed = 7.5f;
 	// Bouncing on X
 	static bool bGoingRight = true;
-	if (currentTargetTransform.translate.x < xRightLimit && bGoingRight)
+	//if (currentTargetTransform.translate.x < xRightLimit && bGoingRight)
+	//{
+	//	currentTargetTransform.translate.x += (speed * deltaTime);
+	//}
+	//else if (currentTargetTransform.translate.x >= xLeftLimit && !bGoingRight)
+	//{
+	//	currentTargetTransform.translate.x -= (speed * deltaTime);
+	//}
+	//else
+	//{
+	//	bGoingRight = !bGoingRight;
+	//}
+
+	// Go at random
+	static bool bFirstTime = true;
+	static float timer = 3.0f;
+	static float currentTime = 0.0f;
+	currentTime += deltaTime;
+	if (!bFirstTime || currentTime < timer)
 	{
-		currentTargetTransform.translate.x += (speed /** deltaTime*/);
+		return;
 	}
-	else if (currentTargetTransform.translate.x >= xLeftLimit && !bGoingRight)
-	{
-		currentTargetTransform.translate.x -= (speed /** deltaTime*/);
-	}
-	else
-	{
-		bGoingRight = !bGoingRight;
-	}
+
+	currentTargetTransform.translate.x = VgMath::randomBetween(xLeftLimit, xRightLimit);
+	currentTime = 0.0f;
+	bFirstTime = false;
 
 	// Move it into terrainComp space/world
 	VgMath::Transform targetTransformInCompSpace = terrainTransformComp.localTransform * currentTargetTransform;
@@ -128,38 +143,38 @@ void UpdateTerrainContextWithLoadedMaps(
 ) {
 	TerrainID mappingToClear[LOADED_MAPS];
 
-	gMutex.lock();
-
-	if (!inTerrainsAssetsContext.bNewData)
 	{
-		gMutex.unlock();
-		return;
-	}
+		std::unique_lock<std::mutex> lock(gMutex);
 
-	// Copy for mapping
-	memcpy(
-		&mappingToClear[0]
-		, &inTerrainsContext.loadedMaps[0]
-		, sizeof(inTerrainsContext.loadedMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
-	);
+		if (!inTerrainsAssetsContext.bNewData)
+		{
+			return;
+		}
 
-	// copy the loaded map buffers
-	assert(inTerrainsContext.numOfLoadedTerrainDisplacementMaps == inTerrainsAssetsContext.numOfLoadedTerrainDisplacementMaps);
-	memcpy(
-		&inTerrainsContext.terrainDisplacementMaps[0]
-		, &inTerrainsAssetsContext.terrainDisplacementMaps[0]
-		, sizeof(inTerrainsContext.terrainDisplacementMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
-	);
+		// Copy for mapping
+		memcpy(
+			&mappingToClear[0]
+			, &inTerrainsContext.loadedMaps[0]
+			, sizeof(inTerrainsContext.loadedMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
+		);
 
-	// copy also the loaded maps
-	memcpy(
-		&inTerrainsContext.loadedMaps[0]
-		, &inTerrainsAssetsContext.loadedMaps[0]
-		, sizeof(inTerrainsContext.loadedMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
-	);
+		// copy the loaded map buffers
+		assert(inTerrainsContext.numOfLoadedTerrainDisplacementMaps == inTerrainsAssetsContext.numOfLoadedTerrainDisplacementMaps);
+		memcpy(
+			&inTerrainsContext.terrainDisplacementMaps[0]
+			, &inTerrainsAssetsContext.terrainDisplacementMaps[0]
+			, sizeof(inTerrainsContext.terrainDisplacementMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
+		);
+
+		// copy also the loaded maps
+		memcpy(
+			&inTerrainsContext.loadedMaps[0]
+			, &inTerrainsAssetsContext.loadedMaps[0]
+			, sizeof(inTerrainsContext.loadedMaps[0]) * inTerrainsContext.numOfLoadedTerrainDisplacementMaps
+		);
 	
-	inTerrainsAssetsContext.bNewData = false;
-	gMutex.unlock();
+		inTerrainsAssetsContext.bNewData = false;
+	}
 
 	// update mapping
 	for (TerrainID i = 0; i < LOADED_MAPS; i++)
@@ -200,7 +215,29 @@ void TerrainSystem::UpdateTerrains(
 	//
 
 	VgMath::Vector3 targetPosition;
-	BounceTarget(currentTargetTransform, terrainTransformComp, targetPosition);
+	BounceTarget(
+		currentTargetTransform
+		, terrainTransformComp
+		, targetPosition
+		, deltaTime
+	);
+
+	// Check target position in grid
+	// if it the same as the old one, skip
+	TerrainID currentTargetLinearizedIndex = PositionToIndex(
+		terrainsContext.terrainDimension
+		, terrainsContext.maxNumTerrains
+		, &targetPosition
+	);
+	if (terrainsContext.oldTargetLinearizedIndex != TERRAIN_INDEX_NULL
+		&& terrainsContext.oldTargetLinearizedIndex == currentTargetLinearizedIndex)
+	{
+		return;
+	}
+	else
+	{
+		terrainsContext.oldTargetLinearizedIndex = currentTargetLinearizedIndex;
+	}
 
 	CalculateNearTargetIndexes(
 		&targetPosition
@@ -224,6 +261,20 @@ void TerrainSystem::UpdateTerrains(
 
 	if (numOfNewMapsRequired == 0) {
 		return;
+	}
+
+	{
+		TerrainID gridEdge = (TerrainID)(sqrt(terrainsContext.maxNumTerrains));
+		std::cout << "row: " << currentTargetLinearizedIndex / gridEdge << std::endl; 
+		std::cout << "col: " << currentTargetLinearizedIndex % gridEdge << std::endl;
+
+		std::cout << "Req: " << std::endl;
+		std::cout << "[" << std::endl;
+		for (TerrainID i = 0; i < LOADED_MAPS; i++)
+		{
+			std::cout << "\t" << terrainsContext.requiredMaps[i] << std::endl;
+		}
+		std::cout << "]" << std::endl;
 	}
 
 	// Find which new maps we need and sub them with the old ones
@@ -313,7 +364,7 @@ void TerrainSystem::UpdateTerrains(
 		}
 	}
 
-	std::cout << "Terrain update" << std::endl;
+	//std::cout << "Terrain update" << std::endl;
 }
 
 // assuming OutIndexesBuffer.num == numberOfNearTargetIndexes
@@ -337,12 +388,12 @@ void TerrainSystem::CalculateNearTargetIndexes(
 	TerrainID iteration = 0;
 	TerrainID dimSizeIncrease = (TerrainID)(sqrt(LOADED_MAPS))/2;
 	for (int32_t row = (int32_t)(targetRow) -dimSizeIncrease; row <= targetRow + dimSizeIncrease; row++) {
-		if (row < 0 || row > gridEdge) {
+		if (row < 0 || row >= gridEdge) {
 			continue;
 		}
 
 		for (int32_t col = (int32_t)(targetCol) -dimSizeIncrease; col <= targetCol + dimSizeIncrease; col++) {
-			if (col < 0 || col > gridEdge) {
+			if (col < 0 || col >= gridEdge) {
 				continue;
 			}
 
@@ -498,7 +549,7 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 	std::string absProjPath = GetRelativeProjectPathWithMarker();
 	std::string filePath = absProjPath + relPath;
 
-	std::cout << "reading file: " << filePath << std::endl;
+	//std::cout << "reading file: " << filePath << std::endl;
 
 	size_t bufferElementSize = sizeof(fileContent[0]);
 	File::ReadBinaryFile(
@@ -507,18 +558,12 @@ void TerrainSystem::LoadTerrainDisplacementMap(
 		, bufferElementSize, mapBufferSize
 	);
 
-	//// #TODO LOCK
-	//gMutex.lock();
 	memcpy(
 		mapBuffer
 		, fileContent
 		, sizeof(float) * mapBufferSize
 	);
 	*loadedMapPosToFill = terrainPosition;
-	//(*bNewData) = true;
-	//gMutex.unlock();
-	// #TODO UnLOCK
-
 }
 
 void TerrainSystem::AsyncLoadTerrainDisplacementMap(
@@ -540,8 +585,6 @@ void TerrainSystem::AsyncLoadTerrainDisplacementMap(
 		return;
 	}
 
-	//sleep_ms(500);
-
 	// since this could go in another thread
 	// we dont want to lock the map buffer while reading file
 	float fileContent[TERRAIN_MAP_SIZE];
@@ -552,7 +595,7 @@ void TerrainSystem::AsyncLoadTerrainDisplacementMap(
 	std::string absProjPath = GetRelativeProjectPathWithMarker();
 	std::string filePath = absProjPath + relPath;
 
-	std::cout << "reading file: " << filePath << std::endl;
+	//std::cout << "reading file: " << filePath << std::endl;
 
 	size_t bufferElementSize = sizeof(fileContent[0]);
 	File::ReadBinaryFile(
@@ -561,15 +604,18 @@ void TerrainSystem::AsyncLoadTerrainDisplacementMap(
 		, bufferElementSize, mapBufferSize
 	);
 
-	gMutex.lock();
-	memcpy(
-		mapBuffer
-		, fileContent
-		, sizeof(float) * mapBufferSize
-	);
-	*loadedMapPosToFill = terrainPosition;
-	(*bNewData) = true;
-	gMutex.unlock();
+	{
+		std::unique_lock<std::mutex> lock(gMutex);
+		memcpy(
+			mapBuffer
+			, fileContent
+			, sizeof(float) * mapBufferSize
+		);
+		*loadedMapPosToFill = terrainPosition;
+		(*bNewData) = true;
+	}
+
+	//sleep_ms(150);
 }
 
 TerrainID TerrainSystem::PositionToIndex(

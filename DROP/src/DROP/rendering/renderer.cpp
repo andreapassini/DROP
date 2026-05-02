@@ -57,7 +57,8 @@ GLenum glCheckErrorExt(const char* file, int line)
         case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
         case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        LOG_CORE_ERROR("{0} | {1} ({2})", error, file, line);
+        //LOG_CORE_ERROR("{0} | {1} ({2})", error, file, line);
+        std::cout << error << file << line << std::endl;
     }
     return errorCode;
 }
