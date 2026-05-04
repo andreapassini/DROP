@@ -114,7 +114,8 @@ void TerrainSystem::InitTargetPosition(
 	//
 
 	// Init Old position
-	VgMath::Transform currentTransform = terrainTransformComp.localTransform * currentTargetTransform;
+	VgMath::Transform currentTransform = currentTargetTransform;
+	currentTransform.translate = currentTransform.translate - terrainTransformComp.localTransform.translate;
 	TerrainID currentTargetLinearizedIndex = PositionToIndex(
 		terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
@@ -301,7 +302,8 @@ void TerrainSystem::UpdateTerrains(
 #endif
 	// Check target position in grid
 	// if it the same as the old one, skip
-	VgMath::Transform currentTransform = terrainTransformComp.localTransform * currentTargetTransform;
+	VgMath::Transform currentTransform = currentTargetTransform;
+	currentTransform.translate = currentTransform.translate - terrainTransformComp.localTransform.translate;
 	TerrainID currentTargetLinearizedIndex = PositionToIndex(
 		terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
@@ -717,7 +719,7 @@ TerrainID TerrainSystem::PositionToIndex(
 
 	// Grid calculation
 	TerrainID gridEdge = (TerrainID)(sqrt(maxNumTerrains)); // sqrt should handle neg numbers
-	TerrainID col = (TerrainID)(abs(inPosition->x) / gridEdge);
+	TerrainID col = (TerrainID)(abs(inPosition->x) / gridEdge); // ABS should not be needed since we should move everything in terrain comp space
 	TerrainID row = (TerrainID)(abs(inPosition->z) / gridEdge);
 	TerrainID numCol = gridEdge;
 
