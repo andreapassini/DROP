@@ -88,8 +88,42 @@ void TerrainSystem::DiplaceTerrainComponent(
 	float gridCenter = (float)numRowOrCol / 2.0f;
 	float displacement = terrainEdgeSize * gridCenter;
 	 
-	VgMath::Vector3 extraDisplacement = VgMath::Vector3(displacement, 0.0f, 0.0f) + VgMath::Vector3(0.0f, 0.0f, displacement);
-	transformComp.localTransform.translate = transformComp.localTransform.translate - extraDisplacement; // minus since we are rendering them from bot left
+	// Goal: Move the grid to place grid center in world (0.0, 0.0, 0.0)
+	// Grid starting from bot left
+	// 0.0  o - - > X
+	//      |
+	//		|
+	//		v Z
+	// Terrain transform (-displacement, 0.0, -displacement)
+	VgMath::Vector3 extraDisplacement = VgMath::Vector3(-displacement, 0.0f, 0.0f) + VgMath::Vector3(0.0f, 0.0f, displacement);
+	transformComp.localTransform.translate = transformComp.localTransform.translate + extraDisplacement; // minus since we are rendering them from bot left
+}
+
+void TerrainSystem::InitTargetPosition(
+	bseecs::ECS& ecs
+) {
+	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
+	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
+
+	// Move the specified debug target to position
+// #TODO assuming a single TerrainTarget
+	std::vector<TerrainComponent>& denseTerrainComponents = ecs.GetComponentPool<TerrainComponent>().Data();
+	EntityID DenseID = 0;
+	TerrainComponent& terrainComponent = denseTerrainComponents[DenseID];
+	TransformComponent& terrainTransformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(DenseID);
+	//
+
+	// Init Old position
+	VgMath::Transform currentTransform = terrainTransformComp.localTransform * currentTargetTransform;
+	TerrainID currentTargetLinearizedIndex = PositionToIndex(
+		terrainsContext.terrainDimension
+		, terrainsContext.maxNumTerrains
+		, &currentTransform.translate
+	);
+	terrainsContext.oldTargetLinearizedIndex = currentTargetLinearizedIndex;
+
+	VgMath::Transform& currentDebugPosTransform = ecs.Get<TransformComponent>(terrainsContext.debugPosID).localTransform;
+	currentDebugPosTransform = terrainTransformComp.localTransform;
 }
 
 void BounceTarget(
@@ -133,6 +167,42 @@ void BounceTarget(
 	// Move it into terrainComp space/world
 	VgMath::Transform targetTransformInCompSpace = terrainTransformComp.localTransform * currentTargetTransform;
 	outTargetPosition = -targetTransformInCompSpace.translate;
+}
+
+void MoveTargetToRandomSpotOnce(
+	VgMath::Transform& currentTargetTransform
+	, TransformComponent& terrainTransformComp
+	, VgMath::Vector3& outTargetPosition
+	, const float deltaTime
+) {
+	float xLeftLimit = -(121.0f / 2.0);
+	float xRightLimit = 121.0f / 2.0;
+	float speed = 7.5f;
+	// Bouncing on X
+	static bool bMovingOnX = true;
+
+	// Go at random
+	static bool bFirstTime = true;
+	static float timer = 3.0f;
+	static float currentTime = 0.0f;
+	currentTime += deltaTime;
+	if (!bFirstTime || currentTime < timer)
+	{
+		return;
+	}
+
+	if (bMovingOnX)
+	{
+		//currentTargetTransform.translate.x = VgMath::randomBetween(xLeftLimit, xRightLimit);
+		currentTargetTransform.translate.x = -50.0f;
+	}
+
+	currentTime = 0.0f;
+	bFirstTime = false;
+
+	// Move it into terrainComp space/world
+	//VgMath::Transform targetTransformInCompSpace = terrainTransformComp.localTransform * currentTargetTransform;
+	outTargetPosition = currentTargetTransform.translate;
 }
 
 // Loaders threads -> inTerrainsAssetsContext
@@ -214,23 +284,31 @@ void TerrainSystem::UpdateTerrains(
 	TransformComponent& terrainTransformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(DenseID);
 	//
 
-	VgMath::Vector3 targetPosition;
+#if BOUNCE
 	BounceTarget(
 		currentTargetTransform
 		, terrainTransformComp
 		, targetPosition
 		, deltaTime
 	);
-
+#else
+	MoveTargetToRandomSpotOnce(
+		currentTargetTransform
+		, terrainTransformComp
+		, currentTargetTransform.translate
+		, deltaTime
+	);
+#endif
 	// Check target position in grid
 	// if it the same as the old one, skip
+	VgMath::Transform currentTransform = terrainTransformComp.localTransform * currentTargetTransform;
 	TerrainID currentTargetLinearizedIndex = PositionToIndex(
 		terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
-		, &targetPosition
+		, &currentTransform.translate
 	);
-	if (terrainsContext.oldTargetLinearizedIndex != TERRAIN_INDEX_NULL
-		&& terrainsContext.oldTargetLinearizedIndex == currentTargetLinearizedIndex)
+	if (terrainsContext.oldTargetLinearizedIndex == TERRAIN_INDEX_NULL
+		|| terrainsContext.oldTargetLinearizedIndex == currentTargetLinearizedIndex)
 	{
 		return;
 	}
@@ -240,7 +318,7 @@ void TerrainSystem::UpdateTerrains(
 	}
 
 	CalculateNearTargetIndexes(
-		&targetPosition
+		&currentTransform.translate
 		, terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
 		, LOADED_MAPS // must be bufferSize
@@ -248,18 +326,22 @@ void TerrainSystem::UpdateTerrains(
 	);
 
 	// Do we need to update loaded maps?
-	TerrainID numOfNewMapsRequired = 0;
+	TerrainID numOfNewMapsRequired = LOADED_MAPS;
 	for (TerrainID i = 0; i < LOADED_MAPS; i++) {
-		numOfNewMapsRequired++;		
-		for (TerrainID j = 0; j < LOADED_MAPS && TERRAIN_INDEX_NULL != terrainsContext.requiredMaps[i]; j++) {
+		for (TerrainID j = 0; j < LOADED_MAPS; j++) {
 			if (terrainsContext.loadedMaps[j] == terrainsContext.requiredMaps[i]) {
 				//terrainsContext.requiredMaps[i] = TERRAIN_INDEX_NULL;
 				numOfNewMapsRequired--;
 			}
+			else if (TERRAIN_INDEX_NULL == terrainsContext.requiredMaps[i])
+			{
+				numOfNewMapsRequired--;
+				break;
+			}
 		}
 	}
 
-	if (numOfNewMapsRequired == 0) {
+	if (numOfNewMapsRequired <= 0 || numOfNewMapsRequired > LOADED_MAPS) {
 		return;
 	}
 
@@ -380,19 +462,21 @@ void TerrainSystem::CalculateNearTargetIndexes(
 		, numberOfTerrains
 		, inTargetPosition
 	);
-	TerrainID gridEdge = (TerrainID)(sqrt(numberOfTerrains));
-	TerrainID targetRow = targetLinearizedIndex / gridEdge;
-	TerrainID targetCol = targetLinearizedIndex % gridEdge;
+	int32_t gridEdge = (int32_t)(sqrt(numberOfTerrains));
+	int32_t targetRow = (int32_t)(targetLinearizedIndex / gridEdge);
+	int32_t targetCol = (int32_t)(targetLinearizedIndex % gridEdge);
 
 	// we are subtracting, use int
 	TerrainID iteration = 0;
-	TerrainID dimSizeIncrease = (TerrainID)(sqrt(LOADED_MAPS))/2;
-	for (int32_t row = (int32_t)(targetRow) -dimSizeIncrease; row <= targetRow + dimSizeIncrease; row++) {
+	int32_t dimSizeIncrease = (int32_t)(sqrt(LOADED_MAPS))/2;
+	for (int32_t row = targetRow - dimSizeIncrease; row <= targetRow + dimSizeIncrease; row++) {
+
 		if (row < 0 || row >= gridEdge) {
 			continue;
 		}
 
-		for (int32_t col = (int32_t)(targetCol) -dimSizeIncrease; col <= targetCol + dimSizeIncrease; col++) {
+		for (int32_t col = targetCol -dimSizeIncrease; col <= targetCol + dimSizeIncrease; col++) {
+
 			if (col < 0 || col >= gridEdge) {
 				continue;
 			}
@@ -618,6 +702,7 @@ void TerrainSystem::AsyncLoadTerrainDisplacementMap(
 	//sleep_ms(150);
 }
 
+// InPos must be in TerrainCompSpace
 TerrainID TerrainSystem::PositionToIndex(
 	const float terrainDimension
 	, const TerrainID maxNumTerrains
@@ -631,9 +716,9 @@ TerrainID TerrainSystem::PositionToIndex(
 	}
 
 	// Grid calculation
-	TerrainID gridEdge = (TerrainID)(sqrt(maxNumTerrains));
-	TerrainID col = (TerrainID)(inPosition->x / gridEdge);
-	TerrainID row = (TerrainID)(inPosition->z / gridEdge);
+	TerrainID gridEdge = (TerrainID)(sqrt(maxNumTerrains)); // sqrt should handle neg numbers
+	TerrainID col = (TerrainID)(abs(inPosition->x) / gridEdge);
+	TerrainID row = (TerrainID)(abs(inPosition->z) / gridEdge);
 	TerrainID numCol = gridEdge;
 
 	outTerrainID = col + (row * numCol);

@@ -8,12 +8,14 @@ struct TerrainsAssetsContext;
 
 namespace VgMath {
 	class Vector3;
+	class Transform;
 }
 
 namespace TerrainSystem {
 
 void InitTerrains(bseecs::ECS& ecs);
 void DiplaceTerrainComponent(bseecs::ECS& ecs);
+void InitTargetPosition(bseecs::ECS& ecs);
 void UpdateTerrains(
 	bseecs::ECS& ecs
 	, const float deltaTime

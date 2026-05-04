@@ -6,12 +6,12 @@ Entities:
     TransformComponent:
       LocalTransform:
         Translate: [0, -1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 1
       Parent: 18446744073709551615
       CumulativeTransform:
         Translate: [0, -1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 1
     TerrainComponent:
       modelId: 3
@@ -23,12 +23,12 @@ Entities:
     TransformComponent:
       LocalTransform:
         Translate: [0, 1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 1
       Parent: 18446744073709551615
       CumulativeTransform:
         Translate: [0, 1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 1
     StaticMeshComponent:
       modelId: 1
@@ -40,12 +40,12 @@ Entities:
     TransformComponent:
       LocalTransform:
         Translate: [7, 1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
-        Scale: 1.0
-      Parent: 18446744073709551615
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+      Parent: 1
       CumulativeTransform:
         Translate: [3.6400000751018524, 1.4799999892711639, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 1.0000000000000002, 0], 0]
         Scale: 0.2303999897003175
     StaticMeshComponent:
       modelId: 0
@@ -56,14 +56,14 @@ Entities:
       Tag name: Bunny
     TransformComponent:
       LocalTransform:
-        Translate: [0, 1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
-        Scale: 10.0
-      Parent: 18446744073709551615
+        Translate: [3, 1, 0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
+        Scale: 0.47999998927116394
+      Parent: 1
       CumulativeTransform:
-        Translate: [0.0, 0.0, 0.0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
-        Scale: 1.0
+        Translate: [1.5600000321865082, 1.4799999892711639, 0]
+        Rotate: [[0, 1.0000000000000002, 0], 0]
+        Scale: 0.2303999897003175
     StaticMeshComponent:
       modelId: 2
       materialId: 3
@@ -74,12 +74,12 @@ Entities:
     TransformComponent:
       LocalTransform:
         Translate: [-5, 0, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 0.47999998927116394
       Parent: 18446744073709551615
       CumulativeTransform:
         Translate: [-5, 0, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 0.47999998927116394
     ParticleEmitter:
       numberOfParticles: 1000
@@ -102,12 +102,12 @@ Entities:
     TransformComponent:
       LocalTransform:
         Translate: [10, 10, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 0.47999998927116394
       Parent: 18446744073709551615
       CumulativeTransform:
         Translate: [10, 10, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
+        Rotate: [[0, 0.70710678118654757, 0], 0.70710678118654757]
         Scale: 0.47999998927116394
     PBParticleEmitter:
       numberOfParticles: 1000

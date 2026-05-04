@@ -69,23 +69,24 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		TerrainComponent& terrainComponent = denseTerrainComponents[i];
 
 		TransformComponent& transformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(i);
-		Transform& worldTransform = transformComp.cumulatedTransform;
+		Transform& localTransform = transformComp.localTransform;
 
 		// Consider the entity as the center of all terrains
 		// 3 should be num row and num col
 		int32_t numRowOrCol = (int32_t)sqrt(terrainComponent.numOfTerrains); // since it's a square
 
-		float debugDisplacement = 0.1f;
-		float displacement = TERRAIN_EDGE_SIZE + debugDisplacement;
+		//float debugDisplacement = 0.0f;
+		float displacement = TERRAIN_EDGE_SIZE;
 
 		for (uint32_t j = 0; j < terrainComponent.numOfTerrains; j++) {
 			float row = (float)(j / numRowOrCol);
 			float col = (float)(j % numRowOrCol);
 
 			VgMath::Vector3 extraDisplacement;
-			extraDisplacement.x = (float)(col) * displacement;
-			extraDisplacement.z = (float)(row) * displacement;
-			Transform movedTransform = worldTransform;
+			extraDisplacement.x = ((float)(col) * displacement) /*+ debugDisplacement*/;
+			// Z minus since pos is towards camera
+			extraDisplacement.z = - ((float)(row) * displacement) /*+ debugDisplacement*/;
+			Transform movedTransform = localTransform;
 			movedTransform.translate += extraDisplacement;
 
 			Renderer::DrawTerrain(

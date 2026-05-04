@@ -63,6 +63,7 @@ struct TerrainsContext {
 	TerrainID oldTargetLinearizedIndex = TERRAIN_INDEX_NULL;
 
 	EntityID targetID = 1; // 1 is the 
+	EntityID debugPosID = 3; // 1 is the 
 };
 
 
