@@ -63,6 +63,9 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		);
 	}
 
+	// Draw terrain target
+
+
 	// draw all the terrains
 	for (size_t i = 0; i < denseTerrainComponents.size(); i++)
 	{
@@ -97,6 +100,23 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 				, rendererContext
 				, terrainsContext
 			);
+
+			if (rendererContext.drawDebug)
+			{
+				movedTransform.translate.y += 2.5f;
+				bool bInsideTargetRange = terrainsContext.terrainToDisplacementMappings[j] != TERRAIN_INDEX_NULL ? true : false;
+				Renderer::DrawTerrainCell(
+					terrainComponent
+					, j
+					, bInsideTargetRange
+					, - 5.25f
+					, movedTransform
+					, sceneContext
+					, rendererContext
+					, terrainsContext
+					, &rendererContext.shaders[EMPTY_QUAD_SHADER]
+				);
+			}
 		}
 	}
 

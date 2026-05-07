@@ -98,7 +98,7 @@ namespace Drop
         bool backFaceCulling = true;
         EClockWise clockWiseOrder = EClockWise::COUNTER_CLOCKWISE;
 
-        bool drawDebug = false;
+        bool drawDebug = true;
 
         // All the shader paths
 
@@ -196,6 +196,18 @@ namespace Drop
             , SceneContext& sceneContext
             , RendererContext& rendererContext
             , TerrainsContext& terrainsContext
+        );
+
+        void DrawTerrainCell(
+            const TerrainComponent& terrainComponent
+            , size_t terrainIndex
+            , bool bInsideTargetRange
+            , float additionalSize
+            , VgMath::Transform& worldTransform
+            , SceneContext& sceneContext
+            , RendererContext& rendererContext
+            , TerrainsContext& terrainsContext
+            , Shader* const emptyQuadGeomShader
         );
 
         void RecompileAllShaders(

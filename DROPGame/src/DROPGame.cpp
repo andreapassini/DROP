@@ -395,7 +395,7 @@ public:
         ImGui::Checkbox("Wireframe", &m_Wireframe);
 
         ImGui::Separator();
-        ImGui::Checkbox("Draw Debug Lines", &m_DrawDebug);
+        ImGui::Checkbox("Draw Debug Lines", &gameEngine->g_activeScene->ecs.GetSingletonComponent<RendererContext>().drawDebug);
 
         ImGui::Separator();
         if (ImGui::Button("Recompile all shaders \nin materials (R as shortcut)")) {

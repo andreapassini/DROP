@@ -41,14 +41,14 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 	memset(&terrainContext.loadedMaps[0], TERRAIN_INDEX_NULL
 		, sizeof(terrainContext.loadedMaps[0]) * LOADED_MAPS);
 
-	memset(&terrainContext.stubTerrainDisplacementMap.displacementMap[0], 0.0
+	memset(&terrainContext.stubTerrainDisplacementMap.displacementMap[0], 0.0f
 		, sizeof(terrainContext.stubTerrainDisplacementMap.displacementMap[0]) 
-			* terrainContext.stubTerrainDisplacementMap.displacementMapSize);
+			* LOADED_MAPS);
 
 	for (uint32_t i = 0; i < terrainContext.numOfLoadedTerrainDisplacementMaps; i++) {
-		memset(&terrainContext.terrainDisplacementMaps[i].displacementMap[0], 0.0
+		memset(&terrainContext.terrainDisplacementMaps[i].displacementMap[0], 0.0f
 			, sizeof(terrainContext.terrainDisplacementMaps[i].displacementMap[0]) 
-				* terrainContext.terrainDisplacementMaps[i].displacementMapSize);
+				* LOADED_MAPS);
 	}
 
 	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
@@ -61,9 +61,9 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 		, sizeof(terrainsAssetsContext.loadedMaps[0]) * LOADED_MAPS);
 
 	for (uint32_t i = 0; i < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps; i++) {
-		memset(&terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0], 0.0
+		memset(&terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0], 0.0f
 			, sizeof(terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0])
-			* terrainsAssetsContext.terrainDisplacementMaps[i].displacementMapSize);
+			* LOADED_MAPS);
 	}
 
 	TerrainSystem::InitTerrainsDisplacementMaps(
@@ -170,32 +170,39 @@ void BounceTarget(
 	outTargetPosition = -targetTransformInCompSpace.translate;
 }
 
-void MoveTargetToRandomSpotOnce(
+void MoveTargetToRandomSpot(
 	VgMath::Transform& currentTargetTransform
 	, TransformComponent& terrainTransformComp
 	, VgMath::Vector3& outTargetPosition
 	, const float deltaTime
+	, bool bMoveOnce
 ) {
-	float xLeftLimit = -(121.0f / 2.0);
-	float xRightLimit = 121.0f / 2.0;
+	float xLeftLimit = -(121.0f / 4.0f);
+	float xRightLimit = 121.0f / 4.0f;
 	float speed = 7.5f;
-	// Bouncing on X
-	static bool bMovingOnX = true;
+	bool bMovingOnX = true;
+	bool bMovingOnZ = true;
 
 	// Go at random
 	static bool bFirstTime = true;
-	static float timer = 3.0f;
+	static float timer = 5.0f;
 	static float currentTime = 0.0f;
 	currentTime += deltaTime;
-	if (!bFirstTime || currentTime < timer)
+
+	if ((bMoveOnce && !bFirstTime) || currentTime < timer)
 	{
 		return;
 	}
-
+	
 	if (bMovingOnX)
 	{
-		//currentTargetTransform.translate.x = VgMath::randomBetween(xLeftLimit, xRightLimit);
-		currentTargetTransform.translate.x = -50.0f;
+		currentTargetTransform.translate.x = trunc(VgMath::randomBetween(xLeftLimit, xRightLimit));
+		//currentTargetTransform.translate.x = -50.0f;
+	}
+	
+	if (bMovingOnZ)
+	{
+		currentTargetTransform.translate.z = trunc(VgMath::randomBetween(xLeftLimit, xRightLimit));
 	}
 
 	currentTime = 0.0f;
@@ -293,11 +300,12 @@ void TerrainSystem::UpdateTerrains(
 		, deltaTime
 	);
 #else
-	MoveTargetToRandomSpotOnce(
+	MoveTargetToRandomSpot(
 		currentTargetTransform
 		, terrainTransformComp
 		, currentTargetTransform.translate
 		, deltaTime
+		, true // Move once
 	);
 #endif
 	// Check target position in grid

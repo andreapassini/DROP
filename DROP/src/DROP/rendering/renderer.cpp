@@ -1106,6 +1106,91 @@ namespace Drop
         model.Draw();
     }
 
+    void Renderer::DrawTerrainCell(
+        const TerrainComponent& terrainComponent
+        , size_t terrainIndex
+        , bool bInsideTargetRange
+        , float additionalSize
+        , VgMath::Transform& worldTransform
+        , SceneContext& sceneContext
+        , RendererContext& rendererContext
+        , TerrainsContext& terrainsContext
+        , Shader* const emptyQuadGeomShader
+    ) {
+        // Clear errors
+        glCheckError();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // we set the viewport for the final rendering step
+        glViewport(0, 0, sceneContext.width, sceneContext.height);
+        emptyQuadGeomShader->Use();
+
+        glCheckError();
+
+        // we pass projection and view matrices to the Shader Program
+        GLint projectionMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetProjectionMatrix()));
+        glCheckError();
+
+        GLint viewMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "viewMatrix");
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(sceneContext.camera->GetViewMatrix()));
+        glCheckError();
+
+        //// VAO is made "active"
+        //glBindVertexArray(m_billboardVAO);
+        //glCheckError();
+
+        glm::mat4 modelMatrix(1.0f);
+        const VgMath::Transform& testTransform = worldTransform;
+        SceneGraph::TransformToMatrix(testTransform, modelMatrix);
+        GLint modelMatrixLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "modelMatrix");
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glCheckError();
+
+        GLint particleSizeLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "size");
+        glCheckError();
+        glUniform2fv(
+            particleSizeLocation
+            , 1
+            , glm::value_ptr(
+                glm::vec2(
+                    terrainsContext.terrainDimension + additionalSize
+                    , terrainsContext.terrainDimension + additionalSize
+                )
+            )
+        );
+        glCheckError();
+
+        GLint colorLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "colorIn");
+        glm::vec4 color = glm::vec4(COLOR_POURPLE_RED, 1.0f);
+        if (bInsideTargetRange)
+        {
+            color = glm::vec4(
+                COLOR_AMBER
+                , 1.0f
+            );
+        }
+        else
+        {
+            color = glm::vec4(
+                COLOR_GREEN_BLUE
+                , 1.0f
+            );
+        }
+        glUniform4fv(colorLocation, 1, glm::value_ptr(color));
+        glCheckError();
+
+        // rendering data
+        glDrawArrays(GL_POINTS, 0, 1);
+        glCheckError();
+        
+
+        // VAO is "detached"
+        glBindVertexArray(0);
+        glCheckError();
+    }
+
     void Renderer::RecompileAllShaders(
         SceneContext& sceneContext
         , RendererContext& rendererContext
