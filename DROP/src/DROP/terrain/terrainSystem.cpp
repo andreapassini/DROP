@@ -85,8 +85,8 @@ void TerrainSystem::DiplaceTerrainComponent(
 
 	int32_t numRowOrCol = (int32_t)sqrt(terrainComponent.numOfTerrains); // since it's a square
 	float terrainEdgeSize = TERRAIN_EDGE_SIZE;
-	float gridCenter = (float)numRowOrCol / 2.0f;
-	float displacement = terrainEdgeSize * gridCenter;
+	float gridCenter = (float)numRowOrCol * 0.5f;
+	float displacement = (terrainEdgeSize * gridCenter) - (terrainEdgeSize * 0.5f);
 	 
 	// Goal: Move the grid to place grid center in world (0.0, 0.0, 0.0)
 	// Grid starting from bot left
@@ -196,13 +196,14 @@ void MoveTargetToRandomSpot(
 	
 	if (bMovingOnX)
 	{
-		currentTargetTransform.translate.x = trunc(VgMath::randomBetween(xLeftLimit, xRightLimit));
-		//currentTargetTransform.translate.x = -50.0f;
+		//currentTargetTransform.translate.x = trunc(VgMath::randomBetween(xLeftLimit, xRightLimit));
+		currentTargetTransform.translate.x = -30.0f;
 	}
 	
 	if (bMovingOnZ)
 	{
 		currentTargetTransform.translate.z = trunc(VgMath::randomBetween(xLeftLimit, xRightLimit));
+		currentTargetTransform.translate.z = -30.0f;
 	}
 
 	currentTime = 0.0f;
@@ -300,6 +301,7 @@ void TerrainSystem::UpdateTerrains(
 		, deltaTime
 	);
 #else
+	// Test move -24, -26
 	MoveTargetToRandomSpot(
 		currentTargetTransform
 		, terrainTransformComp
@@ -310,8 +312,13 @@ void TerrainSystem::UpdateTerrains(
 #endif
 	// Check target position in grid
 	// if it the same as the old one, skip
-	VgMath::Transform currentTransform = currentTargetTransform;
-	currentTransform.translate = currentTransform.translate - terrainTransformComp.localTransform.translate;
+	VgMath::Transform currentTransform;
+	//currentTransform.translate = currentTransform.translate - terrainTransformComp.localTransform.translate;
+	//currentTransform.translate = terrainTransformComp.localTransform.translate - currentTransform.translate;
+	//currentTransform.translate = -(currentTargetTransform.translate - terrainTransformComp.localTransform.translate);
+	currentTransform.translate = (-terrainTransformComp.localTransform.translate + currentTargetTransform.translate);
+	currentTransform.translate.z = -currentTransform.translate.z; // since Z towards cam is positive
+
 	TerrainID currentTargetLinearizedIndex = PositionToIndex(
 		terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
@@ -726,10 +733,10 @@ TerrainID TerrainSystem::PositionToIndex(
 	}
 
 	// Grid calculation
-	TerrainID gridEdge = (TerrainID)(sqrt(maxNumTerrains)); // sqrt should handle neg numbers
-	TerrainID col = (TerrainID)(abs(inPosition->x) / gridEdge); // ABS should not be needed since we should move everything in terrain comp space
-	TerrainID row = (TerrainID)(abs(inPosition->z) / gridEdge);
-	TerrainID numCol = gridEdge;
+	TerrainID edgeSize = TERRAIN_EDGE_SIZE;
+	TerrainID col = (TerrainID)(abs(inPosition->x) / edgeSize); // ABS should not be needed since we should move everything in terrain comp space
+	TerrainID row = (TerrainID)(abs(inPosition->z) / edgeSize);
+	TerrainID numCol = (TerrainID)(sqrt(maxNumTerrains)); // sqrt should handle neg numbers
 
 	outTerrainID = col + (row * numCol);
 

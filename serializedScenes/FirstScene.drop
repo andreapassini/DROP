@@ -39,7 +39,7 @@ Entities:
       Tag name: Cube
     TransformComponent:
       LocalTransform:
-        Translate: [7, 1, 0]
+        Translate: [0, 1, 0]
         Rotate: [[0.0, 1.0, 0.0], 0.0]
         Scale: 1.0
       Parent: 18446744073709551615

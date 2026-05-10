@@ -78,7 +78,7 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 		// 3 should be num row and num col
 		int32_t numRowOrCol = (int32_t)sqrt(terrainComponent.numOfTerrains); // since it's a square
 
-		//float debugDisplacement = 0.0f;
+		float debugDisplacement = 0.0f;
 		float displacement = TERRAIN_EDGE_SIZE;
 
 		for (uint32_t j = 0; j < terrainComponent.numOfTerrains; j++) {
@@ -86,9 +86,9 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 			float col = (float)(j % numRowOrCol);
 
 			VgMath::Vector3 extraDisplacement;
-			extraDisplacement.x = ((float)(col) * displacement) /*+ debugDisplacement*/;
+			extraDisplacement.x = ((float)(col) * displacement) + ((float)(col) * debugDisplacement);
 			// Z minus since pos is towards camera
-			extraDisplacement.z = - ((float)(row) * displacement) /*+ debugDisplacement*/;
+			extraDisplacement.z = - ((float)(row) * displacement) - ((float)(row) * debugDisplacement);
 			Transform movedTransform = localTransform;
 			movedTransform.translate += extraDisplacement;
 
@@ -108,6 +108,9 @@ void RenderingSystem::Update(ECS& ecs, const float deltaTime) {
 				Renderer::DrawTerrainCell(
 					terrainComponent
 					, j
+					, row
+					, col
+					, (float)(numRowOrCol)
 					, bInsideTargetRange
 					, - 5.25f
 					, movedTransform

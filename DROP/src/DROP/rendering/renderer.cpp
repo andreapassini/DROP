@@ -1109,6 +1109,9 @@ namespace Drop
     void Renderer::DrawTerrainCell(
         const TerrainComponent& terrainComponent
         , size_t terrainIndex
+        , float row
+        , float col
+        , float edgeSize
         , bool bInsideTargetRange
         , float additionalSize
         , VgMath::Transform& worldTransform
@@ -1161,9 +1164,15 @@ namespace Drop
             )
         );
         glCheckError();
-
         GLint colorLocation = glGetUniformLocation(emptyQuadGeomShader->Program, "colorIn");
-        glm::vec4 color = glm::vec4(COLOR_POURPLE_RED, 1.0f);
+        glm::vec4 color = glm::vec4(COLOR_AMBER, 1.0f);
+
+        VgMath::Vector4 colorA = VgMath::Vector4(COLOR_GREEN.x, COLOR_GREEN.y, COLOR_GREEN.z, 1.0f);
+        VgMath::Vector4 colorB = VgMath::Vector4(COLOR_BLOOD_RED.x, COLOR_BLOOD_RED.y, COLOR_BLOOD_RED.z, 1.0f);
+        //VgMath::Vector4 lerpedColor = lerp(colorA, colorB, row/edgeSize);
+        //color.x = lerpedColor.x;
+        //color.y = lerpedColor.y;
+        //color.z = lerpedColor.z;
         if (bInsideTargetRange)
         {
             color = glm::vec4(

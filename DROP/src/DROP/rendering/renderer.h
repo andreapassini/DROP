@@ -201,6 +201,9 @@ namespace Drop
         void DrawTerrainCell(
             const TerrainComponent& terrainComponent
             , size_t terrainIndex
+            , float row
+            , float col
+            , float edgeSize
             , bool bInsideTargetRange
             , float additionalSize
             , VgMath::Transform& worldTransform
