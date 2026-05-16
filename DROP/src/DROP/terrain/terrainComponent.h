@@ -16,6 +16,12 @@ typedef uint32_t ModelID;
 typedef uint32_t MaterialID;
 typedef uint32_t TerrainID;
 
+struct TerrainGridIndex {
+	TerrainID linearizedIndex = 0;
+	TerrainID row = 0;
+	TerrainID col = 0;
+};
+
 struct TerrainDisplacementMap {
 	//TerrainID terrainIndex = TERRAIN_INDEX_NULL;
 	uint32_t displacementMapSize = TERRAIN_MAP_SIZE;
@@ -60,7 +66,7 @@ struct TerrainsContext {
 	// Used for grid calculation
 	float terrainDimension = 10.0f;
 	std::string terrainDisplacementPath[MAX_NUM_TERRAINS];
-	TerrainID oldTargetLinearizedIndex = TERRAIN_INDEX_NULL;
+	TerrainGridIndex oldTargetIndex;
 
 	EntityID targetID = 1; // 1 is the 
 	EntityID debugPosID = 3; // 1 is the 

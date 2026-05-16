@@ -23,7 +23,7 @@
 #include "DROP/assetManager/assetManager.h"
 
 
-// #TODO move this into the terrain contenxt
+// #TODO move this into the terrain context
 std::mutex gMutex;
 
 void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
@@ -116,12 +116,12 @@ void TerrainSystem::InitTargetPosition(
 	// Init Old position
 	VgMath::Transform currentTransform = currentTargetTransform;
 	currentTransform.translate = currentTransform.translate - terrainTransformComp.localTransform.translate;
-	TerrainID currentTargetLinearizedIndex = PositionToIndex(
+	TerrainGridIndex currentTargetIndex = PositionToIndex(
 		terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
 		, &currentTransform.translate
 	);
-	terrainsContext.oldTargetLinearizedIndex = currentTargetLinearizedIndex;
+	terrainsContext.oldTargetIndex = currentTargetIndex;
 
 	VgMath::Transform& currentDebugPosTransform = ecs.Get<TransformComponent>(terrainsContext.debugPosID).localTransform;
 	currentDebugPosTransform = terrainTransformComp.localTransform;
@@ -313,29 +313,27 @@ void TerrainSystem::UpdateTerrains(
 	// Check target position in grid
 	// if it the same as the old one, skip
 	VgMath::Transform currentTransform;
-	//currentTransform.translate = currentTransform.translate - terrainTransformComp.localTransform.translate;
-	//currentTransform.translate = terrainTransformComp.localTransform.translate - currentTransform.translate;
-	//currentTransform.translate = -(currentTargetTransform.translate - terrainTransformComp.localTransform.translate);
 	currentTransform.translate = (-terrainTransformComp.localTransform.translate + currentTargetTransform.translate);
 	currentTransform.translate.z = -currentTransform.translate.z; // since Z towards cam is positive
 
-	TerrainID currentTargetLinearizedIndex = PositionToIndex(
+	TerrainGridIndex currentTargetIndex = PositionToIndex(
 		terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
 		, &currentTransform.translate
 	);
-	if (terrainsContext.oldTargetLinearizedIndex == TERRAIN_INDEX_NULL
-		|| terrainsContext.oldTargetLinearizedIndex == currentTargetLinearizedIndex)
+	TerrainID currentTargetLinearizedIndex = currentTargetIndex.linearizedIndex;
+	if (terrainsContext.oldTargetIndex.linearizedIndex == TERRAIN_INDEX_NULL
+		|| terrainsContext.oldTargetIndex.linearizedIndex == currentTargetLinearizedIndex)
 	{
 		return;
 	}
 	else
 	{
-		terrainsContext.oldTargetLinearizedIndex = currentTargetLinearizedIndex;
+		terrainsContext.oldTargetIndex = currentTargetIndex;
 	}
 
 	CalculateNearTargetIndexes(
-		&currentTransform.translate
+		&currentTargetIndex
 		, terrainsContext.terrainDimension
 		, terrainsContext.maxNumTerrains
 		, LOADED_MAPS // must be bufferSize
@@ -468,20 +466,17 @@ void TerrainSystem::UpdateTerrains(
 
 // assuming OutIndexesBuffer.num == numberOfNearTargetIndexes
 void TerrainSystem::CalculateNearTargetIndexes(
-	const VgMath::Vector3* const inTargetPosition
+	const TerrainGridIndex* const inTargetIndex
 	, const float terrainDimension
 	, const TerrainID numberOfTerrains
 	, const TerrainID numberOfNearTargetIndexes
 	, TerrainID* const OutIndexesBuffer
 ) {
-	TerrainID targetLinearizedIndex = PositionToIndex(
-		terrainDimension
-		, numberOfTerrains
-		, inTargetPosition
-	);
+	assert(inTargetIndex);
+
 	int32_t gridEdge = (int32_t)(sqrt(numberOfTerrains));
-	int32_t targetRow = (int32_t)(targetLinearizedIndex / gridEdge);
-	int32_t targetCol = (int32_t)(targetLinearizedIndex % gridEdge);
+	int32_t targetRow = inTargetIndex->row;
+	int32_t targetCol = inTargetIndex->col;
 
 	// we are subtracting, use int
 	TerrainID iteration = 0;
@@ -720,12 +715,12 @@ void TerrainSystem::AsyncLoadTerrainDisplacementMap(
 }
 
 // InPos must be in TerrainCompSpace
-TerrainID TerrainSystem::PositionToIndex(
+TerrainGridIndex TerrainSystem::PositionToIndex(
 	const float terrainDimension
 	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
 ) {
-	TerrainID outTerrainID = TERRAIN_INDEX_NULL;
+	TerrainGridIndex outTerrainID;
 	if (!inPosition)
 	{
 		DebugBreak();
@@ -738,22 +733,20 @@ TerrainID TerrainSystem::PositionToIndex(
 	TerrainID row = (TerrainID)(abs(inPosition->z) / edgeSize);
 	TerrainID numCol = (TerrainID)(sqrt(maxNumTerrains)); // sqrt should handle neg numbers
 
-	outTerrainID = col + (row * numCol);
-
-	if (outTerrainID >= maxNumTerrains)
-	{
-		outTerrainID = TERRAIN_INDEX_NULL;
-	}
+	outTerrainID.linearizedIndex = col + (row * numCol);
+	outTerrainID.row = row;
+	outTerrainID.col = col;
 
 	return outTerrainID;
 }
 
-TerrainID TerrainSystem::PositionToIndexClamped(
+TerrainGridIndex TerrainSystem::PositionToIndexClamped(
 	const float terrainDimension
 	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
 ) {
-	TerrainID outTerrainID = TERRAIN_INDEX_NULL;
+	TerrainGridIndex outTerrainID;
+	TerrainID numCol = (TerrainID)(sqrt(maxNumTerrains)); // sqrt should handle neg numbers
 
 	outTerrainID = PositionToIndex(
 		terrainDimension
@@ -761,7 +754,9 @@ TerrainID TerrainSystem::PositionToIndexClamped(
 		, inPosition
 	);
 
-	outTerrainID = clamp<TerrainID>(outTerrainID, 0, maxNumTerrains);
+	outTerrainID.linearizedIndex = clamp<TerrainID>(outTerrainID.linearizedIndex, 0, maxNumTerrains);
+	outTerrainID.row = clamp<TerrainID>(outTerrainID.linearizedIndex, 0, numCol);
+	outTerrainID.col = clamp<TerrainID>(outTerrainID.linearizedIndex, 0, numCol);
 
 	return outTerrainID;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DROP/ECS/beecs.h"
+#include "terrainComponent.h"
 
 typedef uint32_t TerrainID;
 struct TerrainsContext;
@@ -22,11 +23,11 @@ void UpdateTerrains(
 );
 
 void CalculateNearTargetIndexes(
-	const VgMath::Vector3* const inTargetPosition
+	const TerrainGridIndex* const inTargetIndex
 	, const float terrainDimension
 	, const TerrainID numberOfTerrains
-	, const TerrainID numberOfNearTargetIndecies
-	, TerrainID* const OutIndeciesBuffer
+	, const TerrainID numberOfNearTargetIndexes
+	, TerrainID* const OutIndexesBuffer
 );
 
 void GenerateSaveAndSetPathForTerrainsDisplacementMaps(
@@ -60,12 +61,12 @@ void AsyncLoadTerrainDisplacementMap(
 	//, std::string filePath
 );
 
-TerrainID PositionToIndex(
+TerrainGridIndex PositionToIndex(
 	const float terrainDimension
 	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
 );
-TerrainID PositionToIndexClamped(
+TerrainGridIndex PositionToIndexClamped(
 	const float terrainDimension
 	, const TerrainID maxNumTerrains
 	, const VgMath::Vector3* const inPosition
