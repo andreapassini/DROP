@@ -123,8 +123,13 @@ void main()
 {
     // we repeat_0 the UVs and we sample the texture
     vec2 repeated_UV = mod(interp_UV*repeat_0, 1.0);
-    vec4 surfaceColor = texture(tex_0, repeated_UV);
-
+    // vec4 surfaceColor = texture(tex_0, repeated_UV);
+    vec4 surfaceColor = vec4(
+        flat_UV.x * vertexDisplacement
+        , flat_UV.y * vertexDisplacement
+        , 0.0
+        , 1.0
+    );
     // normalization of the per-fragment normal
     vec3 N = normalize(vNormal);
     // normalization of the per-fragment light incidence direction
@@ -190,12 +195,17 @@ void main()
     //        shadow value = 0 -> fragment is in light
     // Therefore, we use (1-shadow) as weight to apply to the illumination model
     vec3 finalColor = (1.0 - shadow)*(lambert + specular)*NdotL;
-    // colorFrag = vec4(finalColor, 1.0);
+    colorFrag = vec4(finalColor, 1.0);
    
     // float maxVertexIDFloat = float(flat_maxVertexID);
     // float vertexIDFloat = float(flat_vertexID) / maxVertexIDFloat;
 
-   colorFrag = vec4(flat_UV.x * vertexDisplacement, flat_UV.y * vertexDisplacement, 0.0, 1.0);
+//    colorFrag = vec4(
+//         flat_UV.x * vertexDisplacement
+//         , flat_UV.y * vertexDisplacement
+//         , 0.0
+//         , 1.0
+//     );
 //    colorFrag = vec4(flat_UV.x, flat_UV.y, 0.0, 1.0);
 //     colorFrag = vec4( vertexDisplacement, vertexDisplacement, 0.0, 1.0);
 //     float float_flat_terrainIndex = float(flat_terrainIndex);

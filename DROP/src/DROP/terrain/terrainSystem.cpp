@@ -41,14 +41,12 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 	memset(&terrainContext.loadedMaps[0], TERRAIN_INDEX_NULL
 		, sizeof(terrainContext.loadedMaps[0]) * LOADED_MAPS);
 
-	memset(&terrainContext.stubTerrainDisplacementMap.displacementMap[0], 0.0f
-		, sizeof(terrainContext.stubTerrainDisplacementMap.displacementMap[0]) 
-			* LOADED_MAPS);
+	memset(&terrainContext.stubTerrainDisplacementMap.displacementMap[0], 0x0
+		, sizeof(terrainContext.stubTerrainDisplacementMap.displacementMap[0]) * TERRAIN_MAP_SIZE);
 
 	for (uint32_t i = 0; i < terrainContext.numOfLoadedTerrainDisplacementMaps; i++) {
 		memset(&terrainContext.terrainDisplacementMaps[i].displacementMap[0], 0.0f
-			, sizeof(terrainContext.terrainDisplacementMaps[i].displacementMap[0]) 
-				* LOADED_MAPS);
+			, sizeof(terrainContext.terrainDisplacementMaps[i].displacementMap[0]) * TERRAIN_MAP_SIZE);
 	}
 
 	TerrainsAssetsContext& terrainsAssetsContext = ecs.GetSingletonComponent<TerrainsAssetsContext>();
@@ -62,8 +60,7 @@ void TerrainSystem::InitTerrains(bseecs::ECS& ecs) {
 
 	for (uint32_t i = 0; i < terrainsAssetsContext.numOfLoadedTerrainDisplacementMaps; i++) {
 		memset(&terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0], 0.0f
-			, sizeof(terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0])
-			* LOADED_MAPS);
+			, sizeof(terrainsAssetsContext.terrainDisplacementMaps[i].displacementMap[0]) * TERRAIN_MAP_SIZE);
 	}
 
 	TerrainSystem::InitTerrainsDisplacementMaps(

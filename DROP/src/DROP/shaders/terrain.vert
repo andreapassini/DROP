@@ -1,7 +1,7 @@
 /*
 21_ggx_tex_shadow.vert: vertex shader for GGX illumination model, with shadow rendering using shadow map
 
-N.B.) the shader considers only a directional light (simpler to manage for the creation of the shadow map). 
+N.B.) the shader considers only a directional light (simpler to manage for the creation of the shadow map).
 For more lights, of different kind, the shader must be modified to consider each case
 
 author: Davide Gadia
@@ -41,7 +41,7 @@ uniform vec3 lightVector;
 uniform float time;
 
 uniform int maxVertexID;
-//uniform int edge;
+//uniform int edgeFloat;
 uniform int terrainIndex;
 
 uniform float maxDisplacement;
@@ -79,26 +79,19 @@ void main(){
   flat_maxVertexID = maxVertexID;
   flat_maxDisplacement = maxDisplacement;
 
-  // vertex position in world coordinates
-  // float cosUVx = cos((UV.x + time) * 2);
-  // float sinUVy = sin((UV.y + time) * 2.5);
-  // float sinUVy2 = sin((UV.y + time) * 2 * 2.35);
-  // float sinPosY = position.y + cosUVx + sinUVy + sinUVy2;
-  float sinPosY = 0.0;
-  float edge = float(sqrt(maxVertexID)); // beware of x < 0
-  int edgeInt = int(edge);
-  float edgeFloat = float(edge);
-  int raw = int(UV.x * edgeFloat);  
+  float edgeFloat = float(sqrt(maxVertexID)) - 1.0f; // beware of x < 0
+  int edgeInt = int(edgeFloat);
+  int row = int(UV.x * edgeFloat);
   int col = int(UV.y * edgeFloat);
-//  int raw = int(clamp(UV.x * edgeFloat, 0.0, edge));  
-//  int col = int(clamp(UV.y * edgeFloat, 0.0, edge));
-////  int linearizedIndex = clamp(((raw * edgeInt) + col), 0, maxVertexID);
-  int linearizedIndex = (raw * edgeInt) + col;
-  sinPosY = displacementMap[linearizedIndex];
-  vertexDisplacement = sinPosY;
-  // sinPosY = 0.0;
-  vec4 mPosition = modelMatrix * vec4( position.x, sinPosY, position.z, 1.0 );
-  //  vec4 mPosition = modelMatrix * vec4( position.x, position.y + time, position.z, 1.0 );
+  int linearizedIndex = (row * edgeInt) + col;
+  vertexDisplacement = displacementMap[linearizedIndex];
+
+  vec4 mPosition = modelMatrix * vec4(
+    position.x
+    , vertexDisplacement     // , position.y
+    , position.z
+    , 1.0
+  );
   // vertex position in camera coordinates
   vec4 mvPosition = viewMatrix * mPosition;
 
