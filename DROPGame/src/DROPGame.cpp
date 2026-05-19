@@ -411,9 +411,12 @@ public:
         ImGui::Text("Camera pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", m_Camera.m_Position.x, m_Camera.m_Position.y, m_Camera.m_Position.z);
         // Sphere pos
         TerrainsContext& terrainsContext = gameEngine->g_activeScene->ecs.GetSingletonComponent<TerrainsContext>();
-        VgMath::Vector3 targetPosition = gameEngine->g_activeScene->ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform.translate;
-
-        ImGui::Text("Sphere pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", targetPosition.x, targetPosition.y, targetPosition.z);
+        TransformComponent* currentTargetTransformComponent = gameEngine->g_activeScene->ecs.Get<TransformComponent>(terrainsContext.targetID);
+        if (currentTargetTransformComponent)
+        {
+            VgMath::Vector3 targetPosition = currentTargetTransformComponent->localTransform.translate;
+            ImGui::Text("Sphere pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", targetPosition.x, targetPosition.y, targetPosition.z);
+        }
             
 		ImGui::End();
 
@@ -455,15 +458,42 @@ public:
             if (waitTime < gameEngine->m_CurrentTime) {
         	    waitTime = gameEngine->m_CurrentTime + spawnDelay;
 
-                ParticleEmitter& particleEmitter = gameEngine->g_activeScene->ecs.Get<ParticleEmitter>(particleEmitterID);
-                TransformComponent& particleEmitterTransform = gameEngine->g_activeScene->ecs.Get<TransformComponent>(particleEmitterID);
+                if (NULL_ENTITY == particleEmitterID)
+                {
+                    return;
+                }
+                ParticleEmitter* particleEmitter = gameEngine->g_activeScene->ecs.Get<ParticleEmitter>(particleEmitterID);
+                if (!particleEmitter)
+                {
+                    return;
+                }
+                TransformComponent* particleEmitterTransform = gameEngine->g_activeScene->ecs.Get<TransformComponent>(particleEmitterID);
+                if (!particleEmitterTransform)
+                {
+                    return;
+                }
+
                 // this is done inside the Emit function, not super clean
                 //particleEmitter.spawningValues.spawningSurface.m_Transform = &particleEmitterTransform.m_CumulatedTransform;
-                EmitParticles(particleEmitter, particleEmitterTransform.cumulatedTransform);
+                EmitParticles(*particleEmitter, particleEmitterTransform->cumulatedTransform);
 
-                PBParticleEmitter& pbParticleEmitter = gameEngine->g_activeScene->ecs.Get<PBParticleEmitter>(pbParticleEmitterID);
-                TransformComponent& pbParticleEmitterTransform = gameEngine->g_activeScene->ecs.Get<TransformComponent>(pbParticleEmitterID);
-                EmitParticles(pbParticleEmitter, pbParticleEmitterTransform.cumulatedTransform);
+                if (NULL_ENTITY == pbParticleEmitterID)
+                {
+                    return;
+                }
+                PBParticleEmitter* pbParticleEmitter = gameEngine->g_activeScene->ecs.Get<PBParticleEmitter>(pbParticleEmitterID);
+                if (!pbParticleEmitter)
+                {
+                    return;
+                }
+
+                TransformComponent* pbParticleEmitterTransform = gameEngine->g_activeScene->ecs.Get<TransformComponent>(pbParticleEmitterID);
+                if (!pbParticleEmitterTransform)
+                {
+                    return;
+                }
+
+                EmitParticles(*pbParticleEmitter, pbParticleEmitterTransform->cumulatedTransform);
             }
         }
     }
@@ -494,8 +524,10 @@ public:
     float waitTime = 0.0f;
     float spawnDelay = 10.0f;
     //EntityID particleEmitterID = NULL_ENTITY;
-    EntityID particleEmitterID = 4;
-    EntityID pbParticleEmitterID = 5;
+    //EntityID particleEmitterID = 4;
+    //EntityID pbParticleEmitterID = 5;
+    EntityID particleEmitterID = NULL_ENTITY;
+    EntityID pbParticleEmitterID = NULL_ENTITY;
 };
 
 Drop::GameEngine* Drop::CreateGameEngine(int argc, char** argv)

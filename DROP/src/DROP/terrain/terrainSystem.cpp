@@ -100,7 +100,13 @@ void TerrainSystem::InitTargetPosition(
 	bseecs::ECS& ecs
 ) {
 	TerrainsContext& terrainsContext = ecs.GetSingletonComponent<TerrainsContext>();
-	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
+	TransformComponent* currentTransformComponent = ecs.Get<TransformComponent>(terrainsContext.targetID);
+	if (!currentTransformComponent)
+	{
+		return;
+	}
+
+	VgMath::Transform& currentTargetTransform = currentTransformComponent->localTransform;
 
 	// Move the specified debug target to position
 // #TODO assuming a single TerrainTarget
@@ -120,7 +126,13 @@ void TerrainSystem::InitTargetPosition(
 	);
 	terrainsContext.oldTargetIndex = currentTargetIndex;
 
-	VgMath::Transform& currentDebugPosTransform = ecs.Get<TransformComponent>(terrainsContext.debugPosID).localTransform;
+	TransformComponent* currentDebugTransformComponent = ecs.Get<TransformComponent>(terrainsContext.debugPosID);
+	if (!currentDebugTransformComponent)
+	{
+		return;
+	}
+
+	VgMath::Transform& currentDebugPosTransform = currentDebugTransformComponent->localTransform;
 	currentDebugPosTransform = terrainTransformComp.localTransform;
 }
 
@@ -281,7 +293,12 @@ void TerrainSystem::UpdateTerrains(
 		, terrainsAssetsContext
 	);
 
-	VgMath::Transform& currentTargetTransform = ecs.Get<TransformComponent>(terrainsContext.targetID).localTransform;
+	TransformComponent* currentTargetTransformComponent = ecs.Get<TransformComponent>(terrainsContext.targetID);
+	if (!currentTargetTransformComponent)
+	{
+		return;
+	}
+	VgMath::Transform& currentTargetTransform = currentTargetTransformComponent->localTransform;
 
 	// #TODO assuming a single TerrainTarget
 	std::vector<TerrainComponent>& denseTerrainComponents = ecs.GetComponentPool<TerrainComponent>().Data();

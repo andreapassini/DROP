@@ -196,8 +196,9 @@ namespace SceneSerializer
 			out << YAML::Key << "Tag";
 			
 			out << YAML::BeginMap;
-			Tag& currentTag = ecs.Get<Tag>(entityId);
-			out << YAML::Key << "Tag name" << YAML::Value << currentTag.tagName;
+			Tag* currentTag = ecs.Get<Tag>(entityId);
+			assert(currentTag);
+			out << YAML::Key << "Tag name" << YAML::Value << currentTag->tagName;
 			out << YAML::EndMap;
 		}		
 		if (ecs.Has<TransformComponent>(entityId))
@@ -205,10 +206,10 @@ namespace SceneSerializer
 			out << YAML::Key << "TransformComponent";
 
 			out << YAML::BeginMap;
-			TransformComponent& currentTransformComp = ecs.Get<TransformComponent>(entityId);
-			out << YAML::Key << "LocalTransform" << YAML::Value << currentTransformComp.localTransform;
-			out << YAML::Key << "Parent" << YAML::Value << currentTransformComp.parent;
-			out << YAML::Key << "CumulativeTransform" << YAML::Value << currentTransformComp.cumulatedTransform;
+			TransformComponent* currentTransformComp = ecs.Get<TransformComponent>(entityId);
+			out << YAML::Key << "LocalTransform" << YAML::Value << currentTransformComp->localTransform;
+			out << YAML::Key << "Parent" << YAML::Value << currentTransformComp->parent;
+			out << YAML::Key << "CumulativeTransform" << YAML::Value << currentTransformComp->cumulatedTransform;
 			out << YAML::EndMap;
 
 		}
@@ -216,42 +217,42 @@ namespace SceneSerializer
 		{
 			out << YAML::Key << "StaticMeshComponent";
 			out << YAML::BeginMap;
-			StaticMeshComponent& s = ecs.Get<StaticMeshComponent>(entityId);
-			out << YAML::Key << "modelId" << YAML::Value << s.modelId;
-			out << YAML::Key << "materialId" << YAML::Value << s.materialId;
-			out << YAML::Key << "bCastShadow" << YAML::Value << s.bCastShadow;
+			StaticMeshComponent* s = ecs.Get<StaticMeshComponent>(entityId);
+			out << YAML::Key << "modelId" << YAML::Value << s->modelId;
+			out << YAML::Key << "materialId" << YAML::Value << s->materialId;
+			out << YAML::Key << "bCastShadow" << YAML::Value << s->bCastShadow;
 			out << YAML::EndMap;
 		}
 		if (ecs.Has<TerrainComponent>(entityId))
 		{
 			out << YAML::Key << "TerrainComponent";
 			out << YAML::BeginMap;
-			TerrainComponent& s = ecs.Get<TerrainComponent>(entityId);
-			out << YAML::Key << "modelId" << YAML::Value << s.modelId;
-			out << YAML::Key << "materialId" << YAML::Value << s.materialId;
-			out << YAML::Key << "bCastShadow" << YAML::Value << s.bCastShadow;
+			TerrainComponent* s = ecs.Get<TerrainComponent>(entityId);
+			out << YAML::Key << "modelId" << YAML::Value << s->modelId;
+			out << YAML::Key << "materialId" << YAML::Value << s->materialId;
+			out << YAML::Key << "bCastShadow" << YAML::Value << s->bCastShadow;
 			out << YAML::EndMap;
 		}
 		if (ecs.Has<ParticleEmitter>(entityId))
 		{
 			out << YAML::Key << "ParticleEmitter";
 			out << YAML::BeginMap;
-			ParticleEmitter& p = ecs.Get<ParticleEmitter>(entityId);
-			out << YAML::Key << "numberOfParticles" << YAML::Value << p.numberOfParticles;
-			out << YAML::Key << "particleToEmitEachTime" << YAML::Value << p.particleToEmitEachTime;
-			out << YAML::Key << "lastIndex" << YAML::Value << p.lastIndex;
-			out << YAML::Key << "spawningValues" << YAML::Value << p.spawningValues;
+			ParticleEmitter* p = ecs.Get<ParticleEmitter>(entityId);
+			out << YAML::Key << "numberOfParticles" << YAML::Value << p->numberOfParticles;
+			out << YAML::Key << "particleToEmitEachTime" << YAML::Value << p->particleToEmitEachTime;
+			out << YAML::Key << "lastIndex" << YAML::Value << p->lastIndex;
+			out << YAML::Key << "spawningValues" << YAML::Value << p->spawningValues;
 			out << YAML::EndMap;
 		}
 		if (ecs.Has<PBParticleEmitter>(entityId))
 		{
 			out << YAML::Key << "ParticleEmitter";
 			out << YAML::BeginMap;
-			PBParticleEmitter& p = ecs.Get<PBParticleEmitter>(entityId);
-			out << YAML::Key << "numberOfParticles" << YAML::Value << p.numberOfParticles;
-			out << YAML::Key << "particleToEmitEachTime" << YAML::Value << p.particleToEmitEachTime;
-			out << YAML::Key << "lastIndex" << YAML::Value << p.lastIndex;
-			out << YAML::Key << "spawningValues" << YAML::Value << p.spawningValues;
+			PBParticleEmitter* p = ecs.Get<PBParticleEmitter>(entityId);
+			out << YAML::Key << "numberOfParticles" << YAML::Value << p->numberOfParticles;
+			out << YAML::Key << "particleToEmitEachTime" << YAML::Value << p->particleToEmitEachTime;
+			out << YAML::Key << "lastIndex" << YAML::Value << p->lastIndex;
+			out << YAML::Key << "spawningValues" << YAML::Value << p->spawningValues;
 			out << YAML::EndMap;
 		}
 #pragma endregion

@@ -546,7 +546,7 @@ namespace bseecs {
 		* - ecs.GetComponent<Transform>(player);
 		*/
 		template <typename T>
-		T& Get(EntityID id) {
+		T* Get(EntityID id) {
 			BSEECS_ASSERT_VALID_ENTITY(id);
 
 			SparseSet<T>& pool = GetComponentPool<T>();
@@ -554,7 +554,7 @@ namespace bseecs {
 			BSEECS_ASSERT(component,
 				ENTITY_INFO(id) << " missing component 'in " << typeid(T).name() << "' pool");
 
-			return *component;
+			return component;
 		}
 
 		/*
