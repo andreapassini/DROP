@@ -17,42 +17,6 @@ https://drive.google.com/drive/folders/1BnptvQUHHxcnXt53LJGVPdqLg2EXvkPA?usp=sha
 
 - double click on "scripts\\Setup.bat"
 
-# TODO List
-- Math
-    - [x] Vector4
-
-- ECS porting
-    - [x] Static mesh component
-    - [x] Transform component
-    - [x] Particle system porting
-    - [ ] Add multithreading to transform updates
-    - [ ] Add multithreading to particle update
-    - [ ] Fix the scene graph move and remove node, the error is not considering move from another branch
-    - [ ] rename Scene and Renderer context into state
-    - [ ] add a Game State to singleton components
-    - [ ] Add time state
-    - [ ] Move the active camera to a singleton component (Scene context)
-    - [ ] Move the Inputs into a Singleton Components (TBD)
-    - [ ] Consider refactoring singleton components to make them more efficient (without using a map) 
-
-- Particles
-  - [ ] GPU Particles
-
-- Code cleanup:
-    - [x] Fix relative path for assets, using path from exe 
-
-- Rendering
-    - [x] Renderer refactoring
-    - [x] Render translucent objects
-    - [x] back-face culling, fix the CCW(for mesh) and CW(for billboards)
-    - Debug
-        - [ ] Add debug texture viewer in the renderer by adding a specific pass where needed
-        - [ ] Add debug main view, render normals in color channel
-        - [ ] Add debug main view, render shadow map with inverted colors, projected on the plane
-    - [ ] Consider reworking the material to use a map for textures 
-    - [ ] Add Normale, Specular, Bump and Displacement maps
-    - [ ] Add cube maps
-
 ## Next Big Features Roadmap
 
 - Vertex Animations for Grass
@@ -92,7 +56,26 @@ The cumulated one for the scale, orientation and position of the object in world
 ![image](https://github.com/user-attachments/assets/4ba4b20a-ca1e-46cf-b3b4-296daccfa756)
 
 
-# Terrain System
+# Terrain Streaming System
+
+My Super Simple Terrain Streaming System.
+
+## Pre-requisites
+
+Pre requisite: having a terrain 
+Or just generate a pseudo random one, as I did.
+
+## Terrain
+
+Divide the scene into grid of cells
+
+Each cell will be a slice of our terrain and it will be made of:
+
+- plane mesh
+- height map e vertical displacement texture
+
+
+
 
 ![TerrainGridDisplacement](https://github.com/user-attachments/assets/f320c1d3-25e6-4a63-8aa1-07c8f2d6b83b)
 
