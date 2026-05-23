@@ -34,37 +34,3 @@ Entities:
       modelId: 1
       materialId: 1
       bCastShadow: true
-  - Entity: 2
-    Tag:
-      Tag name: Cube
-    TransformComponent:
-      LocalTransform:
-        Translate: [0, 1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
-        Scale: 1.0
-      Parent: 18446744073709551615
-      CumulativeTransform:
-        Translate: [3.6400000751018524, 1.4799999892711639, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
-        Scale: 0.2303999897003175
-    StaticMeshComponent:
-      modelId: 0
-      materialId: 2
-      bCastShadow: true
-  - Entity: 3
-    Tag:
-      Tag name: Bunny
-    TransformComponent:
-      LocalTransform:
-        Translate: [0, 1, 0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
-        Scale: 10.0
-      Parent: 18446744073709551615
-      CumulativeTransform:
-        Translate: [0.0, 0.0, 0.0]
-        Rotate: [[0.0, 1.0, 0.0], 0.0]
-        Scale: 1.0
-    StaticMeshComponent:
-      modelId: 2
-      materialId: 3
-      bCastShadow: false

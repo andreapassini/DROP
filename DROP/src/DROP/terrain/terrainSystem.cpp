@@ -126,6 +126,7 @@ void TerrainSystem::InitTargetPosition(
 	);
 	terrainsContext.oldTargetIndex = currentTargetIndex;
 
+	if (NULL_ENTITY == terrainsContext.debugPosID) { return; }
 	TransformComponent* currentDebugTransformComponent = ecs.Get<TransformComponent>(terrainsContext.debugPosID);
 	if (!currentDebugTransformComponent)
 	{
