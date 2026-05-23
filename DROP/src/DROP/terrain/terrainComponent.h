@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "DROP/ECS/beecs.h"
+
 #define MAX_NUM_TERRAINS 121
 
 #define TERRAIN_INDEX_NULL UINT32_MAX
@@ -69,7 +71,8 @@ struct TerrainsContext {
 	TerrainGridIndex oldTargetIndex;
 
 	EntityID targetID = 1; // 1 is the 
-	EntityID debugPosID = 3; // 1 is the 
+	//EntityID debugPosID = 3; // 1 is the 
+	EntityID debugPosID = bseecs::NULL_ENTITY; // 1 is the 
 };
 
 
