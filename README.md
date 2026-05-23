@@ -78,6 +78,8 @@ Each cell will be a slice of our terrain and it will be made of:
 
 ![TerrainComponentPosition](https://github.com/user-attachments/assets/b00e63d8-8886-47d8-9c3a-6c2f73bbc322)
 
+![TargetPosition](https://github.com/user-attachments/assets/e1d5625d-194c-4ca6-a645-613128718b63)
+
 ![TerrainGridDisplacement](https://github.com/user-attachments/assets/f320c1d3-25e6-4a63-8aa1-07c8f2d6b83b)
 
 ![GridCalculation](https://github.com/user-attachments/assets/b0d2b53a-fe8f-4d2a-aaa3-417033fce857)
