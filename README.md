@@ -74,6 +74,8 @@ Each cell will be a slice of our terrain and it will be made of:
 - plane mesh
 - height map e vertical displacement texture
 
+![SliceOfTerrain](https://github.com/user-attachments/assets/0d0314a0-7414-4f1f-a9b4-fff57c7c5b68)
+
 ![TerrainSetup](https://github.com/user-attachments/assets/91956d2c-233b-4895-acc9-6f77f5a6514b)
 
 ![TerrainComponentPosition](https://github.com/user-attachments/assets/b00e63d8-8886-47d8-9c3a-6c2f73bbc322)
