@@ -122,16 +122,45 @@ float G1(float angle, float Alpha)
 void main()
 {
     // we repeat_0 the UVs and we sample the texture
-    vec2 repeated_UV = mod(interp_UV*repeat_0, 1.0);
+    // vec2 repeated_UV = mod(interp_UV*repeat_0, 1.0);
     // vec4 surfaceColor = texture(tex_0, repeated_UV);
+    vec2 mod_UV = mod(interp_UV*repeat_0, 25.0);
+    mod_UV = mod_UV * 25.0;
+    vec2 step_UV = mod_UV;
+    step_UV.x = step(mod_UV.x, 1.0);
+    step_UV.y = step(mod_UV.y, 1.0);
+
+    vec3 normal = normalize(
+        cross(
+            dFdx(vViewPosition.xyz)
+            , dFdy(vViewPosition.xyz)
+        )
+    );
+
+    vec3 white_color = vec3(1.0, 1.0, 1.0);
+    vec3 lightGreen_color = vec3(
+        8.0 / 255.0
+        , 143.0 / 255.0
+        , 175.0 / 255.0
+    );
+    float stepUnified = (step_UV.x + step_UV.y)/2.0;
+    vec3 step_color = mix(lightGreen_color, white_color, stepUnified);
+
+    // vec4 surfaceColor = vec4(
+    //     step_color * vertexDisplacement
+    //     // step_color
+    //     , 1.0
+    // );
     vec4 surfaceColor = vec4(
         flat_UV.x * vertexDisplacement
         , flat_UV.y * vertexDisplacement
         , 0.0
         , 1.0
     );
+
     // normalization of the per-fragment normal
-    vec3 N = normalize(vNormal);
+    // vec3 N = normalize(vNormal);
+    vec3 N = normal;
     // normalization of the per-fragment light incidence direction
     vec3 L = normalize(lightDir.xyz);
 

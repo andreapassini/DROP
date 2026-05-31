@@ -308,6 +308,7 @@ void TerrainSystem::UpdateTerrains(
 	TransformComponent& terrainTransformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(DenseID);
 	//
 
+#if MOVE_TERRAIN_TARGET
 #if BOUNCE
 	BounceTarget(
 		currentTargetTransform
@@ -325,6 +326,8 @@ void TerrainSystem::UpdateTerrains(
 		, true // Move once
 	);
 #endif
+#endif
+
 	// Check target position in grid
 	// if it the same as the old one, skip
 	VgMath::Transform currentTransform;
