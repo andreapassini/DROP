@@ -68,8 +68,6 @@ out flat int flat_maxVertexID;
 out flat float flat_maxDisplacement;
 out flat int flat_linearizedIndex;
 
-out vec3 fragmentPosition;
-
 // for the correct rendering of the shadows, we need to calculate the vertex coordinates also in "light coordinates" (= using light as a camera)
 out vec4 posLightSpace;
 
