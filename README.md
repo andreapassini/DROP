@@ -102,6 +102,8 @@ Once the
 
 ![TargetMovingPosition](https://github.com/user-attachments/assets/dd3f0f5c-1b1c-46c5-8d69-faddf228cff4)
 
+![NewMapsRequested](https://github.com/user-attachments/assets/fc938642-d47c-4c6c-91c2-40f5e88830db)
+
 ## Response
 
 
