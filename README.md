@@ -71,11 +71,13 @@ I just generated a pseudo random terrain.
 
 ## Terrain Setup
 
-Divide the scene into grid of cells.
-For this example the grid is a square made of 11x11 cells 
+- **Divide the scene into grid of cells**.  
+    For this example the grid is a square made of 11x11 cells 
+    ![TerrainSetup](https://github.com/user-attachments/assets/91956d2c-233b-4895-acc9-6f77f5a6514b)
 
-![TerrainSetup](https://github.com/user-attachments/assets/91956d2c-233b-4895-acc9-6f77f5a6514b)
-
+- **Displace the terrain component** or starting point to the **bottom left** of the scene.       
+    This will simplify the grid management since we will not need to handle row and col with negative numbers
+    ![TerrainComponentPosition](https://github.com/user-attachments/assets/b00e63d8-8886-47d8-9c3a-6c2f73bbc322)
 
 ### Terrain Cell or Slice
 
@@ -86,14 +88,13 @@ It's made of:
 - **`height map`** or vertical displacement texture 
     
     This is the part that was pseudo randomly generated
-    It is made of 81 floats, based on the number of vertices of the mesh we are using.
+    It is made of 81 floats (9x9), based on the number of vertices of the mesh we are using.
+    Each pixel represent the vertical displacement applied to a specific mesh vertex.
 
 
 ![SliceOfTerrain](https://github.com/user-attachments/assets/0d0314a0-7414-4f1f-a9b4-fff57c7c5b68)
 
 ## Detection
-
-![TerrainComponentPosition](https://github.com/user-attachments/assets/b00e63d8-8886-47d8-9c3a-6c2f73bbc322)
 
 ![TargetPosition](https://github.com/user-attachments/assets/e1d5625d-194c-4ca6-a645-613128718b63)
 
