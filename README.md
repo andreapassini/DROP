@@ -96,7 +96,15 @@ It's made of:
 
 ## Detection
 
+Once the 
+
 ![TargetPosition](https://github.com/user-attachments/assets/e1d5625d-194c-4ca6-a645-613128718b63)
+
+
+![TargetPosition](https://github.com/user-attachments/assets/b3527741-643f-4ed0-984c-951399fd6ce5)
+
+## Response
+
 
 ![TerrainGridDisplacement](https://github.com/user-attachments/assets/f320c1d3-25e6-4a63-8aa1-07c8f2d6b83b)
 
