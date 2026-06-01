@@ -58,25 +58,40 @@ The cumulated one for the scale, orientation and position of the object in world
 
 # Terrain Streaming System
 
-My Super Simple Terrain Streaming System.
+My Bare Bone Terrain Streaming System.
+
+
 
 ## Pre-requisites
 
-Pre requisite: having a terrain 
-Or just generate a pseudo random one, as I did.
+Pre requisite: having a terrain to stream.
 
-## Terrain
+Since this is just a toy game engine for the moment, 
+I just generated a pseudo random terrain.
 
-Divide the scene into grid of cells
+## Terrain Setup
 
-Each cell will be a slice of our terrain and it will be made of:
+Divide the scene into grid of cells.
+For this example the grid is a square made of 11x11 cells 
 
-- plane mesh
-- height map e vertical displacement texture
+![TerrainSetup](https://github.com/user-attachments/assets/91956d2c-233b-4895-acc9-6f77f5a6514b)
+
+
+### Terrain Cell or Slice
+
+Each cell is a slice of our terrain with width and length of 10x10.
+It's made of:
+
+- **`plane mesh`**
+- **`height map`** or vertical displacement texture 
+    
+    This is the part that was pseudo randomly generated
+    It is made of 81 floats, based on the number of vertices of the mesh we are using.
+
 
 ![SliceOfTerrain](https://github.com/user-attachments/assets/0d0314a0-7414-4f1f-a9b4-fff57c7c5b68)
 
-![TerrainSetup](https://github.com/user-attachments/assets/91956d2c-233b-4895-acc9-6f77f5a6514b)
+## Detection
 
 ![TerrainComponentPosition](https://github.com/user-attachments/assets/b00e63d8-8886-47d8-9c3a-6c2f73bbc322)
 
