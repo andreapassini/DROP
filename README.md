@@ -98,9 +98,11 @@ It's made of:
 
 ![Streaming](https://github.com/user-attachments/assets/79c0ff37-97d2-41df-beec-f7c3eb1f859f)
 
-Once the 
+The goal of the Terrain Streaming System is to dynamically load only the necessary displacement maps around the Target/Player.
 
 ### Detection
+
+Once the Target/Player changes cell, new displacement maps will be required.
 
 ![TargetPosition](https://github.com/user-attachments/assets/e1d5625d-194c-4ca6-a645-613128718b63)
 
@@ -108,8 +110,9 @@ Once the
 
 ![NewMapsRequested](https://github.com/user-attachments/assets/fc938642-d47c-4c6c-91c2-40f5e88830db)
 
-## Response
+### Response
 
+The map requested are forwarded to the Asset Thread that will read the specific files and fill its response buffer. Once every N loaded maps, the game thread will copy the results into its buffer to be rendered.
 
 ![TerrainGridDisplacement](https://github.com/user-attachments/assets/f320c1d3-25e6-4a63-8aa1-07c8f2d6b83b)
 
