@@ -94,9 +94,13 @@ It's made of:
 
 ![SliceOfTerrain](https://github.com/user-attachments/assets/0d0314a0-7414-4f1f-a9b4-fff57c7c5b68)
 
-## Detection
+## Streaming
+
+![Streaming](https://github.com/user-attachments/assets/79c0ff37-97d2-41df-beec-f7c3eb1f859f)
 
 Once the 
+
+### Detection
 
 ![TargetPosition](https://github.com/user-attachments/assets/e1d5625d-194c-4ca6-a645-613128718b63)
 
