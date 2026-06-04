@@ -308,7 +308,7 @@ void TerrainSystem::UpdateTerrains(
 	TransformComponent& terrainTransformComp = ecs.GetSibiling<TerrainComponent, TransformComponent>(DenseID);
 	//
 
-#define MOVE_TERRAIN_TARGET
+//#define MOVE_TERRAIN_TARGET
 #ifdef MOVE_TERRAIN_TARGET
 #ifdef BOUNCE
 	BounceTarget(

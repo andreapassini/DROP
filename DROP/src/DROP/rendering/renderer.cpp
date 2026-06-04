@@ -1064,7 +1064,8 @@ namespace Drop
 
         GLsizei displacementMapSize = terrainsContext.terrainDisplacementMaps[0].displacementMapSize;
         assert(numVertices == terrainsContext.terrainDisplacementMaps[0].displacementMapSize);
-        if (terrainsContext.terrainToDisplacementMappings[terrainIndex] != TERRAIN_INDEX_NULL) {
+        if (terrainsContext.terrainToDisplacementMappings[terrainIndex] != TERRAIN_INDEX_NULL) 
+        {
             TerrainID mapID = terrainsContext.terrainToDisplacementMappings[terrainIndex];
             TerrainID loadedMapID = terrainsContext.loadedMaps[mapID];
             assert(loadedMapID == terrainIndex);
@@ -1080,7 +1081,8 @@ namespace Drop
             );
             glCheckError();
         }
-        else { 
+        else 
+        { 
             glUniform1fv(\
                 glGetUniformLocation(\
                     shader.Program \
