@@ -28,14 +28,19 @@ inline FILETIME Win32_GetLastWriteTime(
 ) {
     FILETIME LastWriteTime = {};
 
-    WIN32_FIND_DATAA FindData;
-    HANDLE FindHandle = FindFirstFileA(Filename, &FindData);
-    if (FindHandle != INVALID_HANDLE_VALUE)
+    //WIN32_FIND_DATAA FindData;
+    //HANDLE FindHandle = FindFirstFileA(Filename, &FindData);
+    //if (FindHandle != INVALID_HANDLE_VALUE)
+    //{
+    //    LastWriteTime = FindData.ftLastWriteTime;
+    //    FindClose(FindHandle);
+    //}
+    WIN32_FILE_ATTRIBUTE_DATA Data;
+    if (GetFileAttributesEx(Filename, GetFileExInfoStandard, &Data))
     {
-        LastWriteTime = FindData.ftLastWriteTime;
-        FindClose(FindHandle);
+        LastWriteTime = Data.ftLastWriteTime;
     }
-
+    
     return(LastWriteTime);
 }
 
@@ -265,7 +270,6 @@ void Win32_CheckAndUpdateDLL(
         // Something is wrong with this, i cannot, without bp, update the DLL
         // https://hero.handmade.network/forums/code-discussion/t/3266-weird_bug_with_live_code_editing
         // Fix for now - look at episode 39, the blog quoted a fix
-        Sleep(30);
         Win32_UnloadCode(
             hinstLib
             , EngineFunctions
