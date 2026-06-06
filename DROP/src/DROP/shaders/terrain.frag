@@ -8,7 +8,7 @@ N.B. 2) the shader considers only a directional light (simpler to manage for the
 
 N.B. 3)  the different effects are implemented using Shaders Subroutines
 
-author: Davide Gadia
+author: Davide Gadia, Andrea Passini
 
 Real-Time Graphics Programming - a.a. 2022/2023
 Master degree in Computer Science
@@ -56,6 +56,8 @@ uniform float Alpha; // rugosity - 0 : smooth, 1: rough
 uniform float F0; // fresnel reflectance at normal incidence
 uniform float Kd; // weight of diffuse reflection
 
+out vec4 mvPosition;
+
 ////////////////////////////////////////////////////////////////////
 
 // it applies Percentage-Closer Filtering to smooth the shadow edged. 
@@ -75,6 +77,12 @@ float Shadow_PCF_Final()
     // we calculate an adaptive bias to apply to the currentDepth value, to avoid the shadow acne effect.
     // the bias value is in the range [0.005,0.05]: the final value is calculated considering the angle between the normal and the direction of light
     vec3 normal = normalize(vNormal);
+    // vec3 normal = normalize(
+    //     cross(
+    //         dFdx(vViewPosition.xyz)
+    //         , dFdy(vViewPosition.xyz)
+    //     )
+    // );
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 
     // Version 3: we apply Percentage Close Filtering (PCF) to smooth shadow edges
@@ -147,7 +155,7 @@ void main()
     vec3 step_color = mix(lightGreen_color, white_color, stepUnified);
 
     // vec4 surfaceColor = vec4(
-    //     step_color * vertexDisplacement
+    //     step_color
     //     // step_color
     //     , 1.0
     // );
@@ -157,7 +165,18 @@ void main()
         , 0.0
         , 1.0
     );
-
+    // vec4 surfaceColor = vec4(
+    //     flat_UV.x
+    //     , flat_UV.y
+    //     , 0.0
+    //     , 1.0
+    // );
+    // vec4 surfaceColor = vec4(
+    //     normal.x
+    //     , normal.y
+    //     , normal.z
+    //     , 1.0
+    // );
     // normalization of the per-fragment normal
     // vec3 N = normalize(vNormal);
     vec3 N = normal;

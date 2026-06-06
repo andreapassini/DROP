@@ -58,29 +58,61 @@ The cumulated one for the scale, orientation and position of the object in world
 
 # Terrain Streaming System
 
-My Super Simple Terrain Streaming System.
+My Bare Bone Terrain Streaming System.
+
+
 
 ## Pre-requisites
 
-Pre requisite: having a terrain 
-Or just generate a pseudo random one, as I did.
+Pre requisite: having a terrain to stream.
 
-## Terrain
+Since this is just a toy game engine for the moment, 
+I just generated a pseudo random terrain.
 
-Divide the scene into grid of cells
+## Terrain Setup
 
-Each cell will be a slice of our terrain and it will be made of:
+- **Divide the scene into grid of cells**.  
+    For this example the grid is a square made of 11x11 cells 
+    ![TerrainSetup](https://github.com/user-attachments/assets/91956d2c-233b-4895-acc9-6f77f5a6514b)
 
-- plane mesh
-- height map e vertical displacement texture
+- **Displace the terrain component** or starting point to the **bottom left** of the scene.       
+    This will simplify the grid management since we will not need to handle row and col with negative numbers
+    ![TerrainComponentPosition](https://github.com/user-attachments/assets/b00e63d8-8886-47d8-9c3a-6c2f73bbc322)
+
+### Terrain Cell or Slice
+
+Each cell is a slice of our terrain with width and length of 10x10.
+It's made of:
+
+- **`plane mesh`**
+- **`height map`** or vertical displacement texture 
+    
+    This is the part that was pseudo randomly generated
+    It is made of 81 floats (9x9), based on the number of vertices of the mesh we are using.
+    Each pixel represent the vertical displacement applied to a specific mesh vertex.
+
 
 ![SliceOfTerrain](https://github.com/user-attachments/assets/0d0314a0-7414-4f1f-a9b4-fff57c7c5b68)
 
-![TerrainSetup](https://github.com/user-attachments/assets/91956d2c-233b-4895-acc9-6f77f5a6514b)
+## Streaming
 
-![TerrainComponentPosition](https://github.com/user-attachments/assets/b00e63d8-8886-47d8-9c3a-6c2f73bbc322)
+![Streaming](https://github.com/user-attachments/assets/79c0ff37-97d2-41df-beec-f7c3eb1f859f)
+
+The goal of the Terrain Streaming System is to dynamically load only the necessary displacement maps around the Target/Player.
+
+### Detection
+
+Once the Target/Player changes cell, new displacement maps will be required.
 
 ![TargetPosition](https://github.com/user-attachments/assets/e1d5625d-194c-4ca6-a645-613128718b63)
+
+![TargetMovingPosition](https://github.com/user-attachments/assets/dd3f0f5c-1b1c-46c5-8d69-faddf228cff4)
+
+![NewMapsRequested](https://github.com/user-attachments/assets/fc938642-d47c-4c6c-91c2-40f5e88830db)
+
+### Response
+
+The map requested are forwarded to the Asset Thread that will read the specific files and fill its response buffer. Once every N loaded maps, the game thread will copy the results into its buffer to be rendered.
 
 ![TerrainGridDisplacement](https://github.com/user-attachments/assets/f320c1d3-25e6-4a63-8aa1-07c8f2d6b83b)
 
