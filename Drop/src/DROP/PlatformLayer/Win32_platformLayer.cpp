@@ -28,13 +28,6 @@ inline FILETIME Win32_GetLastWriteTime(
 ) {
     FILETIME LastWriteTime = {};
 
-    //WIN32_FIND_DATAA FindData;
-    //HANDLE FindHandle = FindFirstFileA(Filename, &FindData);
-    //if (FindHandle != INVALID_HANDLE_VALUE)
-    //{
-    //    LastWriteTime = FindData.ftLastWriteTime;
-    //    FindClose(FindHandle);
-    //}
     WIN32_FILE_ATTRIBUTE_DATA Data;
     if (GetFileAttributesEx(Filename, GetFileExInfoStandard, &Data))
     {
