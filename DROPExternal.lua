@@ -8,3 +8,7 @@ IncludeDir["Glad"] = "%{wks.location}/Drop/dependencies/Glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/Drop/dependencies/ImGui"
 IncludeDir["glm"] = "%{wks.location}/Drop/dependencies/glm"
 IncludeDir["assimp"] = "%{wks.location}/Drop/dependencies/assimp/includes"
+IncludeDir["vulkan"] = "%{wks.location}/dependencies/VulkanSDK/Include"
+
+LibDir = {}
+LibDir["vulkan_libs"] = "%{wks.location}/dependencies/VulkanSDK/Lib"

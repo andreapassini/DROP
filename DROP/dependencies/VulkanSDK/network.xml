@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<Network>
+    <ProxyType>1</ProxyType>
+    <Ftp>
+        <Host></Host>
+        <Port>0</Port>
+        <Username></Username>
+        <Password></Password>
+    </Ftp>
+    <Http>
+        <Host></Host>
+        <Port>0</Port>
+        <Username></Username>
+        <Password></Password>
+    </Http>
+    <Repositories/>
+    <LocalCachePath>C:/Users/andre/AppData/Local/cache\qt-installer-framework\7d7bf0b4-aceb-378d-b92c-fadf1152d3a6</LocalCachePath>
+</Network>

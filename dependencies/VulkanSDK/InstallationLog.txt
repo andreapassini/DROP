@@ -1,0 +1,398 @@
+************************************* Invoked: Mon Mar 2 21:39:57 2026
+[0] Arguments: C:\Users\andre\Downloads\vulkansdk-windows-X64-1.4.341.1.exe
+[26] Operations sanity check succeeded.
+[44] Using metadata cache from "C:/Users/andre/AppData/Local/cache\\qt-installer-framework\\7d7bf0b4-aceb-378d-b92c-fadf1152d3a6"
+[44] Found 1 cached items.
+[45] Language: it-IT
+[436] Loaded control script ":/metadata/installer-config/installscript_qs.qs"
+[436] Using control script: ":/metadata/installer-config/installscript_qs.qs"
+[2235] Fetching latest update information...
+[2241] Downloading 1 items to cache.
+[2241] Recupero di informazioni da repository remoti in corso...
+[3389] Loading component scripts...
+[17932] Loading component scripts...
+[20317] Componenti selezionati senza dipendenze:
+com.lunarg.vulkan 
+com.lunarg.vulkan.core 
+com.lunarg.vulkan.volk 
+com.lunarg.vulkan.debug 
+com.lunarg.vulkan.vma
+[20317] Installation space required: "3.35 GB" Temporary space required: "359.41 MB" Local repository size: "0.00 byte"
+[20320] Cache is on a different volume than the installation directory. Cache volume mount point: "C:\\" Free space available: "36.69 GB" Install volume mount point: "E:\\" Free space available: "818.37 GB"
+[21057] backup  operation: Mkdir
+[21058] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[21058] Done
+[21058] perform  operation: Mkdir
+[21058] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[21058] Done
+[21058] Preparazione dell'installazione in corso...
+[21058] Install size: 5 components
+[21059] Download pacchetti in corso...
+[21059] Download archivio "1.4.341.1Bin.7z.sha1" per il componente Volk header, source, and library..
+[21659] Download archivio "1.4.341.1Bin.7z" per il componente Volk header, source, and library..
+[22621] Download archivio "1.4.341.1Include.7z.sha1" per il componente Volk header, source, and library..
+[23488] Download archivio "1.4.341.1Include.7z" per il componente Volk header, source, and library..
+[24317] Download archivio "1.4.341.1Lib.7z.sha1" per il componente Volk header, source, and library..
+[25009] Download archivio "1.4.341.1Lib.7z" per il componente Volk header, source, and library..
+[26216] Download archivio "1.4.341.1Bin.7z.sha1" per il componente Shader Toolchain Debug Symbols - 64-bit.
+[27116] Download archivio "1.4.341.1Bin.7z" per il componente Shader Toolchain Debug Symbols - 64-bit.
+[33026] Download archivio "1.4.341.1Lib.7z.sha1" per il componente Shader Toolchain Debug Symbols - 64-bit.
+[33637] Download archivio "1.4.341.1Lib.7z" per il componente Shader Toolchain Debug Symbols - 64-bit.
+[38389] Download archivio "1.4.341.1Include.7z.sha1" per il componente Vulkan Memory Allocator header..
+[38975] Download archivio "1.4.341.1Include.7z" per il componente Vulkan Memory Allocator header..
+[40126] Preparing to unpack components...
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Bin.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1cmake.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Config.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Helpers.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Lib.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1share.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Include.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40135] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40135] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1content.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40135] Started
+[40137] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40137] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Source.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40137] Started
+[40138] backup com.lunarg.vulkan.core concurrent operation: Extract
+[40138] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Templates.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40138] Started
+[40138] backup com.lunarg.vulkan.volk concurrent operation: Extract
+[40138] 	- arguments: installer://com.lunarg.vulkan.volk/1.4.341.1Bin.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40138] Started
+[40139] backup com.lunarg.vulkan.volk concurrent operation: Extract
+[40139] 	- arguments: installer://com.lunarg.vulkan.volk/1.4.341.1Include.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40139] Started
+[40140] backup com.lunarg.vulkan.volk concurrent operation: Extract
+[40140] 	- arguments: installer://com.lunarg.vulkan.volk/1.4.341.1Lib.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40140] Started
+[40140] backup com.lunarg.vulkan.debug concurrent operation: Extract
+[40140] 	- arguments: installer://com.lunarg.vulkan.debug/1.4.341.1Bin.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40140] Started
+[40140] backup com.lunarg.vulkan.debug concurrent operation: Extract
+[40140] 	- arguments: installer://com.lunarg.vulkan.debug/1.4.341.1Lib.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40140] Started
+[40141] backup com.lunarg.vulkan.vma concurrent operation: Extract
+[40141] 	- arguments: installer://com.lunarg.vulkan.vma/1.4.341.1Include.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40141] Started
+[40145] Unpacking components...
+[40146] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Bin.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40146] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Lib.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40146] perform com.lunarg.vulkan.debug concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.debug/1.4.341.1Bin.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40146] perform com.lunarg.vulkan.debug concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.debug/1.4.341.1Lib.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40146] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Helpers.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40146] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Include.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40146] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1share.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40146] perform com.lunarg.vulkan.vma concurrent operation: Extract
+[40146] 	- arguments: installer://com.lunarg.vulkan.vma/1.4.341.1Include.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40146] Started
+[40167] perform com.lunarg.vulkan.volk concurrent operation: Extract
+[40167] 	- arguments: installer://com.lunarg.vulkan.volk/1.4.341.1Lib.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40167] Started
+[40215] perform com.lunarg.vulkan.volk concurrent operation: Extract
+[40215] 	- arguments: installer://com.lunarg.vulkan.volk/1.4.341.1Bin.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40215] Started
+[40239] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40239] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Source.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40239] Started
+[40266] perform com.lunarg.vulkan.volk concurrent operation: Extract
+[40266] 	- arguments: installer://com.lunarg.vulkan.volk/1.4.341.1Include.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40266] Started
+[40275] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40275] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Config.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40275] Started
+[40301] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40301] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1Templates.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40301] Started
+[40309] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40309] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1content.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40309] Started
+[40348] perform com.lunarg.vulkan.core concurrent operation: Extract
+[40348] 	- arguments: installer://com.lunarg.vulkan.core/1.4.341.1cmake.7z, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK
+[40348] Started
+[57099] Installazione componente The Vulkan SDK
+[57102] backup com.lunarg.vulkan operation: License
+[57102] 	- arguments:
+[57102] Done
+[57102] perform com.lunarg.vulkan operation: License
+[57102] 	- arguments:
+[57104] Done
+[57106] Installazione componente The Vulkan SDK Core (Always Installed)
+[57108] Starting elevated process "C:\\Users\\andre\\Downloads\\vulkansdk-windows-X64-1.4.341.1.exe" with arguments " --start-server PRODUCTION,{87ba7a8a-4589-4534-a737-675e08fb122e},{56bc3ecb-1ffe-4fa7-93cf-dbbf02c2ea96}"
+[59820] Finished starting elevated process.
+[60046] "Execute" as admin: true
+[60046] backup com.lunarg.vulkan.core operation: Execute
+[60047] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, INSTALLRT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\VulkanRT.exe /s
+[60047] Done
+[60047] perform com.lunarg.vulkan.core operation: Execute
+[60048] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, INSTALLRT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\VulkanRT.exe /s
+[60113] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "INSTALLRT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\VulkanRT.exe /s
+[61895] Done
+[61896] "Execute" as admin: true
+[61896] backup com.lunarg.vulkan.core operation: Execute
+[61897] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK, SHORTCUTS, Vulkan SDK 1.4.341.1, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, REMOVESHORTCUTS, Vulkan SDK 1.4.341.1
+[61897] Done
+[61897] perform com.lunarg.vulkan.core operation: Execute
+[61899] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK, SHORTCUTS, Vulkan SDK 1.4.341.1, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, REMOVESHORTCUTS, Vulkan SDK 1.4.341.1
+[61905] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK SHORTCUTS Vulkan SDK 1.4.341.1
+[62132] Done
+[62133] "Execute" as admin: true
+[62133] backup com.lunarg.vulkan.core operation: Execute
+[62134] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_api_dump.json
+[62134] Done
+[62134] perform com.lunarg.vulkan.core operation: Execute
+[62134] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_api_dump.json
+[62141] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_api_dump.json
+[62151] Done
+[62152] "Execute" as admin: true
+[62152] backup com.lunarg.vulkan.core operation: Execute
+[62153] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_api_dump.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_api_dump.json
+[62153] Done
+[62153] perform com.lunarg.vulkan.core operation: Execute
+[62154] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_api_dump.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_api_dump.json
+[62160] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_api_dump.json
+[62171] Done
+[62171] "Execute" as admin: true
+[62171] backup com.lunarg.vulkan.core operation: Execute
+[62172] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_gfxreconstruct.json
+[62172] Done
+[62172] perform com.lunarg.vulkan.core operation: Execute
+[62173] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_gfxreconstruct.json
+[62179] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_gfxreconstruct.json
+[62190] Done
+[62190] "Execute" as admin: true
+[62190] backup com.lunarg.vulkan.core operation: Execute
+[62192] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_gfxreconstruct.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_gfxreconstruct.json
+[62192] Done
+[62192] perform com.lunarg.vulkan.core operation: Execute
+[62192] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_gfxreconstruct.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_gfxreconstruct.json
+[62200] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_gfxreconstruct.json
+[62211] Done
+[62212] "Execute" as admin: true
+[62212] backup com.lunarg.vulkan.core operation: Execute
+[62212] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_synchronization2.json
+[62212] Done
+[62212] perform com.lunarg.vulkan.core operation: Execute
+[62213] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_synchronization2.json
+[62219] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_khronos_synchronization2.json
+[62230] Done
+[62230] "Execute" as admin: true
+[62231] backup com.lunarg.vulkan.core operation: Execute
+[62232] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_synchronization2.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_synchronization2.json
+[62232] Done
+[62232] perform com.lunarg.vulkan.core operation: Execute
+[62233] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_synchronization2.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_synchronization2.json
+[62239] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_khronos_synchronization2.json
+[62250] Done
+[62251] "Execute" as admin: true
+[62251] backup com.lunarg.vulkan.core operation: Execute
+[62251] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_validation.json
+[62251] Done
+[62252] perform com.lunarg.vulkan.core operation: Execute
+[62252] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_validation.json
+[62258] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_khronos_validation.json
+[62269] Done
+[62269] "Execute" as admin: true
+[62269] backup com.lunarg.vulkan.core operation: Execute
+[62270] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_validation.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_validation.json
+[62270] Done
+[62271] perform com.lunarg.vulkan.core operation: Execute
+[62271] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_validation.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_validation.json
+[62278] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_khronos_validation.json
+[62288] Done
+[62289] "Execute" as admin: true
+[62289] backup com.lunarg.vulkan.core operation: Execute
+[62289] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_monitor.json
+[62289] Done
+[62289] perform com.lunarg.vulkan.core operation: Execute
+[62290] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_monitor.json
+[62296] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_monitor.json
+[62306] Done
+[62307] "Execute" as admin: true
+[62307] backup com.lunarg.vulkan.core operation: Execute
+[62308] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_monitor.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_monitor.json
+[62308] Done
+[62308] perform com.lunarg.vulkan.core operation: Execute
+[62309] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_monitor.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_monitor.json
+[62315] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_monitor.json
+[62326] Done
+[62326] "Execute" as admin: true
+[62326] backup com.lunarg.vulkan.core operation: Execute
+[62327] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_screenshot.json
+[62327] Done
+[62327] perform com.lunarg.vulkan.core operation: Execute
+[62327] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_screenshot.json
+[62334] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_screenshot.json
+[62345] Done
+[62345] "Execute" as admin: true
+[62345] backup com.lunarg.vulkan.core operation: Execute
+[62346] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_screenshot.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_screenshot.json
+[62346] Done
+[62346] perform com.lunarg.vulkan.core operation: Execute
+[62347] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_screenshot.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_screenshot.json
+[62354] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_screenshot.json
+[62365] Done
+[62366] "Execute" as admin: true
+[62366] backup com.lunarg.vulkan.core operation: Execute
+[62366] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_profiles.json
+[62366] Done
+[62366] perform com.lunarg.vulkan.core operation: Execute
+[62367] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_profiles.json
+[62374] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_khronos_profiles.json
+[62384] Done
+[62384] "Execute" as admin: true
+[62385] backup com.lunarg.vulkan.core operation: Execute
+[62386] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_profiles.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_profiles.json
+[62386] Done
+[62386] perform com.lunarg.vulkan.core operation: Execute
+[62387] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_profiles.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_profiles.json
+[62393] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_khronos_profiles.json
+[62403] Done
+[62404] "Execute" as admin: true
+[62404] backup com.lunarg.vulkan.core operation: Execute
+[62405] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_shader_object.json
+[62405] Done
+[62405] perform com.lunarg.vulkan.core operation: Execute
+[62405] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_khronos_shader_object.json
+[62412] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_khronos_shader_object.json
+[62422] Done
+[62423] "Execute" as admin: true
+[62423] backup com.lunarg.vulkan.core operation: Execute
+[62424] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_shader_object.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_shader_object.json
+[62424] Done
+[62424] perform com.lunarg.vulkan.core operation: Execute
+[62425] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_shader_object.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_khronos_shader_object.json
+[62432] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_khronos_shader_object.json
+[62443] Done
+[62444] "Execute" as admin: true
+[62444] backup com.lunarg.vulkan.core operation: Execute
+[62444] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_crash_diagnostic.json
+[62444] Done
+[62444] perform com.lunarg.vulkan.core operation: Execute
+[62445] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_crash_diagnostic.json
+[62451] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_crash_diagnostic.json
+[62462] Done
+[62463] "Execute" as admin: true
+[62463] backup com.lunarg.vulkan.core operation: Execute
+[62464] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_crash_diagnostic.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_crash_diagnostic.json
+[62464] Done
+[62464] perform com.lunarg.vulkan.core operation: Execute
+[62465] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, ADDEXPLICIT, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_crash_diagnostic.json, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, DELKEYVALUE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin\VkLayer_crash_diagnostic.json
+[62471] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "ADDEXPLICIT E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin\\VkLayer_crash_diagnostic.json
+[62483] Done
+[62484] "Execute" as admin: true
+[62484] backup com.lunarg.vulkan.core operation: Execute
+[62484] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_device_simulation.json
+[62484] Done
+[62485] perform com.lunarg.vulkan.core operation: Execute
+[62485] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, CLEANEXPLICIT, VkLayer_device_simulation.json
+[62491] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "CLEANEXPLICIT VkLayer_device_simulation.json
+[62503] Done
+[62503] "Execute" as admin: true
+[62503] backup com.lunarg.vulkan.core operation: Execute
+[62505] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin, NOP, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin, REMOVE
+[62505] Done
+[62505] perform com.lunarg.vulkan.core operation: Execute
+[62507] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin, NOP, UNDOEXECUTE, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin, REMOVE
+[62515] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin NOP
+[62527] Done
+[62527] "Execute" as admin: true
+[62527] backup com.lunarg.vulkan.core operation: Execute
+[62529] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin, ADD
+[62529] Done
+[62529] perform com.lunarg.vulkan.core operation: Execute
+[62530] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Helpers\install_helper.exe, E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\Bin, ADD
+[62537] E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Helpers\\install_helper.exe" started, arguments: "E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK\\Bin ADD
+[62548] Done
+[62549] backup com.lunarg.vulkan.core operation: License
+[62549] 	- arguments:
+[62549] Done
+[62549] perform com.lunarg.vulkan.core operation: License
+[62549] 	- arguments:
+[62550] Done
+[62563] Installazione componente Shader Toolchain Debug Symbols - 64-bit
+[62566] backup com.lunarg.vulkan.debug operation: License
+[62566] 	- arguments:
+[62566] Done
+[62566] perform com.lunarg.vulkan.debug operation: License
+[62566] 	- arguments:
+[62567] Done
+[62591] Writing maintenance tool: "E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK/maintenancetool.exe.new"
+[62591] Scrittura dello strumento di manutenzione.
+[62696] Wrote permissions for maintenance tool.
+[62776] Maintenance tool hard restart: false.
+[62779] Installazione completata.
+[62920] perform  operation: Delete
+[62920] 	- arguments: E:/ANDREA/FREE_TIME/CODE/FallEngine/dependencies/VulkanSDK/Helpers/VC_redist.x64.exe
+[62921] Done
+[62923] Warning: QString::arg: Argument missing: Run the Vulkan Configurator and Hardware Capabilities Viewer, Vulkan SDK 1.4.341.1
+[62924] Component name: com.lunarg.vulkan.core
+[62924] perform  operation: Execute
+[62924] 	- arguments: reg, ADD, HKEY_LOCAL_MACHINE\SOFTWARE\LunarG\VulkanSDK, /v, com.lunarg.vulkan.core, /t, REG_DWORD, /d, 1, /f
+[62937] reg" started, arguments: "ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\LunarG\\VulkanSDK /v com.lunarg.vulkan.core /t REG_DWORD /d 1 /f
+[62950] Done
+[62951] Is Installed
+[62951] Component name: com.lunarg.vulkan.glm
+[62951] perform  operation: Execute
+[62951] 	- arguments: reg, ADD, HKEY_LOCAL_MACHINE\SOFTWARE\LunarG\VulkanSDK, /v, com.lunarg.vulkan.glm, /t, REG_DWORD, /d, 0, /f
+[62962] reg" started, arguments: "ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\LunarG\\VulkanSDK /v com.lunarg.vulkan.glm /t REG_DWORD /d 0 /f
+[62969] Done
+[62970] Was not installed
+[62970] Component name: com.lunarg.vulkan.sdl2
+[62970] perform  operation: Execute
+[62970] 	- arguments: reg, ADD, HKEY_LOCAL_MACHINE\SOFTWARE\LunarG\VulkanSDK, /v, com.lunarg.vulkan.sdl2, /t, REG_DWORD, /d, 0, /f
+[62980] reg" started, arguments: "ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\LunarG\\VulkanSDK /v com.lunarg.vulkan.sdl2 /t REG_DWORD /d 0 /f
+[62988] Done
+[62989] Was not installed
+[62989] Component name: com.lunarg.vulkan.volk
+[62989] perform  operation: Execute
+[62989] 	- arguments: reg, ADD, HKEY_LOCAL_MACHINE\SOFTWARE\LunarG\VulkanSDK, /v, com.lunarg.vulkan.volk, /t, REG_DWORD, /d, 1, /f
+[62999] reg" started, arguments: "ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\LunarG\\VulkanSDK /v com.lunarg.vulkan.volk /t REG_DWORD /d 1 /f
+[63006] Done
+[63006] Is Installed
+[63007] Component name: com.lunarg.vulkan.debug
+[63007] perform  operation: Execute
+[63007] 	- arguments: reg, ADD, HKEY_LOCAL_MACHINE\SOFTWARE\LunarG\VulkanSDK, /v, com.lunarg.vulkan.debug, /t, REG_DWORD, /d, 1, /f
+[63016] reg" started, arguments: "ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\LunarG\\VulkanSDK /v com.lunarg.vulkan.debug /t REG_DWORD /d 1 /f
+[63024] Done
+[63025] Is Installed
+[63025] Component name: com.lunarg.vulkan.vma
+[63025] perform  operation: Execute
+[63025] 	- arguments: reg, ADD, HKEY_LOCAL_MACHINE\SOFTWARE\LunarG\VulkanSDK, /v, com.lunarg.vulkan.vma, /t, REG_DWORD, /d, 1, /f
+[63035] reg" started, arguments: "ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\LunarG\\VulkanSDK /v com.lunarg.vulkan.vma /t REG_DWORD /d 1 /f
+[63043] Done
+[63043] Is Installed
+[63043] Component name: com.lunarg.vulkan.arm64
+[63043] perform  operation: Execute
+[63043] 	- arguments: reg, ADD, HKEY_LOCAL_MACHINE\SOFTWARE\LunarG\VulkanSDK, /v, com.lunarg.vulkan.arm64, /t, REG_DWORD, /d, 0, /f
+[63053] reg" started, arguments: "ADD HKEY_LOCAL_MACHINE\\SOFTWARE\\LunarG\\VulkanSDK /v com.lunarg.vulkan.arm64 /t REG_DWORD /d 0 /f
+[63060] Done
+[63061] Was not installed

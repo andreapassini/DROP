@@ -12,10 +12,6 @@ project "Drop"
       "src/**.h"
       , "src/**.cpp"
 
-      , "src/**.frag"
-      , "src/**.vert"
-      , "src/**.geom"
-
       , "dependencies/stb_image/**.h"
 		, "dependencies/stb_image/**.cpp"
 		, "dependencies/glm/glm/**.hpp"
@@ -37,6 +33,7 @@ project "Drop"
       
       , "dependencies/spdlog/include"
 
+      , "%{IncludeDir.vulkan}"
       , "%{IncludeDir.GLFW}"
 		, "%{IncludeDir.Glad}"
 		, "%{IncludeDir.ImGui}"
@@ -48,12 +45,16 @@ project "Drop"
 
    libdirs { 
       "dependencies/assimp/libs"
+      , "%{LibDir.vulkan_libs}"
    }
 
    links
    {
       "Glad"
-      
+      , "vulkan-1.lib"
+      -- Runtime spir-v shader compilation
+      , "shaderc_combined.lib"
+
       , "GLFW"
       
       -- GUI

@@ -43,7 +43,9 @@ We do a second render pass, this time we calculate the color of the fragments ke
 
 https://howtovulkan.com/#libraries
 
-## Shading Language
+## Setup
+
+### Shading Language
 
 Vulkan consumes shaders in an intermediate format called **SPIR-V**.
 This decouples the API from the actual shading language.
@@ -51,6 +53,20 @@ https://www.khronos.org/spirv/
 
 ![SPIR-V Language Ecosystem](https://github.com/user-attachments/assets/c1688b2a-56ed-4bce-b4ee-ace3ae153fb5)
 
+### Vulkan SDK
+
+- **Volk** (https://github.com/zeux/volk) - Meta-loader that simplifies loading of Vulkan functions
+- **VMA** (https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator) - Simplifies dealing with memory allocations. Removes some of the verbosity around memory management
+
+https://vulkan.lunarg.com/sdk/home
+
+While it's not required for developing Vulkan applications, the LunarG Vulkan SDK provides a convenient way to install commonly used libraries and tools, some of which are used in this tutorial. It's therefore recommended to install this. When installing, be sure to select the optional GLM, Volk, SDL3 and Vulkan Memory Allocator components. Alternatively, you can download these from their respective repositories and adjust the include paths in the CMakeLists.txt file.
+
+### Validation layers
+
+Vulkan was designed to minimize driver overhead. While that can result in better performance, it also removes many of the safeguards that APIs like OpenGL had and puts that responsibility into your hands. If you misuse Vulkan the driver is free to crash. So even if your app works on one GPU, it doesn't guarantee that it works on others. On the other hand, the Vulkan specification defines valid usages for all functionality. And with the validation layers, an easy-to-use tool to check for that exists. (https://github.com/KhronosGroup/Vulkan-ValidationLayers)
+
+Validation layers can be enabled in code, but the easier option is to enable the layers via the Vulkan Configurator GUI provided by the Vulkan SDK. Once they're enabled, any improper use of the API will be logged to the command line window of our application.
 
 # Scene Graph
 

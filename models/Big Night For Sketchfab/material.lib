@@ -1,34 +1,3 @@
-# Aspose.3D Wavefront OBJ Exporter
-# Copyright 2004-2023 Aspose Pty Ltd.
-# File created: 07/20/2023 19:41:40
-
-newmtl lambert8
-	Ka 0 0 0
-	Kd 1 1 1
-	Ke 0 0 0
-	illum 2
-	d 1
-	Tr 0
-	map_Kd Armour_C.png
-newmtl surfaceShader1
-	Ka 0 0 0
-	Kd 0 0 0
-	Ke 0 0 0
-	illum 2
-	d 1
-	Tr 0
-newmtl surfaceShader2
-	Ka 0 0 0
-	Kd 0 0 0
-	Ke 0 0 0
-	illum 2
-	d 1
-	Tr 0
-newmtl lambert10
-	Ka 0 0 0
-	Kd 1 1 1
-	Ke 0 0 0
-	illum 2
-	d 1
-	Tr 0
-	map_Kd Axe_C.png
+version https://git-lfs.github.com/spec/v1
+oid sha256:089c8f1993bdb0fa9cc2e8919e7bbc14765a83fced9a4aa45c8e6cccacb5afdb
+size 460
