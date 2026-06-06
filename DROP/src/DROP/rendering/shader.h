@@ -24,6 +24,7 @@ using namespace std;
 // to be removed
 #include <filesystem>
 #include <DROP/utils/Log.h>
+#include "DROP/core/file.h"
 
 #define MAX_SHADER_PATH 256
 #define NULL_SHADER UINT32_MAX
@@ -443,6 +444,8 @@ public:
     GLuint geometryShaderFilePathSize;
     GLuint fragmentShaderFilePathSize;
     GLuint computeShaderFilePathSize;
+
+    FileTime fileTime;
 
 private:
 
