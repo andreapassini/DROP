@@ -38,6 +38,20 @@ In order to create shadows we need to put the camera on the light position with 
 We do a first render pass, without calculating the color, in order to find the surfaces that are hidden by the objects.
 We do a second render pass, this time we calculate the color of the fragments keeping in consideration also the area obscured by the shadows.
 
+
+# Vulkan Renderer
+
+https://howtovulkan.com/#libraries
+
+## Shading Language
+
+Vulkan consumes shaders in an intermediate format called **SPIR-V**.
+This decouples the API from the actual shading language.
+https://www.khronos.org/spirv/
+
+![SPIR-V Language Ecosystem](https://github.com/user-attachments/assets/c1688b2a-56ed-4bce-b4ee-ace3ae153fb5)
+
+
 # Scene Graph
 
 Implementing the scene graph using a tree.
@@ -117,4 +131,3 @@ The map requested are forwarded to the Asset Thread that will read the specific 
 ![TerrainGridDisplacement](https://github.com/user-attachments/assets/f320c1d3-25e6-4a63-8aa1-07c8f2d6b83b)
 
 ![GridCalculation](https://github.com/user-attachments/assets/b0d2b53a-fe8f-4d2a-aaa3-417033fce857)
-
