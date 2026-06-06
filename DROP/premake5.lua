@@ -84,7 +84,7 @@ project "Drop"
 
    filter "system:windows"
       systemversion "latest"
-      defines { "DROP_PLATFORM_WINDOWS" }
+      defines { "DROP_PLATFORM_WINDOWS", "VULKAN" }
 
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }
