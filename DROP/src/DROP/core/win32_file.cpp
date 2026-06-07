@@ -122,4 +122,17 @@ size_t File::ReadBinaryFile(
 	return bytesRead;
 }
 
+FileTime File::GetLastWriteTime(char* filePath)
+{
+	FileTime lastFileTime = {};
+
+	WIN32_FILE_ATTRIBUTE_DATA Data;
+	if (GetFileAttributesEx(filePath, GetFileExInfoStandard, &Data))
+	{
+		lastFileTime = Data.ftLastWriteTime;
+	}
+
+	return lastFileTime;
+}
+
 #endif // DROP_PLATFORM_WINDOWS

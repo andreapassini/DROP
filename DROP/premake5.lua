@@ -84,6 +84,7 @@ project "Drop"
    filter "system:windows"
       systemversion "latest"
       defines { "DROP_PLATFORM_WINDOWS" }
+      characterset ("ASCII")
 
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }

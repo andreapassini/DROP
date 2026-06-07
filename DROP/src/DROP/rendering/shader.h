@@ -4,7 +4,7 @@ Shader class
 
 N.B. ) adaptation of https://github.com/JoeyDeVries/LearnOpenGL/blob/master/includes/learnopengl/shader.h
 
-author: Davide Gadia
+author: Davide Gadia, Andrea Passini
 
 Real-Time Graphics Programming - a.a. 2022/2023
 Master degree in Computer Science
@@ -24,6 +24,8 @@ using namespace std;
 // to be removed
 #include <filesystem>
 #include <DROP/utils/Log.h>
+#include "DROP/core/file.h"
+#include "../dependencies/Glad/include/GLAD/glad.h"
 
 #define MAX_SHADER_PATH 256
 #define NULL_SHADER UINT32_MAX
@@ -151,6 +153,13 @@ public:
         // Step 4: we delete the shaders because they are linked to the Shader Program, and we do not need them anymore
         glDeleteShader(vertex);
         glDeleteShader(fragment);
+
+#ifdef DROP_DEBUG
+        // Update last write time
+        vertexShaderFileTime = File::GetLastWriteTime(vertexShaderFilePath);
+        fragmentShaderFileTime = File::GetLastWriteTime(fragmentShaderFilePath);
+#endif // DROP_DEBUG
+
     }
 
     void CompileShaders(
@@ -261,6 +270,14 @@ public:
         glDeleteShader(vertex);
         glDeleteShader(geometry);
         glDeleteShader(fragment);
+
+#ifdef DROP_DEBUG
+        // Update last write time
+        vertexShaderFileTime = File::GetLastWriteTime(vertexShaderFilePath);
+        geometryShaderFileTime = File::GetLastWriteTime(geometryShaderFilePath);
+        fragmentShaderFileTime = File::GetLastWriteTime(fragmentShaderFilePath);
+#endif // DROP_DEBUG
+
     }
 
     void CompileShaders(
@@ -323,6 +340,11 @@ public:
 
         // Step 4: we delete the shaders because they are linked to the Shader Program, and we do not need them anymore
         glDeleteShader(compute);
+
+#ifdef DROP_DEBUG
+        // Update last write time
+        computeShaderFileTime = File::GetLastWriteTime(computeShaderFilePath);
+#endif // DROP_DEBUG
     }
 
     void DeleteShadersAndPrograms(){
@@ -444,6 +466,11 @@ public:
     GLuint fragmentShaderFilePathSize;
     GLuint computeShaderFilePathSize;
 
+    FileTime vertexShaderFileTime;
+    FileTime geometryShaderFileTime;
+    FileTime fragmentShaderFileTime;
+    FileTime computeShaderFileTime;
+
 private:
 
     // Check compilation and linking errors
@@ -473,3 +500,10 @@ private:
 		}
 	}
 };
+
+void ShaderHotReloading(Shader* shader);
+
+bool HasNewerWriteTime(
+    FileTime* lastFileTime
+    , char* filePath
+);
