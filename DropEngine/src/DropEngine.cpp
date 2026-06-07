@@ -4,6 +4,7 @@
 
 #include "Utils/Log.h"
 #include "Window/Window.h"
+#include "UI/UI.h"
 
 #include "GameEngine.h"
 #include "EngineState.h"
@@ -164,7 +165,22 @@ void StartEngine(
     );
 
     // ImGUI
+    // We need to allocate memory on the .exe (Platform Layer)
+    // Allocate on PermanentStorage
+    size_t UIByteSize = sizeof(UI::UIContext);
+    engineState->uiContext = ArenaAlloc<UI::UIContext>(
+        &engineState->persistentArenaAllocator
+        , UIByteSize
+    );
 
+    engineState->imGuiAllocator.allocFunc = TempGLFWAllocate;
+    engineState->imGuiAllocator.freeFunc = TempGLFWDeallocate;
+    engineState->imGuiAllocator.userData = (void*)(&engineState->persistentArenaAllocator);
+    UI::InitUI(
+        engineState->uiContext
+        , &engineState->imGuiAllocator
+        , engineState->windowHandle
+    );
 
     //engineState->windowHandle = Window::Create();
     //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
@@ -182,6 +198,7 @@ void UpdateEngine(
     assert(engineState);
 
     // THIS SHOULD BE DONE ON REATTACH
+    // Reattach GLFW
     glfwSetLib(engineState->windowHandle->glfwLibrary);
     std::cout << "engineState->windowHandle->glfwLibrary = " 
         << (uintptr_t)engineState->windowHandle->glfwLibrary << std::endl;
@@ -189,6 +206,13 @@ void UpdateEngine(
         engineState->windowHandle->glfwWindow
         , &engineState->windowHandle
     );
+    // Reattach ImGui
+    UI::HotReloadContextReset(
+        engineState->uiContext
+        , &engineState->imGuiAllocator
+        , engineState->windowHandle
+    );
+    // -------------
 
     // Get time from glfwGetTime
     const float deltaTime = (float)glfwGetTime();
@@ -202,6 +226,9 @@ void UpdateEngine(
             , &gDropEngineCalls
         );
     }
+
+    // Render UI
+
 
     // Swap buffers
     OnEndFrame(engineState->windowHandle);

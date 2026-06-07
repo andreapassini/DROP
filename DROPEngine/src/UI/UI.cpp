@@ -1,23 +1,29 @@
 #include "UI.h"
 
-#define IMGUI_DISABLE_DEFAULT_ALLOCATORS
-#include "imgui.h"
-
 #include "Window/Window.h"
 
-void Drop::InitUI(
-	UI* uiContext
+#define IMGUI_DISABLE_DEFAULT_ALLOCATORS
+#include "imgui.h"
+#include "imgui_internal.h"
+#include "examples/imgui_impl_glfw.h"
+#include "examples/imgui_impl_opengl3.h"
+//// Emedded font
+//#include "ImGui/Roboto-Regular.embed"
+
+void UI::InitUI(
+	UIContext* uiContext
 	, const ImGuiAllocator* imGuiAllocator
+	, Drop::Window* window
 ) {
 	if (!uiContext) return;
 	if (!imGuiAllocator) return;
 	if (!imGuiAllocator->allocFunc) return;
 	if (!imGuiAllocator->freeFunc) return;
 	if (!imGuiAllocator->userData) return;
+	if (!window) return;
 
 	IMGUI_CHECKVERSION();
 
-	// Recall at every HotReload
 	ImGui::SetAllocatorFunctions(
 		imGuiAllocator->allocFunc
 		, imGuiAllocator->freeFunc
@@ -45,7 +51,59 @@ void Drop::InitUI(
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
 
-	ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow(), true);
+	ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)window->glfwWindow, true);
 	ImGui_ImplOpenGL3_Init("#version 410");
+
+}
+
+// Recall at every HotReload
+void UI::HotReloadContextReset(
+	UIContext* uiContext
+	, const ImGuiAllocator* imGuiAllocator
+	, Drop::Window* window
+) {
+	ImGui::SetCurrentContext(uiContext->imGuiContext);
+
+	ImGui::SetAllocatorFunctions(
+		imGuiAllocator->allocFunc
+		, imGuiAllocator->freeFunc
+		, imGuiAllocator->userData
+	);
+}
+
+void UI::UpdateAndRenderUI(
+	UpdateUI* updateUIfunc
+	, Drop::Window* window
+) {
+	if (!updateUIfunc) return;
+
+	// render your GUI
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	// Call game UI update
+	(*(updateUIfunc))();
+
+	// Just for test
+	ImGui::Begin("Drop Rendering");
+	ImGui::Text("Some Text data: %d", 123);
+	ImGui::End();
+	// -------
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2((float)window->width, (float)window->height);
+	
+	// Rendering ImGui
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		GLFWwindow* backup_current_context = glfwGetCurrentContext();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		glfwMakeContextCurrent(backup_current_context);
+	}
 
 }
