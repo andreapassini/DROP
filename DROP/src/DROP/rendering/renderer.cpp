@@ -1223,6 +1223,18 @@ namespace Drop
         }
     }
 
+    void Renderer::HotReloadingForAllShadersInMaterials(
+        SceneContext& sceneContext
+        , RendererContext& rendererContext
+    ) {
+        for (size_t i = 0; i < sceneContext.materials->size(); i++)
+        {
+            Material& CurrentMaterial = sceneContext.materials->at(i);
+            Shader& CurrentShader = rendererContext.shaders[CurrentMaterial.shaderID];
+            ShaderHotReloading(&CurrentShader);
+        }
+    }
+
 //https://learnopengl.com/In-Practice/Debugging
 //https://computergraphics.stackexchange.com/questions/23/how-can-i-debug-what-is-being-rendered-to-a-frame-buffer-object-in-opengl
 //    // XXX WARNING: Untested code follows

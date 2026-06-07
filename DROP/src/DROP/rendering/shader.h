@@ -25,6 +25,7 @@ using namespace std;
 #include <filesystem>
 #include <DROP/utils/Log.h>
 #include "DROP/core/file.h"
+#include "../dependencies/Glad/include/GLAD/glad.h"
 
 #define MAX_SHADER_PATH 256
 #define NULL_SHADER UINT32_MAX
@@ -155,7 +156,8 @@ public:
 
 #ifdef DROP_DEBUG
         // Update last write time
-
+        vertexShaderFileTime = File::GetLastWriteTime(vertexShaderFilePath);
+        fragmentShaderFileTime = File::GetLastWriteTime(fragmentShaderFilePath);
 #endif // DROP_DEBUG
 
     }
@@ -268,6 +270,14 @@ public:
         glDeleteShader(vertex);
         glDeleteShader(geometry);
         glDeleteShader(fragment);
+
+#ifdef DROP_DEBUG
+        // Update last write time
+        vertexShaderFileTime = File::GetLastWriteTime(vertexShaderFilePath);
+        geometryShaderFileTime = File::GetLastWriteTime(geometryShaderFilePath);
+        fragmentShaderFileTime = File::GetLastWriteTime(fragmentShaderFilePath);
+#endif // DROP_DEBUG
+
     }
 
     void CompileShaders(
@@ -330,6 +340,11 @@ public:
 
         // Step 4: we delete the shaders because they are linked to the Shader Program, and we do not need them anymore
         glDeleteShader(compute);
+
+#ifdef DROP_DEBUG
+        // Update last write time
+        computeShaderFileTime = File::GetLastWriteTime(computeShaderFilePath);
+#endif // DROP_DEBUG
     }
 
     void DeleteShadersAndPrograms(){
@@ -451,7 +466,10 @@ public:
     GLuint fragmentShaderFilePathSize;
     GLuint computeShaderFilePathSize;
 
-    FileTime fileTime;
+    FileTime vertexShaderFileTime;
+    FileTime geometryShaderFileTime;
+    FileTime fragmentShaderFileTime;
+    FileTime computeShaderFileTime;
 
 private:
 
@@ -484,3 +502,8 @@ private:
 };
 
 void ShaderHotReloading(Shader* shader);
+
+bool HasNewerWriteTime(
+    FileTime* lastFileTime
+    , char* filePath
+);

@@ -221,5 +221,9 @@ namespace Drop
             SceneContext& sceneContext
             , RendererContext& rendererContext
         );
+        void HotReloadingForAllShadersInMaterials(
+            SceneContext& sceneContext
+            , RendererContext& rendererContext
+        );
     };
 }

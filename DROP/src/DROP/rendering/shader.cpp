@@ -10,8 +10,8 @@ void ShaderHotReloading(Shader* shader)
         && shader->fragment != NULL_SHADER
         && shader->geometry == NULL_SHADER
     ) {
-        if (HasNewerWriteTime(shader, shader->vertex)
-            || HasNewerWriteTime(shader, shader->fragment)
+        if (HasNewerWriteTime(&shader->vertexShaderFileTime, shader->vertexShaderFilePath)
+            || HasNewerWriteTime(&shader->fragmentShaderFileTime, shader->fragmentShaderFilePath)
         ) {
             shader->ReCompileShader();
         }
@@ -20,16 +20,16 @@ void ShaderHotReloading(Shader* shader)
         && shader->fragment != NULL_SHADER
         && shader->geometry != NULL_SHADER
     ) {
-        if (HasNewerWriteTime(shader, shader->vertex)
-            || HasNewerWriteTime(shader, shader->fragment)
-            || HasNewerWriteTime(shader, shader->geometry)
+        if (HasNewerWriteTime(&shader->vertexShaderFileTime, shader->vertexShaderFilePath)
+            || HasNewerWriteTime(&shader->fragmentShaderFileTime, shader->fragmentShaderFilePath)
+            || HasNewerWriteTime(&shader->geometryShaderFileTime, shader->geometryShaderFilePath)
         ) {
             shader->ReCompileShader();
         }
     }
     else if (shader->compute != NULL_SHADER)
     {
-        if (HasNewerWriteTime(shader, shader->compute))
+        if (HasNewerWriteTime(&shader->computeShaderFileTime, shader->computeShaderFilePath))
         {
             shader->ReCompileShader();
         }
@@ -37,9 +37,20 @@ void ShaderHotReloading(Shader* shader)
 }
 
 bool HasNewerWriteTime(
-    Shader* shader
+    FileTime* lastFileTime
     , char* filePath
 ) {
-    FileTime lastFileTime = File::GetLastWriteTime(filePath);
-    return false;
+    bool bHasNewerFileWriteTime = false;
+
+    if (!lastFileTime) return bHasNewerFileWriteTime;
+    if (!filePath) return bHasNewerFileWriteTime;
+
+    FileTime newLastFileTime = File::GetLastWriteTime(filePath);
+
+    if (CompareFileTime(&newLastFileTime, lastFileTime) != 0)
+    {
+        bHasNewerFileWriteTime = true;
+    }
+    
+    return bHasNewerFileWriteTime;
 }

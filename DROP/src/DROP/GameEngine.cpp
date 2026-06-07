@@ -211,6 +211,13 @@ namespace Drop
 					, renderContext
 				);
 			}
+			else
+			{
+				Renderer::HotReloadingForAllShadersInMaterials(
+					sceneContext
+					, renderContext
+				);
+			}
 
 			m_Game->m_Camera.OnUpdate(m_DeltaTime);
 			m_Game->m_Camera.OnResize(m_ActiveWindowHandle->GetWidth(), m_ActiveWindowHandle->GetHeight());
