@@ -27,4 +27,8 @@ size_t ReadBinaryFile(
 	, void* outBuffer, size_t elementSize, size_t elementCount
 );
 
+FileTime GetLastWriteTime(
+	char* filePath
+);
+
 }

@@ -4,7 +4,7 @@ Shader class
 
 N.B. ) adaptation of https://github.com/JoeyDeVries/LearnOpenGL/blob/master/includes/learnopengl/shader.h
 
-author: Davide Gadia
+author: Davide Gadia, Andrea Passini
 
 Real-Time Graphics Programming - a.a. 2022/2023
 Master degree in Computer Science
@@ -152,6 +152,12 @@ public:
         // Step 4: we delete the shaders because they are linked to the Shader Program, and we do not need them anymore
         glDeleteShader(vertex);
         glDeleteShader(fragment);
+
+#ifdef DROP_DEBUG
+        // Update last write time
+
+#endif // DROP_DEBUG
+
     }
 
     void CompileShaders(
@@ -476,3 +482,5 @@ private:
 		}
 	}
 };
+
+void ShaderHotReloading(Shader* shader);
