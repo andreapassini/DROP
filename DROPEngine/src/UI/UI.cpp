@@ -105,5 +105,4 @@ void UI::UpdateAndRenderUI(
 		ImGui::RenderPlatformWindowsDefault();
 		glfwMakeContextCurrent(backup_current_context);
 	}
-
 }
