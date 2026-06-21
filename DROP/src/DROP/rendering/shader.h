@@ -30,6 +30,31 @@ using namespace std;
 #define MAX_SHADER_PATH 256
 #define NULL_SHADER UINT32_MAX
 
+class Shader;
+
+void ShaderHotReloading(Shader* shader);
+
+bool HasNewerWriteTime(
+    FileTime* lastFileTime
+    , char* filePath
+);
+
+void ReadIncludeFunctionFromFile(
+    std::string* shaderFunctionName
+    , std::string* outIncludeShaderFunctionCode
+    , GLchar* shaderPath
+    , size_t shaderPathSize
+);
+
+// The incuded shader functions must be in the same folder
+// It will call assert if the "includes" fails
+// OPTIMIZATION: Pre cache all the possible shader functions
+void ResolveShaderPreProcessorIncludes(
+    GLchar* shaderPath
+    , size_t shaderPathSize
+    , std::string* shaderCode
+);
+
 class Shader
 {
 public:
@@ -121,6 +146,18 @@ public:
             cout << e.what() << ", " << e.code().message() << e.code().value() << endl;
             cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
         }
+
+        // Precompile Includes
+        ResolveShaderPreProcessorIncludes(
+            vertexShaderFilePath
+            , vertexShaderFilePathSize
+            , &vertexCode
+        );
+        ResolveShaderPreProcessorIncludes(
+            fragmentShaderFilePath
+            , fragmentShaderFilePathSize
+            , &fragmentCode
+        );
 
         // Convert strings to char pointers
         const GLchar* vShaderCode = vertexCode.c_str();
@@ -226,11 +263,27 @@ public:
             cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
         }
 
+        // Precompile Includes
+        ResolveShaderPreProcessorIncludes(
+            vertexShaderFilePath
+            , vertexShaderFilePathSize
+            , &vertexCode
+        );
+        ResolveShaderPreProcessorIncludes(
+            geometryShaderFilePath
+            , geometryShaderFilePathSize
+            , &geometryCode
+        );
+        ResolveShaderPreProcessorIncludes(
+            fragmentShaderFilePath
+            , fragmentShaderFilePathSize
+            , &fragmentCode
+        );
+
         // Convert strings to char pointers
         const GLchar* vShaderCode = vertexCode.c_str();
         const GLchar* gShaderCode = geometryCode.c_str();
         const GLchar* fShaderCode = fragmentCode.c_str();
-
 
         // Step 2: we compile the shaders
         //GLuint vertex, geometry, fragment;
@@ -317,6 +370,13 @@ public:
             cout << e.what() << ", " << e.code().message() << e.code().value() << endl;
             cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl;
         }
+
+        // Precompile Includes
+        ResolveShaderPreProcessorIncludes(
+            computeShaderFilePath
+            , computeShaderFilePathSize
+            , &computeCode
+        );
 
         // Convert strings to char pointers
         const GLchar* cShaderCode = computeCode.c_str();
@@ -500,10 +560,3 @@ private:
 		}
 	}
 };
-
-void ShaderHotReloading(Shader* shader);
-
-bool HasNewerWriteTime(
-    FileTime* lastFileTime
-    , char* filePath
-);

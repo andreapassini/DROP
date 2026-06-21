@@ -27,6 +27,11 @@ size_t ReadBinaryFile(
 	, void* outBuffer, size_t elementSize, size_t elementCount
 );
 
+void ReadTextFile(
+	std::string* inFilePath
+	, std::string* outTextContent
+);
+
 FileTime GetLastWriteTime(
 	char* filePath
 );

@@ -1,17 +1,6 @@
-/*
-21_ggx_tex_shadow.vert: vertex shader for GGX illumination model, with shadow rendering using shadow map
-
-N.B.) the shader considers only a directional light (simpler to manage for the creation of the shadow map).
-For more lights, of different kind, the shader must be modified to consider each case
-
-author: Davide Gadia
-
-Real-Time Graphics Programming - a.a. 2022/2023
-Master degree in Computer Science
-Universita' degli Studi di Milano
-*/
-
 #version 430 core
+
+#include "SomeShaderFunction.fun"
 
 // vertex position in world coordinates
 layout (location = 0) in vec3 position;

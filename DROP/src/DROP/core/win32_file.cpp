@@ -5,6 +5,10 @@
 
 #include <cstdio>
 #include <cassert>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 #include "DROP/core/file.h"
 #include <string>
@@ -120,6 +124,40 @@ size_t File::ReadBinaryFile(
 	fclose(f);
 
 	return bytesRead;
+}
+
+void File::ReadTextFile(
+	std::string* inFilePath
+	, std::string* outTextContent
+) {
+	std::ifstream textFile;
+	textFile.open(*inFilePath);
+	if (!textFile.is_open())
+	{
+		std::cerr << "Error opening file: " << *inFilePath << std::endl;
+
+		// Check for specific error conditions
+		if (textFile.bad())
+		{
+			std::cerr << "Fatal error: badbit is set." << std::endl;
+		}
+
+		if (textFile.fail())
+		{
+			// Print a more detailed error message using
+			// strerror
+			std::cerr << "Error details: " << strerror(errno) << std::endl;
+		}
+
+		// Handle the error or exit the program
+		return;
+	}
+
+	std::stringstream textStream;
+	textStream << textFile.rdbuf();
+	textFile.close();
+	
+	*outTextContent = textStream.str();
 }
 
 FileTime File::GetLastWriteTime(char* filePath)
