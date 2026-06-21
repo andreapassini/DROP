@@ -44,6 +44,9 @@ void* TempGLFWReallocate(
     ArenaAllocator* arenaAllocator = (ArenaAllocator*)(user);
     assert(arenaAllocator);
 
+    // The fucking realloc should copy the old stuff
+    assert(0);
+
     return ArenaResize(
         arenaAllocator
         , block
