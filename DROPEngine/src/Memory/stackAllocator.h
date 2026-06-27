@@ -11,15 +11,15 @@
 
 struct StackAllocator
 {
-	unsigned char* buf = nullptr;
-	size_t buf_len = 0LL;
+	unsigned char* buffer = nullptr;
+	size_t bufferLenght = 0LL;
 	size_t offset = 0LL;
 };
 
 // We need a Fat Header for the REALLOC
 // -> Realloc: Resize the allocation and copy the data (beware of the size limit)
 // 
-// - Size of the allocation
+// - Size of the allocation to enforce FIFO free
 struct StackAllocatorHeader
 {
 	size_t allocationSize;
@@ -27,8 +27,8 @@ struct StackAllocatorHeader
 
 void StackInit(
 	StackAllocator* stackAllocator
-	, void* backningBuffer
-	, size_t backningBufferLength
+	, void* backBuffer
+	, size_t backBufferLength
 );
 
 // Returning the ptr to allocation after the header
@@ -40,7 +40,7 @@ void* StackAlloc(
 
 void StackFree(
 	StackAllocator* stackAllocator
-	, void* backningBuffer
+	, void* backBuffer
 );
 
 void* StackResize(
