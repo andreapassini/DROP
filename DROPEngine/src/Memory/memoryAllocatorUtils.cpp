@@ -1,5 +1,6 @@
 #include <cassert>
 #include "Types/Types.h"
+#include "memoryAllocatorUtils.h"
 
 #ifndef DEFAULT_ALIGNMENT
 #define DEFAULT_ALIGNMENT (2*sizeof(void *))
@@ -36,4 +37,49 @@ uintptr_t AlignForward(
 		p += a - modulo;
 	}
 	return p;
+}
+
+
+size_t CalulatePaddingWithHeader(
+	uintptr_t ptr
+	, size_t headerSize
+	, uintptr_t alignment /*= DEFAULT_ALIGNMENT*/
+) {
+	uintptr_t p, a, modulo, padding, needed_space;
+
+	assert(IsPowerOfTwo(alignment));
+
+	p = ptr;
+	a = alignment;
+	modulo = p & (a - 1); // (p % a) as it assumes alignment is a power of two
+
+	padding = 0;
+	needed_space = 0;
+
+	if (modulo != 0)
+	{ // Same logic as 'align_forward'
+		padding = a - modulo;
+	}
+
+	needed_space = (uintptr_t)headerSize;
+
+	// Header size is not contained in padding, calculate the size of header aligned
+	if (padding < needed_space)
+	{
+		needed_space -= padding;
+
+		if ((needed_space & (a - 1)) != 0) // assumes alignment is a power of two
+		{
+			padding += a * (1 + (needed_space / a));
+		}
+		else
+		{
+			padding += a * (needed_space / a);
+		}
+	}
+	// else
+	// If Header can be contained in-between ptr and padding to align forward
+	// we do not need to calculate the rest
+	
+	return (size_t)padding;
 }

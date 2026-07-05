@@ -21,3 +21,10 @@ uintptr_t AlignForward(
 	uintptr_t ptr
 	, size_t align
 );
+
+
+size_t CalulatePaddingWithHeader(
+	uintptr_t ptr
+	, size_t header_size
+	, uintptr_t alignment = DEFAULT_ALIGNMENT
+);

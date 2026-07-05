@@ -12,7 +12,7 @@
 struct StackAllocator
 {
 	unsigned char* buffer = nullptr;
-	size_t bufferLenght = 0LL;
+	size_t bufferLength = 0LL;
 	size_t offset = 0LL;
 };
 
@@ -22,7 +22,9 @@ struct StackAllocator
 // - Size of the allocation to enforce FIFO free
 struct StackAllocatorHeader
 {
-	size_t allocationSize;
+	// stackAllocator->offset + padding + size
+	size_t padding = 0LL; // maybe this can be calculated
+	size_t allocationSize = 0LL;
 };
 
 void StackInit(
@@ -40,17 +42,19 @@ void* StackAlloc(
 
 void StackFree(
 	StackAllocator* stackAllocator
-	, void* backBuffer
+	, void* ptr
 );
 
 void* StackResize(
 	StackAllocator* stackAllocator
-	, void* old_memor
-	, size_t old_size
-	, size_t new_size
+	, void* ptr
+	, void* old_memory
+	, size_t oldSize
+	, size_t newSize
 	, size_t align = DEFAULT_ALIGNMENT
 );
 
-void ArenaFreeAll(
+void StackFreeAll(
 	StackAllocator* stackAllocator
 );
+
