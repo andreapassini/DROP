@@ -151,7 +151,7 @@ void* StackRealloc(
 	StackAllocator* stackAllocator
 	, void* ptr
 	, size_t newSize
-	, size_t alignment = DEFAULT_ALIGNMENT
+	, size_t alignment /*= DEFAULT_ALIGNMENT*/
 ) {
 	// ensure allocation in stack allocator
 	if (!ptr)

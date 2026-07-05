@@ -9,7 +9,7 @@
 #include "GameEngine.h"
 #include "EngineState.h"
 #include "DROPGame.h"
-#include "Memory/arenaAllocator.h"
+#include "Memory/stackAllocator.h"
 
 #include "glfw/glfw3.h"
 
@@ -27,11 +27,11 @@ void* TempGLFWAllocate(
     size_t size
     , void* user
 ) {
-    ArenaAllocator* arenaAllocator = (ArenaAllocator*)(user);
-    assert(arenaAllocator);
+    StackAllocator* stackAllocator = (StackAllocator*)(user);
+    assert(stackAllocator);
 
-    return ArenaAlloc(
-        arenaAllocator
+    return StackAlloc(
+        stackAllocator
         , size
     );
 }
@@ -41,16 +41,16 @@ void* TempGLFWReallocate(
     , size_t size
     , void* user
 ) {
-    ArenaAllocator* arenaAllocator = (ArenaAllocator*)(user);
-    assert(arenaAllocator);
+    StackAllocator* stackAllocator = (StackAllocator*)(user);
+    assert(stackAllocator);
 
-    // The fucking realloc should copy the old stuff
-    assert(0);
-
-    return ArenaResize(
-        arenaAllocator
+    //  StackAllocator* stackAllocator
+    //  , void* ptr
+    //  , size_t newSize
+    //  , size_t alignment = DEFAULT_ALIGNMENT
+    return StackRealloc(
+        stackAllocator
         , block
-        , 0L // this will call an ArenaAlloc right away, not a big deal for now
         , size
     );
 }
@@ -59,11 +59,11 @@ void TempGLFWDeallocate(
     void* block
     , void* user
 ) {
-    ArenaAllocator* arenaAllocator = (ArenaAllocator*)(user);
-    assert(arenaAllocator);
+    StackAllocator* stackAllocator = (StackAllocator*)(user);
+    assert(stackAllocator);
 
-    return ArenaFree(
-        arenaAllocator
+    return StackFree(
+        stackAllocator
         , block
     );
 }
@@ -122,18 +122,18 @@ void StartEngine(
 
     uintptr_t persistentMemoryAfterGameState = engineStateUIntptr + sizeof(EngineState);
 
-    ArenaInit(
-        &engineState->persistentArenaAllocator
+    StackInit(
+        &engineState->persistentStackAllocator
         , (void*)persistentMemoryAfterGameState
         , engineMemory->persistentMemorysizeInBytes
     );
-    ArenaInit(
-        &engineState->sceneArenaAllocator
+    StackInit(
+        &engineState->sceneStackAllocator
         , engineMemory->sceneMemory
         , engineMemory->sceneMemorysizeInBytes
     );
-    ArenaInit(
-        &engineState->frameArenaAllocator
+    StackInit(
+        &engineState->frameStackAllocator
         , engineMemory->frameMemory
         , engineMemory->frameMemorySizeInBytes
     );
@@ -141,8 +141,8 @@ void StartEngine(
     // We need to allocate memory on the .exe (Platform Layer)
     // Allocate on PermanentStorage
     size_t WindowSize = sizeof(Drop::Window);
-    engineState->windowHandle = ArenaAlloc<Drop::Window>(
-        &engineState->persistentArenaAllocator
+    engineState->windowHandle = StackAlloc<Drop::Window>(
+        &engineState->persistentStackAllocator
         , WindowSize
     );
 
@@ -159,7 +159,7 @@ void StartEngine(
     currentAllocator.allocate = TempGLFWAllocate;
     currentAllocator.reallocate = TempGLFWReallocate;
     currentAllocator.deallocate = TempGLFWDeallocate;
-    currentAllocator.user = (void*)(&engineState->persistentArenaAllocator);
+    currentAllocator.user = (void*)(&engineState->persistentStackAllocator);
 
     InitWindow(
         windowProps
@@ -171,14 +171,14 @@ void StartEngine(
     // We need to allocate memory on the .exe (Platform Layer)
     // Allocate on PermanentStorage
     size_t UIByteSize = sizeof(UI::UIContext);
-    engineState->uiContext = ArenaAlloc<UI::UIContext>(
-        &engineState->persistentArenaAllocator
+    engineState->uiContext = StackAlloc<UI::UIContext>(
+        &engineState->persistentStackAllocator
         , UIByteSize
     );
 
     engineState->imGuiAllocator.allocFunc = TempGLFWAllocate;
     engineState->imGuiAllocator.freeFunc = TempGLFWDeallocate;
-    engineState->imGuiAllocator.userData = (void*)(&engineState->persistentArenaAllocator);
+    engineState->imGuiAllocator.userData = (void*)(&engineState->persistentStackAllocator);
     UI::InitUI(
         engineState->uiContext
         , &engineState->imGuiAllocator

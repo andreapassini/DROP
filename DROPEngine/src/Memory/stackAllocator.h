@@ -40,6 +40,48 @@ void* StackAlloc(
 	, size_t alignment = DEFAULT_ALIGNMENT
 );
 
+template <typename T>
+T* StackAlloc(
+	StackAllocator* stackAllocator
+	, size_t size
+	, size_t alignment = DEFAULT_ALIGNMENT
+) {
+	uintptr_t curr_addr, next_addr;
+	size_t padding;
+	StackAllocatorHeader* header;
+
+	assert(IsPowerOfTwo(alignment));
+
+	curr_addr = (uintptr_t)stackAllocator->buffer + (uintptr_t)stackAllocator->offset;
+
+	padding = CalulatePaddingWithHeader(
+		curr_addr
+		, (uintptr_t)alignment
+		, sizeof(StackAllocatorHeader)
+	);
+
+	if (stackAllocator->offset + padding + size > stackAllocator->bufferLength)
+	{
+		// Stack allocator is out of memory
+		return nullptr;
+	}
+	stackAllocator->offset += padding;
+
+	next_addr = curr_addr + (uintptr_t)padding;
+	header = (StackAllocatorHeader*)(next_addr - sizeof(StackAllocatorHeader));
+
+	header->padding = padding;
+	header->allocationSize = size;
+
+	stackAllocator->offset += size;
+
+	void* ptr = (void*)(next_addr);
+	memset(ptr, 0, size);
+
+	return new (ptr) T();
+};
+
+
 void StackFree(
 	StackAllocator* stackAllocator
 	, void* ptr
@@ -52,6 +94,13 @@ void* StackResize(
 	, size_t oldSize
 	, size_t newSize
 	, size_t align = DEFAULT_ALIGNMENT
+);
+
+void* StackRealloc(
+	StackAllocator* stackAllocator
+	, void* ptr
+	, size_t newSize
+	, size_t alignment = DEFAULT_ALIGNMENT
 );
 
 void StackFreeAll(
