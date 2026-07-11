@@ -24,8 +24,6 @@
 //    distribution.
 //
 //========================================================================
-// Please use C89 style variable declarations in this file because VS 2010
-//========================================================================
 
 #include "internal.h"
 
@@ -41,7 +39,7 @@
 
 // This contains all mutable state shared between compilation units of GLFW
 //
-_GLFWlibrary* _glfw;
+_GLFWlibrary _glfw = { GLFW_FALSE };
 
 // These are outside of _glfw so they can be used before initialization and
 // after termination without special handling when _glfw is cleared to zero
@@ -51,16 +49,22 @@ static GLFWerrorfun _glfwErrorCallback;
 static GLFWallocator _glfwInitAllocator;
 static _GLFWinitconfig _glfwInitHints =
 {
-    GLFW_TRUE,      // hat buttons
-    GLFW_ANGLE_PLATFORM_TYPE_NONE, // ANGLE backend
-    GLFW_ANY_PLATFORM, // preferred platform
-    NULL,           // vkGetInstanceProcAddr function
+    .hatButtons = GLFW_TRUE,
+    .angleType = GLFW_ANGLE_PLATFORM_TYPE_NONE,
+    .platformID = GLFW_ANY_PLATFORM,
+    .vulkanLoader = NULL,
+    .ns =
     {
-        GLFW_TRUE,  // macOS menu bar
-        GLFW_TRUE   // macOS bundle chdir
+        .menubar = GLFW_TRUE,
+        .chdir = GLFW_TRUE
     },
+    .x11 =
     {
-        GLFW_TRUE,  // X11 XCB Vulkan surface
+        .xcbVulkanSurface = GLFW_TRUE,
+    },
+    .wl =
+    {
+        .libdecorMode = GLFW_WAYLAND_PREFER_LIBDECOR
     },
 };
 
@@ -91,48 +95,48 @@ static void terminate(void)
 {
     int i;
 
-    memset(&_glfw->callbacks, 0, sizeof(_glfw->callbacks));
+    memset(&_glfw.callbacks, 0, sizeof(_glfw.callbacks));
 
-    while (_glfw->windowListHead)
-        glfwDestroyWindow((GLFWwindow*) _glfw->windowListHead);
+    while (_glfw.windowListHead)
+        glfwDestroyWindow((GLFWwindow*) _glfw.windowListHead);
 
-    while (_glfw->cursorListHead)
-        glfwDestroyCursor((GLFWcursor*) _glfw->cursorListHead);
+    while (_glfw.cursorListHead)
+        glfwDestroyCursor((GLFWcursor*) _glfw.cursorListHead);
 
-    for (i = 0;  i < _glfw->monitorCount;  i++)
+    for (i = 0;  i < _glfw.monitorCount;  i++)
     {
-        _GLFWmonitor* monitor = _glfw->monitors[i];
+        _GLFWmonitor* monitor = _glfw.monitors[i];
         if (monitor->originalRamp.size)
-            _glfw->platform.setGammaRamp(monitor, &monitor->originalRamp);
+            _glfw.platform.setGammaRamp(monitor, &monitor->originalRamp);
         _glfwFreeMonitor(monitor);
     }
 
-    _glfw_free(_glfw->monitors);
-    _glfw->monitors = NULL;
-    _glfw->monitorCount = 0;
+    _glfw_free(_glfw.monitors);
+    _glfw.monitors = NULL;
+    _glfw.monitorCount = 0;
 
-    _glfw_free(_glfw->mappings);
-    _glfw->mappings = NULL;
-    _glfw->mappingCount = 0;
+    _glfw_free(_glfw.mappings);
+    _glfw.mappings = NULL;
+    _glfw.mappingCount = 0;
 
     _glfwTerminateVulkan();
-    _glfw->platform.terminateJoysticks();
-    _glfw->platform.terminate();
+    _glfw.platform.terminateJoysticks();
+    _glfw.platform.terminate();
 
-    _glfw->initialized = GLFW_FALSE;
+    _glfw.initialized = GLFW_FALSE;
 
-    while (_glfw->errorListHead)
+    while (_glfw.errorListHead)
     {
-        _GLFWerror* error = _glfw->errorListHead;
-        _glfw->errorListHead = error->next;
+        _GLFWerror* error = _glfw.errorListHead;
+        _glfw.errorListHead = error->next;
         _glfw_free(error);
     }
 
-    _glfwPlatformDestroyTls(&_glfw->contextSlot);
-    _glfwPlatformDestroyTls(&_glfw->errorSlot);
-    _glfwPlatformDestroyMutex(&_glfw->errorLock);
+    _glfwPlatformDestroyTls(&_glfw.contextSlot);
+    _glfwPlatformDestroyTls(&_glfw.errorSlot);
+    _glfwPlatformDestroyMutex(&_glfw.errorLock);
 
-    memset(_glfw, 0, sizeof(_glfw));
+    memset(&_glfw, 0, sizeof(_glfw));
 }
 
 
@@ -171,6 +175,59 @@ size_t _glfwEncodeUTF8(char* s, uint32_t codepoint)
     return count;
 }
 
+// Splits and translates a text/uri-list into separate file paths
+// NOTE: This function destroys the provided string
+//
+char** _glfwParseUriList(char* text, int* count)
+{
+    const char* prefix = "file://";
+    char** paths = NULL;
+    char* line;
+
+    *count = 0;
+
+    while ((line = strtok(text, "\r\n")))
+    {
+        char* path;
+
+        text = NULL;
+
+        if (line[0] == '#')
+            continue;
+
+        if (strncmp(line, prefix, strlen(prefix)) == 0)
+        {
+            line += strlen(prefix);
+            // TODO: Validate hostname
+            while (*line != '/')
+                line++;
+        }
+
+        (*count)++;
+
+        path = _glfw_calloc(strlen(line) + 1, 1);
+        paths = _glfw_realloc(paths, *count * sizeof(char*));
+        paths[*count - 1] = path;
+
+        while (*line)
+        {
+            if (line[0] == '%' && line[1] && line[2])
+            {
+                const char digits[3] = { line[1], line[2], '\0' };
+                *path = (char) strtol(digits, NULL, 16);
+                line += 2;
+            }
+            else
+                *path = *line;
+
+            path++;
+            line++;
+        }
+    }
+
+    return paths;
+}
+
 char* _glfw_strdup(const char* source)
 {
     const size_t length = strlen(source);
@@ -179,28 +236,14 @@ char* _glfw_strdup(const char* source)
     return result;
 }
 
-float _glfw_fminf(float a, float b)
+int _glfw_min(int a, int b)
 {
-    if (a != a)
-        return b;
-    else if (b != b)
-        return a;
-    else if (a < b)
-        return a;
-    else
-        return b;
+    return a < b ? a : b;
 }
 
-float _glfw_fmaxf(float a, float b)
+int _glfw_max(int a, int b)
 {
-    if (a != a)
-        return b;
-    else if (b != b)
-        return a;
-    else if (a > b)
-        return a;
-    else
-        return b;
+    return a > b ? a : b;
 }
 
 void* _glfw_calloc(size_t count, size_t size)
@@ -215,7 +258,7 @@ void* _glfw_calloc(size_t count, size_t size)
             return NULL;
         }
 
-        block = _glfw->allocator.allocate(count * size, _glfw->allocator.user);
+        block = _glfw.allocator.allocate(count * size, _glfw.allocator.user);
         if (block)
             return memset(block, 0, count * size);
         else
@@ -232,7 +275,7 @@ void* _glfw_realloc(void* block, size_t size)
 {
     if (block && size)
     {
-        void* resized = _glfw->allocator.reallocate(block, size, _glfw->allocator.user);
+        void* resized = _glfw.allocator.reallocate(block, size, _glfw.allocator.user);
         if (resized)
             return resized;
         else
@@ -253,7 +296,7 @@ void* _glfw_realloc(void* block, size_t size)
 void _glfw_free(void* block)
 {
     if (block)
-        _glfw->allocator.deallocate(block, _glfw->allocator.user);
+        _glfw.allocator.deallocate(block, _glfw.allocator.user);
 }
 
 
@@ -312,17 +355,17 @@ void _glfwInputError(int code, const char* format, ...)
             strcpy(description, "ERROR: UNKNOWN GLFW ERROR");
     }
 
-    if (_glfw->initialized)
+    if (_glfw.initialized)
     {
-        error = _glfwPlatformGetTls(&_glfw->errorSlot);
+        error = _glfwPlatformGetTls(&_glfw.errorSlot);
         if (!error)
         {
             error = _glfw_calloc(1, sizeof(_GLFWerror));
-            _glfwPlatformSetTls(&_glfw->errorSlot, error);
-            _glfwPlatformLockMutex(&_glfw->errorLock);
-            error->next = _glfw->errorListHead;
-            _glfw->errorListHead = error;
-            _glfwPlatformUnlockMutex(&_glfw->errorLock);
+            _glfwPlatformSetTls(&_glfw.errorSlot, error);
+            _glfwPlatformLockMutex(&_glfw.errorLock);
+            error->next = _glfw.errorListHead;
+            _glfw.errorListHead = error;
+            _glfwPlatformUnlockMutex(&_glfw.errorLock);
         }
     }
     else
@@ -342,46 +385,45 @@ void _glfwInputError(int code, const char* format, ...)
 
 GLFWAPI int glfwInit(void)
 {
-    if (_glfw->initialized)
+    if (_glfw.initialized)
         return GLFW_TRUE;
 
-    // This now is dangerous, we need to take the pointer by itself and not the &to*
-    memset(_glfw, 0, sizeof(_glfw));
-    _glfw->hints.init = _glfwInitHints;
+    memset(&_glfw, 0, sizeof(_glfw));
+    _glfw.hints.init = _glfwInitHints;
 
-    _glfw->allocator = _glfwInitAllocator;
-    if (!_glfw->allocator.allocate)
+    _glfw.allocator = _glfwInitAllocator;
+    if (!_glfw.allocator.allocate)
     {
-        _glfw->allocator.allocate   = defaultAllocate;
-        _glfw->allocator.reallocate = defaultReallocate;
-        _glfw->allocator.deallocate = defaultDeallocate;
+        _glfw.allocator.allocate   = defaultAllocate;
+        _glfw.allocator.reallocate = defaultReallocate;
+        _glfw.allocator.deallocate = defaultDeallocate;
     }
 
-    if (!_glfwSelectPlatform(_glfw->hints.init.platformID, &_glfw->platform))
+    if (!_glfwSelectPlatform(_glfw.hints.init.platformID, &_glfw.platform))
         return GLFW_FALSE;
 
-    if (!_glfw->platform.init())
-    {
-        terminate();
-        return GLFW_FALSE;
-    }
-
-    if (!_glfwPlatformCreateMutex(&_glfw->errorLock) ||
-        !_glfwPlatformCreateTls(&_glfw->errorSlot) ||
-        !_glfwPlatformCreateTls(&_glfw->contextSlot))
+    if (!_glfw.platform.init())
     {
         terminate();
         return GLFW_FALSE;
     }
 
-    _glfwPlatformSetTls(&_glfw->errorSlot, &_glfwMainThreadError);
+    if (!_glfwPlatformCreateMutex(&_glfw.errorLock) ||
+        !_glfwPlatformCreateTls(&_glfw.errorSlot) ||
+        !_glfwPlatformCreateTls(&_glfw.contextSlot))
+    {
+        terminate();
+        return GLFW_FALSE;
+    }
+
+    _glfwPlatformSetTls(&_glfw.errorSlot, &_glfwMainThreadError);
 
     _glfwInitGamepadMappings();
 
     _glfwPlatformInitTimer();
-    _glfw->timer.offset = _glfwPlatformGetTimerValue();
+    _glfw.timer.offset = _glfwPlatformGetTimerValue();
 
-    _glfw->initialized = GLFW_TRUE;
+    _glfw.initialized = GLFW_TRUE;
 
     glfwDefaultWindowHints();
     return GLFW_TRUE;
@@ -389,7 +431,7 @@ GLFWAPI int glfwInit(void)
 
 GLFWAPI void glfwTerminate(void)
 {
-    if (!_glfw->initialized)
+    if (!_glfw.initialized)
         return;
 
     terminate();
@@ -417,6 +459,9 @@ GLFWAPI void glfwInitHint(int hint, int value)
         case GLFW_X11_XCB_VULKAN_SURFACE:
             _glfwInitHints.x11.xcbVulkanSurface = value;
             return;
+        case GLFW_WAYLAND_LIBDECOR:
+            _glfwInitHints.wl.libdecorMode = value;
+            return;
     }
 
     _glfwInputError(GLFW_INVALID_ENUM,
@@ -434,29 +479,6 @@ GLFWAPI void glfwInitAllocator(const GLFWallocator* allocator)
     }
     else
         memset(&_glfwInitAllocator, 0, sizeof(GLFWallocator));
-}
-
-GLFWAPI GLFWlibrary* glfwGetLib()
-{
-    return _glfw;
-}
-
-GLFWAPI size_t glfwGetLibSize()
-{
-    return sizeof(GLFWlibrary);
-}
-
-GLFWAPI void glfwSetLib(GLFWlibrary* inGlfwLib)
-{
-    if (!inGlfwLib) {
-        return;
-    }
-    _glfw = inGlfwLib;
-}
-
-GLFWAPI GLFWlibrary* glfwAllocateLib(const GLFWallocator* allocator)
-{
-    return allocator->allocate(sizeof(GLFWlibrary), allocator->user);
 }
 
 GLFWAPI void glfwInitVulkanLoader(PFN_vkGetInstanceProcAddr loader)
@@ -482,8 +504,8 @@ GLFWAPI int glfwGetError(const char** description)
     if (description)
         *description = NULL;
 
-    if (_glfw->initialized)
-        error = _glfwPlatformGetTls(&_glfw->errorSlot);
+    if (_glfw.initialized)
+        error = _glfwPlatformGetTls(&_glfw.errorSlot);
     else
         error = &_glfwMainThreadError;
 

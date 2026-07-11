@@ -147,14 +147,6 @@ void StartEngine(
     );
 
     WindowProps windowProps;
-    // glfw allocator
-    //typedef struct GLFWallocator
-    //{
-    //    GLFWallocatefun allocate;
-    //    GLFWreallocatefun reallocate;
-    //    GLFWdeallocatefun deallocate;
-    //    void* user;
-    //};
     GLFWallocator currentAllocator;
     currentAllocator.allocate = TempGLFWAllocate;
     currentAllocator.reallocate = TempGLFWReallocate;
@@ -167,23 +159,23 @@ void StartEngine(
         , &currentAllocator
     );
 
-    // ImGUI
-    // We need to allocate memory on the .exe (Platform Layer)
-    // Allocate on PermanentStorage
-    size_t UIByteSize = sizeof(UI::UIContext);
-    engineState->uiContext = StackAlloc<UI::UIContext>(
-        &engineState->persistentStackAllocator
-        , UIByteSize
-    );
+    //// ImGUI
+    //// We need to allocate memory on the .exe (Platform Layer)
+    //// Allocate on PermanentStorage
+    //size_t UIByteSize = sizeof(UI::UIContext);
+    //engineState->uiContext = StackAlloc<UI::UIContext>(
+    //    &engineState->persistentStackAllocator
+    //    , UIByteSize
+    //);
 
-    engineState->imGuiAllocator.allocFunc = TempGLFWAllocate;
-    engineState->imGuiAllocator.freeFunc = TempGLFWDeallocate;
-    engineState->imGuiAllocator.userData = (void*)(&engineState->persistentStackAllocator);
-    UI::InitUI(
-        engineState->uiContext
-        , &engineState->imGuiAllocator
-        , engineState->windowHandle
-    );
+    //engineState->imGuiAllocator.allocFunc = TempGLFWAllocate;
+    //engineState->imGuiAllocator.freeFunc = TempGLFWDeallocate;
+    //engineState->imGuiAllocator.userData = (void*)(&engineState->persistentStackAllocator);
+    //UI::InitUI(
+    //    engineState->uiContext
+    //    , &engineState->imGuiAllocator
+    //    , engineState->windowHandle
+    //);
 
     //engineState->windowHandle = Window::Create();
     //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
@@ -202,19 +194,19 @@ void UpdateEngine(
 
     // THIS SHOULD BE DONE ON REATTACH
     // Reattach GLFW
-    glfwSetLib(engineState->windowHandle->glfwLibrary);
-    std::cout << "engineState->windowHandle->glfwLibrary = " 
-        << (uintptr_t)engineState->windowHandle->glfwLibrary << std::endl;
-    glfwSetWindowUserPointer(
-        engineState->windowHandle->glfwWindow
-        , &engineState->windowHandle
-    );
-    // Reattach ImGui
-    UI::HotReloadContextReset(
-        engineState->uiContext
-        , &engineState->imGuiAllocator
-        , engineState->windowHandle
-    );
+    //glfwSetLib(engineState->windowHandle->glfwLibrary);
+    //std::cout << "engineState->windowHandle->glfwLibrary = " 
+    //    << (uintptr_t)engineState->windowHandle->glfwLibrary << std::endl;
+    //glfwSetWindowUserPointer(
+    //    engineState->windowHandle->glfwWindow
+    //    , &engineState->windowHandle
+    //);
+    //// Reattach ImGui
+    //UI::HotReloadContextReset(
+    //    engineState->uiContext
+    //    , &engineState->imGuiAllocator
+    //    , engineState->windowHandle
+    //);
     // -------------
 
     // Get time from glfwGetTime

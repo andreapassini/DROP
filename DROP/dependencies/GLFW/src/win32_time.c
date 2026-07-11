@@ -24,11 +24,10 @@
 //    distribution.
 //
 //========================================================================
-// Please use C89 style variable declarations in this file because VS 2010
-//========================================================================
 
 #include "internal.h"
 
+#if defined(GLFW_BUILD_WIN32_TIMER)
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW platform API                      //////
@@ -36,7 +35,7 @@
 
 void _glfwPlatformInitTimer(void)
 {
-    QueryPerformanceFrequency((LARGE_INTEGER*) &_glfw->timer.win32.frequency);
+    QueryPerformanceFrequency((LARGE_INTEGER*) &_glfw.timer.win32.frequency);
 }
 
 uint64_t _glfwPlatformGetTimerValue(void)
@@ -48,6 +47,8 @@ uint64_t _glfwPlatformGetTimerValue(void)
 
 uint64_t _glfwPlatformGetTimerFrequency(void)
 {
-    return _glfw->timer.win32.frequency;
+    return _glfw.timer.win32.frequency;
 }
+
+#endif // GLFW_BUILD_WIN32_TIMER
 

@@ -19,11 +19,11 @@
 		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwWindow"); \
 		return; \
 	} \
-	if(!window->glfwLibrary) \
-	{ \
-		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwLibrary"); \
-		return; \
-	} \
+	//if(!window->glfwLibrary) \
+	//{ \
+	//	LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwLibrary"); \
+	//	return; \
+	//} \
 
 #define CHECK_AND_RETURN_WINDOW(window, returnValue) \
 	if(!window) \
@@ -36,11 +36,11 @@
 		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwWindow"); \
 		return returnValue; \
 	} \
-	if(!window->glfwLibrary) \
-	{ \
-		LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwLibrary"); \
-		return returnValue; \
-	} \
+	//if(!window->glfwLibrary) \
+	//{ \
+	//	LOG_CORE_ERROR("Window Error: ({0})", "!window->glfwLibrary"); \
+	//	return returnValue; \
+	//} \
 
 using namespace Drop;
 
@@ -79,9 +79,9 @@ namespace Drop
 		// and !window->glfwWindow
 
 		// TODO: glfwTerminate on system shutdown
-		glfwInitAllocator(glfwAllocator); // THIS IS STILL USING A STRUCT and not a PTR
-		window->glfwLibrary = glfwAllocateLib(glfwAllocator);
-		glfwSetLib(window->glfwLibrary);
+		//glfwInitAllocator(glfwAllocator); // THIS IS STILL USING A STRUCT and not a PTR
+		//window->glfwLibrary = glfwAllocateLib(glfwAllocator);
+		//glfwSetLib(window->glfwLibrary);
 		
 		int32 success = glfwInit();
 		assert(success /*, "Could not intialize GLFW!"*/);
