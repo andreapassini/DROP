@@ -1,5 +1,5 @@
 project "ImGui"
-    kind "StaticLib"
+    kind "SharedLib"
     language "C++"
     
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -17,6 +17,12 @@ project "ImGui"
         "imstb_textedit.h",
         "imstb_truetype.h",
         "imgui_demo.cpp"
+    }
+
+    includedirs
+    {
+        "imgui/"
+        , "imgui/backends/"
     }
     
     filter "system:windows"
