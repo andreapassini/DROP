@@ -4,6 +4,7 @@ IncludeDir = {}
 IncludeDir["stb_image"] = "%{wks.location}/Drop/dependencies/stb_image/include"
 IncludeDir["yaml_cpp"] = "%{wks.location}/Drop/dependencies/yaml-cpp/include"
 IncludeDir["GLFW"] = "%{wks.location}/Drop/dependencies/GLFW/include"
+IncludeDir["GLFW_lib"] = "%{wks.location}/Drop/dependencies/GLFW/bin/Debug-windows-x86_64/GLFW"
 IncludeDir["glad"] = "%{wks.location}/Drop/dependencies/glad/include"
 IncludeDir["spdlog"] = "%{wks.location}/Drop/dependencies/spdlog/include"
 IncludeDir["ImGui"] = "%{wks.location}/Drop/dependencies/ImGui"

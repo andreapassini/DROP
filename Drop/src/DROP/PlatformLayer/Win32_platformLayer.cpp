@@ -6,6 +6,7 @@
 #include <stdlib.h>         // abort
 #include <iostream>
 #include <assert.h>
+#include "Shlwapi.h"
 
 // Platform includes
 #include "Win32_platformLayer.h"
@@ -17,6 +18,8 @@
 #include "Memory/memoryAllocator.h"
 #include "Strings/stringUtils.h"
 #include "Types/Types.h"
+
+#include "GLFW/glfw3.h"
 
 struct DropFileTime
 {
@@ -33,7 +36,9 @@ inline FILETIME Win32_GetLastWriteTime(
     {
         LastWriteTime = Data.ftLastWriteTime;
     }
-    
+
+    glfwInit();
+
     return(LastWriteTime);
 }
 
@@ -109,13 +114,17 @@ void Win32_LoadLibrary(
 
     InEngineFunctions.bIsValid = false;
 
+    bool bFileExist = PathFileExists(SourceDLLName);
+    assert(bFileExist);
+
     InEngineFunctions.DLLastWriteTime = Win32_GetLastWriteTime(SourceDLLName);
-    //CopyFile(T_ENGINE_DLL_NAME, T_ENGINE_DLL_TEMP_NAME, FALSE);
-    CopyFileA(SourceDLLName, TempDLLName, FALSE);
+    CopyFile(SourceDLLName, TempDLLName, FALSE);
+
+    bool bTempDllFileExist = PathFileExists(SourceDLLName);
+    assert(bTempDllFileExist);
 
     // Get a handle to the DLL module
-    //inHinstLib = LoadLibrary(T_ENGINE_DLL_NAME);
-    inHinstLib = LoadLibraryA(TempDLLName);
+    inHinstLib = LoadLibrary(TempDLLName);
 
     // If the handle is valid, try to get the function address.
 

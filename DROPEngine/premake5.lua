@@ -41,24 +41,10 @@ project "DropEngine"
       , "%{IncludeDir.yaml_cpp}"
    }
 
-   -- includedirs
-   -- {
-      -- "%{wks.location}/Drop/dependencies/spdlog/include"
-      -- , "%{wks.location}/Drop/src"
-      -- , "%{wks.location}/Drop/dependencies"
-
-      -- "%{IncludeDir.glad}"
-      -- , "%{IncludeDir.GLFW}"
-      -- , "%{IncludeDir.ImGui}"
-      -- , "%{IncludeDir.glm}"
-      -- , "%{IncludeDir.stb_image}"
-      -- , "%{IncludeDir.assimp}"
-      -- , "%{IncludeDir.yaml_cpp}"
-   -- }
-
    libdirs 
    { 
       "%{IncludeDir.assimp_lib}"
+      , "%{IncludeDir.GLFW_lib}"
    }
 
    links
@@ -93,7 +79,7 @@ project "DropEngine"
 
    filter "system:windows"
       systemversion "latest"
-      defines { "DROP_PLATFORM_WINDOWS" }
+      defines { "DROP_PLATFORM_WINDOWS", "GLFW_DLL" }
 
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }

@@ -1,11 +1,16 @@
 project "GLFW"
-	kind "StaticLib"
+	kind "SharedLib"
+	architecture "x86_64"
 	language "C"
 	staticruntime "off"
 	warnings "off"
 
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	-- targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	-- objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	targetdir ("%{wks.location}/bin/" .. outputdir .. "/Drop")
+   objdir ("%{wks.location}/bin-int/" .. outputdir .. "/Drop")
+
 
 	files
 	{
@@ -94,8 +99,9 @@ project "GLFW"
 
 		defines 
 		{ 
-			"_GLFW_WIN32",
-			"_CRT_SECURE_NO_WARNINGS"
+			"_GLFW_WIN32"
+			, "_CRT_SECURE_NO_WARNINGS"
+			, "_GLFW_BUILD_DLL"
 		}
 
 	filter "configurations:Debug"

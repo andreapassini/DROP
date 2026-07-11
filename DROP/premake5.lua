@@ -1,5 +1,6 @@
 project "Drop"
    kind "ConsoleApp"
+   architecture "x86_64"
    language "C++"
    cppdialect "C++17"
    staticruntime "off"
@@ -32,10 +33,12 @@ project "Drop"
       "src"
       , "%{wks.location}/DropEngine/src"
       , "%{wks.location}/DropGame/src"
+      , "%{IncludeDir.GLFW}"
    }
 
    libdirs 
    { 
+      "%{IncludeDir.GLFW_lib}"
    }
 
    links
@@ -45,12 +48,15 @@ project "Drop"
 
       -- Engine specific
       -- , "DropEngine" -- Do it your selfs for live coding
+
+      -- Libs
+      , "GLFW"
    }
 
 
    filter "system:windows"
       systemversion "latest"
-      defines { "DROP_PLATFORM_WINDOWS" }
+      defines { "DROP_PLATFORM_WINDOWS", "GLFW_DLL" }
       characterset ("ASCII")
 
 

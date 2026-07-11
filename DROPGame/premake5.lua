@@ -31,27 +31,21 @@ project "DropGame"
    {
       "src"
       , "%{wks.location}/DROPEngine/src"
+      , "%{IncludeDir.GLFW}"
    }
 
-   includedirs
+   libdirs
    {
-      -- "%{wks.location}/Drop/dependencies/spdlog/include"
-      -- , "%{wks.location}/Drop/src"
-      -- , "%{wks.location}/Drop/dependencies"
-
-      -- "%{IncludeDir.glad}"
-      -- , "%{IncludeDir.GLFW}"
-      -- , "%{IncludeDir.ImGui}"
-      -- , "%{IncludeDir.glm}"
-      -- , "%{IncludeDir.stb_image}"
-      -- , "%{IncludeDir.assimp}"
-      -- , "%{IncludeDir.yaml_cpp}"
+      "%{IncludeDir.GLFW_lib}"
    }
 
    links
    {
       -- Windows specific
       "shlwapi.lib"
+
+       -- Libs
+      , "GLFW"
    }
 
 
