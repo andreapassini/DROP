@@ -14,3 +14,4 @@
 bin-int/
 DROP/dependencies/assimp/libs/assimp-vc143-mt.lib
 dependencies/assimp/libs/assimp-vc143-mt.lib
+DROP/dependencies/GLFW/glfw-3.4.bin.WIN64.zip
