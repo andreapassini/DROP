@@ -47,7 +47,7 @@ struct GameProcAdresses;
 struct DropPlatformCalls;
 struct EngineMemory;
 
-typedef void(DLLFUN* START_ENGINE)(DropPlatformCalls*, EngineMemory*);
+typedef void(DLLFUN* START_ENGINE)(DropPlatformCalls*, EngineMemory*, void*);
 typedef void(DLLFUN* UPDATE_ENGINE)(DropPlatformCalls*, EngineMemory*, GameProcAdresses*);
 
 struct DropPlatformCalls
@@ -100,11 +100,13 @@ extern "C" {
 	void DLLEXPORT StartEngine(
 		DropPlatformCalls* platformCalls
 		, EngineMemory* engineMemory
+		, void* windowPtr
 	);
 	// Stub
 	void StartEngineStub(
 		DropPlatformCalls* platformCalls
 		, EngineMemory* engineMemory
+		, void* windowPtr
 	) {};
 
 	void DLLEXPORT UpdateEngine( // Get the DeltaTime from glfwGetTime

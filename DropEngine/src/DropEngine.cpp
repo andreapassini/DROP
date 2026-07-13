@@ -11,7 +11,9 @@
 #include "DROPGame.h"
 #include "Memory/stackAllocator.h"
 
+#include "GLAD/glad.h"
 #include "glfw/glfw3.h"
+#include "glm/glm.hpp"
 
 using namespace Drop;
 
@@ -72,6 +74,7 @@ void TempGLFWDeallocate(
 void StartEngine(
     DropPlatformCalls* platformCalls
     , EngineMemory* engineMemory
+    , void* windowPtr
 ) {
     Drop::Log::Init();
     LOG_CORE_WARN("Initialized Log!");
@@ -153,6 +156,7 @@ void StartEngine(
     currentAllocator.deallocate = TempGLFWDeallocate;
     currentAllocator.user = (void*)(&engineState->persistentStackAllocator);
 
+    engineState->windowHandle->glfwWindow = (GLFWwindow*)windowPtr;
     InitWindow(
         windowProps
         , engineState->windowHandle
@@ -179,6 +183,61 @@ void StartEngine(
 
     //engineState->windowHandle = Window::Create();
     //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
+
+    enum EClockWise
+    {
+        COUNTER_CLOCKWISE
+        , CLOCKWISE
+    };
+
+
+    // we enable Z test
+    glEnable(GL_DEPTH_TEST);
+
+    // Backface culling
+    if (true)
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        switch (EClockWise::CLOCKWISE)
+        {
+        case EClockWise::CLOCKWISE:
+            glFrontFace(GL_CW);
+            break;
+        case EClockWise::COUNTER_CLOCKWISE:
+            glFrontFace(GL_CCW);
+            break;
+        default:
+            glFrontFace(GL_CCW);
+            break;
+        }
+    }
+
+    constexpr glm::vec3 COLOR_OIL_BLUE = glm::vec3(
+        21.0f / 255.0f,
+        45.0f / 255.0f,
+        50.0f / 255.0f);
+    constexpr glm::vec3 DEFAULT_CLEAR_COLOR = COLOR_OIL_BLUE;
+    //the "clear" color for the frame buffer
+    //glClearColor(DEFAULT_CLEAR_COLOR.r, DEFAULT_CLEAR_COLOR.g, DEFAULT_CLEAR_COLOR.b, 1.0f);
+    glClearColor(DEFAULT_CLEAR_COLOR.r, DEFAULT_CLEAR_COLOR.g, DEFAULT_CLEAR_COLOR.b, 0.5f);
+
+    GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    //// we bind the depth map FBO
+    //glBindFramebuffer(GL_FRAMEBUFFER, rendererContext.depthMapFBO);
+    //glFramebufferTexture2D(
+    //    GL_FRAMEBUFFER
+    //    , GL_DEPTH_ATTACHMENT
+    //    , GL_TEXTURE_2D
+    //    , rendererContext.depthMap
+    //    , 0);
+    // we set that we are not calculating nor saving color data
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void UpdateEngine(
@@ -212,6 +271,8 @@ void UpdateEngine(
     // Get time from glfwGetTime
     const float deltaTime = (float)glfwGetTime();
     std::cout << "Time: " << deltaTime << std::endl;
+
+    OnUpdate(engineState->windowHandle);
 
     if (gameCalls->UpdateGame)
     {

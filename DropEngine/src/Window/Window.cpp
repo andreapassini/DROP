@@ -83,34 +83,34 @@ namespace Drop
 		//window->glfwLibrary = glfwAllocateLib(glfwAllocator);
 		//glfwSetLib(window->glfwLibrary);
 		
-		int32 success = glfwInit();
-		assert(success /*, "Could not intialize GLFW!"*/);
-		glfwSetErrorCallback(GLFWErrorCallback);
+		//int32 success = glfwInit();
+		//assert(success /*, "Could not intialize GLFW!"*/);
+		//glfwSetErrorCallback(GLFWErrorCallback);
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-		// we set if the window is resizable
-		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
+		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+		//// we set if the window is resizable
+		//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);   // If u want to resize it, u have to change also the camera
 
-		window->glfwWindow = glfwCreateWindow(
-			window->width
-			, window->height
-			, window->title.c_str()
-			, nullptr
-			, nullptr
-		);
+		//window->glfwWindow = glfwCreateWindow(
+		//	window->width
+		//	, window->height
+		//	, window->title.c_str()
+		//	, nullptr
+		//	, nullptr
+		//);
 
-		// Consider making Context Graphics Lib independent
-		if (!window->glfwWindow)
-		{
-			assert(false/*, "Failed to create GLFW window"*/);
-			glfwTerminate();
-			return;
-		}
+		//// Consider making Context Graphics Lib independent
+		//if (!window->glfwWindow)
+		//{
+		//	assert(false/*, "Failed to create GLFW window"*/);
+		//	glfwTerminate();
+		//	return;
+		//}
 
-		glfwMakeContextCurrent(window->glfwWindow);
+		//glfwMakeContextCurrent(window->glfwWindow);
 		int32 status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		assert(status/*, "Failed to initialize Glad!"*/);
 

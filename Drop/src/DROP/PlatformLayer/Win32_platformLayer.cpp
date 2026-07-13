@@ -19,6 +19,7 @@
 #include "Strings/stringUtils.h"
 #include "Types/Types.h"
 
+#include "GLAD/glad.h"
 #include "GLFW/glfw3.h"
 
 struct DropFileTime
@@ -36,8 +37,6 @@ inline FILETIME Win32_GetLastWriteTime(
     {
         LastWriteTime = Data.ftLastWriteTime;
     }
-
-    glfwInit();
 
     return(LastWriteTime);
 }
@@ -308,6 +307,13 @@ bool bUpdatedGameDLLCheck = false;
 #endif
 #endif
 
+GLFWwindow* glfwWindow = nullptr;
+
+static void GLFWErrorCallback(int32 error, const char* description)
+{
+    std::cout << "GLFW Error " << error << ": " << description << std::endl;
+}
+
 namespace Drop 
 {
 
@@ -382,9 +388,40 @@ int Main(int argc, char** argv)
 
     EngineMemory engineMemory;
 
+    // Init Window
+    int32 success = glfwInit();
+    assert(success /*, "Could not intialize GLFW!"*/);
+    glfwSetErrorCallback(GLFWErrorCallback);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // we set if the window is resizable
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);   // If u want to resize it, u have to change also the camera
+
+    glfwWindow = glfwCreateWindow(
+        1600
+        , 900
+        , "DROP FROM PLATFORM"
+        , nullptr
+        , nullptr
+    );
+
+    // Consider making Context Graphics Lib independent
+    if (!glfwWindow)
+    {
+        assert(false/*, "Failed to create GLFW window"*/);
+        glfwTerminate();
+    }
+
+    glfwMakeContextCurrent(glfwWindow);
+
+    // END: Init Window
+
     engineDLL.procAdresses.StartEngine(
         &platformCalls
         , &engineMemory // this will be initialized by the Engine
+        , glfwWindow
     );
 
     gameDLL.procAdresses.StartGame();
