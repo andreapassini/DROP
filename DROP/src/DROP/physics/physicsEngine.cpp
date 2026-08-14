@@ -28,7 +28,8 @@ void PhysicsEngine::PhysicsStep()
 
 	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
 	
-	ApplyForces();
+	//ApplyForces();
+	SIMD_ApplyForces();
 
 	// Handle constraints
 	ApplyConstraints();
@@ -52,6 +53,18 @@ void PhysicsEngine::ApplyForces()
 
 	for (auto& handle : futures) {
 		handle.wait();
+	}
+}
+
+void PhysicsEngine::SIMD_ApplyForces()
+{
+#define NUM 123'000'0
+
+	//#pragma omp simd
+	for (int32_t i = 0; i < NUM; i++)
+	{
+		i += 1;
+		i -= 1;
 	}
 }
 

@@ -16,7 +16,7 @@ public:
 	bool m_IsStatic;
 
 	static constexpr float DAMPING = 0.01f; // how much to damp the simulation each frame
-	static constexpr float FIXED_TIME_STEP = (1.0f / 30.0f);
+	static constexpr float FIXED_TIME_STEP = (1.0f / 120.0f);
 	static constexpr float FIXED_TIME_STEP2 = (FIXED_TIME_STEP * FIXED_TIME_STEP);
 
 };

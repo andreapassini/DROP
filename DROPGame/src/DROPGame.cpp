@@ -405,6 +405,8 @@ public:
             );
         }
         
+        SceneContext& sceneContext = gameEngine->g_activeScene->ecs.GetSingletonComponent<SceneContext>();
+
         ImGui::Begin("Drop Scene");
         ImGui::Separator();
 
@@ -417,6 +419,8 @@ public:
             VgMath::Vector3 targetPosition = currentTargetTransformComponent->localTransform.translate;
             ImGui::Text("Sphere pos: \n\t%.3f, \n\t%.3f, \n\t%.3f", targetPosition.x, targetPosition.y, targetPosition.z);
         }
+
+        ImGui::Text("Physics step duration: %f ms", sceneContext.physicsStepDuration);
             
 		ImGui::End();
 

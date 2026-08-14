@@ -34,6 +34,7 @@ public:
 
 private:
 	void ApplyForces();
+	void SIMD_ApplyForces();
 	void ApplyConstraints();
 	void HandleCollision();
 	static void ApplyForceToSinglePhysicsObject(PhysicsObject* const physicsObject);

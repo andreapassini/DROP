@@ -92,6 +92,14 @@ namespace Drop
 
 		LOG_CORE_INFO("Drop Engine starting");
 
+		// SIMD
+#ifdef __AVX2__
+		std::cout << "AVX2 supported!\n";
+#else
+		std::cout << "AVX2 not supported.\n";
+#endif
+
+
 		// to be removed
 		m_ActiveWindowHandle = std::unique_ptr<Window>(Window::Create());
 		Input::m_ActiveWindowHandle = (GLFWwindow*)m_ActiveWindowHandle->GetNativeWindow();
@@ -100,9 +108,12 @@ namespace Drop
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.IniFilename = "imgui.ini";
+		ImGui::LoadIniSettingsFromDisk(ImGui::GetIO().IniFilename);
+
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+		//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
@@ -241,7 +252,15 @@ namespace Drop
 
 				m_Game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
 
+				// Calculate times
+				// Start Time
+				float startTime = GetTime();
+
 				m_PhysicsEngine.PhysicsStep();
+
+				float endTime = GetTime();
+				sceneContext.physicsStepDuration = endTime - startTime;
+				sceneContext.physicsStepDuration *= 1000.0f; // to ms
 
 				if (!m_PauseParticleUpdate) {
 					ParticleSystem::UpdatePB(g_activeScene->ecs, m_DeltaTime);

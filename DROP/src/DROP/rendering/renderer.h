@@ -80,6 +80,8 @@ namespace Drop
         bool vSync = false;
 
         float time = 0.0f;
+
+        float physicsStepDuration = 0.0f;
     };
 
     struct RendererContext {
