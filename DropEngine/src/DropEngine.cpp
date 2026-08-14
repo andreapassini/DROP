@@ -163,23 +163,23 @@ void StartEngine(
         , &currentAllocator
     );
 
-    //// ImGUI
-    //// We need to allocate memory on the .exe (Platform Layer)
-    //// Allocate on PermanentStorage
-    //size_t UIByteSize = sizeof(UI::UIContext);
-    //engineState->uiContext = StackAlloc<UI::UIContext>(
-    //    &engineState->persistentStackAllocator
-    //    , UIByteSize
-    //);
+    // ImGUI
+    // We need to allocate memory on the .exe (Platform Layer)
+    // Allocate on PermanentStorage
+    size_t UIByteSize = sizeof(UI::UIContext);
+    engineState->uiContext = StackAlloc<UI::UIContext>(
+        &engineState->persistentStackAllocator
+        , UIByteSize
+    );
 
-    //engineState->imGuiAllocator.allocFunc = TempGLFWAllocate;
-    //engineState->imGuiAllocator.freeFunc = TempGLFWDeallocate;
-    //engineState->imGuiAllocator.userData = (void*)(&engineState->persistentStackAllocator);
-    //UI::InitUI(
-    //    engineState->uiContext
-    //    , &engineState->imGuiAllocator
-    //    , engineState->windowHandle
-    //);
+    engineState->imGuiAllocator.allocFunc = TempGLFWAllocate;
+    engineState->imGuiAllocator.freeFunc = TempGLFWDeallocate;
+    engineState->imGuiAllocator.userData = (void*)(&engineState->persistentStackAllocator);
+    UI::InitUI(
+        engineState->uiContext
+        , &engineState->imGuiAllocator
+        , engineState->windowHandle
+    );
 
     //engineState->windowHandle = Window::Create();
     //Input::m_WindowHandle = (GLFWwindow*)m_WindowHandle->GetNativeWindow();
@@ -260,12 +260,12 @@ void UpdateEngine(
     //    engineState->windowHandle->glfwWindow
     //    , &engineState->windowHandle
     //);
-    //// Reattach ImGui
-    //UI::HotReloadContextReset(
-    //    engineState->uiContext
-    //    , &engineState->imGuiAllocator
-    //    , engineState->windowHandle
-    //);
+    // Reattach ImGui
+    UI::HotReloadContextReset(
+        engineState->uiContext
+        , &engineState->imGuiAllocator
+        , engineState->windowHandle
+    );
     // -------------
 
     // Get time from glfwGetTime
@@ -283,8 +283,12 @@ void UpdateEngine(
         );
     }
 
+    UI::UpdateUI Update;
     // Render UI
-
+    UI::UpdateAndRenderUI(
+        &Update
+        , engineState->windowHandle
+    );
 
     // Swap buffers
     OnEndFrame(engineState->windowHandle);

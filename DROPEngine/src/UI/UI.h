@@ -35,6 +35,8 @@ void HotReloadContextReset(
 	, Drop::Window* window
 );
 
+void StubUpdate();
+
 void UpdateAndRenderUI(
 	UpdateUI* updateUIfunc
 	, Drop::Window* window

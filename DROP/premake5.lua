@@ -34,6 +34,7 @@ project "Drop"
       , "%{wks.location}/DropEngine/src"
       , "%{wks.location}/DropGame/src"
       , "%{IncludeDir.GLFW}"
+      , "%{IncludeDir.glad}"
    }
 
    libdirs 
@@ -51,6 +52,7 @@ project "Drop"
 
       -- Libs
       , "GLFW"
+      , "glad"
    }
 
 
