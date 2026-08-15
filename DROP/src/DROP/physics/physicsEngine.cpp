@@ -2,6 +2,10 @@
 
 #include <future> 
 
+#include "physicsComponent.h"
+#include <valarray>
+#include <xmmintrin.h>
+
 void PhysicsEngine::ApplyForceToSinglePhysicsObject(PhysicsObject* const physicsObject) {
 	physicsObject->PhysicsStep();
 }
@@ -21,7 +25,7 @@ void PhysicsEngine::SynchVirtualTime(double timeToSync) {
 	m_VirtualTime = timeToSync;
 }
 
-void PhysicsEngine::PhysicsStep()
+void PhysicsEngine::SIMD_PhysicsStep(ECS& ecs)
 {
 	if (m_IsPaused)
 		return;
@@ -29,24 +33,61 @@ void PhysicsEngine::PhysicsStep()
 	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
 	
 	//ApplyForces();
-	SIMD_ApplyForces();
+	SIMD_ApplyForces(ecs);
 
-	// Handle constraints
-	ApplyConstraints();
+	//// Handle constraints
+	//ApplyConstraints();
 
-	// Handle collisions
-	HandleCollision();
+	//// Handle collisions
+	//HandleCollision();
 }
 
-void PhysicsEngine::ApplyForces()
+void PhysicsEngine::PhysicsStep(ECS& ecs)
+{
+	if (m_IsPaused)
+		return;
+
+	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
+	
+	ApplyForces(ecs);
+
+	//// Handle constraints
+	//ApplyConstraints();
+
+	//// Handle collisions
+	//HandleCollision();
+}
+
+void VerletResolution(
+	PhysicsComponent* physicsComponent
+	, size_t offset
+	, size_t numOfElements
+	, size_t max
+) {
+#pragma omp simd
+	for (size_t i = offset; i < numOfElements && i < max; i++)
+	{
+		physicsComponent[i].force.x *= 10.0f;
+	}
+}
+
+void PhysicsEngine::ApplyForces(ECS& ecs)
 {
 	std::vector<std::future<void>> futures;
 
-	for (auto& it : m_PhysicsObjetcs) {
+	std::vector<PhysicsComponent> densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
+
+	size_t numElementsPerThread = 1'000;
+	size_t max = densePhysicsComponents.size();
+	for (size_t i = 0; i < densePhysicsComponents.size(); i+= numElementsPerThread) {
+		size_t offset = i * numElementsPerThread;
 		futures.push_back(
 			std::async(std::launch::async,
-				ApplyForceToSinglePhysicsObject,
-				&it.second
+				VerletResolution
+				, &densePhysicsComponents[i]
+				, offset
+				, numElementsPerThread
+				, max
 			)
 		);
 	}
@@ -54,17 +95,77 @@ void PhysicsEngine::ApplyForces()
 	for (auto& handle : futures) {
 		handle.wait();
 	}
+
+//
+////#pragma omp simd
+//	for (size_t i = 0; i < densePhysicsComponents.size(); i++)
+//	{
+//		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
+//
+//		// SIMD TEST
+//		currentPhysicsComp.force.x *= 10.0f;
+//		//
+//
+//		//if (currentPhysicsComp.isStatic)
+//		//{
+//		//	currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
+//		//	return;
+//		//}
+//
+//		//// assuming to always add gravity
+//		//currentPhysicsComp.force = VgMath::Vector3(0.0, -9.8, 0.0);
+//
+//		//VgMath::Vector3 tempPos = currentPhysicsComp.position;
+//		//VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
+//		//currentPhysicsComp.position = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position) 
+//		//	- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition) + (accel * currentPhysicsComp.FIXED_TIME_STEP2);
+//		//currentPhysicsComp.oldPosition = tempPos;
+//
+//		//// impulse only in one frame
+//		//currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
+//	}
 }
 
-void PhysicsEngine::SIMD_ApplyForces()
+void PhysicsEngine::SIMD_ApplyForces(ECS& ecs)
 {
-#define NUM 123'000'0
+	std::vector<PhysicsComponent> densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
-	//#pragma omp simd
-	for (int32_t i = 0; i < NUM; i++)
+	size_t n = densePhysicsComponents.size();
+
+	//for (size_t i = 0; i < n; i += 8)
+	//{  // Process 8 floats at a time
+	//	__m256 va = _mm256_loadu_ps(&a[i]);  // Load 8 floats
+	//	__m256 vb = _mm256_loadu_ps(&b[i]);
+	//	__m256 vr = _mm256_add_ps(va, 6);   // Vectorized addition
+	//	_mm256_storeu_ps(&result[i], vr);    // Store result
+	//}
+
+	#pragma omp simd
+	for (size_t i = 0; i < densePhysicsComponents.size(); i++)
 	{
-		i += 1;
-		i -= 1;
+		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
+
+		// SIMD TEST
+		currentPhysicsComp.force.x *= 10.0f;
+		//
+
+		//if (currentPhysicsComp.isStatic)
+		//{
+		//	currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
+		//	return;
+		//}
+
+		//// assuming to always add gravity
+		//currentPhysicsComp.force = VgMath::Vector3(0.0, -9.8, 0.0);
+
+		//VgMath::Vector3 tempPos = currentPhysicsComp.position;
+		//VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
+		//currentPhysicsComp.position = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position) 
+		//	- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition) + (accel * currentPhysicsComp.FIXED_TIME_STEP2);
+		//currentPhysicsComp.oldPosition = tempPos;
+
+		//// impulse only in one frame
+		//currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
 	}
 }
 

@@ -43,7 +43,7 @@ namespace bseecs {
 	// Set this to NULL_ENTITY if you want no limit.
 	// Once limit is hit, an assert will fire and
 	// the program will terminate.
-	constexpr size_t MAX_ENTITIES = 1'000'000;
+	constexpr size_t MAX_ENTITIES = 1'000'100;
 
 	// Should be a multiple of 32 (4 bytes), since
 	// bitset overallocates by 4 bytes each time.

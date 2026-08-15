@@ -256,11 +256,22 @@ namespace Drop
 				// Start Time
 				float startTime = GetTime();
 
-				m_PhysicsEngine.PhysicsStep();
+				m_PhysicsEngine.PhysicsStep(g_activeScene->ecs);
 
 				float endTime = GetTime();
 				sceneContext.physicsStepDuration = endTime - startTime;
 				sceneContext.physicsStepDuration *= 1000.0f; // to ms
+
+				// SIMD
+				// Calculate times
+				// Start Time
+				startTime = GetTime();
+
+				m_PhysicsEngine.SIMD_PhysicsStep(g_activeScene->ecs);
+
+				endTime = GetTime();
+				sceneContext.SIMD_physicsStepDuration = endTime - startTime;
+				sceneContext.SIMD_physicsStepDuration *= 1000.0f; // to ms
 
 				if (!m_PauseParticleUpdate) {
 					ParticleSystem::UpdatePB(g_activeScene->ecs, m_DeltaTime);

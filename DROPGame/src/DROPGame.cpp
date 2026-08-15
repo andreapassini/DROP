@@ -13,6 +13,7 @@
 #include "DROP/terrain/terrainComponent.h"
 #include "DROP/terrain/terrainSystem.h"
 #include "DROP/terrain/terrainTargetComponent.h"
+#include "DROP/physics/physicsComponent.h"
 
 #define UV_GRID_SIM_DIFFUSE_MAP 0
 #define CRACKED_SOIL_DIFFUSE_MAP 1
@@ -170,6 +171,9 @@ public:
 
         gameEngine->g_activeScene->ecs.RegisterComponent<ParticleEmitter, TransformComponent>();
         gameEngine->g_activeScene->ecs.RegisterComponent<PBParticleEmitter, TransformComponent>();
+
+        //gameEngine->g_activeScene->ecs.RegisterComponent<PhysicsComponent, TransformComponent>();
+        gameEngine->g_activeScene->ecs.RegisterComponent<PhysicsComponent>();
 
         //gameEngine->g_activeScene->ecs.RegisterComponent<Billboard, Transform>();
         //gameEngine->g_activeScene->ecs.RegisterComponent<PhysicsObject>();
@@ -345,6 +349,29 @@ public:
             , currScene
         );
 
+        // Add physics entities
+#define NUM_PHYSICS_ENTITITES 100'000
+#define X_MIN_LIMIT -25.0f
+#define X_MAX_LIMIT 25.0f
+#define Y_MIN_LIMIT 0.0f
+#define Y_MAX_LIMIT 25.0f
+#define Z_MIN_LIMIT -25.0f
+#define Z_MAX_LIMIT 25.0f
+#define MIN_MASS 5.0f
+#define MAX_MASS 25.0f
+        for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
+        {
+            EntityID currentEntityID = currScene->ecs.CreateEntity();
+            PhysicsComponent& physicsComponent = currScene->ecs.Add<PhysicsComponent>(currentEntityID);
+            physicsComponent.mass = MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS));
+            physicsComponent.oldPosition.x = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
+            physicsComponent.oldPosition.y = Y_MIN_LIMIT + (RandomBetween0and1() * (Y_MAX_LIMIT - Y_MIN_LIMIT));
+            physicsComponent.oldPosition.z = Z_MIN_LIMIT + (RandomBetween0and1() * (Z_MAX_LIMIT - Z_MIN_LIMIT));
+            physicsComponent.position = physicsComponent.oldPosition;
+            physicsComponent.isStatic = false;
+            physicsComponent.force = 0.0f;
+        }
+
         SceneGraph::CalculateWorldTransforms(gameEngine->g_activeScene->ecs);
 
 //      // #TODO Add line component
@@ -421,6 +448,7 @@ public:
         }
 
         ImGui::Text("Physics step duration: %f ms", sceneContext.physicsStepDuration);
+        ImGui::Text("SIMD Physics step duration: %f ms", sceneContext.SIMD_physicsStepDuration);
             
 		ImGui::End();
 

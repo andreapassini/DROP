@@ -90,11 +90,12 @@ project "Drop"
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }
       runtime "Debug"
-      optimize "Off"
+      optimize "On"
       symbols "On"
 		-- buildoptions "/MDd"
       -- buildoptions "/MD"
       buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions "/MT"   
 
    filter "configurations:Release"
       defines { "DROP_RELEASE" }
@@ -103,6 +104,7 @@ project "Drop"
       symbols "On"
       -- buildoptions "/MD"
       buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions "/MT"
 
    filter "configurations:Dist"
       defines { "DROP_DIST" }
@@ -111,3 +113,4 @@ project "Drop"
       symbols "Off"
       -- buildoptions "/MD"
       buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions "/MT"

@@ -8,12 +8,17 @@
 #include "constraint.h"
 #include "collider.h"
 
+#include "DROP/ECS/beecs.h"
+
+using namespace bseecs;
+
 class PhysicsEngine
 {
 public:
 	PhysicsEngine(double startingTime, uint32_t reserve_val);
 
-	void PhysicsStep();
+	void PhysicsStep(ECS& ecs);
+	void SIMD_PhysicsStep(ECS& ecs);
 
 	void SynchVirtualTime(double timeToSync);
 
@@ -33,8 +38,8 @@ public:
 	static constexpr uint32_t maxIter = 15;
 
 private:
-	void ApplyForces();
-	void SIMD_ApplyForces();
+	void ApplyForces(ECS& ecs);
+	void SIMD_ApplyForces(ECS& ecs);
 	void ApplyConstraints();
 	void HandleCollision();
 	static void ApplyForceToSinglePhysicsObject(PhysicsObject* const physicsObject);
