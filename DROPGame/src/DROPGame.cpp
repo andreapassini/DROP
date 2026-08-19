@@ -344,10 +344,10 @@ public:
         currScene->sceneName = "FirstScene";
 
         std::string scenePath = GetRelativeProjectPathWithMarker() + "\\serializedScenes\\" + currScene->sceneName + ".drop";
-        SceneSerializer::DeserializeSceneFromText(
-            scenePath
-            , currScene
-        );
+        //SceneSerializer::DeserializeSceneFromText(
+        //    scenePath
+        //    , currScene
+        //);
 
         // Add physics entities
 #define NUM_PHYSICS_ENTITITES 100'000
@@ -359,6 +359,8 @@ public:
 #define Z_MAX_LIMIT 25.0f
 #define MIN_MASS 5.0f
 #define MAX_MASS 25.0f
+        SceneContext& sceneContext = currScene->ecs.GetSingletonComponent<SceneContext>();
+        sceneContext.physicsComponents = NUM_PHYSICS_ENTITITES;
         for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
         {
             EntityID currentEntityID = currScene->ecs.CreateEntity();
@@ -449,6 +451,7 @@ public:
 
         ImGui::Text("Physics step duration: %f ms", sceneContext.physicsStepDuration);
         ImGui::Text("SIMD Physics step duration: %f ms", sceneContext.SIMD_physicsStepDuration);
+        ImGui::Text("Multi Thread step duration: %f ms", sceneContext.MultiThread_physicsStepDuration);
             
 		ImGui::End();
 

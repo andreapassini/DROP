@@ -160,6 +160,19 @@ void File::ReadTextFile(
 	*outTextContent = textStream.str();
 }
 
+void File::WriteTextFile(
+	std::string* inFilePath
+	, std::string* inTextContent
+) {
+	if (!inFilePath) return;
+	if (!inTextContent) return;
+
+	std::ofstream textFile;
+	textFile.open(*inFilePath);
+	textFile << inTextContent->c_str();
+	textFile.close();
+}
+
 FileTime File::GetLastWriteTime(char* filePath)
 {
 	FileTime lastFileTime = {};

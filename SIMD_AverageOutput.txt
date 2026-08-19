@@ -1,0 +1,5 @@
+physicsComponents: 100000
+numOfIterations: 100
+physicsStepAverage: 2.809192
+SIMD_physicsStepAverage: 2.740215
+MultiThread_physicsStepAverage: 1.624548

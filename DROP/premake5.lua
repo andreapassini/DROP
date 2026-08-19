@@ -85,7 +85,7 @@ project "Drop"
       systemversion "latest"
       defines { "DROP_PLATFORM_WINDOWS" }
       characterset ("ASCII")
-      vectorextensions ("AVX2")
+      -- vectorextensions ("AVX2")
 
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }
@@ -94,8 +94,8 @@ project "Drop"
       symbols "On"
 		-- buildoptions "/MDd"
       -- buildoptions "/MD"
-      buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
-      -- buildoptions "/MT"   
+      -- buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
+      buildoptions "/MT"   
 
    filter "configurations:Release"
       defines { "DROP_RELEASE" }

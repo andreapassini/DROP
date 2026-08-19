@@ -33,6 +33,7 @@
 #include "terrain/terrainComponent.h"
 #include "terrain/terrainSystem.h"
 #include "assetManager/assetManager.h"
+#include "utils/ExecPath.h"
 
 extern bool g_GameEngineRunning;
 
@@ -200,8 +201,8 @@ namespace Drop
 
 		renderContext.window = Input::m_ActiveWindowHandle;
 
-		TerrainSystem::DiplaceTerrainComponent(g_activeScene->ecs);
-		TerrainSystem::InitTargetPosition(g_activeScene->ecs);
+		//TerrainSystem::DiplaceTerrainComponent(g_activeScene->ecs);
+		//TerrainSystem::InitTargetPosition(g_activeScene->ecs);
 
 		// Main loop
 		while (!m_ActiveWindowHandle->IsShouldClose())
@@ -250,28 +251,96 @@ namespace Drop
 				//for (auto& game : m_GamesStack)
 				//	game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
 
+
 				m_Game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
 
-				// Calculate times
-				// Start Time
-				float startTime = GetTime();
+				for (size_t max = 10'000; max < 1'000'000; max *= 10)
+				{
+					const int32_t numOfIterations = 100;
 
-				m_PhysicsEngine.PhysicsStep(g_activeScene->ecs);
+					// Single Threaded
+					sceneContext.physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Start Time
+						float startTime = GetTime();
 
-				float endTime = GetTime();
-				sceneContext.physicsStepDuration = endTime - startTime;
-				sceneContext.physicsStepDuration *= 1000.0f; // to ms
+						m_PhysicsEngine.PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
 
-				// SIMD
-				// Calculate times
-				// Start Time
-				startTime = GetTime();
+						float endTime = GetTime();
+						sceneContext.physicsStepDuration += (endTime - startTime) * 1000.0f;
+					}
+					float physicsStepAverage = sceneContext.physicsStepDuration / numOfIterations;
 
-				m_PhysicsEngine.SIMD_PhysicsStep(g_activeScene->ecs);
+					// SIMD
+					sceneContext.SIMD_physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Calculate times
+						// Start Time
+						float startTime = GetTime();
 
-				endTime = GetTime();
-				sceneContext.SIMD_physicsStepDuration = endTime - startTime;
-				sceneContext.SIMD_physicsStepDuration *= 1000.0f; // to ms
+						m_PhysicsEngine.SIMD_PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
+
+						float endTime = GetTime();
+						sceneContext.SIMD_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					}
+					float SIMD_physicsStepAverage = sceneContext.SIMD_physicsStepDuration / numOfIterations;
+
+					// Multi Threaded
+					sceneContext.MultiThread_physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Start Time
+						float startTime = GetTime();
+
+						m_PhysicsEngine.MultiThread_PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
+
+						float endTime = GetTime();
+						sceneContext.MultiThread_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					}
+					float MultiThread_physicsStepAverage = sceneContext.MultiThread_physicsStepDuration / numOfIterations;
+
+					// write on file the averages
+					std::string averagesText;
+
+					SceneContext& sceneContext = g_activeScene->ecs.GetSingletonComponent<SceneContext>();
+						
+					averagesText.append("Array of Structures");
+					averagesText.append("\n");
+
+					averagesText.append("physicsComponents: ");
+					averagesText.append(std::to_string(max));
+					averagesText.append("\n");
+
+					averagesText.append("numOfIterations: ");
+					averagesText.append(std::to_string(numOfIterations));
+					averagesText.append("\n");
+
+					averagesText.append("physicsStepAverage: ");
+					averagesText.append(std::to_string(physicsStepAverage));
+					averagesText.append("\n");
+
+					averagesText.append("SIMD_physicsStepAverage: ");
+					averagesText.append(std::to_string(SIMD_physicsStepAverage));
+					averagesText.append("\n");
+
+					averagesText.append("MultiThread_physicsStepAverage: ");
+					averagesText.append(std::to_string(MultiThread_physicsStepAverage));
+
+					std::string absProjPath = GetRelativeProjectPathWithMarker();
+					std::string filePath = absProjPath + "\\NoSIMD_AverageOutput.txt";
+					File::WriteTextFile(&filePath, &averagesText);
+				}
 
 				if (!m_PauseParticleUpdate) {
 					ParticleSystem::UpdatePB(g_activeScene->ecs, m_DeltaTime);
@@ -294,7 +363,7 @@ namespace Drop
 
 			SceneGraph::CalculateWorldTransforms(g_activeScene->ecs);
 
-			TerrainSystem::UpdateTerrains(g_activeScene->ecs, m_DeltaTime);
+			//TerrainSystem::UpdateTerrains(g_activeScene->ecs, m_DeltaTime);
 
 			RenderingSystem::Update(g_activeScene->ecs, m_DeltaTime);
 

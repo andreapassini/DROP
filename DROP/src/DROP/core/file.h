@@ -22,6 +22,11 @@ void WriteBinaryFile(
 	, char* inBuffer, size_t elementSize, size_t elementCount
 );
 
+void WriteTextFile(
+	std::string* inFilePath
+	, std::string* inTextContent
+);
+
 size_t ReadBinaryFile(
 	std::string inFilePath
 	, void* outBuffer, size_t elementSize, size_t elementCount

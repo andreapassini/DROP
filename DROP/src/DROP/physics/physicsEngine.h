@@ -17,8 +17,15 @@ class PhysicsEngine
 public:
 	PhysicsEngine(double startingTime, uint32_t reserve_val);
 
-	void PhysicsStep(ECS& ecs);
-	void SIMD_PhysicsStep(ECS& ecs);
+	void PhysicsStep(ECS& ecs
+		, const size_t max
+	);
+	void MultiThread_PhysicsStep(ECS& ecs
+		, const size_t max
+	);
+	void SIMD_PhysicsStep(ECS& ecs
+		, const size_t max
+	);
 
 	void SynchVirtualTime(double timeToSync);
 
@@ -38,8 +45,15 @@ public:
 	static constexpr uint32_t maxIter = 15;
 
 private:
-	void ApplyForces(ECS& ecs);
-	void SIMD_ApplyForces(ECS& ecs);
+	void ApplyForces(ECS& ecs
+		, const size_t max
+	);
+	void MultiThread_ApplyForces(ECS& ecs
+		, const size_t max
+	);
+	void SIMD_ApplyForces(ECS& ecs
+		, const size_t max
+	);
 	void ApplyConstraints();
 	void HandleCollision();
 	static void ApplyForceToSinglePhysicsObject(PhysicsObject* const physicsObject);
