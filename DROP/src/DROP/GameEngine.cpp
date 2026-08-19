@@ -254,9 +254,9 @@ namespace Drop
 
 				m_Game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
 
-				for (size_t max = 10'000; max < 1'000'000; max *= 10)
+				for (int32_t max = 10'000; max <= 1'000'000; max *= 10)
 				{
-					const int32_t numOfIterations = 100;
+					const int32_t numOfIterations = 10;
 
 					// Single Threaded
 					sceneContext.physicsStepDuration = 0.0f;
@@ -271,11 +271,12 @@ namespace Drop
 						);
 
 						float endTime = GetTime();
-						sceneContext.physicsStepDuration += (endTime - startTime) * 1000.0f;
+						float duration = (endTime - startTime);
+						sceneContext.physicsStepDuration += duration * 1000.0f;
 					}
 					float physicsStepAverage = sceneContext.physicsStepDuration / numOfIterations;
 
-					// SIMD
+					//SIMD
 					sceneContext.SIMD_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
@@ -336,11 +337,14 @@ namespace Drop
 
 					averagesText.append("MultiThread_physicsStepAverage: ");
 					averagesText.append(std::to_string(MultiThread_physicsStepAverage));
+					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
-					std::string filePath = absProjPath + "\\NoSIMD_AverageOutput.txt";
-					File::WriteTextFile(&filePath, &averagesText);
+					std::string filePath = absProjPath + "\\AoS_SIMD_AverageOutput.txt";
+					File::AppendTextFile(&filePath, &averagesText);
 				}
+				
+				assert(0);
 
 				if (!m_PauseParticleUpdate) {
 					ParticleSystem::UpdatePB(g_activeScene->ecs, m_DeltaTime);

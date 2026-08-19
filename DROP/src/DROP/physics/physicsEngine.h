@@ -18,13 +18,13 @@ public:
 	PhysicsEngine(double startingTime, uint32_t reserve_val);
 
 	void PhysicsStep(ECS& ecs
-		, const size_t max
+		, const int32_t max
 	);
 	void MultiThread_PhysicsStep(ECS& ecs
-		, const size_t max
+		, const int32_t max
 	);
 	void SIMD_PhysicsStep(ECS& ecs
-		, const size_t max
+		, const int32_t max
 	);
 
 	void SynchVirtualTime(double timeToSync);
@@ -46,13 +46,13 @@ public:
 
 private:
 	void ApplyForces(ECS& ecs
-		, const size_t max
+		, const int32_t max
 	);
 	void MultiThread_ApplyForces(ECS& ecs
-		, const size_t max
+		, const int32_t max
 	);
 	void SIMD_ApplyForces(ECS& ecs
-		, const size_t max
+		, const int32_t max
 	);
 	void ApplyConstraints();
 	void HandleCollision();

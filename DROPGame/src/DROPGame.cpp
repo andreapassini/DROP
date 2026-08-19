@@ -350,7 +350,8 @@ public:
         //);
 
         // Add physics entities
-#define NUM_PHYSICS_ENTITITES 100'000
+#define NUM_PHYSICS_ENTITITES 1'000'000 // strange behavior with 1 mln
+//#define NUM_PHYSICS_ENTITITES 100'000
 #define X_MIN_LIMIT -25.0f
 #define X_MAX_LIMIT 25.0f
 #define Y_MIN_LIMIT 0.0f

@@ -3,7 +3,7 @@
 #include <future> 
 
 #include "physicsComponent.h"
-//#include <xmmintrin.h>
+#include <xmmintrin.h>
 
 void PhysicsEngine::ApplyForceToSinglePhysicsObject(PhysicsObject* const physicsObject) {
 	physicsObject->PhysicsStep();
@@ -26,7 +26,7 @@ void PhysicsEngine::SynchVirtualTime(double timeToSync) {
 
 void PhysicsEngine::SIMD_PhysicsStep(
 	ECS& ecs
-	, const size_t max
+	, const int32_t max
 ) {
 	if (m_IsPaused)
 		return;
@@ -45,7 +45,7 @@ void PhysicsEngine::SIMD_PhysicsStep(
 
 void PhysicsEngine::PhysicsStep(
 	ECS& ecs
-	, const size_t max
+	, const int32_t max
 ) {
 	if (m_IsPaused)
 		return;
@@ -63,7 +63,7 @@ void PhysicsEngine::PhysicsStep(
 
 void PhysicsEngine::MultiThread_PhysicsStep(
 	ECS& ecs
-	, const size_t max
+	, const int32_t max
 ) {
 	if (m_IsPaused)
 		return;
@@ -95,8 +95,8 @@ void VerletResolution(
 		}
 	}
 
-//#pragma omp simd
-	for (size_t i = offset; i < numOfElements; i++)
+#pragma omp simd
+	for (int32_t i = offset; i < numOfElements; i++)
 	{
 		PhysicsComponent& currentPhysicsComp = physicsComponent[i];
 
@@ -116,12 +116,12 @@ void VerletResolution(
 
 void PhysicsEngine::ApplyForces(
 	ECS& ecs
-	, const size_t max
+	, const int32_t max
 ) {
-	std::vector<PhysicsComponent> densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
+	std::vector<PhysicsComponent>& densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
 
-	for (size_t i = 0; i < max; i++)
+	for (int32_t i = 0; i < max; i++)
 	{
 		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
 
@@ -170,16 +170,16 @@ void PhysicsEngine::ApplyForces(
 
 void PhysicsEngine::MultiThread_ApplyForces(
 	ECS& ecs
-	, const size_t max
+	, const int32_t max
 ) {
 	std::vector<std::future<void>> futures;
 
-	std::vector<PhysicsComponent> densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
+	std::vector<PhysicsComponent>& densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
 	size_t numElementsPerThread = 1'000;
 	//size_t max = densePhysicsComponents.size();
-	for (size_t i = 0; i < max; i+= numElementsPerThread) {
-		size_t offset = i /** numElementsPerThread*/;
+	for (int32_t i = 0; i < max; i+= numElementsPerThread) {
+		int32_t offset = i /** numElementsPerThread*/;
 		futures.push_back(
 			std::async(std::launch::async,
 				VerletResolution
@@ -227,9 +227,9 @@ void PhysicsEngine::MultiThread_ApplyForces(
 
 void PhysicsEngine::SIMD_ApplyForces(
 	ECS& ecs
-	, const size_t max
+	, const int32_t max
 ) {
-	std::vector<PhysicsComponent> densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
+	std::vector<PhysicsComponent>& densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
 	//size_t n = densePhysicsComponents.size();
 
@@ -241,8 +241,8 @@ void PhysicsEngine::SIMD_ApplyForces(
 	//	_mm256_storeu_ps(&result[i], vr);    // Store result
 	//}
 
-//#pragma omp simd simdlen(128)
-	for (size_t i = 0; i < max; i++)
+#pragma omp simd simdlen(128)
+	for (int32_t i = 0; i < max; i++)
 	{
 		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
 
