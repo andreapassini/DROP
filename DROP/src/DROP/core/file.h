@@ -27,6 +27,11 @@ void WriteTextFile(
 	, std::string* inTextContent
 );
 
+void AppendTextFile(
+	std::string* inFilePath
+	, std::string* inTextContent
+);
+
 size_t ReadBinaryFile(
 	std::string inFilePath
 	, void* outBuffer, size_t elementSize, size_t elementCount

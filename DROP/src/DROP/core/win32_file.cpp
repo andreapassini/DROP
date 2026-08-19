@@ -173,6 +173,21 @@ void File::WriteTextFile(
 	textFile.close();
 }
 
+void File::AppendTextFile(
+	std::string* inFilePath
+	, std::string* inTextContent
+) {
+	if (!inFilePath) return;
+	if (!inTextContent) return;
+
+	std::ofstream textFile;
+	// std::ios::app is the open mode "append" meaning
+	// new data will be written to the end of the file.
+	textFile.open(*inFilePath, std::ios::app);
+	textFile << inTextContent->c_str();
+	textFile.close();
+}
+
 FileTime File::GetLastWriteTime(char* filePath)
 {
 	FileTime lastFileTime = {};
