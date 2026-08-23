@@ -375,6 +375,24 @@ public:
             physicsComponent.force = 0.0f;
         }
 
+
+        // Physics Component - SoA 
+        PhysicsComponents& physicsComponents = currScene->ecs.GetSingletonComponent<PhysicsComponents>();
+        physicsComponents.positions.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.oldPositions.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.forces.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.masses.reserve(NUM_PHYSICS_ENTITITES);
+        for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
+        {
+            physicsComponents.masses[i] = MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS));
+            physicsComponents.oldPositions[i].x = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
+            physicsComponents.oldPositions[i].y = Y_MIN_LIMIT + (RandomBetween0and1() * (Y_MAX_LIMIT - Y_MIN_LIMIT));
+            physicsComponents.oldPositions[i].z = Z_MIN_LIMIT + (RandomBetween0and1() * (Z_MAX_LIMIT - Z_MIN_LIMIT));
+            physicsComponents.positions[i] = physicsComponents.oldPositions[i];
+            physicsComponents.forces[i] = 0.0f;
+        }
+        // -----
+
         SceneGraph::CalculateWorldTransforms(gameEngine->g_activeScene->ecs);
 
 //      // #TODO Add line component

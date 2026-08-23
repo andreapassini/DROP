@@ -34,6 +34,7 @@
 #include "terrain/terrainSystem.h"
 #include "assetManager/assetManager.h"
 #include "utils/ExecPath.h"
+#include "physics/physicsComponent.h"
 
 extern bool g_GameEngineRunning;
 
@@ -142,6 +143,8 @@ namespace Drop
 		g_activeScene->ecs.RegisterSingletonComponent<TerrainsContext>(arena);
 		g_activeScene->ecs.RegisterSingletonComponent<TerrainsAssetsContext>(arena);
 		g_activeScene->ecs.RegisterSingletonComponent<AssetManagerContext>(arena);
+
+		g_activeScene->ecs.RegisterSingletonComponent<PhysicsComponents>(arena);
 
 		//g_activeScene->ecs.RegisterSingletonComponent<SceneContext>(arena);
 		//g_activeScene->ecs.RegisterSingletonComponent<RendererContext>(arena);
@@ -311,12 +314,68 @@ namespace Drop
 					}
 					float MultiThread_physicsStepAverage = sceneContext.MultiThread_physicsStepDuration / numOfIterations;
 
+					// ---------------------------------------------------
+					
+					// SoA
+					sceneContext.SoA_physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Start Time
+						float startTime = GetTime();
+
+						m_PhysicsEngine.SoA_PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
+
+						float endTime = GetTime();
+						float duration = (endTime - startTime);
+						sceneContext.SoA_physicsStepDuration += duration * 1000.0f;
+					}
+					float SoA_physicsStepAverage = sceneContext.SoA_physicsStepDuration / numOfIterations;
+
+					//SIMD
+					sceneContext.SIMD_SoA_physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Calculate times
+						// Start Time
+						float startTime = GetTime();
+
+						m_PhysicsEngine.SIMD_SoA_PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
+
+						float endTime = GetTime();
+						sceneContext.SIMD_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					}
+					float SIMD_SoA_physicsStepAverage = sceneContext.SIMD_SoA_physicsStepDuration / numOfIterations;
+
+					// Multi Threaded
+					sceneContext.MultiThread_SoA_physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Start Time
+						float startTime = GetTime();
+
+						m_PhysicsEngine.MultiThread_SoA_PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
+
+						float endTime = GetTime();
+						sceneContext.MultiThread_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					}
+					float MultiThread_SoA_physicsStepAverage = sceneContext.MultiThread_SoA_physicsStepDuration / numOfIterations;
+
+
 					// write on file the averages
 					std::string averagesText;
 
 					SceneContext& sceneContext = g_activeScene->ecs.GetSingletonComponent<SceneContext>();
 						
-					averagesText.append("Array of Structures");
+					averagesText.append("Array of Structs");
 					averagesText.append("\n");
 
 					averagesText.append("physicsComponents: ");
@@ -335,12 +394,43 @@ namespace Drop
 					averagesText.append(std::to_string(SIMD_physicsStepAverage));
 					averagesText.append("\n");
 
+					PhysicsComponents& physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
+
 					averagesText.append("MultiThread_physicsStepAverage: ");
 					averagesText.append(std::to_string(MultiThread_physicsStepAverage));
+					averagesText.append("\n\t numElementsPerThread = ");
+					averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
+
+
+					// SoA
+					averagesText.append("Struct of Arrays");
+					averagesText.append("\n");
+
+					averagesText.append("physicsComponents: ");
+					averagesText.append(std::to_string(max));
+					averagesText.append("\n");
+
+					averagesText.append("numOfIterations: ");
+					averagesText.append(std::to_string(numOfIterations));
+					averagesText.append("\n");
+
+					averagesText.append("SoA_physicsStepAverage: ");
+					averagesText.append(std::to_string(SoA_physicsStepAverage));
+					averagesText.append("\n");
+
+					averagesText.append("SIMD_SoA_physicsStepAverage: ");
+					averagesText.append(std::to_string(SIMD_SoA_physicsStepAverage));
+					averagesText.append("\n");
+
+					averagesText.append("MultiThread_SoA_physicsStepAverage: ");
+					averagesText.append(std::to_string(MultiThread_SoA_physicsStepAverage));
+					averagesText.append("\n\t numElementsPerThread = ");
+					averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
+					averagesText.append("\n");
 					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
-					std::string filePath = absProjPath + "\\AoS_SIMD_AverageOutput.txt";
+					std::string filePath = absProjPath + "\\AverageOutput.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				

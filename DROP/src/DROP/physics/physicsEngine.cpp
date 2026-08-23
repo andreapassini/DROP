@@ -1,6 +1,7 @@
 #include "physicsEngine.h"
 
 #include <future> 
+#include <thread>
 
 #include "physicsComponent.h"
 #include <xmmintrin.h>
@@ -24,25 +25,6 @@ void PhysicsEngine::SynchVirtualTime(double timeToSync) {
 	m_VirtualTime = timeToSync;
 }
 
-void PhysicsEngine::SIMD_PhysicsStep(
-	ECS& ecs
-	, const int32_t max
-) {
-	if (m_IsPaused)
-		return;
-
-	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
-	
-	//ApplyForces();
-	SIMD_ApplyForces(ecs, max);
-
-	//// Handle constraints
-	//ApplyConstraints();
-
-	//// Handle collisions
-	//HandleCollision();
-}
-
 void PhysicsEngine::PhysicsStep(
 	ECS& ecs
 	, const int32_t max
@@ -61,6 +43,61 @@ void PhysicsEngine::PhysicsStep(
 	//HandleCollision();
 }
 
+void PhysicsEngine::SoA_PhysicsStep(
+	ECS& ecs
+	, const int32_t max
+) {
+	if (m_IsPaused)
+		return;
+
+	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
+	
+	SoA_ApplyForces(ecs, max);
+
+	//// Handle constraints
+	//ApplyConstraints();
+
+	//// Handle collisions
+	//HandleCollision();
+}
+
+void PhysicsEngine::SIMD_PhysicsStep(
+	ECS& ecs
+	, const int32_t max
+) {
+	if (m_IsPaused)
+		return;
+
+	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
+	
+	SIMD_ApplyForces(ecs, max);
+
+	//// Handle constraints
+	//ApplyConstraints();
+
+	//// Handle collisions
+	//HandleCollision();
+}
+
+void PhysicsEngine::SIMD_SoA_PhysicsStep(
+	ECS& ecs
+	, const int32_t max
+) {
+	if (m_IsPaused)
+		return;
+
+	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
+	
+	SIMD_SoA_ApplyForces(ecs, max);
+
+	//// Handle constraints
+	//ApplyConstraints();
+
+	//// Handle collisions
+	//HandleCollision();
+}
+
+
 void PhysicsEngine::MultiThread_PhysicsStep(
 	ECS& ecs
 	, const int32_t max
@@ -71,6 +108,24 @@ void PhysicsEngine::MultiThread_PhysicsStep(
 	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
 	
 	MultiThread_ApplyForces(ecs, max);
+
+	//// Handle constraints
+	//ApplyConstraints();
+
+	//// Handle collisions
+	//HandleCollision();
+}
+
+void PhysicsEngine::MultiThread_SoA_PhysicsStep(
+	ECS& ecs
+	, const int32_t max
+) {
+	if (m_IsPaused)
+		return;
+
+	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
+	
+	MultiThread_SoA_ApplyForces(ecs, max);
 
 	//// Handle constraints
 	//ApplyConstraints();
@@ -114,6 +169,45 @@ void VerletResolution(
 	}
 }
 
+void SoA_VerletResolution(
+	VgMath::Vector3* positions
+	, VgMath::Vector3* oldPositions
+	, VgMath::Vector3* forces
+	, float* masses
+	, float DAMPING
+	, float FIXED_TIME_STEP2
+	, int32_t offset
+	, int32_t numOfElements
+	, int32_t max
+) {
+	if (offset + numOfElements > max)
+	{
+		// remove exceeding elements
+		numOfElements -= (offset + numOfElements) - max; 
+		if (numOfElements < 0)
+		{
+			return;
+		}
+	}
+
+#pragma omp simd
+	for (int32_t i = offset; i < numOfElements; i++)
+	{
+		// assuming to always add gravity
+		forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+
+		VgMath::Vector3 tempPos = positions[i];
+		VgMath::Vector3 accel = forces[i] / masses[i];
+		positions[i] = ((2.0f - DAMPING) * positions[i])
+			- ((1.0f - DAMPING) * oldPositions[i])
+			+ (accel * FIXED_TIME_STEP2);
+		oldPositions[i] = tempPos;
+
+		// impulse only in one frame
+		//forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+	}
+}
+
 void PhysicsEngine::ApplyForces(
 	ECS& ecs
 	, const int32_t max
@@ -131,41 +225,37 @@ void PhysicsEngine::ApplyForces(
 		VgMath::Vector3 tempPos = currentPhysicsComp.position;
 		VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
 		currentPhysicsComp.position = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position)
-			- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition) + (accel * currentPhysicsComp.FIXED_TIME_STEP2);
+			- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition) 
+			+ (accel * currentPhysicsComp.FIXED_TIME_STEP2);
 		currentPhysicsComp.oldPosition = tempPos;
+
 
 		// impulse only in one frame
 		currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
 	}
+}
 
-//
-////#pragma omp simd
-//	for (size_t i = 0; i < densePhysicsComponents.size(); i++)
-//	{
-//		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
-//
-//		// SIMD TEST
-//		currentPhysicsComp.force.x *= 10.0f;
-//		//
-//
-//		//if (currentPhysicsComp.isStatic)
-//		//{
-//		//	currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
-//		//	return;
-//		//}
-//
-//		//// assuming to always add gravity
-//		//currentPhysicsComp.force = VgMath::Vector3(0.0, -9.8, 0.0);
-//
-//		//VgMath::Vector3 tempPos = currentPhysicsComp.position;
-//		//VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
-//		//currentPhysicsComp.position = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position) 
-//		//	- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition) + (accel * currentPhysicsComp.FIXED_TIME_STEP2);
-//		//currentPhysicsComp.oldPosition = tempPos;
-//
-//		//// impulse only in one frame
-//		//currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
-//	}
+void PhysicsEngine::SoA_ApplyForces(
+	ECS& ecs
+	, const int32_t max
+) {
+	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
+
+	for (int32_t i = 0; i < max; i++)
+	{
+		// assuming to always add gravity
+		physicsComponents.forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+
+		VgMath::Vector3 tempPos = physicsComponents.positions[i];
+		VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+		physicsComponents.positions[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions[i])
+			+ (accel * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.oldPositions[i] = tempPos;
+
+		// impulse only in one frame
+		//physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+	}
 }
 
 void PhysicsEngine::MultiThread_ApplyForces(
@@ -225,6 +315,54 @@ void PhysicsEngine::MultiThread_ApplyForces(
 //	}
 }
 
+void PhysicsEngine::MultiThread_SoA_ApplyForces(
+	ECS& ecs
+	, const int32_t max
+) {
+	std::vector<std::future<void>> futures;
+
+	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
+
+
+	//	VgMath::Vector3* positions
+	//	, VgMath::Vector3* oldPositions
+	//	, VgMath::Vector3* forces
+	//	, float* masses
+	//	, const float DAMPING
+	//	, const float FIXED_TIME_STEP2
+
+	//may return 0 when not able to detect
+	physicsComponents.processor_count = std::thread::hardware_concurrency();
+	if (physicsComponents.processor_count == 0)
+	{
+		assert(0);
+	}
+
+	//physicsComponents.numElementsPerThread = max / physicsComponents.processor_count;
+	physicsComponents.numElementsPerThread = 10'000;
+	for (int32_t i = 0; i < max; i+= physicsComponents.numElementsPerThread) {
+		int32_t offset = i /** numElementsPerThread*/;
+		futures.push_back(
+			std::async(std::launch::async,
+				SoA_VerletResolution
+				, physicsComponents.positions.data()
+				, physicsComponents.oldPositions.data()
+				, physicsComponents.forces.data()
+				, physicsComponents.masses.data()
+				, physicsComponents.DAMPING
+				, physicsComponents.FIXED_TIME_STEP2
+				, offset
+				, physicsComponents.numElementsPerThread
+				, max
+			)
+		);
+	}
+
+	for (auto& handle : futures) {
+		handle.wait();
+	}
+}
+
 void PhysicsEngine::SIMD_ApplyForces(
 	ECS& ecs
 	, const int32_t max
@@ -241,7 +379,7 @@ void PhysicsEngine::SIMD_ApplyForces(
 	//	_mm256_storeu_ps(&result[i], vr);    // Store result
 	//}
 
-#pragma omp simd simdlen(128)
+#pragma omp simd
 	for (int32_t i = 0; i < max; i++)
 	{
 		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
@@ -257,6 +395,30 @@ void PhysicsEngine::SIMD_ApplyForces(
 
 		// impulse only in one frame
 		currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
+	}
+}
+
+void PhysicsEngine::SIMD_SoA_ApplyForces(
+	ECS& ecs
+	, const int32_t max
+) {
+	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
+
+#pragma omp simd simdlen(8)
+	for (int32_t i = 0; i < max; i++)
+	{
+		// assuming to always add gravity
+		physicsComponents.forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+
+		VgMath::Vector3 tempPos = physicsComponents.positions[i];
+		VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+		physicsComponents.positions[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions[i])
+			+ (accel * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.oldPositions[i] = tempPos;
+
+		//// impulse only in one frame
+		//physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
 	}
 }
 

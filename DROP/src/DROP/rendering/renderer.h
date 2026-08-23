@@ -85,6 +85,10 @@ namespace Drop
         float physicsStepDuration = 0.0f;
         float MultiThread_physicsStepDuration = 0.0f;
         float SIMD_physicsStepDuration = 0.0f;
+
+        float SoA_physicsStepDuration = 0.0f;
+        float MultiThread_SoA_physicsStepDuration = 0.0f;
+        float SIMD_SoA_physicsStepDuration = 0.0f;
     };
 
     struct RendererContext {

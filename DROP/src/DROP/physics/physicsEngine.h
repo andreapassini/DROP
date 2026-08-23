@@ -27,6 +27,16 @@ public:
 		, const int32_t max
 	);
 
+	void SoA_PhysicsStep(ECS& ecs
+		, const int32_t max
+	);
+	void SIMD_SoA_PhysicsStep(ECS& ecs
+		, const int32_t max
+	);
+	void MultiThread_SoA_PhysicsStep(ECS& ecs
+		, const int32_t max
+	);
+
 	void SynchVirtualTime(double timeToSync);
 
 	double GetVirtualTIme();
@@ -54,6 +64,17 @@ private:
 	void SIMD_ApplyForces(ECS& ecs
 		, const int32_t max
 	);
+
+	void SoA_ApplyForces(ECS& ecs
+		, const int32_t max
+	);
+	void MultiThread_SoA_ApplyForces(ECS& ecs
+		, const int32_t max
+	);
+	void SIMD_SoA_ApplyForces(ECS& ecs
+		, const int32_t max
+	);
+
 	void ApplyConstraints();
 	void HandleCollision();
 	static void ApplyForceToSinglePhysicsObject(PhysicsObject* const physicsObject);
