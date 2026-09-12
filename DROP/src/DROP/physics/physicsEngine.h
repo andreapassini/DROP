@@ -9,6 +9,7 @@
 #include "collider.h"
 
 #include "DROP/ECS/beecs.h"
+#include "DROP/physics/physicsComponent.h"
 
 using namespace bseecs;
 
@@ -42,6 +43,26 @@ public:
 	double GetVirtualTIme();
 
 	void AddForceToAll(VgMath::Vector3 force);
+
+	void static ResetPositions(
+		std::vector<PhysicsComponent>& A
+	);
+
+	static bool CheckEquality(
+		std::vector<PhysicsComponent>& A
+		, std::vector<PhysicsComponent>& B
+	);
+
+	void static ResetPositions(
+		PhysicsComponents& A
+	);
+	
+	static bool CheckEquality(
+		PhysicsComponents& A
+		, PhysicsComponents& B
+	);
+	
+
 public:
 	std::unordered_map<uint32_t, PhysicsObject> m_PhysicsObjetcs;
 	// Yes I have to use the pointer and ruin the data-oriented approach 
@@ -54,7 +75,6 @@ public:
 	uint32_t m_CollisionsIterations;
 	static constexpr uint32_t maxIter = 15;
 
-private:
 	void ApplyForces(ECS& ecs
 		, const int32_t max
 	);

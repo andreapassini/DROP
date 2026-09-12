@@ -36,6 +36,8 @@
 #include "utils/ExecPath.h"
 #include "physics/physicsComponent.h"
 
+#include <immintrin.h>
+
 extern bool g_GameEngineRunning;
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
@@ -257,7 +259,7 @@ namespace Drop
 
 				m_Game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
 
-				for (int32_t max = 10'000; max <= 1'000'000; max *= 10)
+				for (int32_t max = 10; max <= 1'000'000; max *= 10)
 				{
 					const int32_t numOfIterations = 10;
 
@@ -279,6 +281,13 @@ namespace Drop
 					}
 					float physicsStepAverage = sceneContext.physicsStepDuration / numOfIterations;
 
+					// copy the results to verify correctness
+					std::vector<PhysicsComponent>& densePhysicsComponents = g_activeScene->ecs.GetComponentPool<PhysicsComponent>().Data();
+					std::vector<PhysicsComponent> copyForChecker = densePhysicsComponents; // copy by value
+									
+					// Reset the positions
+					PhysicsEngine::ResetPositions(densePhysicsComponents);
+
 					//SIMD
 					sceneContext.SIMD_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
@@ -297,6 +306,16 @@ namespace Drop
 					}
 					float SIMD_physicsStepAverage = sceneContext.SIMD_physicsStepDuration / numOfIterations;
 
+					// Check
+					bool bEquality = PhysicsEngine::CheckEquality(
+						copyForChecker
+						, densePhysicsComponents
+					);
+					assert(bEquality);
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(densePhysicsComponents);
+
 					// Multi Threaded
 					sceneContext.MultiThread_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
@@ -313,6 +332,16 @@ namespace Drop
 						sceneContext.MultiThread_physicsStepDuration += (endTime - startTime) * 1000.0f;
 					}
 					float MultiThread_physicsStepAverage = sceneContext.MultiThread_physicsStepDuration / numOfIterations;
+
+					// Check
+					bEquality = PhysicsEngine::CheckEquality(
+						copyForChecker
+						, densePhysicsComponents
+					);
+					assert(bEquality);
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(densePhysicsComponents);
 
 					// ---------------------------------------------------
 					
@@ -334,6 +363,12 @@ namespace Drop
 					}
 					float SoA_physicsStepAverage = sceneContext.SoA_physicsStepDuration / numOfIterations;
 
+					PhysicsComponents& physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
+					PhysicsComponents copyForChecker_SoA = physicsComponents; // copy by value
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(physicsComponents);
+
 					//SIMD
 					sceneContext.SIMD_SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
@@ -352,6 +387,16 @@ namespace Drop
 					}
 					float SIMD_SoA_physicsStepAverage = sceneContext.SIMD_SoA_physicsStepDuration / numOfIterations;
 
+					// Check
+					bEquality = PhysicsEngine::CheckEquality(
+						copyForChecker_SoA
+						, physicsComponents
+					);
+					assert(bEquality);
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(physicsComponents);
+
 					// Multi Threaded
 					sceneContext.MultiThread_SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
@@ -369,6 +414,15 @@ namespace Drop
 					}
 					float MultiThread_SoA_physicsStepAverage = sceneContext.MultiThread_SoA_physicsStepDuration / numOfIterations;
 
+					// Check
+					bEquality = PhysicsEngine::CheckEquality(
+						copyForChecker_SoA
+						, physicsComponents
+					);
+					assert(bEquality);
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(physicsComponents);
 
 					// write on file the averages
 					std::string averagesText;
@@ -394,7 +448,7 @@ namespace Drop
 					averagesText.append(std::to_string(SIMD_physicsStepAverage));
 					averagesText.append("\n");
 
-					PhysicsComponents& physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
+					physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
 
 					averagesText.append("MultiThread_physicsStepAverage: ");
 					averagesText.append(std::to_string(MultiThread_physicsStepAverage));
@@ -403,6 +457,7 @@ namespace Drop
 
 
 					// SoA
+					averagesText.append("\n");
 					averagesText.append("Struct of Arrays");
 					averagesText.append("\n");
 
@@ -430,7 +485,7 @@ namespace Drop
 					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
-					std::string filePath = absProjPath + "\\AverageOutput.txt";
+					std::string filePath = absProjPath + "\\O3_SoAFast_immintrin_Small_Desktop_AverageOutput.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				

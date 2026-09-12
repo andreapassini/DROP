@@ -196,8 +196,8 @@ void SoA_VerletResolution(
 		// assuming to always add gravity
 		forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
 
-		VgMath::Vector3 tempPos = positions[i];
 		VgMath::Vector3 accel = forces[i] / masses[i];
+		VgMath::Vector3 tempPos = positions[i];
 		positions[i] = ((2.0f - DAMPING) * positions[i])
 			- ((1.0f - DAMPING) * oldPositions[i])
 			+ (accel * FIXED_TIME_STEP2);
@@ -266,7 +266,7 @@ void PhysicsEngine::MultiThread_ApplyForces(
 
 	std::vector<PhysicsComponent>& densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
-	size_t numElementsPerThread = 1'000;
+	size_t numElementsPerThread = 10'000;
 	//size_t max = densePhysicsComponents.size();
 	for (int32_t i = 0; i < max; i+= numElementsPerThread) {
 		int32_t offset = i /** numElementsPerThread*/;
@@ -322,14 +322,6 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 	std::vector<std::future<void>> futures;
 
 	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
-
-
-	//	VgMath::Vector3* positions
-	//	, VgMath::Vector3* oldPositions
-	//	, VgMath::Vector3* forces
-	//	, float* masses
-	//	, const float DAMPING
-	//	, const float FIXED_TIME_STEP2
 
 	//may return 0 when not able to detect
 	physicsComponents.processor_count = std::thread::hardware_concurrency();
@@ -445,3 +437,100 @@ void PhysicsEngine::AddForceToAll(VgMath::Vector3 force)
 	}
 }
 
+bool PhysicsEngine::CheckEquality(
+	std::vector<PhysicsComponent>& A
+	, std::vector<PhysicsComponent>& B
+) {
+	bool bEquals = false;
+
+	int32_t ANum = A.size();
+	int32_t BNum = B.size();
+
+	if (ANum != BNum)
+	{
+		return bEquals;
+	}
+
+	bEquals = true;
+
+	for (size_t i = 0; i < ANum; i++)
+	{
+		if (A[i].oldPosition.x != B[i].oldPosition.x
+			&& A[i].oldPosition.y != B[i].oldPosition.y
+			&& A[i].oldPosition.z != B[i].oldPosition.z
+			&& A[i].position.x != B[i].position.x
+			&& A[i].position.y != B[i].position.y
+			&& A[i].position.z != B[i].position.z
+		) {
+			bEquals = false;
+			break;
+		}
+	}
+
+	return bEquals;
+}
+
+void PhysicsEngine::ResetPositions(
+	std::vector<PhysicsComponent>& A
+) {
+	for (size_t i = 0; i < A.size(); i++)
+	{
+		A[i].oldPosition.x = 0.0;
+		A[i].oldPosition.y = 0.0;
+		A[i].oldPosition.z = 0.0;
+
+		A[i].position.x = 0.0;
+		A[i].position.y = 0.0;
+		A[i].position.z = 0.0;
+	}
+}
+
+// SoA
+
+bool PhysicsEngine::CheckEquality(
+	PhysicsComponents& A
+	, PhysicsComponents& B
+) {
+	bool bEquals = false;
+
+	int32_t ANum = A.positions.size();
+	int32_t BNum = B.positions.size();
+
+	if (ANum != BNum)
+	{
+		return bEquals;
+	}
+
+	bEquals = true;
+
+	for (size_t i = 0; i < ANum; i++)
+	{
+		if (A.oldPositions[i].x != B.oldPositions[i].x
+			&& A.oldPositions[i].y != B.oldPositions[i].y
+			&& A.oldPositions[i].z != B.oldPositions[i].z
+			&& A.positions[i].x != B.positions[i].x
+			&& A.positions[i].y != B.positions[i].y
+			&& A.positions[i].z != B.positions[i].z
+		) {
+			bEquals = false;
+			break;
+		}
+	}
+
+	return bEquals;
+}
+
+void PhysicsEngine::ResetPositions(
+	PhysicsComponents& A
+) {
+	for (size_t i = 0; i < A.positions.size(); i++)
+	{
+		A.oldPositions[i].x = 0.0;
+		A.oldPositions[i].y = 0.0;
+		A.oldPositions[i].z = 0.0;
+
+		A.positions[i].x = 0.0;
+		A.positions[i].y = 0.0;
+		A.positions[i].z = 0.0;
+	}
+}

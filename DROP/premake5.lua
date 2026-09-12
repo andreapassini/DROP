@@ -90,10 +90,11 @@ project "Drop"
    filter "configurations:Debug"
       defines { "DROP_DEBUG" }
       runtime "Debug"
-      optimize "On"
+      optimize "Off"
       symbols "On"
 		-- buildoptions "/MDd"
       -- buildoptions "/MD"
+      -- buildoptions {"/MT", "/arch:AVX2", "–mavx2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
       buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
       -- buildoptions "/MT"   
 
