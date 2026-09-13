@@ -352,14 +352,14 @@ public:
         // Add physics entities
 #define NUM_PHYSICS_ENTITITES 1'000'000 // strange behavior with 1 mln
 //#define NUM_PHYSICS_ENTITITES 100'000
-#define X_MIN_LIMIT -25.0f
-#define X_MAX_LIMIT 25.0f
+#define X_MIN_LIMIT 0.0f
+#define X_MAX_LIMIT 0.0f
 #define Y_MIN_LIMIT 0.0f
-#define Y_MAX_LIMIT 25.0f
-#define Z_MIN_LIMIT -25.0f
-#define Z_MAX_LIMIT 25.0f
-#define MIN_MASS 5.0f
-#define MAX_MASS 25.0f
+#define Y_MAX_LIMIT 0.0f
+#define Z_MIN_LIMIT 0.0f
+#define Z_MAX_LIMIT 0.0f
+#define MIN_MASS 500.0f
+#define MAX_MASS 2'500.0f
         SceneContext& sceneContext = currScene->ecs.GetSingletonComponent<SceneContext>();
         sceneContext.physicsComponents = NUM_PHYSICS_ENTITITES;
         for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
