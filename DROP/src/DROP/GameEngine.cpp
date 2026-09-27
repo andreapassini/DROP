@@ -485,7 +485,7 @@ namespace Drop
 					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
-					std::string filePath = absProjPath + "\\O3_SoAFast_immintrin_Small_Desktop_AverageOutput.txt";
+					std::string filePath = absProjPath + "\\AVX2_Divided2_alignas(16)_Desktop_AverageOutput.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				

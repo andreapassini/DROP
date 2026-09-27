@@ -160,8 +160,14 @@ void VerletResolution(
 
 		VgMath::Vector3 tempPos = currentPhysicsComp.position;
 		VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
-		currentPhysicsComp.position = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position) 
-			- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition) + (accel * currentPhysicsComp.FIXED_TIME_STEP2);
+
+		VgMath::Vector3 DAMPxPos = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position);
+		VgMath::Vector3 DAMPxOldPos = ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition);
+		VgMath::Vector3 Accel = (accel * currentPhysicsComp.FIXED_TIME_STEP2);
+
+		currentPhysicsComp.position = DAMPxPos
+			- DAMPxOldPos
+			+ Accel;
 		currentPhysicsComp.oldPosition = tempPos;
 
 		// impulse only in one frame
@@ -198,13 +204,16 @@ void SoA_VerletResolution(
 
 		VgMath::Vector3 accel = forces[i] / masses[i];
 		VgMath::Vector3 tempPos = positions[i];
-		positions[i] = ((2.0f - DAMPING) * positions[i])
-			- ((1.0f - DAMPING) * oldPositions[i])
-			+ (accel * FIXED_TIME_STEP2);
+		VgMath::Vector3 DAMPxPos = ((2.0f - DAMPING) * positions[i]);
+		VgMath::Vector3 DAMPxOldPos = ((1.0f - DAMPING) * oldPositions[i]);
+		VgMath::Vector3 Accel = (accel * FIXED_TIME_STEP2);
+		positions[i] = DAMPxPos
+			- DAMPxOldPos
+			+ Accel;
 		oldPositions[i] = tempPos;
 
 		// impulse only in one frame
-		//forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
 	}
 }
 
@@ -214,7 +223,7 @@ void PhysicsEngine::ApplyForces(
 ) {
 	std::vector<PhysicsComponent>& densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
-
+#pragma loop(no_vector)
 	for (int32_t i = 0; i < max; i++)
 	{
 		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
@@ -241,6 +250,7 @@ void PhysicsEngine::SoA_ApplyForces(
 ) {
 	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
 
+#pragma loop(no_vector)
 	for (int32_t i = 0; i < max; i++)
 	{
 		// assuming to always add gravity
@@ -254,7 +264,7 @@ void PhysicsEngine::SoA_ApplyForces(
 		physicsComponents.oldPositions[i] = tempPos;
 
 		// impulse only in one frame
-		//physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
 	}
 }
 
@@ -409,8 +419,8 @@ void PhysicsEngine::SIMD_SoA_ApplyForces(
 			+ (accel * physicsComponents.FIXED_TIME_STEP2);
 		physicsComponents.oldPositions[i] = tempPos;
 
-		//// impulse only in one frame
-		//physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		// impulse only in one frame
+		physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
 	}
 }
 

@@ -12,9 +12,9 @@ project "Drop"
       "src/**.h"
       , "src/**.cpp"
 
-      , "src/**.frag"
-      , "src/**.vert"
-      , "src/**.geom"
+      -- , "src/**.frag"
+      -- , "src/**.vert"
+      -- , "src/**.geom"
 
       , "dependencies/stb_image/**.h"
 		, "dependencies/stb_image/**.cpp"
@@ -85,6 +85,7 @@ project "Drop"
       systemversion "latest"
       defines { "DROP_PLATFORM_WINDOWS" }
       characterset ("ASCII")
+      -- vectorextensions ("SSE4.2")
       vectorextensions ("AVX2")
 
    filter "configurations:Debug"
@@ -104,7 +105,9 @@ project "Drop"
       optimize "On"
       symbols "On"
       -- buildoptions "/MD"
-      buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions {"/MT", "/arch:AVX2", "–mavx2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions {"/MT", "/arch:SSE4.2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
+      buildoptions {"/MT", "/arch:AVX2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
       -- buildoptions "/MT"
 
    filter "configurations:Dist"

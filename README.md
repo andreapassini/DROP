@@ -118,3 +118,16 @@ The map requested are forwarded to the Asset Thread that will read the specific 
 
 ![GridCalculation](https://github.com/user-attachments/assets/b0d2b53a-fe8f-4d2a-aaa3-417033fce857)
 
+
+
+# Fast Physics Update
+
+- Normal loop
+- O2
+- O3
+- AoS v SoA
+- march Native
+- Alignas
+- Multi Threading
+- Instruction split
+
