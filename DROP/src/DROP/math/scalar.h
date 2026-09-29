@@ -4,7 +4,7 @@
 
 namespace VgMath{
 
-typedef double Scalar;
+typedef float Scalar;
 
 const Scalar EPSILON = 1e-10;
 const Scalar EPSILON2 = EPSILON*EPSILON;

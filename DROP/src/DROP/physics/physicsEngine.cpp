@@ -203,13 +203,71 @@ void SoA_VerletResolution(
 		forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
 
 		VgMath::Vector3 accel = forces[i] / masses[i];
+
 		VgMath::Vector3 tempPos = positions[i];
+
 		VgMath::Vector3 DAMPxPos = ((2.0f - DAMPING) * positions[i]);
+
 		VgMath::Vector3 DAMPxOldPos = ((1.0f - DAMPING) * oldPositions[i]);
+
 		VgMath::Vector3 Accel = (accel * FIXED_TIME_STEP2);
+
 		positions[i] = DAMPxPos
 			- DAMPxOldPos
 			+ Accel;
+
+		oldPositions[i] = tempPos;
+
+		// impulse only in one frame
+		forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+	}
+}
+
+void SoA_HandSIMD_VerletResolution(
+	VgMath::Vector3* positions
+	, VgMath::Vector3* oldPositions
+	, VgMath::Vector3* forces
+	, float* masses
+	, float DAMPING
+	, float FIXED_TIME_STEP2
+	, int32_t offset
+	, int32_t numOfElements
+	, int32_t max
+) {
+	if (offset + numOfElements > max)
+	{
+		// remove exceeding elements
+		numOfElements -= (offset + numOfElements) - max; 
+		if (numOfElements < 0)
+		{
+			return;
+		}
+	}
+
+#pragma omp simd
+	for (int32_t i = offset; i < numOfElements; i++)
+	{
+		// assuming to always add gravity
+		forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+
+		// 256 / 32 = 8
+		// vec3 -> 2 unused floats each times 
+		//__m256 forces = {};
+
+		VgMath::Vector3 accel = forces[i] / masses[i];
+
+		VgMath::Vector3 tempPos = positions[i];
+
+		VgMath::Vector3 DAMPxPos = ((2.0f - DAMPING) * positions[i]);
+
+		VgMath::Vector3 DAMPxOldPos = ((1.0f - DAMPING) * oldPositions[i]);
+
+		VgMath::Vector3 Accel = (accel * FIXED_TIME_STEP2);
+
+		positions[i] = DAMPxPos
+			- DAMPxOldPos
+			+ Accel;
+
 		oldPositions[i] = tempPos;
 
 		// impulse only in one frame
@@ -257,10 +315,13 @@ void PhysicsEngine::SoA_ApplyForces(
 		physicsComponents.forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
 
 		VgMath::Vector3 tempPos = physicsComponents.positions[i];
+
 		VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+
 		physicsComponents.positions[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions[i])
 			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions[i])
 			+ (accel * physicsComponents.FIXED_TIME_STEP2);
+
 		physicsComponents.oldPositions[i] = tempPos;
 
 		// impulse only in one frame
@@ -406,17 +467,20 @@ void PhysicsEngine::SIMD_SoA_ApplyForces(
 ) {
 	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
 
-#pragma omp simd simdlen(8)
+#pragma omp simd
 	for (int32_t i = 0; i < max; i++)
 	{
 		// assuming to always add gravity
 		physicsComponents.forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
 
 		VgMath::Vector3 tempPos = physicsComponents.positions[i];
+
 		VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+
 		physicsComponents.positions[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions[i])
 			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions[i])
 			+ (accel * physicsComponents.FIXED_TIME_STEP2);
+
 		physicsComponents.oldPositions[i] = tempPos;
 
 		// impulse only in one frame
@@ -515,12 +579,8 @@ bool PhysicsEngine::CheckEquality(
 
 	for (size_t i = 0; i < ANum; i++)
 	{
-		if (A.oldPositions[i].x != B.oldPositions[i].x
-			&& A.oldPositions[i].y != B.oldPositions[i].y
-			&& A.oldPositions[i].z != B.oldPositions[i].z
-			&& A.positions[i].x != B.positions[i].x
-			&& A.positions[i].y != B.positions[i].y
-			&& A.positions[i].z != B.positions[i].z
+		if (VgMath::areEqual(A.oldPositions[i], B.oldPositions[i])
+			&& VgMath::areEqual(A.positions[i], B.positions[i])
 		) {
 			bEquals = false;
 			break;

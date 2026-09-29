@@ -108,6 +108,7 @@ project "Drop"
       -- buildoptions {"/MT", "/arch:AVX2", "–mavx2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
       -- buildoptions {"/MT", "/arch:SSE4.2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
       buildoptions {"/MT", "/arch:AVX2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions {"/MT", "-march=native", "-o3", "-openmp:experimental", "-Qvec-report:2"}
       -- buildoptions "/MT"
 
    filter "configurations:Dist"

@@ -5,7 +5,7 @@
 
 namespace VgMath{
 
-typedef double Scalar;
+typedef float Scalar;
 
 /* a 3D point, aka, a POSITION in 3D */
 

@@ -126,6 +126,7 @@ The map requested are forwarded to the Asset Thread that will read the specific 
 - O2
 - O3
 - AoS v SoA
+- SoA for each dims
 - march Native
 - Alignas
 - Multi Threading

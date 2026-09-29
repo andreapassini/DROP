@@ -378,18 +378,33 @@ public:
 
         // Physics Component - SoA 
         PhysicsComponents& physicsComponents = currScene->ecs.GetSingletonComponent<PhysicsComponents>();
-        physicsComponents.positions.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.oldPositions.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.forces.reserve(NUM_PHYSICS_ENTITITES);
+        //physicsComponents.positions.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.positions_X.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.positions_Y.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.positions_Z.reserve(NUM_PHYSICS_ENTITITES);
+        //physicsComponents.oldPositions.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.oldPositions_X.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.oldPositions_Y.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.oldPositions_Z.reserve(NUM_PHYSICS_ENTITITES);
+        //physicsComponents.forces.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.forces_X.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.forces_Y.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.forces_Z.reserve(NUM_PHYSICS_ENTITITES);
         physicsComponents.masses.reserve(NUM_PHYSICS_ENTITITES);
         for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
         {
             physicsComponents.masses[i] = MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS));
-            physicsComponents.oldPositions[i].x = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
-            physicsComponents.oldPositions[i].y = Y_MIN_LIMIT + (RandomBetween0and1() * (Y_MAX_LIMIT - Y_MIN_LIMIT));
-            physicsComponents.oldPositions[i].z = Z_MIN_LIMIT + (RandomBetween0and1() * (Z_MAX_LIMIT - Z_MIN_LIMIT));
-            physicsComponents.positions[i] = physicsComponents.oldPositions[i];
-            physicsComponents.forces[i] = 0.0f;
+            physicsComponents.oldPositions_X[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
+            physicsComponents.oldPositions_Y[i] = Y_MIN_LIMIT + (RandomBetween0and1() * (Y_MAX_LIMIT - Y_MIN_LIMIT));
+            physicsComponents.oldPositions_Z[i] = Z_MIN_LIMIT + (RandomBetween0and1() * (Z_MAX_LIMIT - Z_MIN_LIMIT));
+            //physicsComponents.positions[i] = physicsComponents.oldPositions[i];
+            physicsComponents.positions_X[i] = physicsComponents.oldPositions_X[i];
+            physicsComponents.positions_Y[i] = physicsComponents.oldPositions_Y[i];
+            physicsComponents.positions_Z[i] = physicsComponents.oldPositions_Z[i];
+            //physicsComponents.forces[i] = 0.0f;
+            physicsComponents.forces_X[i] = 0.0f;
+            physicsComponents.forces_Y[i] = 0.0f;
+            physicsComponents.forces_Z[i] = 0.0f;
         }
         // -----
 

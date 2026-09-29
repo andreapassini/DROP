@@ -1,0 +1,90 @@
+Array of Structs
+physicsComponents: 10
+numOfIterations: 10
+physicsStepAverage: 0.000325
+SIMD_physicsStepAverage: 0.000507
+MultiThread_physicsStepAverage: 0.016165
+	 numElementsPerThread = 10000
+Struct of Arrays
+physicsComponents: 10
+numOfIterations: 10
+SoA_physicsStepAverage: 0.000373
+SIMD_SoA_physicsStepAverage: 0.000089
+MultiThread_SoA_physicsStepAverage: 0.009847
+	 numElementsPerThread = 10000
+
+Array of Structs
+physicsComponents: 100
+numOfIterations: 10
+physicsStepAverage: 0.001317
+SIMD_physicsStepAverage: 0.001752
+MultiThread_physicsStepAverage: 0.014091
+	 numElementsPerThread = 10000
+Struct of Arrays
+physicsComponents: 100
+numOfIterations: 10
+SoA_physicsStepAverage: 0.002003
+SIMD_SoA_physicsStepAverage: 0.000304
+MultiThread_SoA_physicsStepAverage: 0.014031
+	 numElementsPerThread = 10000
+
+Array of Structs
+physicsComponents: 1000
+numOfIterations: 10
+physicsStepAverage: 0.011086
+SIMD_physicsStepAverage: 0.011092
+MultiThread_physicsStepAverage: 0.026703
+	 numElementsPerThread = 10000
+Struct of Arrays
+physicsComponents: 1000
+numOfIterations: 10
+SoA_physicsStepAverage: 0.018251
+SIMD_SoA_physicsStepAverage: 0.002027
+MultiThread_SoA_physicsStepAverage: 0.014323
+	 numElementsPerThread = 10000
+
+Array of Structs
+physicsComponents: 10000
+numOfIterations: 10
+physicsStepAverage: 0.109339
+SIMD_physicsStepAverage: 0.109768
+MultiThread_physicsStepAverage: 0.127560
+	 numElementsPerThread = 10000
+Struct of Arrays
+physicsComponents: 10000
+numOfIterations: 10
+SoA_physicsStepAverage: 0.171709
+SIMD_SoA_physicsStepAverage: 0.018197
+MultiThread_SoA_physicsStepAverage: 0.033426
+	 numElementsPerThread = 10000
+
+Array of Structs
+physicsComponents: 100000
+numOfIterations: 10
+physicsStepAverage: 1.099414
+SIMD_physicsStepAverage: 1.099503
+MultiThread_physicsStepAverage: 0.125992
+	 numElementsPerThread = 10000
+Struct of Arrays
+physicsComponents: 100000
+numOfIterations: 10
+SoA_physicsStepAverage: 1.950979
+SIMD_SoA_physicsStepAverage: 0.224477
+MultiThread_SoA_physicsStepAverage: 0.037682
+	 numElementsPerThread = 10000
+
+Array of Structs
+physicsComponents: 1000000
+numOfIterations: 10
+physicsStepAverage: 11.142158
+SIMD_physicsStepAverage: 11.127012
+MultiThread_physicsStepAverage: 0.150263
+	 numElementsPerThread = 10000
+Struct of Arrays
+physicsComponents: 1000000
+numOfIterations: 10
+SoA_physicsStepAverage: 18.408812
+SIMD_SoA_physicsStepAverage: 2.153909
+MultiThread_SoA_physicsStepAverage: 0.094175
+	 numElementsPerThread = 10000
+

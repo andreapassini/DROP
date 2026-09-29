@@ -10,7 +10,7 @@ using namespace std;
 
 namespace VgMath{
 
-typedef double Scalar;
+typedef float Scalar;
 
 
 class Versor3{

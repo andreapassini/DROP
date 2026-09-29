@@ -6,7 +6,7 @@
 #include "mat3.h"
 
 namespace VgMath{
-typedef double Scalar;
+typedef float Scalar;
 
 class Quaternion; // a forward declaration
 inline Quaternion operator * (const Quaternion &a , const Quaternion &b);  // idem

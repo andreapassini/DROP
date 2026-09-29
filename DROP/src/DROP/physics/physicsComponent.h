@@ -17,7 +17,7 @@ struct PhysicsComponent
 };
 
 // SoA
-struct alignas(16) PhysicsComponents
+struct alignas(64) PhysicsComponents
 {
 	std::vector<VgMath::Vector3> positions;
 	std::vector<VgMath::Vector3> oldPositions;
