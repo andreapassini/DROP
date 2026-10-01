@@ -244,19 +244,103 @@ void SoA_HandSIMD_VerletResolution(
 		}
 	}
 
-#pragma omp simd
-	for (int32_t i = offset; i < numOfElements; i++)
+	float const _2minusDAMPING = (2.0f - DAMPING);
+	float const _1minusDAMPING = (1.0f - DAMPING);
+
+//#pragma omp simd
+	int32_t i;
+	for (i = offset; i+1 < numOfElements; i+=2)
 	{
 		// assuming to always add gravity
-		forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+		//forces[i] = VgMath::Vector3(0.0f, -9.8f, 0.0f);
+
+		__m256 positions256 = {
+			positions[i].x, positions[i].y, positions[i].z
+			, positions[i + 1].x, positions[i + 1].y , positions[i + 1].z
+			, 0.0f, 0.0f 
+		};
+
+		__m256 tempDumping2minus = {
+			_2minusDAMPING, _2minusDAMPING, _2minusDAMPING
+			, _2minusDAMPING, _2minusDAMPING, _2minusDAMPING
+			, 0.0f, 0.0f
+		};
+
+		__m256 tempDumping1minus = {
+			_1minusDAMPING, _1minusDAMPING, _1minusDAMPING
+			, _1minusDAMPING, _1minusDAMPING, _1minusDAMPING
+			, 0.0f, 0.0f
+		};
 
 		// 256 / 32 = 8
 		// vec3 -> 2 unused floats each times 
-		//__m256 forces = {};
+		__m256 forces256 = {
+			0.0f, -9.8f, 0.0f
+			, 0.0f, -9.8f, 0.0f
+			, 0.0f, 0.0f
+		};
+
+		//VgMath::Vector3 accel = forces[i] / masses[i];
+		__m256 masses256 = { 
+			masses[i], masses[i], masses[i]
+			, masses[i+1], masses[i + 1], masses[i + 1]
+			, 0.0, 0.0
+		};
+
+		//VgMath::Vector3 DAMPxPos = ((2.0f - DAMPING) * positions[i]);
+		__m256 DAMPxPos256 = _mm256_sub_ps(positions256, tempDumping2minus);
+
+		VgMath::Vector3 tempOldPosI = positions[i];
+		VgMath::Vector3 tempOldPosIadd1 = positions[i+1];
+		// Not needed
+		//__m256 tempPos256 = { 
+		//	positions[i].x, positions[i].y, positions[i].z
+		//	, positions[i + 1].x, positions[i + 1].y , positions[i + 1].z
+		//	, 0.0f, 0.0f 
+		//};
+
+		__m256 accel256 = _mm256_div_ps(forces256, masses256);
+
+		//VgMath::Vector3 DAMPxOldPos = ((1.0f - DAMPING) * oldPositions[i]);
+		__m256 DAMPxOldPos256 = _mm256_mul_ps(DAMPxPos256, tempDumping1minus);
+
+		//VgMath::Vector3 Accel = (accel * FIXED_TIME_STEP2);
+		__m256 tempFIXED_TIME_STEP2256 = { FIXED_TIME_STEP2 };
+		__m256 Accel256 = _mm256_mul_ps(accel256, tempFIXED_TIME_STEP2256);
+
+		//positions[i] = DAMPxPos
+		//	- DAMPxOldPos
+		//	+ Accel;
+		positions256 = _mm256_sub_ps(DAMPxPos256, DAMPxOldPos256);
+
+		oldPositions[i] = tempOldPosI;
+		oldPositions[i+1] = tempOldPosIadd1;
+
+		positions256 = _mm256_add_ps(positions256, Accel256);
+
+		// impulse only in one frame
+		forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		forces[i + 1] = VgMath::Vector3(0.0, 0.0, 0.0);
+
+		float tempPos[8];
+		_mm256_store_ps(&tempPos[0], positions256);
+
+		positions[i] = VgMath::Vector3(tempPos[0], tempPos[1], tempPos[2]);
+		positions[i+1] = VgMath::Vector3(tempPos[3], tempPos[4], tempPos[5]);
+		// ignoring [6][7] since they are padding
+	} 
+
+	// Handle the edge case of the last i != (numOfElements - 1)
+	if (i != (numOfElements - 1))
+	{
+		i = numOfElements - 1;
+
+		// assuming to always add gravity
+		forces[i] = VgMath::Vector3(0.0f, -9.8f, 0.0f);
 
 		VgMath::Vector3 accel = forces[i] / masses[i];
 
-		VgMath::Vector3 tempPos = positions[i];
+		VgMath::Vector3 tempOldPosI = positions[i];
 
 		VgMath::Vector3 DAMPxPos = ((2.0f - DAMPING) * positions[i]);
 
@@ -268,7 +352,7 @@ void SoA_HandSIMD_VerletResolution(
 			- DAMPxOldPos
 			+ Accel;
 
-		oldPositions[i] = tempPos;
+		oldPositions[i] = tempOldPosI;
 
 		// impulse only in one frame
 		forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
@@ -407,7 +491,8 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 		int32_t offset = i /** numElementsPerThread*/;
 		futures.push_back(
 			std::async(std::launch::async,
-				SoA_VerletResolution
+				//SoA_VerletResolution
+				SoA_HandSIMD_VerletResolution
 				, physicsComponents.positions.data()
 				, physicsComponents.oldPositions.data()
 				, physicsComponents.forces.data()

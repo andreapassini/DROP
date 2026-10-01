@@ -485,7 +485,8 @@ namespace Drop
 					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
-					std::string filePath = absProjPath + "\\PerCompSOA_native_Divided2_alignas(64)_Desktop_AverageOutput.txt";
+					//std::string filePath = absProjPath + "\\PerCompSOA_native_Divided2_alignas(64)_Desktop_AverageOutput.txt";
+					std::string filePath = absProjPath + "\\HANDSIMD2_PerCompSOA_native_Divided2_alignas(64)_Desktop_AverageOutput.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				
