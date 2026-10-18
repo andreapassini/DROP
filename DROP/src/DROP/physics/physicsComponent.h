@@ -17,8 +17,54 @@ struct PhysicsComponent
 };
 
 // SoA
-struct alignas(64) PhysicsComponents
-{
+#ifdef ALL_DIMESNIONS
+struct PhysicsComponents {
+	//std::vector<VgMath::Vector3> positions;
+	std::vector<float> positions_x;
+	std::vector<float> positions_y;
+	std::vector<float> positions_z;
+	//std::vector<VgMath::Vector3> oldPositions;
+	std::vector<float> oldPositions_x;
+	std::vector<float> oldPositions_y;
+	std::vector<float> oldPositions_z;
+	//std::vector<VgMath::Vector3> forces;
+	std::vector<float> forces_x;
+	std::vector<float> forces_y;
+	std::vector<float> forces_z;
+	std::vector<float> masses;
+
+	uint32_t processor_count = 0;
+	size_t numElementsPerThread = 0;
+
+	static constexpr float DAMPING = 0.01f; // how much to damp the simulation each frame
+	static constexpr float FIXED_TIME_STEP = (1.0f / 120.0f);
+	static constexpr float FIXED_TIME_STEP2 = (FIXED_TIME_STEP * FIXED_TIME_STEP);
+};
+#elif ALL_DIMESNIONS_ALIGNAS
+struct alignas(64) PhysicsComponents {
+	//std::vector<VgMath::Vector3> positions;
+	std::vector<float> positions_x;
+	std::vector<float> positions_y;
+	std::vector<float> positions_z;
+	//std::vector<VgMath::Vector3> oldPositions;
+	std::vector<float> oldPositions_x;
+	std::vector<float> oldPositions_y;
+	std::vector<float> oldPositions_z;
+	//std::vector<VgMath::Vector3> forces;
+	std::vector<float> forces_x;
+	std::vector<float> forces_y;
+	std::vector<float> forces_z;
+	std::vector<float> masses;
+
+	uint32_t processor_count = 0;
+	size_t numElementsPerThread = 0;
+
+	static constexpr float DAMPING = 0.01f; // how much to damp the simulation each frame
+	static constexpr float FIXED_TIME_STEP = (1.0f / 120.0f);
+	static constexpr float FIXED_TIME_STEP2 = (FIXED_TIME_STEP * FIXED_TIME_STEP);
+};
+#elif ALIGNAS
+struct alignas(64) PhysicsComponents {
 	std::vector<VgMath::Vector3> positions;
 	std::vector<VgMath::Vector3> oldPositions;
 	std::vector<VgMath::Vector3> forces;
@@ -31,3 +77,19 @@ struct alignas(64) PhysicsComponents
 	static constexpr float FIXED_TIME_STEP = (1.0f / 120.0f);
 	static constexpr float FIXED_TIME_STEP2 = (FIXED_TIME_STEP * FIXED_TIME_STEP);
 };
+#else 
+struct PhysicsComponents {
+	std::vector<VgMath::Vector3> positions;
+	std::vector<VgMath::Vector3> oldPositions;
+	std::vector<VgMath::Vector3> forces;
+	std::vector<float> masses;
+
+	uint32_t processor_count = 0;
+	size_t numElementsPerThread = 0;
+
+	static constexpr float DAMPING = 0.01f; // how much to damp the simulation each frame
+	static constexpr float FIXED_TIME_STEP = (1.0f / 120.0f);
+	static constexpr float FIXED_TIME_STEP2 = (FIXED_TIME_STEP * FIXED_TIME_STEP);
+};
+#endif // 
+
