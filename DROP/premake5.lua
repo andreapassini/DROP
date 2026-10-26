@@ -96,18 +96,22 @@ project "Drop"
 		-- buildoptions "/MDd"
       -- buildoptions "/MD"
       -- buildoptions {"/MT", "/arch:AVX2", "–mavx2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
-      buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
-      -- buildoptions "/MT"   
+      -- buildoptions {"/MT", "/arch:AVX2", "-openmp:experimental", "-Qvec-report:2"}
+      buildoptions "/MT"   
 
    filter "configurations:Release"
-      defines { "DROP_RELEASE" }
+      defines { "DROP_RELEASE", "SOA_ALL_DIMENSIONS" }
       runtime "Release"
       optimize "On"
       symbols "On"
       -- buildoptions "/MD"
       -- buildoptions {"/MT", "/arch:AVX2", "–mavx2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
       -- buildoptions {"/MT", "/arch:SSE4.2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
-      buildoptions {"/MT", "/arch:AVX2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions {"/MT", "/arch:AVX2", "-o3", "-openmp:experimental", "-Qvec-report:2"}
+      buildoptions {"/MT", "-march:native", "-o3", "-openmp:experimental", "-Qvec-report:2"}
+      -- buildoptions {"/MT"}
+      -- buildoptions {"/MT", "-o3"}
+      -- buildoptions {"/MT", "-o3"}
       -- buildoptions {"/MT", "-march=native", "-o3", "-openmp:experimental", "-Qvec-report:2"}
       -- buildoptions "/MT"
 

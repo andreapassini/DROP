@@ -159,15 +159,21 @@ void VerletResolution(
 		currentPhysicsComp.force = VgMath::Vector3(0.0, -9.8, 0.0);
 
 		VgMath::Vector3 tempPos = currentPhysicsComp.position;
+
 		VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
+		currentPhysicsComp.position = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position)
+			- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition)
+			+ (accel * currentPhysicsComp.FIXED_TIME_STEP2);
 
-		VgMath::Vector3 DAMPxPos = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position);
-		VgMath::Vector3 DAMPxOldPos = ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition);
-		VgMath::Vector3 Accel = (accel * currentPhysicsComp.FIXED_TIME_STEP2);
+		//VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
 
-		currentPhysicsComp.position = DAMPxPos
-			- DAMPxOldPos
-			+ Accel;
+		//VgMath::Vector3 DAMPxPos = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position);
+		//VgMath::Vector3 DAMPxOldPos = ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition);
+		//VgMath::Vector3 Accel = (accel * currentPhysicsComp.FIXED_TIME_STEP2);
+
+		//currentPhysicsComp.position = DAMPxPos
+		//	- DAMPxOldPos
+		//	+ Accel;
 		currentPhysicsComp.oldPosition = tempPos;
 
 		// impulse only in one frame
@@ -220,6 +226,73 @@ void SoA_VerletResolution(
 
 		// impulse only in one frame
 		forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+	}
+}
+
+void SoA_VerletResolution_AllDim(
+	float* positions_x
+	, float* positions_y
+	, float* positions_z
+	, float* oldPositions_x
+	, float* oldPositions_y
+	, float* oldPositions_z
+	, float* forces_x
+	, float* forces_y
+	, float* forces_z
+	, float* masses
+	, float DAMPING
+	, float FIXED_TIME_STEP2
+	, int32_t offset
+	, int32_t numOfElements
+	, int32_t max
+) {
+	if (offset + numOfElements > max)
+	{
+		// remove exceeding elements
+		numOfElements -= (offset + numOfElements) - max; 
+		if (numOfElements < 0)
+		{
+			return;
+		}
+	}
+
+#pragma omp simd
+	for (int32_t i = offset; i < numOfElements; i++)
+	{
+		// assuming to always add gravity
+		forces_x[i] = 0.0f;
+		forces_y[i] = -9.8;
+		forces_z[i] = 0.0f;
+
+		//VgMath::Vector3 tempPos = positions[i];
+		float tempPos_x = positions_x[i];
+		float tempPos_y = positions_y[i];
+		float tempPos_z = positions_z[i];
+
+		//VgMath::Vector3 accel = forces[i] / masses[i];
+		float accel_x = forces_x[i] / masses[i];
+		float accel_y = forces_y[i] / masses[i];
+		float accel_z = forces_z[i] / masses[i];
+
+		positions_x[i] = ((2.0f - DAMPING) * positions_x[i])
+			- ((1.0f - DAMPING) * oldPositions_x[i])
+			+ (accel_x * FIXED_TIME_STEP2);
+		positions_y[i] = ((2.0f - DAMPING) * positions_y[i])
+			- ((1.0f - DAMPING) * oldPositions_y[i])
+			+ (accel_y * FIXED_TIME_STEP2);
+		positions_z[i] = ((2.0f - DAMPING) * positions_z[i])
+			- ((1.0f - DAMPING) * oldPositions_z[i])
+			+ (accel_z * FIXED_TIME_STEP2);
+
+		oldPositions_x[i] = tempPos_x;
+		oldPositions_y[i] = tempPos_y;
+		oldPositions_z[i] = tempPos_z;
+
+		// impulse only in one frame
+		//forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		forces_x[i] = 0.0f;
+		forces_y[i] = 0.0f;
+		forces_z[i] = 0.0f;
 	}
 }
 
@@ -365,7 +438,6 @@ void PhysicsEngine::ApplyForces(
 ) {
 	std::vector<PhysicsComponent>& densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
-#pragma loop(no_vector)
 	for (int32_t i = 0; i < max; i++)
 	{
 		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
@@ -392,24 +464,42 @@ void PhysicsEngine::SoA_ApplyForces(
 ) {
 	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
 
-#pragma loop(no_vector)
 	for (int32_t i = 0; i < max; i++)
 	{
 		// assuming to always add gravity
-		physicsComponents.forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+		physicsComponents.forces_x[i] = 0.0f;
+		physicsComponents.forces_y[i] = -9.8f;
+		physicsComponents.forces_z[i] = 0.0f;
 
-		VgMath::Vector3 tempPos = physicsComponents.positions[i];
+		//VgMath::Vector3 tempPos = physicsComponents.positions[i];
+		float tempPos_x = physicsComponents.positions_x[i];
+		float tempPos_y = physicsComponents.positions_y[i];
+		float tempPos_z = physicsComponents.positions_z[i];
 
-		VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+		//VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+		float accel_x = physicsComponents.forces_x[i] / physicsComponents.masses[i];
+		float accel_y = physicsComponents.forces_y[i] / physicsComponents.masses[i];
+		float accel_z = physicsComponents.forces_z[i] / physicsComponents.masses[i];
 
-		physicsComponents.positions[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions[i])
-			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions[i])
-			+ (accel * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.positions_x[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions_x[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions_x[i])
+			+ (accel_x * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.positions_y[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions_y[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions_y[i])
+			+ (accel_y * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.positions_z[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions_z[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions_z[i])
+			+ (accel_z * physicsComponents.FIXED_TIME_STEP2);
 
-		physicsComponents.oldPositions[i] = tempPos;
+		physicsComponents.oldPositions_x[i] = tempPos_x;
+		physicsComponents.oldPositions_y[i] = tempPos_y;
+		physicsComponents.oldPositions_z[i] = tempPos_z;
 
 		// impulse only in one frame
-		physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		//physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		physicsComponents.forces_x[i] = 0.0f;
+		physicsComponents.forces_y[i] = 0.0f;
+		physicsComponents.forces_z[i] = 0.0f;
 	}
 }
 
@@ -490,12 +580,30 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 	for (int32_t i = 0; i < max; i+= physicsComponents.numElementsPerThread) {
 		int32_t offset = i /** numElementsPerThread*/;
 		futures.push_back(
+			//std::async(std::launch::async,
+			//	//SoA_VerletResolution
+			//	SoA_HandSIMD_VerletResolution
+			//	, physicsComponents.positions.data()
+			//	, physicsComponents.oldPositions.data()
+			//	, physicsComponents.forces.data()
+			//	, physicsComponents.masses.data()
+			//	, physicsComponents.DAMPING
+			//	, physicsComponents.FIXED_TIME_STEP2
+			//	, offset
+			//	, physicsComponents.numElementsPerThread
+			//	, max
+			//)
 			std::async(std::launch::async,
-				//SoA_VerletResolution
-				SoA_HandSIMD_VerletResolution
-				, physicsComponents.positions.data()
-				, physicsComponents.oldPositions.data()
-				, physicsComponents.forces.data()
+				SoA_VerletResolution_AllDim
+				, physicsComponents.positions_x.data()
+				, physicsComponents.positions_y.data()
+				, physicsComponents.positions_z.data()
+				, physicsComponents.oldPositions_x.data()
+				, physicsComponents.oldPositions_y.data()
+				, physicsComponents.oldPositions_z.data()
+				, physicsComponents.forces_x.data()
+				, physicsComponents.forces_y.data()
+				, physicsComponents.forces_z.data()
 				, physicsComponents.masses.data()
 				, physicsComponents.DAMPING
 				, physicsComponents.FIXED_TIME_STEP2
@@ -556,20 +664,40 @@ void PhysicsEngine::SIMD_SoA_ApplyForces(
 	for (int32_t i = 0; i < max; i++)
 	{
 		// assuming to always add gravity
-		physicsComponents.forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+		physicsComponents.forces_x[i] = 0.0f;
+		physicsComponents.forces_y[i] = -9.8f;
+		physicsComponents.forces_z[i] = 0.0f;
 
-		VgMath::Vector3 tempPos = physicsComponents.positions[i];
+		//VgMath::Vector3 tempPos = physicsComponents.positions[i];
+		float tempPos_x = physicsComponents.positions_x[i];
+		float tempPos_y = physicsComponents.positions_y[i];
+		float tempPos_z = physicsComponents.positions_z[i];
 
-		VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+		//VgMath::Vector3 accel = physicsComponents.forces[i] / physicsComponents.masses[i];
+		float accel_x = physicsComponents.forces_x[i] / physicsComponents.masses[i];
+		float accel_y = physicsComponents.forces_y[i] / physicsComponents.masses[i];
+		float accel_z = physicsComponents.forces_z[i] / physicsComponents.masses[i];
 
-		physicsComponents.positions[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions[i])
-			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions[i])
-			+ (accel * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.positions_x[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions_x[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions_x[i])
+			+ (accel_x * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.positions_y[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions_y[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions_y[i])
+			+ (accel_y * physicsComponents.FIXED_TIME_STEP2);
+		physicsComponents.positions_z[i] = ((2.0f - physicsComponents.DAMPING) * physicsComponents.positions_z[i])
+			- ((1.0f - physicsComponents.DAMPING) * physicsComponents.oldPositions_z[i])
+			+ (accel_z * physicsComponents.FIXED_TIME_STEP2);
 
-		physicsComponents.oldPositions[i] = tempPos;
+		physicsComponents.oldPositions_x[i] = tempPos_x;
+		physicsComponents.oldPositions_y[i] = tempPos_y;
+		physicsComponents.oldPositions_z[i] = tempPos_z;
 
 		// impulse only in one frame
-		physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		//physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+		physicsComponents.forces_x[i] = 0.0f;
+		physicsComponents.forces_y[i] = 0.0f;
+		physicsComponents.forces_z[i] = 0.0f;
+
 	}
 }
 
@@ -652,8 +780,8 @@ bool PhysicsEngine::CheckEquality(
 ) {
 	bool bEquals = false;
 
-	int32_t ANum = A.positions.size();
-	int32_t BNum = B.positions.size();
+	int32_t ANum = A.positions_x.size();
+	int32_t BNum = B.positions_x.size();
 
 	if (ANum != BNum)
 	{
@@ -664,8 +792,12 @@ bool PhysicsEngine::CheckEquality(
 
 	for (size_t i = 0; i < ANum; i++)
 	{
-		if (VgMath::areEqual(A.oldPositions[i], B.oldPositions[i])
-			&& VgMath::areEqual(A.positions[i], B.positions[i])
+		if (VgMath::areEqual(A.oldPositions_x[i], B.oldPositions_x[i])
+			&& VgMath::areEqual(A.oldPositions_y[i], B.oldPositions_y[i])
+			&& VgMath::areEqual(A.oldPositions_z[i], B.oldPositions_z[i])
+			&& VgMath::areEqual(A.positions_x[i], B.positions_x[i])
+			&& VgMath::areEqual(A.positions_y[i], B.positions_y[i])
+			&& VgMath::areEqual(A.positions_z[i], B.positions_z[i])
 		) {
 			bEquals = false;
 			break;
@@ -678,14 +810,24 @@ bool PhysicsEngine::CheckEquality(
 void PhysicsEngine::ResetPositions(
 	PhysicsComponents& A
 ) {
-	for (size_t i = 0; i < A.positions.size(); i++)
+	for (size_t i = 0; i < A.positions_x.size(); i++)
 	{
-		A.oldPositions[i].x = 0.0;
-		A.oldPositions[i].y = 0.0;
-		A.oldPositions[i].z = 0.0;
+		A.oldPositions_x[i] = 0.0;
+		A.oldPositions_y[i] = 0.0;
+		A.oldPositions_z[i] = 0.0;
 
-		A.positions[i].x = 0.0;
-		A.positions[i].y = 0.0;
-		A.positions[i].z = 0.0;
+		A.positions_x[i] = 0.0;
+		A.positions_y[i] = 0.0;
+		A.positions_z[i] = 0.0;
 	}
+	//for (size_t i = 0; i < A.positions.size(); i++)
+	//{
+	//	A.oldPositions[i].x = 0.0;
+	//	A.oldPositions[i].y = 0.0;
+	//	A.oldPositions[i].z = 0.0;
+
+	//	A.positions[i].x = 0.0;
+	//	A.positions[i].y = 0.0;
+	//	A.positions[i].z = 0.0;
+	//}
 }

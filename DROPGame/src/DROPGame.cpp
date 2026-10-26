@@ -378,16 +378,28 @@ public:
 
         // Physics Component - SoA 
         PhysicsComponents& physicsComponents = currScene->ecs.GetSingletonComponent<PhysicsComponents>();
-        physicsComponents.positions.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.oldPositions.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.forces.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.positions_x.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.positions_y.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.positions_z.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.oldPositions_x.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.oldPositions_y.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.oldPositions_z.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.forces_x.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.forces_y.reserve(NUM_PHYSICS_ENTITITES);
+        physicsComponents.forces_z.reserve(NUM_PHYSICS_ENTITITES);
         physicsComponents.masses.reserve(NUM_PHYSICS_ENTITITES);
         for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
         {
             physicsComponents.masses[i] = MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS));
-            physicsComponents.oldPositions[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
-            physicsComponents.positions[i] = physicsComponents.oldPositions[i];
-            physicsComponents.forces[i] = 0.0f;
+            physicsComponents.oldPositions_x[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
+            physicsComponents.oldPositions_y[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
+            physicsComponents.oldPositions_z[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
+            physicsComponents.positions_x[i] = physicsComponents.oldPositions_x[i];
+            physicsComponents.positions_y[i] = physicsComponents.oldPositions_y[i];
+            physicsComponents.positions_z[i] = physicsComponents.oldPositions_z[i];
+            physicsComponents.forces_x[i] = 0.0f;
+            physicsComponents.forces_y[i] = 0.0f;
+            physicsComponents.forces_z[i] = 0.0f;
         }
         // -----
 

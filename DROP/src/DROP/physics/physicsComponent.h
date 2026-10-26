@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DROP/math/transform.h"
+#include <vector>
 
 struct PhysicsComponent
 {
@@ -16,12 +17,20 @@ struct PhysicsComponent
 	static constexpr float FIXED_TIME_STEP2 = (FIXED_TIME_STEP * FIXED_TIME_STEP);
 };
 
-// SoA
 struct alignas(64) PhysicsComponents
 {
-	std::vector<VgMath::Vector3> positions;
-	std::vector<VgMath::Vector3> oldPositions;
-	std::vector<VgMath::Vector3> forces;
+	//std::vector<VgMath::Vector3> positions;
+	std::vector<float> positions_x;
+	std::vector<float> positions_y;
+	std::vector<float> positions_z;
+	//std::vector<VgMath::Vector3> oldPositions;
+	std::vector<float> oldPositions_x;
+	std::vector<float> oldPositions_y;
+	std::vector<float> oldPositions_z;
+	//std::vector<VgMath::Vector3> forces;
+	std::vector<float> forces_x;
+	std::vector<float> forces_y;
+	std::vector<float> forces_z;
 	std::vector<float> masses;
 
 	uint32_t processor_count = 0;
