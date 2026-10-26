@@ -208,6 +208,46 @@ void SoA_VerletResolution(
 		// assuming to always add gravity
 		forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
 
+		VgMath::Vector3 tempPos = positions[i];
+		VgMath::Vector3 accel = forces[i] / masses[i];
+		positions[i] = ((2.0f - DAMPING) * positions[i])
+			- ((1.0f - DAMPING) * oldPositions[i])
+			+ (accel * FIXED_TIME_STEP2);
+		oldPositions[i] = tempPos;
+
+		// impulse only in one frame
+		forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
+	}
+}
+
+
+void SoA_VerletResolution_Reordered(
+	VgMath::Vector3* positions
+	, VgMath::Vector3* oldPositions
+	, VgMath::Vector3* forces
+	, float* masses
+	, float DAMPING
+	, float FIXED_TIME_STEP2
+	, int32_t offset
+	, int32_t numOfElements
+	, int32_t max
+) {
+	if (offset + numOfElements > max)
+	{
+		// remove exceeding elements
+		numOfElements -= (offset + numOfElements) - max; 
+		if (numOfElements < 0)
+		{
+			return;
+		}
+	}
+
+#pragma omp simd
+	for (int32_t i = offset; i < numOfElements; i++)
+	{
+		// assuming to always add gravity
+		forces[i] = VgMath::Vector3(0.0, -9.8, 0.0);
+
 		VgMath::Vector3 accel = forces[i] / masses[i];
 
 		VgMath::Vector3 tempPos = positions[i];
