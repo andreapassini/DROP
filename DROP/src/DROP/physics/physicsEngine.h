@@ -94,6 +94,9 @@ public:
 	void SIMD_SoA_ApplyForces(ECS& ecs
 		, const int32_t max
 	);
+	void SIMD_ByHand_SoA_ApplyForces(ECS& ecs
+		, const int32_t max
+	);
 
 	void ApplyConstraints();
 	void HandleCollision();
