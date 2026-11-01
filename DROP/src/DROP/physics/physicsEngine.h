@@ -34,6 +34,9 @@ public:
 	void SIMD_SoA_PhysicsStep(ECS& ecs
 		, const int32_t max
 	);
+	void SIMD_ByHand_SoA_PhysicsStep(ECS& ecs
+		, const int32_t max
+	);
 	void MultiThread_SoA_PhysicsStep(ECS& ecs
 		, const int32_t max
 	);

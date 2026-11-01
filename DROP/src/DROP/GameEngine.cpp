@@ -397,6 +397,34 @@ namespace Drop
 					// Reset the positions
 					PhysicsEngine::ResetPositions(physicsComponents);
 
+					//SIMD by HAND
+					sceneContext.SIMD_ByHand_SoA_physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Calculate times
+						// Start Time
+						float startTime = GetTime();
+
+						m_PhysicsEngine.SIMD_ByHand_SoA_PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
+
+						float endTime = GetTime();
+						sceneContext.SIMD_ByHand_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					}
+					float SIMD_ByHand_SoA_physicsStepDuration = sceneContext.SIMD_ByHand_SoA_physicsStepDuration / numOfIterations;
+
+					// Check
+					bEquality = PhysicsEngine::CheckEquality(
+						copyForChecker_SoA
+						, physicsComponents
+					);
+					assert(bEquality);
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(physicsComponents);
+
 					// Multi Threaded
 					sceneContext.MultiThread_SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
@@ -448,6 +476,10 @@ namespace Drop
 					averagesText.append(std::to_string(SIMD_physicsStepAverage));
 					averagesText.append("\n");
 
+					averagesText.append("SIMD_ByHand_SoA_physicsStepDuration: ");
+					averagesText.append(std::to_string(SIMD_ByHand_SoA_physicsStepDuration));
+					averagesText.append("\n");
+
 					physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
 
 					averagesText.append("MultiThread_physicsStepAverage: ");
@@ -477,6 +509,10 @@ namespace Drop
 					averagesText.append(std::to_string(SIMD_SoA_physicsStepAverage));
 					averagesText.append("\n");
 
+					averagesText.append("SIMD_ByHand_SoA_physicsStepDuration: ");
+					averagesText.append(std::to_string(SIMD_ByHand_SoA_physicsStepDuration));
+					averagesText.append("\n");
+
 					averagesText.append("MultiThread_SoA_physicsStepAverage: ");
 					averagesText.append(std::to_string(MultiThread_SoA_physicsStepAverage));
 					averagesText.append("\n\t numElementsPerThread = ");
@@ -486,7 +522,7 @@ namespace Drop
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
 					//std::string filePath = absProjPath + "\\PerCompSOA_native_Divided2_alignas(64)_Desktop_AverageOutput.txt";
-					std::string filePath = absProjPath + "\\Desktop_multiThread_SoAAllDim_march_native.txt";
+					std::string filePath = absProjPath + "\\SIMD_ByHand_march_native.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				
