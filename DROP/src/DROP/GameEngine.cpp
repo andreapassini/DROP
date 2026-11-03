@@ -261,7 +261,7 @@ namespace Drop
 
 				for (int32_t max = 10; max <= 1'000'000; max *= 10)
 				{
-					const int32_t numOfIterations = 10;
+					const int32_t numOfIterations = 1;
 
 					// Single Threaded
 					sceneContext.physicsStepDuration = 0.0f;
@@ -452,40 +452,67 @@ namespace Drop
 					// Reset the positions
 					PhysicsEngine::ResetPositions(physicsComponents);
 
+					// SIMD - Multi Threaded
+					sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration = 0.0f;
+					for (int32_t i = 0; i < numOfIterations; i++)
+					{
+						// Start Time
+						float startTime = GetTime();
+
+						m_PhysicsEngine.MultiThread_SoA_SIMDByHand_PhysicsStep(
+							g_activeScene->ecs
+							, max
+						);
+
+						float endTime = GetTime();
+						sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					}
+					float MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage = sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration / numOfIterations;
+
+					// Check
+					bEquality = PhysicsEngine::CheckEquality(
+						copyForChecker_SoA
+						, physicsComponents
+					);
+					assert(bEquality);
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(physicsComponents);
+
 					// write on file the averages
 					std::string averagesText;
 
 					SceneContext& sceneContext = g_activeScene->ecs.GetSingletonComponent<SceneContext>();
 						
-					averagesText.append("Array of Structs");
-					averagesText.append("\n");
+					//averagesText.append("Array of Structs");
+					//averagesText.append("\n");
 
-					averagesText.append("physicsComponents: ");
-					averagesText.append(std::to_string(max));
-					averagesText.append("\n");
+					//averagesText.append("physicsComponents: ");
+					//averagesText.append(std::to_string(max));
+					//averagesText.append("\n");
 
-					averagesText.append("numOfIterations: ");
-					averagesText.append(std::to_string(numOfIterations));
-					averagesText.append("\n");
+					//averagesText.append("numOfIterations: ");
+					//averagesText.append(std::to_string(numOfIterations));
+					//averagesText.append("\n");
 
-					averagesText.append("physicsStepAverage: ");
-					averagesText.append(std::to_string(physicsStepAverage));
-					averagesText.append("\n");
+					//averagesText.append("physicsStepAverage: ");
+					//averagesText.append(std::to_string(physicsStepAverage));
+					//averagesText.append("\n");
 
-					averagesText.append("SIMD_physicsStepAverage: ");
-					averagesText.append(std::to_string(SIMD_physicsStepAverage));
-					averagesText.append("\n");
+					//averagesText.append("SIMD_physicsStepAverage: ");
+					//averagesText.append(std::to_string(SIMD_physicsStepAverage));
+					//averagesText.append("\n");
 
-					averagesText.append("SIMD_ByHand_SoA_physicsStepDuration: ");
-					averagesText.append(std::to_string(SIMD_ByHand_SoA_physicsStepDuration));
-					averagesText.append("\n");
+					//averagesText.append("SIMD_ByHand_SoA_physicsStepDuration: ");
+					//averagesText.append(std::to_string(SIMD_ByHand_SoA_physicsStepDuration));
+					//averagesText.append("\n");
 
-					physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
+					//physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
 
-					averagesText.append("MultiThread_physicsStepAverage: ");
-					averagesText.append(std::to_string(MultiThread_physicsStepAverage));
-					averagesText.append("\n\t numElementsPerThread = ");
-					averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
+					//averagesText.append("MultiThread_physicsStepAverage: ");
+					//averagesText.append(std::to_string(MultiThread_physicsStepAverage));
+					//averagesText.append("\n\t numElementsPerThread = ");
+					//averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
 
 
 					// SoA
@@ -501,13 +528,13 @@ namespace Drop
 					averagesText.append(std::to_string(numOfIterations));
 					averagesText.append("\n");
 
-					averagesText.append("SoA_physicsStepAverage: ");
-					averagesText.append(std::to_string(SoA_physicsStepAverage));
-					averagesText.append("\n");
+					//averagesText.append("SoA_physicsStepAverage: ");
+					//averagesText.append(std::to_string(SoA_physicsStepAverage));
+					//averagesText.append("\n");
 
-					averagesText.append("SIMD_SoA_physicsStepAverage: ");
-					averagesText.append(std::to_string(SIMD_SoA_physicsStepAverage));
-					averagesText.append("\n");
+					//averagesText.append("SIMD_SoA_physicsStepAverage: ");
+					//averagesText.append(std::to_string(SIMD_SoA_physicsStepAverage));
+					//averagesText.append("\n");
 
 					averagesText.append("SIMD_ByHand_SoA_physicsStepDuration: ");
 					averagesText.append(std::to_string(SIMD_ByHand_SoA_physicsStepDuration));
@@ -518,11 +545,16 @@ namespace Drop
 					averagesText.append("\n\t numElementsPerThread = ");
 					averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
 					averagesText.append("\n");
+					averagesText.append("MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: ");
+					averagesText.append(std::to_string(MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage));
+					averagesText.append("\n\t numElementsPerThread = ");
+					averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
+					averagesText.append("\n");
 					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
 					//std::string filePath = absProjPath + "\\PerCompSOA_native_Divided2_alignas(64)_Desktop_AverageOutput.txt";
-					std::string filePath = absProjPath + "\\SIMD_ByHand_march_native.txt";
+					std::string filePath = absProjPath + "\\MultiThread_SIMDByHand.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				

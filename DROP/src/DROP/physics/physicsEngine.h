@@ -41,6 +41,11 @@ public:
 		, const int32_t max
 	);
 
+	void MultiThread_SoA_SIMDByHand_PhysicsStep(
+		ECS& ecs
+		, const int32_t max
+	);
+
 	void SynchVirtualTime(double timeToSync);
 
 	double GetVirtualTIme();
@@ -92,6 +97,9 @@ public:
 		, const int32_t max
 	);
 	void MultiThread_SoA_ApplyForces(ECS& ecs
+		, const int32_t max
+	);
+	void MultiThread_SoA_SIMDByHand_ApplyForces(ECS& ecs
 		, const int32_t max
 	);
 	void SIMD_SoA_ApplyForces(ECS& ecs

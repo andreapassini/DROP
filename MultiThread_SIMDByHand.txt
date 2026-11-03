@@ -1,0 +1,250 @@
+
+Struct of Arrays
+physicsComponents: 10
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000140
+MultiThread_SoA_physicsStepAverage: 0.013480
+	 numElementsPerThread = 10000
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.151548
+	 numElementsPerThread = 10000
+
+
+Struct of Arrays
+physicsComponents: 100
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000301
+MultiThread_SoA_physicsStepAverage: 0.012863
+	 numElementsPerThread = 10000
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.343677
+	 numElementsPerThread = 10000
+
+
+Struct of Arrays
+physicsComponents: 1000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.001901
+MultiThread_SoA_physicsStepAverage: 0.018114
+	 numElementsPerThread = 10000
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.014773
+	 numElementsPerThread = 10000
+
+
+Struct of Arrays
+physicsComponents: 10000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.018406
+MultiThread_SoA_physicsStepAverage: 0.038618
+	 numElementsPerThread = 10000
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.028503
+	 numElementsPerThread = 10000
+
+
+Struct of Arrays
+physicsComponents: 100000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.194472
+MultiThread_SoA_physicsStepAverage: 0.044608
+	 numElementsPerThread = 10000
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.839663
+	 numElementsPerThread = 10000
+
+
+Struct of Arrays
+physicsComponents: 1000000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 2.514207
+MultiThread_SoA_physicsStepAverage: 0.105953
+	 numElementsPerThread = 10000
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 26.311218
+	 numElementsPerThread = 10000
+
+
+Struct of Arrays
+physicsComponents: 10
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000161
+MultiThread_SoA_physicsStepAverage: 0.024855
+	 numElementsPerThread = 1
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 8199.999023
+	 numElementsPerThread = 1
+
+
+Struct of Arrays
+physicsComponents: 100
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000000
+MultiThread_SoA_physicsStepAverage: 0.016785
+	 numElementsPerThread = 6
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1496.411865
+	 numElementsPerThread = 6
+
+
+Struct of Arrays
+physicsComponents: 1000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.001526
+MultiThread_SoA_physicsStepAverage: 0.019073
+	 numElementsPerThread = 62
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.045776
+	 numElementsPerThread = 62
+
+
+Struct of Arrays
+physicsComponents: 10000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.018311
+MultiThread_SoA_physicsStepAverage: 0.036621
+	 numElementsPerThread = 625
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.149536
+	 numElementsPerThread = 625
+
+
+Struct of Arrays
+physicsComponents: 100000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.185394
+MultiThread_SoA_physicsStepAverage: 0.043488
+	 numElementsPerThread = 6250
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.605774
+	 numElementsPerThread = 6250
+
+
+Struct of Arrays
+physicsComponents: 1000000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 1.951599
+MultiThread_SoA_physicsStepAverage: 0.117493
+	 numElementsPerThread = 62500
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 4.540253
+	 numElementsPerThread = 62500
+
+
+Struct of Arrays
+physicsComponents: 10
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000161
+MultiThread_SoA_physicsStepAverage: 0.015575
+	 numElementsPerThread = 1
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 2.435613
+	 numElementsPerThread = 1
+
+
+Struct of Arrays
+physicsComponents: 100
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000274
+MultiThread_SoA_physicsStepAverage: 0.014472
+	 numElementsPerThread = 6
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 25.446945
+	 numElementsPerThread = 6
+
+
+Struct of Arrays
+physicsComponents: 1000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.001895
+MultiThread_SoA_physicsStepAverage: 0.018913
+	 numElementsPerThread = 62
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 209.810699
+	 numElementsPerThread = 62
+
+
+Struct of Arrays
+physicsComponents: 10000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.018716
+MultiThread_SoA_physicsStepAverage: 0.035548
+	 numElementsPerThread = 625
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 2290.900879
+	 numElementsPerThread = 625
+
+
+Struct of Arrays
+physicsComponents: 10
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000185
+MultiThread_SoA_physicsStepAverage: 0.010550
+	 numElementsPerThread = 1
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 2.577651
+	 numElementsPerThread = 1
+
+
+Struct of Arrays
+physicsComponents: 100
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000316
+MultiThread_SoA_physicsStepAverage: 0.014293
+	 numElementsPerThread = 6
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 25.921902
+	 numElementsPerThread = 6
+
+
+Struct of Arrays
+physicsComponents: 10
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000089
+MultiThread_SoA_physicsStepAverage: 0.012255
+	 numElementsPerThread = 1
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 2.079463
+	 numElementsPerThread = 1
+
+
+Struct of Arrays
+physicsComponents: 100
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.000411
+MultiThread_SoA_physicsStepAverage: 0.017858
+	 numElementsPerThread = 6
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 9.373407
+	 numElementsPerThread = 6
+
+
+Struct of Arrays
+physicsComponents: 1000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.002247
+MultiThread_SoA_physicsStepAverage: 0.018972
+	 numElementsPerThread = 62
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 2.333677
+	 numElementsPerThread = 62
+
+
+Struct of Arrays
+physicsComponents: 10000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.021595
+MultiThread_SoA_physicsStepAverage: 0.040454
+	 numElementsPerThread = 625
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 2.191061
+	 numElementsPerThread = 625
+
+
+Struct of Arrays
+physicsComponents: 100000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 0.190878
+MultiThread_SoA_physicsStepAverage: 0.042760
+	 numElementsPerThread = 6250
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 3.041959
+	 numElementsPerThread = 6250
+
+
+Struct of Arrays
+physicsComponents: 1000000
+numOfIterations: 10
+SIMD_ByHand_SoA_physicsStepDuration: 2.380788
+MultiThread_SoA_physicsStepAverage: 0.088429
+	 numElementsPerThread = 62500
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 7.749391
+	 numElementsPerThread = 62500
+
+
+Struct of Arrays
+physicsComponents: 10
+numOfIterations: 1
+SIMD_ByHand_SoA_physicsStepDuration: 0.003219
+MultiThread_SoA_physicsStepAverage: 0.071526
+	 numElementsPerThread = 10
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 30539.796875
+	 numElementsPerThread = 10
+
