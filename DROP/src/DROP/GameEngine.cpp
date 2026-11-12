@@ -258,10 +258,11 @@ namespace Drop
 
 
 				m_Game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
+#define NUM_PHYSICS_ENTITITES 1'000'000 // strange behavior with 1 mln
 
-				for (int32_t max = 10; max <= 1'000'000; max *= 10)
+				for (int32_t max = NUM_PHYSICS_ENTITITES; max <= NUM_PHYSICS_ENTITITES; max *= 10)
 				{
-					const int32_t numOfIterations = 1;
+					const int32_t numOfIterations = 10;
 
 					// Single Threaded
 					sceneContext.physicsStepDuration = 0.0f;
@@ -438,7 +439,10 @@ namespace Drop
 						);
 
 						float endTime = GetTime();
-						sceneContext.MultiThread_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
+						float iterationTimeMS = (endTime - startTime) * 1000.0f;
+						std::cout << "MultiThread_SoA_physicsStepDuration" 
+							<< "Numbers: " << max << " in iterationTimeMS" << iterationTimeMS << std::endl;
+						sceneContext.MultiThread_SoA_physicsStepDuration += iterationTimeMS;
 					}
 					float MultiThread_SoA_physicsStepAverage = sceneContext.MultiThread_SoA_physicsStepDuration / numOfIterations;
 
@@ -465,7 +469,10 @@ namespace Drop
 						);
 
 						float endTime = GetTime();
-						sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration += (endTime - startTime) * 1000.0f;
+						float iterationTimeMS = (endTime - startTime) * 1000.0f;
+						std::cout << "MultiThread_SoA_SIMD_ByHand_physicsStepDuration" 
+							<< "Numbers: " << max << " in iterationTimeMS" << iterationTimeMS << std::endl;
+						sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration += iterationTimeMS;
 					}
 					float MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage = sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration / numOfIterations;
 
@@ -516,6 +523,8 @@ namespace Drop
 
 
 					// SoA
+					averagesText.append("\n");
+					averagesText.append("-----------------------------------------------------------------------------");
 					averagesText.append("\n");
 					averagesText.append("Struct of Arrays");
 					averagesText.append("\n");

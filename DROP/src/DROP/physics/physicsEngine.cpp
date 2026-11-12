@@ -588,14 +588,12 @@ void SoA_HandSIMD_VerletResolution(
 		forces_z[i + 7] = 0.0f;
 	}
 
-	std::cout << "SIMD for i=" << i << std::endl;
-
 	int32_t remaining = numOfElements - i;
 
 	// Execute the last remaining ops
 	for (i = i; i < numOfElements; i++) // AVX2 -> 256 bits ops -> 8 wide
 	{
-		std::cout << "not SIMD for i=" << i << std::endl;
+		//std::cout << "From Offset " << offset << " : offset not SIMD for i=" << i << std::endl;
 
 		// assuming to always add gravity
 		forces_x[i] = 0.0f;
@@ -777,8 +775,16 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 		assert(0);
 	}
 
-	//physicsComponents.numElementsPerThread = max / physicsComponents.processor_count;
-	physicsComponents.numElementsPerThread = 10'000;
+	if (max > physicsComponents.processor_count)
+	{
+		physicsComponents.numElementsPerThread = max / physicsComponents.processor_count;
+	}
+	else
+	{
+		physicsComponents.numElementsPerThread = max;
+	}
+
+	//physicsComponents.numElementsPerThread = 10'000;
 	for (int32_t i = 0; i < max; i+= physicsComponents.numElementsPerThread) {
 		int32_t offset = i /** numElementsPerThread*/;
 		futures.push_back(
@@ -823,11 +829,15 @@ void PhysicsEngine::MultiThread_SoA_SIMDByHand_ApplyForces(
 		assert(0);
 	}
 
-	physicsComponents.numElementsPerThread = max / physicsComponents.processor_count;
-	if (physicsComponents.numElementsPerThread <= 0)
+	if (max > physicsComponents.processor_count)
+	{
+		physicsComponents.numElementsPerThread = max / physicsComponents.processor_count;
+	}
+	else
 	{
 		physicsComponents.numElementsPerThread = max;
 	}
+
 	//physicsComponents.numElementsPerThread = 10'000;
 	for (int32_t i = 0; i < max; i+= physicsComponents.numElementsPerThread) {
 		int32_t offset = i /** numElementsPerThread*/;
