@@ -33,8 +33,8 @@ struct alignas(64) PhysicsComponents
 	std::vector<float> forces_z;
 	std::vector<float> masses;
 
-	uint32_t processor_count = 0;
-	size_t numElementsPerThread = 0;
+	int32_t processor_count = 0;
+	int32_t numElementsPerThread = 0;
 
 	static constexpr float DAMPING = 0.01f; // how much to damp the simulation each frame
 	static constexpr float FIXED_TIME_STEP = (1.0f / 120.0f);
