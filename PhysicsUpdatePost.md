@@ -68,11 +68,65 @@ Since this is just a pre processor directive you need to take a look at the disa
 ### SIMD Intrinsics
 
 
+### SIMD Times
+
+#### 10'000
+SIMD_SoA_physicsStepAverage: 0.018901
+SIMD_ByHand_SoA_physicsStepDuration: 0.018287
+
+#### 100'000
+SIMD_SoA_physicsStepAverage: 0.218797
+SIMD_ByHand_SoA_physicsStepDuration: 0.184417
+
+#### 1'000'000
+SIMD_SoA_physicsStepAverage: 2.324659
+SIMD_ByHand_SoA_physicsStepDuration: 1.947480
 
 
 # Multi-threading
 
 The next logical optimization is to use multi-threading, by splitting up the work on multiple threads. With this, in theory, I should achieve a speedup equal to the number of cores that my machine supports.
+
+## Times
+
+### 1'000'000
+
+#### 8 Threads
+MultiThread_SoA_physicsStepAverage: 3.388983
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.091182
+
+#### 16 Threads
+MultiThread_SoA_physicsStepAverage: 3.436673
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.099777
+
+#### 24 Threads
+MultiThread_SoA_physicsStepAverage: 3.436673
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.173103
+
+#### 32 Threads
+MultiThread_SoA_physicsStepAverage: 3.334618
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.183510
+
+#### 40 Threads
+MultiThread_SoA_physicsStepAverage: 3.188586
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.092315
+
+#### 40 Threads
+MultiThread_SoA_physicsStepAverage: 3.188586
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.092315
+
+#### 48 Threads
+MultiThread_SoA_physicsStepAverage: 3.039289
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.089883
+
+#### 48 Threads
+MultiThread_SoA_physicsStepAverage: 2.960849
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.173925
+
+#### 48 Threads
+MultiThread_SoA_physicsStepAverage: 2.793264
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.105237
+
 
 ## C++ Futurs
 
