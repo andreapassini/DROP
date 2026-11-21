@@ -259,97 +259,107 @@ namespace Drop
 
 				m_Game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
 #define NUM_PHYSICS_ENTITITES 1'000'000 // strange behavior with 1 mln
-
-				for (int32_t max = NUM_PHYSICS_ENTITITES; max <= NUM_PHYSICS_ENTITITES; max *= 10)
+				int32_t max = NUM_PHYSICS_ENTITITES;
+				int32_t procCount = std::thread::hardware_concurrency();
+				for (int32_t numThreads = 8; numThreads <= 64; numThreads += 8)
 				{
 					const int32_t numOfIterations = 10;
 
-					// Single Threaded
-					sceneContext.physicsStepDuration = 0.0f;
-					for (int32_t i = 0; i < numOfIterations; i++)
-					{
-						// Start Time
-						float startTime = GetTime();
+					bool bEquality = false;
 
-						m_PhysicsEngine.PhysicsStep(
-							g_activeScene->ecs
-							, max
-						);
+					//// Single Threaded
+					//sceneContext.physicsStepDuration = 0.0f;
+					//for (int32_t i = 0; i < numOfIterations; i++)
+					//{
+					//	// Start Time
+					//	float startTime = GetTime();
 
-						float endTime = GetTime();
-						float duration = (endTime - startTime);
-						sceneContext.physicsStepDuration += duration * 1000.0f;
-					}
-					float physicsStepAverage = sceneContext.physicsStepDuration / numOfIterations;
+					//	m_PhysicsEngine.PhysicsStep(
+					//		g_activeScene->ecs
+					//		, max
+					//	);
 
-					// copy the results to verify correctness
-					std::vector<PhysicsComponent>& densePhysicsComponents = g_activeScene->ecs.GetComponentPool<PhysicsComponent>().Data();
-					std::vector<PhysicsComponent> copyForChecker = densePhysicsComponents; // copy by value
-									
+					//	float endTime = GetTime();
+					//	float duration = (endTime - startTime);
+					//	sceneContext.physicsStepDuration += duration * 1000.0f;
+					//}
+					//float physicsStepAverage = sceneContext.physicsStepDuration / numOfIterations;
+
+					//// copy the results to verify correctness
+					//std::vector<PhysicsComponent>& densePhysicsComponents = g_activeScene->ecs.GetComponentPool<PhysicsComponent>().Data();
+					//std::vector<PhysicsComponent> copyForChecker = densePhysicsComponents; // copy by value
+					//				
+					//// Reset the positions
+					//PhysicsEngine::ResetPositions(densePhysicsComponents);
+
+					////SIMD
+					//sceneContext.SIMD_physicsStepDuration = 0.0f;
+					//for (int32_t i = 0; i < numOfIterations; i++)
+					//{
+					//	// Calculate times
+					//	// Start Time
+					//	float startTime = GetTime();
+
+					//	m_PhysicsEngine.SIMD_PhysicsStep(
+					//		g_activeScene->ecs
+					//		, max
+					//	);
+
+					//	float endTime = GetTime();
+					//	sceneContext.SIMD_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					//}
+					//float SIMD_physicsStepAverage = sceneContext.SIMD_physicsStepDuration / numOfIterations;
+
+					//// Check
+					//bEquality = PhysicsEngine::CheckEquality(
+					//	copyForChecker
+					//	, densePhysicsComponents
+					//);
+					//assert(bEquality);
+
+					//// Reset the positions
+					//PhysicsEngine::ResetPositions(densePhysicsComponents);
+
+					//// Multi Threaded
+					//sceneContext.MultiThread_physicsStepDuration = 0.0f;
+					//for (int32_t i = 0; i < numOfIterations; i++)
+					//{
+					//	// Start Time
+					//	float startTime = GetTime();
+
+					//	m_PhysicsEngine.MultiThread_PhysicsStep(
+					//		g_activeScene->ecs
+					//		, max
+					//	);
+
+					//	float endTime = GetTime();
+					//	sceneContext.MultiThread_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					//}
+					//float MultiThread_physicsStepAverage = sceneContext.MultiThread_physicsStepDuration / numOfIterations;
+
+					//// Check
+					//bEquality = PhysicsEngine::CheckEquality(
+					//	copyForChecker
+					//	, densePhysicsComponents
+					//);
+					//assert(bEquality);
+
 					// Reset the positions
-					PhysicsEngine::ResetPositions(densePhysicsComponents);
-
-					//SIMD
-					sceneContext.SIMD_physicsStepDuration = 0.0f;
-					for (int32_t i = 0; i < numOfIterations; i++)
-					{
-						// Calculate times
-						// Start Time
-						float startTime = GetTime();
-
-						m_PhysicsEngine.SIMD_PhysicsStep(
-							g_activeScene->ecs
-							, max
-						);
-
-						float endTime = GetTime();
-						sceneContext.SIMD_physicsStepDuration += (endTime - startTime) * 1000.0f;
-					}
-					float SIMD_physicsStepAverage = sceneContext.SIMD_physicsStepDuration / numOfIterations;
-
-					// Check
-					bool bEquality = PhysicsEngine::CheckEquality(
-						copyForChecker
-						, densePhysicsComponents
-					);
-					assert(bEquality);
-
-					// Reset the positions
-					PhysicsEngine::ResetPositions(densePhysicsComponents);
-
-					// Multi Threaded
-					sceneContext.MultiThread_physicsStepDuration = 0.0f;
-					for (int32_t i = 0; i < numOfIterations; i++)
-					{
-						// Start Time
-						float startTime = GetTime();
-
-						m_PhysicsEngine.MultiThread_PhysicsStep(
-							g_activeScene->ecs
-							, max
-						);
-
-						float endTime = GetTime();
-						sceneContext.MultiThread_physicsStepDuration += (endTime - startTime) * 1000.0f;
-					}
-					float MultiThread_physicsStepAverage = sceneContext.MultiThread_physicsStepDuration / numOfIterations;
-
-					// Check
-					bEquality = PhysicsEngine::CheckEquality(
-						copyForChecker
-						, densePhysicsComponents
-					);
-					assert(bEquality);
-
-					// Reset the positions
-					PhysicsEngine::ResetPositions(densePhysicsComponents);
+					//PhysicsEngine::ResetPositions(densePhysicsComponents);
 
 					// ---------------------------------------------------
-					
+
+					PhysicsComponents* physicsComponents = g_activeScene->ecs.GetSingletonComponentPtr<PhysicsComponents>();
+
+					// Reset the positions
+					PhysicsEngine::ResetPositions(physicsComponents);
+
 					// SoA
 					sceneContext.SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
+						PhysicsEngine::ResetPositions(physicsComponents);
+
 						// Start Time
 						float startTime = GetTime();
 
@@ -364,8 +374,17 @@ namespace Drop
 					}
 					float SoA_physicsStepAverage = sceneContext.SoA_physicsStepDuration / numOfIterations;
 
-					PhysicsComponents& physicsComponents = g_activeScene->ecs.GetSingletonComponent<PhysicsComponents>();
-					PhysicsComponents copyForChecker_SoA = physicsComponents; // copy by value
+					PhysicsComponents copyForChecker_SoA;
+
+					PhysicsEngine::Copy(
+						physicsComponents
+						, &copyForChecker_SoA
+					);
+
+					bEquality = PhysicsEngine::CheckEquality(
+						physicsComponents
+						, &copyForChecker_SoA
+					);
 
 					// Reset the positions
 					PhysicsEngine::ResetPositions(physicsComponents);
@@ -374,6 +393,8 @@ namespace Drop
 					sceneContext.SIMD_SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
+						PhysicsEngine::ResetPositions(physicsComponents);
+
 						// Calculate times
 						// Start Time
 						float startTime = GetTime();
@@ -390,9 +411,13 @@ namespace Drop
 
 					// Check
 					bEquality = PhysicsEngine::CheckEquality(
-						copyForChecker_SoA
-						, physicsComponents
+						physicsComponents
+						, &copyForChecker_SoA
 					);
+
+					std::cout << "MAX: " << max << std::endl;
+					std::cout << "SIMD: " << SIMD_SoA_physicsStepAverage << std::endl;
+
 					assert(bEquality);
 
 					// Reset the positions
@@ -402,6 +427,8 @@ namespace Drop
 					sceneContext.SIMD_ByHand_SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
+						PhysicsEngine::ResetPositions(physicsComponents);
+
 						// Calculate times
 						// Start Time
 						float startTime = GetTime();
@@ -418,38 +445,70 @@ namespace Drop
 
 					// Check
 					bEquality = PhysicsEngine::CheckEquality(
-						copyForChecker_SoA
-						, physicsComponents
+						physicsComponents
+						, &copyForChecker_SoA
 					);
+
+					std::cout << "SIMD HAND: " << SIMD_ByHand_SoA_physicsStepDuration << std::endl;
+
 					assert(bEquality);
 
 					// Reset the positions
 					PhysicsEngine::ResetPositions(physicsComponents);
 
+					physicsComponents->processor_count = numThreads;
+					float floatNumElementsPerThread = (float)max / (float)numThreads;
+					int32_t numElementsPerThread = max / numThreads;
+					int32_t modNumElementsNumThreads = max % numThreads;
+					//assert(modNumElementsNumThreads <= 0);
+					if (modNumElementsNumThreads > 0)
+					{
+						numElementsPerThread += 1;
+					}
+					
+					assert(numElementsPerThread > 0);
+					// This should never happens, it's an error
+					//if (numElementsPerThread < 0)
+					//{
+					//	numElementsPerThread = max;
+					//}
+					physicsComponents->numElementsPerThread = numElementsPerThread;
+
+					std::cout << "Threads: " << numThreads 
+						<< "\n NumElementsPerThread: " << numElementsPerThread
+						<< "\n FloatNumElementsPerThread: " << floatNumElementsPerThread
+						<< "\n ModNumElementsNumThreads: " << modNumElementsNumThreads
+						<< "\n Numbers: " << max << std::endl;
+
 					// Multi Threaded
 					sceneContext.MultiThread_SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
+						PhysicsEngine::ResetPositions(physicsComponents);
+
 						// Start Time
 						float startTime = GetTime();
 
 						m_PhysicsEngine.MultiThread_SoA_PhysicsStep(
 							g_activeScene->ecs
 							, max
+							, numThreads
+							, numElementsPerThread
 						);
 
 						float endTime = GetTime();
 						float iterationTimeMS = (endTime - startTime) * 1000.0f;
 						std::cout << "MultiThread_SoA_physicsStepDuration" 
-							<< "Numbers: " << max << " in iterationTimeMS" << iterationTimeMS << std::endl;
+							<< ", Threads: " << numThreads
+							<< ", Numbers: " << max << " in iterationTimeMS: " << iterationTimeMS << std::endl;
 						sceneContext.MultiThread_SoA_physicsStepDuration += iterationTimeMS;
 					}
 					float MultiThread_SoA_physicsStepAverage = sceneContext.MultiThread_SoA_physicsStepDuration / numOfIterations;
 
 					// Check
 					bEquality = PhysicsEngine::CheckEquality(
-						copyForChecker_SoA
-						, physicsComponents
+						physicsComponents
+						, &copyForChecker_SoA
 					);
 					assert(bEquality);
 
@@ -460,26 +519,31 @@ namespace Drop
 					sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
+						PhysicsEngine::ResetPositions(physicsComponents);
+
 						// Start Time
 						float startTime = GetTime();
 
 						m_PhysicsEngine.MultiThread_SoA_SIMDByHand_PhysicsStep(
 							g_activeScene->ecs
 							, max
+							, numThreads
+							, numElementsPerThread
 						);
 
 						float endTime = GetTime();
 						float iterationTimeMS = (endTime - startTime) * 1000.0f;
 						std::cout << "MultiThread_SoA_SIMD_ByHand_physicsStepDuration" 
-							<< "Numbers: " << max << " in iterationTimeMS" << iterationTimeMS << std::endl;
+							<< ", Threads: " << numThreads
+							<< ", Numbers: " << max << " in iterationTimeMS: " << iterationTimeMS << std::endl;
 						sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration += iterationTimeMS;
 					}
 					float MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage = sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration / numOfIterations;
 
 					// Check
 					bEquality = PhysicsEngine::CheckEquality(
-						copyForChecker_SoA
-						, physicsComponents
+						physicsComponents
+						, &copyForChecker_SoA
 					);
 					assert(bEquality);
 
@@ -519,7 +583,7 @@ namespace Drop
 					//averagesText.append("MultiThread_physicsStepAverage: ");
 					//averagesText.append(std::to_string(MultiThread_physicsStepAverage));
 					//averagesText.append("\n\t numElementsPerThread = ");
-					//averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
+					//averagesText.append(std::to_string(physicsComponents->numElementsPerThread));
 
 
 					// SoA
@@ -545,25 +609,29 @@ namespace Drop
 					//averagesText.append(std::to_string(SIMD_SoA_physicsStepAverage));
 					//averagesText.append("\n");
 
-					averagesText.append("SIMD_ByHand_SoA_physicsStepDuration: ");
-					averagesText.append(std::to_string(SIMD_ByHand_SoA_physicsStepDuration));
-					averagesText.append("\n");
+					//averagesText.append("SIMD_ByHand_SoA_physicsStepDuration: ");
+					//averagesText.append(std::to_string(SIMD_ByHand_SoA_physicsStepDuration));
+					//averagesText.append("\n");
 
 					averagesText.append("MultiThread_SoA_physicsStepAverage: ");
 					averagesText.append(std::to_string(MultiThread_SoA_physicsStepAverage));
+					averagesText.append("\n\t numThreads = ");
+					averagesText.append(std::to_string(physicsComponents->processor_count));
 					averagesText.append("\n\t numElementsPerThread = ");
-					averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
+					averagesText.append(std::to_string(physicsComponents->numElementsPerThread));
 					averagesText.append("\n");
 					averagesText.append("MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: ");
 					averagesText.append(std::to_string(MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage));
+					averagesText.append("\n\t numThreads = ");
+					averagesText.append(std::to_string(physicsComponents->processor_count));
 					averagesText.append("\n\t numElementsPerThread = ");
-					averagesText.append(std::to_string(physicsComponents.numElementsPerThread));
+					averagesText.append(std::to_string(physicsComponents->numElementsPerThread));
 					averagesText.append("\n");
 					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
 					//std::string filePath = absProjPath + "\\PerCompSOA_native_Divided2_alignas(64)_Desktop_AverageOutput.txt";
-					std::string filePath = absProjPath + "\\MultiThread_SIMDByHand.txt";
+					std::string filePath = absProjPath + "\\MultiThread_NumThreads.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				

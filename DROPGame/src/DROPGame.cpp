@@ -357,8 +357,8 @@ public:
 #define Y_MAX_LIMIT 0.0f
 #define Z_MIN_LIMIT 0.0f
 #define Z_MAX_LIMIT 0.0f
-#define MIN_MASS 500.0f
-#define MAX_MASS 2'500.0f
+#define MIN_MASS 10.0f
+#define MAX_MASS 25.0f
         SceneContext& sceneContext = currScene->ecs.GetSingletonComponent<SceneContext>();
         sceneContext.physicsComponents = NUM_PHYSICS_ENTITITES;
         for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
@@ -389,16 +389,17 @@ public:
         physicsComponents.masses.reserve(NUM_PHYSICS_ENTITITES);
         for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
         {
-            physicsComponents.masses[i] = MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS));
-            physicsComponents.oldPositions_x[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
-            physicsComponents.oldPositions_y[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
-            physicsComponents.oldPositions_z[i] = X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT));
-            physicsComponents.positions_x[i] = physicsComponents.oldPositions_x[i];
-            physicsComponents.positions_y[i] = physicsComponents.oldPositions_y[i];
-            physicsComponents.positions_z[i] = physicsComponents.oldPositions_z[i];
-            physicsComponents.forces_x[i] = 0.0f;
-            physicsComponents.forces_y[i] = 0.0f;
-            physicsComponents.forces_z[i] = 0.0f;
+            //physicsComponents.masses.push_back(MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS)));
+            physicsComponents.masses.push_back(10.0);
+            physicsComponents.oldPositions_x.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
+            physicsComponents.oldPositions_y.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
+            physicsComponents.oldPositions_z.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
+            physicsComponents.positions_x.push_back(physicsComponents.oldPositions_x[i]);
+            physicsComponents.positions_y.push_back(physicsComponents.oldPositions_y[i]);
+            physicsComponents.positions_z.push_back(physicsComponents.oldPositions_z[i]);
+            physicsComponents.forces_x.push_back(0.0f);
+            physicsComponents.forces_y.push_back(0.0f);
+            physicsComponents.forces_z.push_back(0.0f);
         }
         // -----
 

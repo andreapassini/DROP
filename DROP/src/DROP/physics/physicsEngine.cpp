@@ -137,13 +137,20 @@ void PhysicsEngine::MultiThread_PhysicsStep(
 void PhysicsEngine::MultiThread_SoA_PhysicsStep(
 	ECS& ecs
 	, const int32_t max
+	, const int32_t numThreads
+	, const int32_t numElementsPerThread
 ) {
 	if (m_IsPaused)
 		return;
 
 	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
 	
-	MultiThread_SoA_ApplyForces(ecs, max);
+	MultiThread_SoA_ApplyForces(
+		ecs
+		, max
+		, numThreads
+		, numElementsPerThread
+	);
 
 	//// Handle constraints
 	//ApplyConstraints();
@@ -155,13 +162,20 @@ void PhysicsEngine::MultiThread_SoA_PhysicsStep(
 void PhysicsEngine::MultiThread_SoA_SIMDByHand_PhysicsStep(
 	ECS& ecs
 	, const int32_t max
+	, const int32_t numThreads
+	, const int32_t numElementsPerThread
 ) {
 	if (m_IsPaused)
 		return;
 
 	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
 	
-	MultiThread_SoA_SIMDByHand_ApplyForces(ecs, max);
+	MultiThread_SoA_SIMDByHand_ApplyForces(
+		ecs
+		, max
+		, numThreads
+		, numElementsPerThread
+	);
 
 	//// Handle constraints
 	//ApplyConstraints();
@@ -180,7 +194,7 @@ void VerletResolution(
 	{
 		// remove exceeding elements
 		numOfElements -= (offset + numOfElements) - max; 
-		if (numOfElements < 0)
+		if (numOfElements <= 0)
 		{
 			return;
 		}
@@ -232,7 +246,7 @@ void SoA_VerletResolution(
 	{
 		// remove exceeding elements
 		numOfElements -= (offset + numOfElements) - max; 
-		if (numOfElements < 0)
+		if (numOfElements <= 0)
 		{
 			return;
 		}
@@ -272,7 +286,7 @@ void SoA_VerletResolution_Reordered(
 	{
 		// remove exceeding elements
 		numOfElements -= (offset + numOfElements) - max; 
-		if (numOfElements < 0)
+		if (numOfElements <= 0)
 		{
 			return;
 		}
@@ -326,49 +340,50 @@ void SoA_VerletResolution_AllDim(
 	{
 		// remove exceeding elements
 		numOfElements -= (offset + numOfElements) - max; 
-		if (numOfElements < 0)
+		if (numOfElements <= 0)
 		{
 			return;
 		}
 	}
 
 #pragma omp simd
-	for (int32_t i = offset; i < numOfElements; i++)
+	for (int32_t i = 0; i < numOfElements; i++)
 	{
+		int32_t currentElement = offset + i;
 		// assuming to always add gravity
-		forces_x[i] = 0.0f;
-		forces_y[i] = -9.8;
-		forces_z[i] = 0.0f;
+		forces_x[currentElement] = 0.0f;
+		forces_y[currentElement] = -9.8f;
+		forces_z[currentElement] = 0.0f;
 
-		//VgMath::Vector3 tempPos = positions[i];
-		float tempPos_x = positions_x[i];
-		float tempPos_y = positions_y[i];
-		float tempPos_z = positions_z[i];
+		//VgMath::Vector3 tempPos = positions[currentElement];
+		float tempPos_x = positions_x[currentElement];
+		float tempPos_y = positions_y[currentElement];
+		float tempPos_z = positions_z[currentElement];
 
-		//VgMath::Vector3 accel = forces[i] / masses[i];
-		float accel_x = forces_x[i] / masses[i];
-		float accel_y = forces_y[i] / masses[i];
-		float accel_z = forces_z[i] / masses[i];
+		//VgMath::Vector3 accel = forces[currentElement] / masses[currentElement];
+		float accel_x = forces_x[currentElement] / masses[currentElement];
+		float accel_y = forces_y[currentElement] / masses[currentElement];
+		float accel_z = forces_z[currentElement] / masses[currentElement];
 
-		positions_x[i] = ((2.0f - DAMPING) * positions_x[i])
-			- ((1.0f - DAMPING) * oldPositions_x[i])
+		positions_x[currentElement] = ((2.0f - DAMPING) * positions_x[currentElement])
+			- ((1.0f - DAMPING) * oldPositions_x[currentElement])
 			+ (accel_x * FIXED_TIME_STEP2);
-		positions_y[i] = ((2.0f - DAMPING) * positions_y[i])
-			- ((1.0f - DAMPING) * oldPositions_y[i])
+		positions_y[currentElement] = ((2.0f - DAMPING) * positions_y[currentElement])
+			- ((1.0f - DAMPING) * oldPositions_y[currentElement])
 			+ (accel_y * FIXED_TIME_STEP2);
-		positions_z[i] = ((2.0f - DAMPING) * positions_z[i])
-			- ((1.0f - DAMPING) * oldPositions_z[i])
+		positions_z[currentElement] = ((2.0f - DAMPING) * positions_z[currentElement])
+			- ((1.0f - DAMPING) * oldPositions_z[currentElement])
 			+ (accel_z * FIXED_TIME_STEP2);
 
-		oldPositions_x[i] = tempPos_x;
-		oldPositions_y[i] = tempPos_y;
-		oldPositions_z[i] = tempPos_z;
+		oldPositions_x[currentElement] = tempPos_x;
+		oldPositions_y[currentElement] = tempPos_y;
+		oldPositions_z[currentElement] = tempPos_z;
 
 		// impulse only in one frame
-		//forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
-		forces_x[i] = 0.0f;
-		forces_y[i] = 0.0f;
-		forces_z[i] = 0.0f;
+		//forces[currentElement] = VgMath::Vector3(0.0, 0.0, 0.0);
+		forces_x[currentElement] = 0.0f;
+		forces_y[currentElement] = 0.0f;
+		forces_z[currentElement] = 0.0f;
 	}
 }
 
@@ -393,7 +408,7 @@ void SoA_HandSIMD_VerletResolution(
 	{
 		// remove exceeding elements
 		numOfElements -= (offset + numOfElements) - max; 
-		if (numOfElements < 0)
+		if (numOfElements <= 0)
 		{
 			return;
 		}
@@ -407,107 +422,109 @@ void SoA_HandSIMD_VerletResolution(
 	int32_t i = 0;
 	for (i = 0; i < numOfElements - 7; i += 8) // AVX2 -> 256 bits ops -> 8 wide
 	{
+		int32_t currentElement = offset + i;
+
 		// assuming to always add gravity
 		__m256 _mForce_x = _mm256_set1_ps(0.0f);
 		__m256 _mForce_y = _mm256_set1_ps(-9.8f);
 		__m256 _mForce_z = _mm256_set1_ps(0.0f);
 
 		__m256 _mMass = _mm256_set_ps(
-			masses[i]
-			, masses[i + 1]
-			, masses[i + 2]
-			, masses[i + 3]
-			, masses[i + 4]
-			, masses[i + 5]
-			, masses[i + 6]
-			, masses[i + 7]
+			masses[currentElement]
+			, masses[currentElement + 1]
+			, masses[currentElement + 2]
+			, masses[currentElement + 3]
+			, masses[currentElement + 4]
+			, masses[currentElement + 5]
+			, masses[currentElement + 6]
+			, masses[currentElement + 7]
 		);
 
 		__m256 _mOldPosition_x = _mm256_set_ps(
-			oldPositions_x[i]
-			, oldPositions_x[i + 1]
-			, oldPositions_x[i + 2]
-			, oldPositions_x[i + 3]
-			, oldPositions_x[i + 4]
-			, oldPositions_x[i + 5]
-			, oldPositions_x[i + 6]
-			, oldPositions_x[i + 7]
+			oldPositions_x[currentElement]
+			, oldPositions_x[currentElement + 1]
+			, oldPositions_x[currentElement + 2]
+			, oldPositions_x[currentElement + 3]
+			, oldPositions_x[currentElement + 4]
+			, oldPositions_x[currentElement + 5]
+			, oldPositions_x[currentElement + 6]
+			, oldPositions_x[currentElement + 7]
 		);
 		__m256 _mOldPosition_y = _mm256_set_ps(
-			oldPositions_y[i]
-			, oldPositions_y[i + 1]
-			, oldPositions_y[i + 2]
-			, oldPositions_y[i + 3]
-			, oldPositions_y[i + 4]
-			, oldPositions_y[i + 5]
-			, oldPositions_y[i + 6]
-			, oldPositions_y[i + 7]
+			oldPositions_y[currentElement]
+			, oldPositions_y[currentElement + 1]
+			, oldPositions_y[currentElement + 2]
+			, oldPositions_y[currentElement + 3]
+			, oldPositions_y[currentElement + 4]
+			, oldPositions_y[currentElement + 5]
+			, oldPositions_y[currentElement + 6]
+			, oldPositions_y[currentElement + 7]
 		);
 		__m256 _mOldPosition_z = _mm256_set_ps(
-			oldPositions_z[i]
-			, oldPositions_z[i + 1]
-			, oldPositions_z[i + 2]
-			, oldPositions_z[i + 3]
-			, oldPositions_z[i + 4]
-			, oldPositions_z[i + 5]
-			, oldPositions_z[i + 6]
-			, oldPositions_z[i + 7]
+			oldPositions_z[currentElement]
+			, oldPositions_z[currentElement + 1]
+			, oldPositions_z[currentElement + 2]
+			, oldPositions_z[currentElement + 3]
+			, oldPositions_z[currentElement + 4]
+			, oldPositions_z[currentElement + 5]
+			, oldPositions_z[currentElement + 6]
+			, oldPositions_z[currentElement + 7]
 		);
 
-		//float tempPos_x = positions_x[i];
+		//float tempPos_x = positions_x[currentElement];
 		__m256 _mPosition_x = _mm256_set_ps(
-			positions_x[i]
-			, positions_x[i + 1]
-			, positions_x[i + 2]
-			, positions_x[i + 3]
-			, positions_x[i + 4]
-			, positions_x[i + 5]
-			, positions_x[i + 6]
-			, positions_x[i + 7]
+			positions_x[currentElement]
+			, positions_x[currentElement + 1]
+			, positions_x[currentElement + 2]
+			, positions_x[currentElement + 3]
+			, positions_x[currentElement + 4]
+			, positions_x[currentElement + 5]
+			, positions_x[currentElement + 6]
+			, positions_x[currentElement + 7]
 		);
-		//float tempPos_y = positions_y[i];
+		//float tempPos_y = positions_y[currentElement];
 		__m256 _mPosition_y = _mm256_set_ps(
-			positions_y[i]
-			, positions_y[i + 1]
-			, positions_y[i + 2]
-			, positions_y[i + 3]
-			, positions_y[i + 4]
-			, positions_y[i + 5]
-			, positions_y[i + 6]
-			, positions_y[i + 7]
+			positions_y[currentElement]
+			, positions_y[currentElement + 1]
+			, positions_y[currentElement + 2]
+			, positions_y[currentElement + 3]
+			, positions_y[currentElement + 4]
+			, positions_y[currentElement + 5]
+			, positions_y[currentElement + 6]
+			, positions_y[currentElement + 7]
 		);
-		//float tempPos_z = positions_z[i];
+		//float tempPos_z = positions_z[currentElement];
 		__m256 _mPosition_z = _mm256_set_ps(
-			positions_z[i]
-			, positions_z[i + 1]
-			, positions_z[i + 2]
-			, positions_z[i + 3]
-			, positions_z[i + 4]
-			, positions_z[i + 5]
-			, positions_z[i + 6]
-			, positions_z[i + 7]
+			positions_z[currentElement]
+			, positions_z[currentElement + 1]
+			, positions_z[currentElement + 2]
+			, positions_z[currentElement + 3]
+			, positions_z[currentElement + 4]
+			, positions_z[currentElement + 5]
+			, positions_z[currentElement + 6]
+			, positions_z[currentElement + 7]
 		);
 
 		__m256 _mTempoPos_x = _mPosition_x;
 		__m256 _mTempoPos_y = _mPosition_y;
 		__m256 _mTempoPos_z = _mPosition_z;
 
-		//VgMath::Vector3 accel = forces[i] / masses[i];
-		//float accel_x = forces_x[i] / masses[i];
+		//VgMath::Vector3 accel = forces[currentElement] / masses[currentElement];
+		//float accel_x = forces_x[currentElement] / masses[currentElement];
 		__m256 _mAccel_x = _mm256_div_ps(_mForce_x, _mMass);
-		//float accel_y = forces_y[i] / masses[i];
+		//float accel_y = forces_y[currentElement] / masses[currentElement];
 		__m256 _mAccel_y = _mm256_div_ps(_mForce_y, _mMass);
-		//float accel_z = forces_z[i] / masses[i];
+		//float accel_z = forces_z[currentElement] / masses[currentElement];
 		__m256 _mAccel_z = _mm256_div_ps(_mForce_z, _mMass);
 
-		//positions_x[i] = ((2.0f - DAMPING) * positions_x[i])
-		//	- ((1.0f - DAMPING) * oldPositions_x[i])
+		//positions_x[currentElement] = ((2.0f - DAMPING) * positions_x[currentElement])
+		//	- ((1.0f - DAMPING) * oldPositions_x[currentElement])
 		//	+ (accel_x * FIXED_TIME_STEP2);
-		//positions_y[i] = ((2.0f - DAMPING) * positions_y[i])
-		//	- ((1.0f - DAMPING) * oldPositions_y[i])
+		//positions_y[currentElement] = ((2.0f - DAMPING) * positions_y[currentElement])
+		//	- ((1.0f - DAMPING) * oldPositions_y[currentElement])
 		//	+ (accel_y * FIXED_TIME_STEP2);
-		//positions_z[i] = ((2.0f - DAMPING) * positions_z[i])
-		//	- ((1.0f - DAMPING) * oldPositions_z[i])
+		//positions_z[currentElement] = ((2.0f - DAMPING) * positions_z[currentElement])
+		//	- ((1.0f - DAMPING) * oldPositions_z[currentElement])
 		//	+ (accel_z * FIXED_TIME_STEP2);
 
 		_mPosition_x = _mm256_mul_ps(_mTwoMinusDamping, _mPosition_x);
@@ -531,104 +548,134 @@ void SoA_HandSIMD_VerletResolution(
 		_mPosition_z = _mm256_add_ps(_mPosition_z, _mAccel_z);
 
 
-		oldPositions_x[i] = float(_mPosition_x.m256_f32[0]);
-		oldPositions_x[i + 1] = float(_mPosition_x.m256_f32[1]);
-		oldPositions_x[i + 2] = float(_mPosition_x.m256_f32[2]);
-		oldPositions_x[i + 3] = float(_mPosition_x.m256_f32[3]);
-		oldPositions_x[i + 4] = float(_mPosition_x.m256_f32[4]);
-		oldPositions_x[i + 5] = float(_mPosition_x.m256_f32[5]);
-		oldPositions_x[i + 6] = float(_mPosition_x.m256_f32[6]);
-		oldPositions_x[i + 7] = float(_mPosition_x.m256_f32[7]);
+		positions_x[currentElement] = float(_mPosition_x.m256_f32[0]);
+		positions_x[currentElement + 1] = float(_mPosition_x.m256_f32[1]);
+		positions_x[currentElement + 2] = float(_mPosition_x.m256_f32[2]);
+		positions_x[currentElement + 3] = float(_mPosition_x.m256_f32[3]);
+		positions_x[currentElement + 4] = float(_mPosition_x.m256_f32[4]);
+		positions_x[currentElement + 5] = float(_mPosition_x.m256_f32[5]);
+		positions_x[currentElement + 6] = float(_mPosition_x.m256_f32[6]);
+		positions_x[currentElement + 7] = float(_mPosition_x.m256_f32[7]);
 
-		oldPositions_y[i] = float(_mPosition_y.m256_f32[0]);
-		oldPositions_y[i + 1] = float(_mPosition_y.m256_f32[1]);
-		oldPositions_y[i + 2] = float(_mPosition_y.m256_f32[2]);
-		oldPositions_y[i + 3] = float(_mPosition_y.m256_f32[3]);
-		oldPositions_y[i + 4] = float(_mPosition_y.m256_f32[4]);
-		oldPositions_y[i + 5] = float(_mPosition_y.m256_f32[5]);
-		oldPositions_y[i + 6] = float(_mPosition_y.m256_f32[6]);
-		oldPositions_y[i + 7] = float(_mPosition_y.m256_f32[7]);
+		positions_y[currentElement] = float(_mPosition_y.m256_f32[0]);
+		positions_y[currentElement + 1] = float(_mPosition_y.m256_f32[1]);
+		positions_y[currentElement + 2] = float(_mPosition_y.m256_f32[2]);
+		positions_y[currentElement + 3] = float(_mPosition_y.m256_f32[3]);
+		positions_y[currentElement + 4] = float(_mPosition_y.m256_f32[4]);
+		positions_y[currentElement + 5] = float(_mPosition_y.m256_f32[5]);
+		positions_y[currentElement + 6] = float(_mPosition_y.m256_f32[6]);
+		positions_y[currentElement + 7] = float(_mPosition_y.m256_f32[7]);
 
-		oldPositions_z[i] = float(_mPosition_z.m256_f32[0]);
-		oldPositions_z[i + 1] = float(_mPosition_z.m256_f32[1]);
-		oldPositions_z[i + 2] = float(_mPosition_z.m256_f32[2]);
-		oldPositions_z[i + 3] = float(_mPosition_z.m256_f32[3]);
-		oldPositions_z[i + 4] = float(_mPosition_z.m256_f32[4]);
-		oldPositions_z[i + 5] = float(_mPosition_z.m256_f32[5]);
-		oldPositions_z[i + 6] = float(_mPosition_z.m256_f32[6]);
-		oldPositions_z[i + 7] = float(_mPosition_z.m256_f32[7]);
+		positions_z[currentElement] = float(_mPosition_z.m256_f32[0]);
+		positions_z[currentElement + 1] = float(_mPosition_z.m256_f32[1]);
+		positions_z[currentElement + 2] = float(_mPosition_z.m256_f32[2]);
+		positions_z[currentElement + 3] = float(_mPosition_z.m256_f32[3]);
+		positions_z[currentElement + 4] = float(_mPosition_z.m256_f32[4]);
+		positions_z[currentElement + 5] = float(_mPosition_z.m256_f32[5]);
+		positions_z[currentElement + 6] = float(_mPosition_z.m256_f32[6]);
+		positions_z[currentElement + 7] = float(_mPosition_z.m256_f32[7]);
+
+		// Old position
+		oldPositions_x[currentElement] = float(_mTempoPos_x.m256_f32[0]);
+		oldPositions_x[currentElement + 1] = float(_mTempoPos_x.m256_f32[1]);
+		oldPositions_x[currentElement + 2] = float(_mTempoPos_x.m256_f32[2]);
+		oldPositions_x[currentElement + 3] = float(_mTempoPos_x.m256_f32[3]);
+		oldPositions_x[currentElement + 4] = float(_mTempoPos_x.m256_f32[4]);
+		oldPositions_x[currentElement + 5] = float(_mTempoPos_x.m256_f32[5]);
+		oldPositions_x[currentElement + 6] = float(_mTempoPos_x.m256_f32[6]);
+		oldPositions_x[currentElement + 7] = float(_mTempoPos_x.m256_f32[7]);
+
+		oldPositions_y[currentElement] = float(_mTempoPos_y.m256_f32[0]);
+		oldPositions_y[currentElement + 1] = float(_mTempoPos_y.m256_f32[1]);
+		oldPositions_y[currentElement + 2] = float(_mTempoPos_y.m256_f32[2]);
+		oldPositions_y[currentElement + 3] = float(_mTempoPos_y.m256_f32[3]);
+		oldPositions_y[currentElement + 4] = float(_mTempoPos_y.m256_f32[4]);
+		oldPositions_y[currentElement + 5] = float(_mTempoPos_y.m256_f32[5]);
+		oldPositions_y[currentElement + 6] = float(_mTempoPos_y.m256_f32[6]);
+		oldPositions_y[currentElement + 7] = float(_mTempoPos_y.m256_f32[7]);
+
+		oldPositions_z[currentElement] = float(_mTempoPos_z.m256_f32[0]);
+		oldPositions_z[currentElement + 1] = float(_mTempoPos_z.m256_f32[1]);
+		oldPositions_z[currentElement + 2] = float(_mTempoPos_z.m256_f32[2]);
+		oldPositions_z[currentElement + 3] = float(_mTempoPos_z.m256_f32[3]);
+		oldPositions_z[currentElement + 4] = float(_mTempoPos_z.m256_f32[4]);
+		oldPositions_z[currentElement + 5] = float(_mTempoPos_z.m256_f32[5]);
+		oldPositions_z[currentElement + 6] = float(_mTempoPos_z.m256_f32[6]);
+		oldPositions_z[currentElement + 7] = float(_mTempoPos_z.m256_f32[7]);
 
 		// impulse only in one frame
-		//forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
-		forces_x[i] = 0.0f;
-		forces_x[i + 1] = 0.0f;
-		forces_x[i + 2] = 0.0f;
-		forces_x[i + 3] = 0.0f;
-		forces_x[i + 4] = 0.0f;
-		forces_x[i + 5] = 0.0f;
-		forces_x[i + 6] = 0.0f;
-		forces_x[i + 7] = 0.0f;
+		//forces[currentElement] = VgMath::Vector3(0.0, 0.0, 0.0);
+		forces_x[currentElement] = 0.0f;
+		forces_x[currentElement + 1] = 0.0f;
+		forces_x[currentElement + 2] = 0.0f;
+		forces_x[currentElement + 3] = 0.0f;
+		forces_x[currentElement + 4] = 0.0f;
+		forces_x[currentElement + 5] = 0.0f;
+		forces_x[currentElement + 6] = 0.0f;
+		forces_x[currentElement + 7] = 0.0f;
 
-		forces_y[i] = 0.0f;
-		forces_y[i + 1] = 0.0f;
-		forces_y[i + 2] = 0.0f;
-		forces_y[i + 3] = 0.0f;
-		forces_y[i + 4] = 0.0f;
-		forces_y[i + 5] = 0.0f;
-		forces_y[i + 6] = 0.0f;
-		forces_y[i + 7] = 0.0f;
+		forces_y[currentElement] = 0.0f;
+		forces_y[currentElement + 1] = 0.0f;
+		forces_y[currentElement + 2] = 0.0f;
+		forces_y[currentElement + 3] = 0.0f;
+		forces_y[currentElement + 4] = 0.0f;
+		forces_y[currentElement + 5] = 0.0f;
+		forces_y[currentElement + 6] = 0.0f;
+		forces_y[currentElement + 7] = 0.0f;
 
-		forces_z[i] = 0.0f;
-		forces_z[i + 1] = 0.0f;
-		forces_z[i + 2] = 0.0f;
-		forces_z[i + 3] = 0.0f;
-		forces_z[i + 4] = 0.0f;
-		forces_z[i + 5] = 0.0f;
-		forces_z[i + 6] = 0.0f;
-		forces_z[i + 7] = 0.0f;
+		forces_z[currentElement] = 0.0f;
+		forces_z[currentElement + 1] = 0.0f;
+		forces_z[currentElement + 2] = 0.0f;
+		forces_z[currentElement + 3] = 0.0f;
+		forces_z[currentElement + 4] = 0.0f;
+		forces_z[currentElement + 5] = 0.0f;
+		forces_z[currentElement + 6] = 0.0f;
+		forces_z[currentElement + 7] = 0.0f;
 	}
 
-	int32_t remaining = numOfElements - i;
+	//int32_t remaining = numOfElements - i;
 
 	// Execute the last remaining ops
 	for (i = i; i < numOfElements; i++) // AVX2 -> 256 bits ops -> 8 wide
 	{
+		int32_t currentElement = offset + i;
+
 		//std::cout << "From Offset " << offset << " : offset not SIMD for i=" << i << std::endl;
 
 		// assuming to always add gravity
-		forces_x[i] = 0.0f;
-		forces_y[i] = -9.8f;
-		forces_z[i] = 0.0f;
+		forces_x[currentElement] = 0.0f;
+		forces_y[currentElement] = -9.8f;
+		forces_z[currentElement] = 0.0f;
 
-		//VgMath::Vector3 tempPos = positions[i];
-		float tempPos_x = positions_x[i];
-		float tempPos_y = positions_y[i];
-		float tempPos_z = positions_z[i];
+		//VgMath::Vector3 tempPos = positions[currentElement];
+		float tempPos_x = positions_x[currentElement];
+		float tempPos_y = positions_y[currentElement];
+		float tempPos_z = positions_z[currentElement];
 
-		//VgMath::Vector3 accel = forces[i] / masses[i];
-		float accel_x = forces_x[i] / masses[i];
-		float accel_y = forces_y[i] / masses[i];
-		float accel_z = forces_z[i] / masses[i];
+		//VgMath::Vector3 accel = forces[currentElement] / masses[currentElement];
+		float accel_x = forces_x[currentElement] / masses[currentElement];
+		float accel_y = forces_y[currentElement] / masses[currentElement];
+		float accel_z = forces_z[currentElement] / masses[currentElement];
 
-		positions_x[i] = ((2.0f - DAMPING) * positions_x[i])
-			- ((1.0f - DAMPING) * oldPositions_x[i])
+		positions_x[currentElement] = ((2.0f - DAMPING) * positions_x[currentElement])
+			- ((1.0f - DAMPING) * oldPositions_x[currentElement])
 			+ (accel_x * FIXED_TIME_STEP2);
-		positions_y[i] = ((2.0f - DAMPING) * positions_y[i])
-			- ((1.0f - DAMPING) * oldPositions_y[i])
+		positions_y[currentElement] = ((2.0f - DAMPING) * positions_y[currentElement])
+			- ((1.0f - DAMPING) * oldPositions_y[currentElement])
 			+ (accel_y * FIXED_TIME_STEP2);
-		positions_z[i] = ((2.0f - DAMPING) * positions_z[i])
-			- ((1.0f - DAMPING) * oldPositions_z[i])
+		positions_z[currentElement] = ((2.0f - DAMPING) * positions_z[currentElement])
+			- ((1.0f - DAMPING) * oldPositions_z[currentElement])
 			+ (accel_z * FIXED_TIME_STEP2);
 
-		oldPositions_x[i] = tempPos_x;
-		oldPositions_y[i] = tempPos_y;
-		oldPositions_z[i] = tempPos_z;
+		oldPositions_x[currentElement] = tempPos_x;
+		oldPositions_y[currentElement] = tempPos_y;
+		oldPositions_z[currentElement] = tempPos_z;
 
 		// impulse only in one frame
-		//forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
-		forces_x[i] = 0.0f;
-		forces_y[i] = 0.0f;
-		forces_z[i] = 0.0f;
+		//forces[currentElement] = VgMath::Vector3(0.0, 0.0, 0.0);
+		forces_x[currentElement] = 0.0f;
+		forces_y[currentElement] = 0.0f;
+		forces_z[currentElement] = 0.0f;
 	}
 }
 
@@ -729,64 +776,20 @@ void PhysicsEngine::MultiThread_ApplyForces(
 	for (auto& handle : futures) {
 		handle.wait();
 	}
-
-//
-////#pragma omp simd
-//	for (size_t i = 0; i < densePhysicsComponents.size(); i++)
-//	{
-//		PhysicsComponent& currentPhysicsComp = densePhysicsComponents[i];
-//
-//		// SIMD TEST
-//		currentPhysicsComp.force.x *= 10.0f;
-//		//
-//
-//		//if (currentPhysicsComp.isStatic)
-//		//{
-//		//	currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
-//		//	return;
-//		//}
-//
-//		//// assuming to always add gravity
-//		//currentPhysicsComp.force = VgMath::Vector3(0.0, -9.8, 0.0);
-//
-//		//VgMath::Vector3 tempPos = currentPhysicsComp.position;
-//		//VgMath::Vector3 accel = currentPhysicsComp.force / currentPhysicsComp.mass;
-//		//currentPhysicsComp.position = ((2.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.position) 
-//		//	- ((1.0f - currentPhysicsComp.DAMPING) * currentPhysicsComp.oldPosition) + (accel * currentPhysicsComp.FIXED_TIME_STEP2);
-//		//currentPhysicsComp.oldPosition = tempPos;
-//
-//		//// impulse only in one frame
-//		//currentPhysicsComp.force = VgMath::Vector3(0.0, 0.0, 0.0);
-//	}
 }
 
 void PhysicsEngine::MultiThread_SoA_ApplyForces(
 	ECS& ecs
 	, const int32_t max
+	, const int32_t numThreads
+	, const int32_t numElementsPerThread
 ) {
 	std::vector<std::future<void>> futures;
 
 	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
 
-	//may return 0 when not able to detect
-	physicsComponents.processor_count = std::thread::hardware_concurrency();
-	if (physicsComponents.processor_count == 0)
-	{
-		assert(0);
-	}
-
-	if (max > physicsComponents.processor_count)
-	{
-		physicsComponents.numElementsPerThread = max / physicsComponents.processor_count;
-	}
-	else
-	{
-		physicsComponents.numElementsPerThread = max;
-	}
-
-	//physicsComponents.numElementsPerThread = 10'000;
-	for (int32_t i = 0; i < max; i+= physicsComponents.numElementsPerThread) {
-		int32_t offset = i /** numElementsPerThread*/;
+	for (int32_t i = 0; i < numThreads; i++) {
+		int32_t offset = i * numElementsPerThread;
 		futures.push_back(
 			std::async(std::launch::async,
 				SoA_VerletResolution_AllDim
@@ -803,7 +806,7 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 				, physicsComponents.DAMPING
 				, physicsComponents.FIXED_TIME_STEP2
 				, offset
-				, physicsComponents.numElementsPerThread
+				, numElementsPerThread
 				, max
 			)
 		);
@@ -817,44 +820,16 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 void PhysicsEngine::MultiThread_SoA_SIMDByHand_ApplyForces(
 	ECS& ecs
 	, const int32_t max
+	, const int32_t numThreads
+	, const int32_t numElementsPerThread
 ) {
 	std::vector<std::future<void>> futures;
 
 	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
 
-	//may return 0 when not able to detect
-	physicsComponents.processor_count = std::thread::hardware_concurrency();
-	if (physicsComponents.processor_count == 0)
-	{
-		assert(0);
-	}
-
-	if (max > physicsComponents.processor_count)
-	{
-		physicsComponents.numElementsPerThread = max / physicsComponents.processor_count;
-	}
-	else
-	{
-		physicsComponents.numElementsPerThread = max;
-	}
-
-	//physicsComponents.numElementsPerThread = 10'000;
-	for (int32_t i = 0; i < max; i+= physicsComponents.numElementsPerThread) {
-		int32_t offset = i /** numElementsPerThread*/;
+	for (int32_t i = 0; i < numThreads; i++) {
+		int32_t offset = i * numElementsPerThread;
 		futures.push_back(
-			//std::async(std::launch::async,
-			//	//SoA_VerletResolution
-			//	SoA_HandSIMD_VerletResolution
-			//	, physicsComponents.positions.data()
-			//	, physicsComponents.oldPositions.data()
-			//	, physicsComponents.forces.data()
-			//	, physicsComponents.masses.data()
-			//	, physicsComponents.DAMPING
-			//	, physicsComponents.FIXED_TIME_STEP2
-			//	, offset
-			//	, physicsComponents.numElementsPerThread
-			//	, max
-			//)
 			std::async(std::launch::async,
 				SoA_HandSIMD_VerletResolution
 				, physicsComponents.positions_x.data()
@@ -870,7 +845,7 @@ void PhysicsEngine::MultiThread_SoA_SIMDByHand_ApplyForces(
 				, physicsComponents.DAMPING
 				, physicsComponents.FIXED_TIME_STEP2
 				, offset
-				, physicsComponents.numElementsPerThread
+				, numElementsPerThread
 				, max
 			)
 		);
@@ -1103,32 +1078,59 @@ void PhysicsEngine::SIMD_ByHand_SoA_ApplyForces(
 		_mPosition_z = _mm256_add_ps(_mPosition_z, _mAccel_z);
 
 
-		physicsComponents.oldPositions_x[i]   = float(_mPosition_x.m256_f32[0]);
-		physicsComponents.oldPositions_x[i+1] = float(_mPosition_x.m256_f32[1]);
-		physicsComponents.oldPositions_x[i+2] = float(_mPosition_x.m256_f32[2]);
-		physicsComponents.oldPositions_x[i+3] = float(_mPosition_x.m256_f32[3]);
-		physicsComponents.oldPositions_x[i+4] = float(_mPosition_x.m256_f32[4]);
-		physicsComponents.oldPositions_x[i+5] = float(_mPosition_x.m256_f32[5]);
-		physicsComponents.oldPositions_x[i+6] = float(_mPosition_x.m256_f32[6]);
-		physicsComponents.oldPositions_x[i+7] = float(_mPosition_x.m256_f32[7]);
+		physicsComponents.positions_x[i]   = float(_mPosition_x.m256_f32[0]);
+		physicsComponents.positions_x[i+1] = float(_mPosition_x.m256_f32[1]);
+		physicsComponents.positions_x[i+2] = float(_mPosition_x.m256_f32[2]);
+		physicsComponents.positions_x[i+3] = float(_mPosition_x.m256_f32[3]);
+		physicsComponents.positions_x[i+4] = float(_mPosition_x.m256_f32[4]);
+		physicsComponents.positions_x[i+5] = float(_mPosition_x.m256_f32[5]);
+		physicsComponents.positions_x[i+6] = float(_mPosition_x.m256_f32[6]);
+		physicsComponents.positions_x[i+7] = float(_mPosition_x.m256_f32[7]);
 
-		physicsComponents.oldPositions_y[i]	  = float(_mPosition_y.m256_f32[0]);
-		physicsComponents.oldPositions_y[i+1] = float(_mPosition_y.m256_f32[1]);
-		physicsComponents.oldPositions_y[i+2] = float(_mPosition_y.m256_f32[2]);
-		physicsComponents.oldPositions_y[i+3] = float(_mPosition_y.m256_f32[3]);
-		physicsComponents.oldPositions_y[i+4] = float(_mPosition_y.m256_f32[4]);
-		physicsComponents.oldPositions_y[i+5] = float(_mPosition_y.m256_f32[5]);
-		physicsComponents.oldPositions_y[i+6] = float(_mPosition_y.m256_f32[6]);
-		physicsComponents.oldPositions_y[i+7] = float(_mPosition_y.m256_f32[7]);
+		physicsComponents.positions_y[i]	  = float(_mPosition_y.m256_f32[0]);
+		physicsComponents.positions_y[i+1] = float(_mPosition_y.m256_f32[1]);
+		physicsComponents.positions_y[i+2] = float(_mPosition_y.m256_f32[2]);
+		physicsComponents.positions_y[i+3] = float(_mPosition_y.m256_f32[3]);
+		physicsComponents.positions_y[i+4] = float(_mPosition_y.m256_f32[4]);
+		physicsComponents.positions_y[i+5] = float(_mPosition_y.m256_f32[5]);
+		physicsComponents.positions_y[i+6] = float(_mPosition_y.m256_f32[6]);
+		physicsComponents.positions_y[i+7] = float(_mPosition_y.m256_f32[7]);
 
-		physicsComponents.oldPositions_z[i]   = float(_mPosition_z.m256_f32[0]);
-		physicsComponents.oldPositions_z[i+1] = float(_mPosition_z.m256_f32[1]);
-		physicsComponents.oldPositions_z[i+2] = float(_mPosition_z.m256_f32[2]);
-		physicsComponents.oldPositions_z[i+3] = float(_mPosition_z.m256_f32[3]);
-		physicsComponents.oldPositions_z[i+4] = float(_mPosition_z.m256_f32[4]);
-		physicsComponents.oldPositions_z[i+5] = float(_mPosition_z.m256_f32[5]);
-		physicsComponents.oldPositions_z[i+6] = float(_mPosition_z.m256_f32[6]);
-		physicsComponents.oldPositions_z[i+7] = float(_mPosition_z.m256_f32[7]);
+		physicsComponents.positions_z[i]   = float(_mPosition_z.m256_f32[0]);
+		physicsComponents.positions_z[i+1] = float(_mPosition_z.m256_f32[1]);
+		physicsComponents.positions_z[i+2] = float(_mPosition_z.m256_f32[2]);
+		physicsComponents.positions_z[i+3] = float(_mPosition_z.m256_f32[3]);
+		physicsComponents.positions_z[i+4] = float(_mPosition_z.m256_f32[4]);
+		physicsComponents.positions_z[i+5] = float(_mPosition_z.m256_f32[5]);
+		physicsComponents.positions_z[i+6] = float(_mPosition_z.m256_f32[6]);
+		physicsComponents.positions_z[i+7] = float(_mPosition_z.m256_f32[7]);
+
+		physicsComponents.oldPositions_x[i]   = float(_mTempoPos_x.m256_f32[0]);
+		physicsComponents.oldPositions_x[i+1] = float(_mTempoPos_x.m256_f32[1]);
+		physicsComponents.oldPositions_x[i+2] = float(_mTempoPos_x.m256_f32[2]);
+		physicsComponents.oldPositions_x[i+3] = float(_mTempoPos_x.m256_f32[3]);
+		physicsComponents.oldPositions_x[i+4] = float(_mTempoPos_x.m256_f32[4]);
+		physicsComponents.oldPositions_x[i+5] = float(_mTempoPos_x.m256_f32[5]);
+		physicsComponents.oldPositions_x[i+6] = float(_mTempoPos_x.m256_f32[6]);
+		physicsComponents.oldPositions_x[i+7] = float(_mTempoPos_x.m256_f32[7]);
+
+		physicsComponents.oldPositions_y[i]	  = float(_mTempoPos_y.m256_f32[0]);
+		physicsComponents.oldPositions_y[i+1] = float(_mTempoPos_y.m256_f32[1]);
+		physicsComponents.oldPositions_y[i+2] = float(_mTempoPos_y.m256_f32[2]);
+		physicsComponents.oldPositions_y[i+3] = float(_mTempoPos_y.m256_f32[3]);
+		physicsComponents.oldPositions_y[i+4] = float(_mTempoPos_y.m256_f32[4]);
+		physicsComponents.oldPositions_y[i+5] = float(_mTempoPos_y.m256_f32[5]);
+		physicsComponents.oldPositions_y[i+6] = float(_mTempoPos_y.m256_f32[6]);
+		physicsComponents.oldPositions_y[i+7] = float(_mTempoPos_y.m256_f32[7]);
+
+		physicsComponents.oldPositions_z[i]   = float(_mTempoPos_z.m256_f32[0]);
+		physicsComponents.oldPositions_z[i+1] = float(_mTempoPos_z.m256_f32[1]);
+		physicsComponents.oldPositions_z[i+2] = float(_mTempoPos_z.m256_f32[2]);
+		physicsComponents.oldPositions_z[i+3] = float(_mTempoPos_z.m256_f32[3]);
+		physicsComponents.oldPositions_z[i+4] = float(_mTempoPos_z.m256_f32[4]);
+		physicsComponents.oldPositions_z[i+5] = float(_mTempoPos_z.m256_f32[5]);
+		physicsComponents.oldPositions_z[i+6] = float(_mTempoPos_z.m256_f32[6]);
+		physicsComponents.oldPositions_z[i+7] = float(_mTempoPos_z.m256_f32[7]);
 
 		// impulse only in one frame
 		//physicsComponents.forces[i] = VgMath::Vector3(0.0, 0.0, 0.0);
@@ -1257,7 +1259,7 @@ bool PhysicsEngine::CheckEquality(
 }
 
 void PhysicsEngine::ResetPositions(
-	std::vector<PhysicsComponent>& A
+	std::vector<PhysicsComponent> A
 ) {
 	for (size_t i = 0; i < A.size(); i++)
 	{
@@ -1273,14 +1275,51 @@ void PhysicsEngine::ResetPositions(
 
 // SoA
 
+void PhysicsEngine::Copy(
+	PhysicsComponents* Source
+	, PhysicsComponents* Destination
+) {
+	int32_t SourceNum = Source->positions_x.size();
+	Destination->oldPositions_x.reserve(SourceNum);
+	Destination->oldPositions_x.reserve(SourceNum);
+	Destination->oldPositions_x.reserve(SourceNum);
+
+	Destination->positions_x.reserve(SourceNum);
+	Destination->positions_x.reserve(SourceNum);
+	Destination->positions_x.reserve(SourceNum);
+
+	Destination->forces_x.reserve(SourceNum);
+	Destination->forces_x.reserve(SourceNum);
+	Destination->forces_x.reserve(SourceNum);
+
+	Destination->masses.reserve(SourceNum);
+
+	for (size_t i = 0; i < SourceNum; i++)
+	{
+		Destination->oldPositions_x.push_back(Source->oldPositions_x[i]);
+		Destination->oldPositions_y.push_back(Source->oldPositions_y[i]);
+		Destination->oldPositions_z.push_back(Source->oldPositions_z[i]);
+
+		Destination->positions_x.push_back(Source->positions_x[i]);
+		Destination->positions_y.push_back(Source->positions_y[i]);
+		Destination->positions_z.push_back(Source->positions_z[i]);
+
+		Destination->forces_x.push_back(Source->forces_x[i]);
+		Destination->forces_y.push_back(Source->forces_y[i]);
+		Destination->forces_z.push_back(Source->forces_z[i]);
+
+		Destination->masses.push_back(Source->masses[i]);
+	}
+}
+
 bool PhysicsEngine::CheckEquality(
-	PhysicsComponents& A
-	, PhysicsComponents& B
+	PhysicsComponents* A
+	, PhysicsComponents* B
 ) {
 	bool bEquals = false;
 
-	int32_t ANum = A.positions_x.size();
-	int32_t BNum = B.positions_x.size();
+	int32_t ANum = A->positions_x.size();
+	int32_t BNum = B->positions_x.size();
 
 	if (ANum != BNum)
 	{
@@ -1291,14 +1330,15 @@ bool PhysicsEngine::CheckEquality(
 
 	for (size_t i = 0; i < ANum; i++)
 	{
-		if (VgMath::areEqual(A.oldPositions_x[i], B.oldPositions_x[i])
-			&& VgMath::areEqual(A.oldPositions_y[i], B.oldPositions_y[i])
-			&& VgMath::areEqual(A.oldPositions_z[i], B.oldPositions_z[i])
-			&& VgMath::areEqual(A.positions_x[i], B.positions_x[i])
-			&& VgMath::areEqual(A.positions_y[i], B.positions_y[i])
-			&& VgMath::areEqual(A.positions_z[i], B.positions_z[i])
+		if (!VgMath::areEqual(A->oldPositions_x[i], B->oldPositions_x[i])
+			|| !VgMath::areEqual(A->oldPositions_y[i], B->oldPositions_y[i])
+			|| !VgMath::areEqual(A->oldPositions_z[i], B->oldPositions_z[i])
+			|| !VgMath::areEqual(A->positions_x[i], B->positions_x[i])
+			|| !VgMath::areEqual(A->positions_y[i], B->positions_y[i])
+			|| !VgMath::areEqual(A->positions_z[i], B->positions_z[i])
 		) {
 			bEquals = false;
+			assert(bEquals);
 			break;
 		}
 	}
@@ -1307,26 +1347,16 @@ bool PhysicsEngine::CheckEquality(
 }
 
 void PhysicsEngine::ResetPositions(
-	PhysicsComponents& A
+	PhysicsComponents* A
 ) {
-	for (size_t i = 0; i < A.positions_x.size(); i++)
+	for (size_t i = 0; i < A->positions_x.size(); i++)
 	{
-		A.oldPositions_x[i] = 0.0;
-		A.oldPositions_y[i] = 0.0;
-		A.oldPositions_z[i] = 0.0;
+		A->oldPositions_x[i] = 0.0f;
+		A->oldPositions_y[i] = 0.0f;
+		A->oldPositions_z[i] = 0.0f;
 
-		A.positions_x[i] = 0.0;
-		A.positions_y[i] = 0.0;
-		A.positions_z[i] = 0.0;
+		A->positions_x[i] = 0.0f;
+		A->positions_y[i] = 0.0f;
+		A->positions_z[i] = 0.0f;
 	}
-	//for (size_t i = 0; i < A.positions.size(); i++)
-	//{
-	//	A.oldPositions[i].x = 0.0;
-	//	A.oldPositions[i].y = 0.0;
-	//	A.oldPositions[i].z = 0.0;
-
-	//	A.positions[i].x = 0.0;
-	//	A.positions[i].y = 0.0;
-	//	A.positions[i].z = 0.0;
-	//}
 }

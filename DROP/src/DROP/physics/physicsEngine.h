@@ -37,13 +37,18 @@ public:
 	void SIMD_ByHand_SoA_PhysicsStep(ECS& ecs
 		, const int32_t max
 	);
-	void MultiThread_SoA_PhysicsStep(ECS& ecs
+	void MultiThread_SoA_PhysicsStep(
+		ECS& ecs
 		, const int32_t max
+		, const int32_t numThreads
+		, const int32_t numElementsPerThread
 	);
 
 	void MultiThread_SoA_SIMDByHand_PhysicsStep(
 		ECS& ecs
 		, const int32_t max
+		, const int32_t numThreads
+		, const int32_t numElementsPerThread
 	);
 
 	void SynchVirtualTime(double timeToSync);
@@ -53,7 +58,7 @@ public:
 	void AddForceToAll(VgMath::Vector3 force);
 
 	void static ResetPositions(
-		std::vector<PhysicsComponent>& A
+		std::vector<PhysicsComponent> A
 	);
 
 	static bool CheckEquality(
@@ -62,12 +67,17 @@ public:
 	);
 
 	void static ResetPositions(
-		PhysicsComponents& A
+		PhysicsComponents* A
+	);
+
+	static void PhysicsEngine::Copy(
+		PhysicsComponents* Source
+		, PhysicsComponents* Destination
 	);
 	
 	static bool CheckEquality(
-		PhysicsComponents& A
-		, PhysicsComponents& B
+		PhysicsComponents* A
+		, PhysicsComponents* B
 	);
 	
 
@@ -96,11 +106,17 @@ public:
 	void SoA_ApplyForces(ECS& ecs
 		, const int32_t max
 	);
-	void MultiThread_SoA_ApplyForces(ECS& ecs
+	void MultiThread_SoA_ApplyForces(
+		ECS& ecs
 		, const int32_t max
+		, const int32_t numThreads
+		, const int32_t numElementsPerThread
 	);
-	void MultiThread_SoA_SIMDByHand_ApplyForces(ECS& ecs
+	void MultiThread_SoA_SIMDByHand_ApplyForces(
+		ECS& ecs
 		, const int32_t max
+		, const int32_t numThreads
+		, const int32_t numElementsPerThread
 	);
 	void SIMD_SoA_ApplyForces(ECS& ecs
 		, const int32_t max

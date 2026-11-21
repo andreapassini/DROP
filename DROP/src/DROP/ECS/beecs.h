@@ -730,6 +730,27 @@ namespace bseecs {
 			return *(tempComp->m_Component);
 		}
 
+		template <typename T>
+		T* GetSingletonComponentPtr()
+		{
+			size_t bitPos = GetSingletonComponentBitPosition<T>();
+
+			BSEECS_ASSERT(bitPos != tombstone
+				, "Attempting to operate on unregistered component '" << typeid(T).name() << "'");
+			
+
+			BSEECS_ASSERT(bitPos < m_singletonComponents.size() && bitPos >= 0
+				, "(Internal): Attempting to index into m_componentPools with out of range bit position");
+
+			// Downcast the generic pointer to the specific sparse set
+			ISingletonComponent* genericPtr = m_singletonComponents[bitPos];
+			SingletonComponent<T>* tempComp = static_cast<SingletonComponent<T>*>(genericPtr);
+			//T* comp = dynamic_cast<T>(tempComp.m_Component);
+			//BSEECS_ASSERT(comp, "Dynamic cast failed for component pool '" << typeid(T).name() << "'");
+
+			return tempComp->m_Component;
+		}
+
 		/*
 		*  Register a component with specific required components
 		*	and create a pool for it
