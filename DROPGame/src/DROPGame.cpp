@@ -374,33 +374,49 @@ public:
             physicsComponent.force = 0.0f;
         }
 
-
-        // Physics Component - SoA 
-        PhysicsComponents& physicsComponents = currScene->ecs.GetSingletonComponent<PhysicsComponents>();
-        physicsComponents.positions_x.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.positions_y.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.positions_z.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.oldPositions_x.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.oldPositions_y.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.oldPositions_z.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.forces_x.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.forces_y.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.forces_z.reserve(NUM_PHYSICS_ENTITITES);
-        physicsComponents.masses.reserve(NUM_PHYSICS_ENTITITES);
-        for (int32_t i = 0; i < NUM_PHYSICS_ENTITITES; i++)
+        // Physics Component - SoA - False Sharing
+        PhysicsComponentsFalseSharing& physicsComponentsFalseSharing = currScene->ecs.GetSingletonComponent<PhysicsComponentsFalseSharing>();
+        const int32_t proc_count = std::thread::hardware_concurrency();
+        int32_t NumPhysicsEntitiesPerProc = NUM_PHYSICS_ENTITITES / proc_count;
+        if (NUM_PHYSICS_ENTITITES % proc_count > 1)
         {
-            //physicsComponents.masses.push_back(MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS)));
-            physicsComponents.masses.push_back(10.0);
-            physicsComponents.oldPositions_x.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
-            physicsComponents.oldPositions_y.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
-            physicsComponents.oldPositions_z.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
-            physicsComponents.positions_x.push_back(physicsComponents.oldPositions_x[i]);
-            physicsComponents.positions_y.push_back(physicsComponents.oldPositions_y[i]);
-            physicsComponents.positions_z.push_back(physicsComponents.oldPositions_z[i]);
-            physicsComponents.forces_x.push_back(0.0f);
-            physicsComponents.forces_y.push_back(0.0f);
-            physicsComponents.forces_z.push_back(0.0f);
+            NumPhysicsEntitiesPerProc += 1;
         }
+        assert(NumPhysicsEntitiesPerProc > 0);
+
+        physicsComponentsFalseSharing.processor_count = proc_count;
+        physicsComponentsFalseSharing.numElementsPerThread = NumPhysicsEntitiesPerProc;
+
+        for (size_t i = 0; i < proc_count; i++)
+        {
+            PhysicsComponents& physicsComponents = physicsComponentsFalseSharing.components.emplace_back();
+            physicsComponents.positions_x.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.positions_y.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.positions_z.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.oldPositions_x.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.oldPositions_y.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.oldPositions_z.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.forces_x.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.forces_y.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.forces_z.reserve(NumPhysicsEntitiesPerProc);
+            physicsComponents.masses.reserve(NumPhysicsEntitiesPerProc);
+
+            for (int32_t j = 0; j < NumPhysicsEntitiesPerProc; j++)
+            {
+                //physicsComponents.masses.push_back(MIN_MASS + (RandomBetween0and1() * (MAX_MASS - MIN_MASS)));
+                physicsComponents.masses.push_back(10.0f); // equal mass
+                physicsComponents.oldPositions_x.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
+                physicsComponents.oldPositions_y.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
+                physicsComponents.oldPositions_z.push_back(X_MIN_LIMIT + (RandomBetween0and1() * (X_MAX_LIMIT - X_MIN_LIMIT)));
+                physicsComponents.positions_x.push_back(physicsComponents.oldPositions_x[j]);
+                physicsComponents.positions_y.push_back(physicsComponents.oldPositions_y[j]);
+                physicsComponents.positions_z.push_back(physicsComponents.oldPositions_z[j]);
+                physicsComponents.forces_x.push_back(0.0f);
+                physicsComponents.forces_y.push_back(0.0f);
+                physicsComponents.forces_z.push_back(0.0f);
+            }
+        }
+
         // -----
 
         SceneGraph::CalculateWorldTransforms(gameEngine->g_activeScene->ecs);

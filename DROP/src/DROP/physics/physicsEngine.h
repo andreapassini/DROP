@@ -28,8 +28,10 @@ public:
 		, const int32_t max
 	);
 
-	void SoA_PhysicsStep(ECS& ecs
+	void SoA_PhysicsStep(
+		ECS& ecs
 		, const int32_t max
+		, PhysicsComponents& physicsComponents
 	);
 	void SIMD_SoA_PhysicsStep(ECS& ecs
 		, const int32_t max
@@ -42,6 +44,7 @@ public:
 		, const int32_t max
 		, const int32_t numThreads
 		, const int32_t numElementsPerThread
+		, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 	);
 
 	void MultiThread_SoA_SIMDByHand_PhysicsStep(
@@ -49,6 +52,7 @@ public:
 		, const int32_t max
 		, const int32_t numThreads
 		, const int32_t numElementsPerThread
+		, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 	);
 
 	void SynchVirtualTime(double timeToSync);
@@ -70,14 +74,28 @@ public:
 		PhysicsComponents* A
 	);
 
+	void static ResetPositions(
+		PhysicsComponentsFalseSharing* A
+	);
+
 	static void PhysicsEngine::Copy(
 		PhysicsComponents* Source
 		, PhysicsComponents* Destination
+	);
+
+	static void PhysicsEngine::Copy(
+		PhysicsComponentsFalseSharing* Source
+		, PhysicsComponentsFalseSharing* Destination
 	);
 	
 	static bool CheckEquality(
 		PhysicsComponents* A
 		, PhysicsComponents* B
+	);
+	
+	static bool CheckEquality(
+		PhysicsComponentsFalseSharing* A
+		, PhysicsComponentsFalseSharing* B
 	);
 	
 
@@ -103,20 +121,25 @@ public:
 		, const int32_t max
 	);
 
-	void SoA_ApplyForces(ECS& ecs
+	void SoA_ApplyForces(
+		ECS& ecs
 		, const int32_t max
+		, PhysicsComponents& physicsComponents
 	);
+
 	void MultiThread_SoA_ApplyForces(
 		ECS& ecs
 		, const int32_t max
 		, const int32_t numThreads
 		, const int32_t numElementsPerThread
+		, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 	);
 	void MultiThread_SoA_SIMDByHand_ApplyForces(
 		ECS& ecs
 		, const int32_t max
 		, const int32_t numThreads
 		, const int32_t numElementsPerThread
+		, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 	);
 	void SIMD_SoA_ApplyForces(ECS& ecs
 		, const int32_t max

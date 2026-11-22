@@ -46,13 +46,18 @@ void PhysicsEngine::PhysicsStep(
 void PhysicsEngine::SoA_PhysicsStep(
 	ECS& ecs
 	, const int32_t max
+	, PhysicsComponents& physicsComponents
 ) {
 	if (m_IsPaused)
 		return;
 
 	m_VirtualTime += PhysicsObject::FIXED_TIME_STEP;
 	
-	SoA_ApplyForces(ecs, max);
+	SoA_ApplyForces(
+		ecs
+		, max
+		, physicsComponents
+	);
 
 	//// Handle constraints
 	//ApplyConstraints();
@@ -139,6 +144,7 @@ void PhysicsEngine::MultiThread_SoA_PhysicsStep(
 	, const int32_t max
 	, const int32_t numThreads
 	, const int32_t numElementsPerThread
+	, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 ) {
 	if (m_IsPaused)
 		return;
@@ -147,11 +153,12 @@ void PhysicsEngine::MultiThread_SoA_PhysicsStep(
 	
 	MultiThread_SoA_ApplyForces(
 		ecs
-		, max
+		, physicsComponentsFalseSharing.numElementsPerThread
 		, numThreads
 		, numElementsPerThread
+		, physicsComponentsFalseSharing
 	);
-
+	
 	//// Handle constraints
 	//ApplyConstraints();
 
@@ -164,6 +171,7 @@ void PhysicsEngine::MultiThread_SoA_SIMDByHand_PhysicsStep(
 	, const int32_t max
 	, const int32_t numThreads
 	, const int32_t numElementsPerThread
+	, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 ) {
 	if (m_IsPaused)
 		return;
@@ -175,7 +183,9 @@ void PhysicsEngine::MultiThread_SoA_SIMDByHand_PhysicsStep(
 		, max
 		, numThreads
 		, numElementsPerThread
+		, physicsComponentsFalseSharing
 	);
+	
 
 	//// Handle constraints
 	//ApplyConstraints();
@@ -708,8 +718,9 @@ void PhysicsEngine::ApplyForces(
 void PhysicsEngine::SoA_ApplyForces(
 	ECS& ecs
 	, const int32_t max
-)	 {
-	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
+	, PhysicsComponents& physicsComponents
+)	{
+	//PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
 
 	for (int32_t i = 0; i < max; i++)
 	{
@@ -783,13 +794,15 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 	, const int32_t max
 	, const int32_t numThreads
 	, const int32_t numElementsPerThread
+	, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 ) {
 	std::vector<std::future<void>> futures;
 
-	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
-
 	for (int32_t i = 0; i < numThreads; i++) {
-		int32_t offset = i * numElementsPerThread;
+
+		PhysicsComponents& physicsComponents = physicsComponentsFalseSharing.components[i];
+		//int32_t offset = i * numElementsPerThread;
+		int32_t offset = 0;
 		futures.push_back(
 			std::async(std::launch::async,
 				SoA_VerletResolution_AllDim
@@ -807,7 +820,7 @@ void PhysicsEngine::MultiThread_SoA_ApplyForces(
 				, physicsComponents.FIXED_TIME_STEP2
 				, offset
 				, numElementsPerThread
-				, max
+				, numElementsPerThread
 			)
 		);
 	}
@@ -822,13 +835,15 @@ void PhysicsEngine::MultiThread_SoA_SIMDByHand_ApplyForces(
 	, const int32_t max
 	, const int32_t numThreads
 	, const int32_t numElementsPerThread
+	, PhysicsComponentsFalseSharing& physicsComponentsFalseSharing
 ) {
 	std::vector<std::future<void>> futures;
-
-	PhysicsComponents& physicsComponents = ecs.GetSingletonComponent<PhysicsComponents>();
-
+	
 	for (int32_t i = 0; i < numThreads; i++) {
-		int32_t offset = i * numElementsPerThread;
+
+		PhysicsComponents& physicsComponents = physicsComponentsFalseSharing.components[i];
+		//int32_t offset = i * numElementsPerThread;
+		int32_t offset = 0;
 		futures.push_back(
 			std::async(std::launch::async,
 				SoA_HandSIMD_VerletResolution
@@ -846,7 +861,7 @@ void PhysicsEngine::MultiThread_SoA_SIMDByHand_ApplyForces(
 				, physicsComponents.FIXED_TIME_STEP2
 				, offset
 				, numElementsPerThread
-				, max
+				, numElementsPerThread
 			)
 		);
 	}
@@ -1309,6 +1324,25 @@ void PhysicsEngine::Copy(
 		Destination->forces_z.push_back(Source->forces_z[i]);
 
 		Destination->masses.push_back(Source->masses[i]);
+
+		assert(Source->positions_y[i] != 0.0f);
+	}
+}
+
+void PhysicsEngine::Copy(
+	PhysicsComponentsFalseSharing* Source
+	, PhysicsComponentsFalseSharing* Destination
+) {
+	int32_t SourceNum = Source->components.size();
+	int32_t DestinationNum = Destination->components.size();
+	//assert(SourceNum == DestinationNum);
+	for (int32_t i = 0; i < SourceNum; i++)
+	{
+		Destination->components.emplace_back();
+		PhysicsEngine::Copy(
+			&Source->components[i]
+			, &Destination->components[i]
+		);
 	}
 }
 
@@ -1346,6 +1380,35 @@ bool PhysicsEngine::CheckEquality(
 	return bEquals;
 }
 
+bool PhysicsEngine::CheckEquality(
+	PhysicsComponentsFalseSharing* A
+	, PhysicsComponentsFalseSharing* B
+) {
+	bool bEquals = false;
+
+	int32_t ANum = A->components.size();
+	int32_t BNum = B->components.size();
+
+	if (ANum != BNum)
+	{
+		return bEquals;
+	}
+
+	bEquals = true;
+
+	for (int32_t i = 0; i < ANum; i++)
+	{
+		bEquals = PhysicsEngine::CheckEquality(
+			&A->components[i]
+			, &B->components[i]
+		);
+		assert(bEquals);
+		break;
+	}
+
+	return bEquals;
+}
+
 void PhysicsEngine::ResetPositions(
 	PhysicsComponents* A
 ) {
@@ -1358,5 +1421,14 @@ void PhysicsEngine::ResetPositions(
 		A->positions_x[i] = 0.0f;
 		A->positions_y[i] = 0.0f;
 		A->positions_z[i] = 0.0f;
+	}
+}
+
+void PhysicsEngine::ResetPositions(
+	PhysicsComponentsFalseSharing* A
+) {
+	for (int32_t i = 0; i < A->components.size(); i++)
+	{
+		PhysicsEngine::ResetPositions(&A->components[i]);
 	}
 }

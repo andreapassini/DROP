@@ -40,3 +40,11 @@ struct alignas(64) PhysicsComponents
 	static constexpr float FIXED_TIME_STEP = (1.0f / 120.0f);
 	static constexpr float FIXED_TIME_STEP2 = (FIXED_TIME_STEP * FIXED_TIME_STEP);
 };
+
+struct alignas(64) PhysicsComponentsFalseSharing
+{
+	std::vector<PhysicsComponents> components;
+
+	int32_t processor_count = 0;
+	int32_t numElementsPerThread = 0;
+};

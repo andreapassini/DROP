@@ -146,7 +146,8 @@ namespace Drop
 		g_activeScene->ecs.RegisterSingletonComponent<TerrainsAssetsContext>(arena);
 		g_activeScene->ecs.RegisterSingletonComponent<AssetManagerContext>(arena);
 
-		g_activeScene->ecs.RegisterSingletonComponent<PhysicsComponents>(arena);
+		//g_activeScene->ecs.RegisterSingletonComponent<PhysicsComponents>(arena);
+		g_activeScene->ecs.RegisterSingletonComponent<PhysicsComponentsFalseSharing>(arena);
 
 		//g_activeScene->ecs.RegisterSingletonComponent<SceneContext>(arena);
 		//g_activeScene->ecs.RegisterSingletonComponent<RendererContext>(arena);
@@ -261,7 +262,7 @@ namespace Drop
 #define NUM_PHYSICS_ENTITITES 1'000'000 // strange behavior with 1 mln
 				int32_t max = NUM_PHYSICS_ENTITITES;
 				int32_t procCount = std::thread::hardware_concurrency();
-				for (int32_t numThreads = 8; numThreads <= 64; numThreads += 8)
+				for (int32_t numThreads = procCount; numThreads <= procCount; numThreads += 8)
 				{
 					const int32_t numOfIterations = 10;
 
@@ -349,24 +350,30 @@ namespace Drop
 
 					// ---------------------------------------------------
 
-					PhysicsComponents* physicsComponents = g_activeScene->ecs.GetSingletonComponentPtr<PhysicsComponents>();
+					//PhysicsComponents* physicsComponents = g_activeScene->ecs.GetSingletonComponentPtr<PhysicsComponents>();
+					PhysicsComponentsFalseSharing* physicsComponentsFalseSharing = g_activeScene->ecs.GetSingletonComponentPtr<PhysicsComponentsFalseSharing>();
+					assert(physicsComponentsFalseSharing != nullptr);
 
 					// Reset the positions
-					PhysicsEngine::ResetPositions(physicsComponents);
+					PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
 					// SoA
 					sceneContext.SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
-						PhysicsEngine::ResetPositions(physicsComponents);
+						PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
 						// Start Time
 						float startTime = GetTime();
 
-						m_PhysicsEngine.SoA_PhysicsStep(
-							g_activeScene->ecs
-							, max
-						);
+						for (int32_t j = 0; j < physicsComponentsFalseSharing->components.size(); j++)
+						{
+							m_PhysicsEngine.SoA_PhysicsStep(
+								g_activeScene->ecs
+								, physicsComponentsFalseSharing->numElementsPerThread
+								, physicsComponentsFalseSharing->components[j]
+							);
+						}
 
 						float endTime = GetTime();
 						float duration = (endTime - startTime);
@@ -374,89 +381,89 @@ namespace Drop
 					}
 					float SoA_physicsStepAverage = sceneContext.SoA_physicsStepDuration / numOfIterations;
 
-					PhysicsComponents copyForChecker_SoA;
+					PhysicsComponentsFalseSharing copyphysicsComponentsFalseSharing;
 
 					PhysicsEngine::Copy(
-						physicsComponents
-						, &copyForChecker_SoA
+						physicsComponentsFalseSharing
+						, &copyphysicsComponentsFalseSharing
 					);
 
 					bEquality = PhysicsEngine::CheckEquality(
-						physicsComponents
-						, &copyForChecker_SoA
+						physicsComponentsFalseSharing
+						, &copyphysicsComponentsFalseSharing
 					);
 
 					// Reset the positions
-					PhysicsEngine::ResetPositions(physicsComponents);
+					PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
-					//SIMD
-					sceneContext.SIMD_SoA_physicsStepDuration = 0.0f;
-					for (int32_t i = 0; i < numOfIterations; i++)
-					{
-						PhysicsEngine::ResetPositions(physicsComponents);
+					////SIMD
+					//sceneContext.SIMD_SoA_physicsStepDuration = 0.0f;
+					//for (int32_t i = 0; i < numOfIterations; i++)
+					//{
+					//	PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
-						// Calculate times
-						// Start Time
-						float startTime = GetTime();
+					//	// Calculate times
+					//	// Start Time
+					//	float startTime = GetTime();
 
-						m_PhysicsEngine.SIMD_SoA_PhysicsStep(
-							g_activeScene->ecs
-							, max
-						);
+					//	m_PhysicsEngine.SIMD_SoA_PhysicsStep(
+					//		g_activeScene->ecs
+					//		, max
+					//	);
 
-						float endTime = GetTime();
-						sceneContext.SIMD_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
-					}
-					float SIMD_SoA_physicsStepAverage = sceneContext.SIMD_SoA_physicsStepDuration / numOfIterations;
+					//	float endTime = GetTime();
+					//	sceneContext.SIMD_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					//}
+					//float SIMD_SoA_physicsStepAverage = sceneContext.SIMD_SoA_physicsStepDuration / numOfIterations;
 
-					// Check
-					bEquality = PhysicsEngine::CheckEquality(
-						physicsComponents
-						, &copyForChecker_SoA
-					);
+					//// Check
+					//bEquality = PhysicsEngine::CheckEquality(
+					//	physicsComponentsFalseSharing
+					//	, &copyphysicsComponentsFalseSharing
+					//);
 
-					std::cout << "MAX: " << max << std::endl;
-					std::cout << "SIMD: " << SIMD_SoA_physicsStepAverage << std::endl;
+					//std::cout << "MAX: " << max << std::endl;
+					//std::cout << "SIMD: " << SIMD_SoA_physicsStepAverage << std::endl;
+
+					//assert(bEquality);
+
+					//// Reset the positions
+					//PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
+
+					////SIMD by HAND
+					//sceneContext.SIMD_ByHand_SoA_physicsStepDuration = 0.0f;
+					//for (int32_t i = 0; i < numOfIterations; i++)
+					//{
+					//	PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
+
+					//	// Calculate times
+					//	// Start Time
+					//	float startTime = GetTime();
+
+					//	m_PhysicsEngine.SIMD_ByHand_SoA_PhysicsStep(
+					//		g_activeScene->ecs
+					//		, max
+					//	);
+
+					//	float endTime = GetTime();
+					//	sceneContext.SIMD_ByHand_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
+					//}
+					//float SIMD_ByHand_SoA_physicsStepDuration = sceneContext.SIMD_ByHand_SoA_physicsStepDuration / numOfIterations;
+
+					//// Check
+					//bEquality = PhysicsEngine::CheckEquality(
+					//	physicsComponents
+					//	, &copyForChecker_SoA
+					//);
+
+					//std::cout << "SIMD HAND: " << SIMD_ByHand_SoA_physicsStepDuration << std::endl;
 
 					assert(bEquality);
 
 					// Reset the positions
-					PhysicsEngine::ResetPositions(physicsComponents);
+					PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
-					//SIMD by HAND
-					sceneContext.SIMD_ByHand_SoA_physicsStepDuration = 0.0f;
-					for (int32_t i = 0; i < numOfIterations; i++)
-					{
-						PhysicsEngine::ResetPositions(physicsComponents);
-
-						// Calculate times
-						// Start Time
-						float startTime = GetTime();
-
-						m_PhysicsEngine.SIMD_ByHand_SoA_PhysicsStep(
-							g_activeScene->ecs
-							, max
-						);
-
-						float endTime = GetTime();
-						sceneContext.SIMD_ByHand_SoA_physicsStepDuration += (endTime - startTime) * 1000.0f;
-					}
-					float SIMD_ByHand_SoA_physicsStepDuration = sceneContext.SIMD_ByHand_SoA_physicsStepDuration / numOfIterations;
-
-					// Check
-					bEquality = PhysicsEngine::CheckEquality(
-						physicsComponents
-						, &copyForChecker_SoA
-					);
-
-					std::cout << "SIMD HAND: " << SIMD_ByHand_SoA_physicsStepDuration << std::endl;
-
-					assert(bEquality);
-
-					// Reset the positions
-					PhysicsEngine::ResetPositions(physicsComponents);
-
-					physicsComponents->processor_count = numThreads;
+					physicsComponentsFalseSharing->processor_count = numThreads;
 					float floatNumElementsPerThread = (float)max / (float)numThreads;
 					int32_t numElementsPerThread = max / numThreads;
 					int32_t modNumElementsNumThreads = max % numThreads;
@@ -472,7 +479,7 @@ namespace Drop
 					//{
 					//	numElementsPerThread = max;
 					//}
-					physicsComponents->numElementsPerThread = numElementsPerThread;
+					physicsComponentsFalseSharing->numElementsPerThread = numElementsPerThread;
 
 					std::cout << "Threads: " << numThreads 
 						<< "\n NumElementsPerThread: " << numElementsPerThread
@@ -484,7 +491,7 @@ namespace Drop
 					sceneContext.MultiThread_SoA_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
-						PhysicsEngine::ResetPositions(physicsComponents);
+						PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
 						// Start Time
 						float startTime = GetTime();
@@ -494,6 +501,7 @@ namespace Drop
 							, max
 							, numThreads
 							, numElementsPerThread
+							, *physicsComponentsFalseSharing
 						);
 
 						float endTime = GetTime();
@@ -507,19 +515,19 @@ namespace Drop
 
 					// Check
 					bEquality = PhysicsEngine::CheckEquality(
-						physicsComponents
-						, &copyForChecker_SoA
+						physicsComponentsFalseSharing
+						, &copyphysicsComponentsFalseSharing
 					);
 					assert(bEquality);
 
 					// Reset the positions
-					PhysicsEngine::ResetPositions(physicsComponents);
+					PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
 					// SIMD - Multi Threaded
 					sceneContext.MultiThread_SoA_SIMD_ByHand_physicsStepDuration = 0.0f;
 					for (int32_t i = 0; i < numOfIterations; i++)
 					{
-						PhysicsEngine::ResetPositions(physicsComponents);
+						PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
 						// Start Time
 						float startTime = GetTime();
@@ -529,6 +537,7 @@ namespace Drop
 							, max
 							, numThreads
 							, numElementsPerThread
+							, *physicsComponentsFalseSharing
 						);
 
 						float endTime = GetTime();
@@ -542,13 +551,13 @@ namespace Drop
 
 					// Check
 					bEquality = PhysicsEngine::CheckEquality(
-						physicsComponents
-						, &copyForChecker_SoA
+						physicsComponentsFalseSharing
+						, &copyphysicsComponentsFalseSharing
 					);
 					assert(bEquality);
 
 					// Reset the positions
-					PhysicsEngine::ResetPositions(physicsComponents);
+					PhysicsEngine::ResetPositions(physicsComponentsFalseSharing);
 
 					// write on file the averages
 					std::string averagesText;
@@ -616,22 +625,22 @@ namespace Drop
 					averagesText.append("MultiThread_SoA_physicsStepAverage: ");
 					averagesText.append(std::to_string(MultiThread_SoA_physicsStepAverage));
 					averagesText.append("\n\t numThreads = ");
-					averagesText.append(std::to_string(physicsComponents->processor_count));
+					averagesText.append(std::to_string(physicsComponentsFalseSharing->processor_count));
 					averagesText.append("\n\t numElementsPerThread = ");
-					averagesText.append(std::to_string(physicsComponents->numElementsPerThread));
+					averagesText.append(std::to_string(physicsComponentsFalseSharing->numElementsPerThread));
 					averagesText.append("\n");
 					averagesText.append("MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: ");
 					averagesText.append(std::to_string(MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage));
 					averagesText.append("\n\t numThreads = ");
-					averagesText.append(std::to_string(physicsComponents->processor_count));
+					averagesText.append(std::to_string(physicsComponentsFalseSharing->processor_count));
 					averagesText.append("\n\t numElementsPerThread = ");
-					averagesText.append(std::to_string(physicsComponents->numElementsPerThread));
+					averagesText.append(std::to_string(physicsComponentsFalseSharing->numElementsPerThread));
 					averagesText.append("\n");
 					averagesText.append("\n");
 
 					std::string absProjPath = GetRelativeProjectPathWithMarker();
 					//std::string filePath = absProjPath + "\\PerCompSOA_native_Divided2_alignas(64)_Desktop_AverageOutput.txt";
-					std::string filePath = absProjPath + "\\MultiThread_NumThreads.txt";
+					std::string filePath = absProjPath + "\\MultiThread_FalseSharing_NumThreads.txt";
 					File::AppendTextFile(&filePath, &averagesText);
 				}
 				

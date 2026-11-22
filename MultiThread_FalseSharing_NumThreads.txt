@@ -1,0 +1,12 @@
+
+-----------------------------------------------------------------------------
+Struct of Arrays
+physicsComponents: 1000000
+numOfIterations: 10
+MultiThread_SoA_physicsStepAverage: 1.199803
+	 numThreads = 16
+	 numElementsPerThread = 62500
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.147580
+	 numThreads = 16
+	 numElementsPerThread = 62500
+
