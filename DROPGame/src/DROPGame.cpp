@@ -376,7 +376,7 @@ public:
 
         // Physics Component - SoA - False Sharing
         PhysicsComponentsFalseSharing& physicsComponentsFalseSharing = currScene->ecs.GetSingletonComponent<PhysicsComponentsFalseSharing>();
-        const int32_t proc_count = std::thread::hardware_concurrency();
+        const int32_t proc_count = 8;
         int32_t NumPhysicsEntitiesPerProc = NUM_PHYSICS_ENTITITES / proc_count;
         if (NUM_PHYSICS_ENTITITES % proc_count > 1)
         {

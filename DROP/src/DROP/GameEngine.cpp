@@ -261,7 +261,7 @@ namespace Drop
 				m_Game->OnFixedUpdate(m_PhysicsEngine.GetVirtualTIme());
 #define NUM_PHYSICS_ENTITITES 1'000'000 // strange behavior with 1 mln
 				int32_t max = NUM_PHYSICS_ENTITITES;
-				int32_t procCount = std::thread::hardware_concurrency();
+				int32_t procCount = 8;
 				for (int32_t numThreads = procCount; numThreads <= procCount; numThreads += 8)
 				{
 					const int32_t numOfIterations = 10;

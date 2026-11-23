@@ -770,9 +770,8 @@ void PhysicsEngine::MultiThread_ApplyForces(
 	std::vector<PhysicsComponent>& densePhysicsComponents = ecs.GetComponentPool<PhysicsComponent>().Data();
 
 	size_t numElementsPerThread = 10'000;
-	//size_t max = densePhysicsComponents.size();
 	for (int32_t i = 0; i < max; i+= numElementsPerThread) {
-		int32_t offset = i /** numElementsPerThread*/;
+		int32_t offset = i;
 		futures.push_back(
 			std::async(std::launch::async,
 				VerletResolution

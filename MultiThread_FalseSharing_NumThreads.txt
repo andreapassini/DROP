@@ -10,3 +10,15 @@ MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 1.147580
 	 numThreads = 16
 	 numElementsPerThread = 62500
 
+
+-----------------------------------------------------------------------------
+Struct of Arrays
+physicsComponents: 1000000
+numOfIterations: 10
+MultiThread_SoA_physicsStepAverage: 1.131350
+	 numThreads = 8
+	 numElementsPerThread = 125000
+MultiThread_SoA_SIMD_ByHand_physicsStepDurationAverage: 0.902879
+	 numThreads = 8
+	 numElementsPerThread = 125000
+

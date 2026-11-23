@@ -36,7 +36,7 @@ Having data like this allows for better caching and a better SIMD implementation
 
 SIMD refers to Single Instruction Multiple Data.
 Modern CPUs support vector instructions that allows to operate using larger registers made of 128, 256 or even 512 bits.
-These operations are also called 4, 8, 16 wide, since we usually operates on float32 numbers.
+These operations are also called 4, 8, 16 wide, since they are usually float32 operations.
 
 ### Compile with SIMD instruction set
 
@@ -81,6 +81,10 @@ SIMD_ByHand_SoA_physicsStepDuration: 0.184417
 #### 1'000'000
 SIMD_SoA_physicsStepAverage: 2.324659
 SIMD_ByHand_SoA_physicsStepDuration: 1.947480
+
+SIMD on a Laptop with Intell CPU
+SIMD_PreProcDir_SoA_physicsStepAverage: 2.940911 ms
+SIMD_Instrisics_SoA_physicsStepDuration: 2.698147 ms
 
 
 # Multi-threading
